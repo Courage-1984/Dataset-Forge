@@ -3,5 +3,3 @@ opencv-python
 Pillow
 tqdm
 imageio
-torch
-timm
