@@ -73,6 +73,8 @@ python main.py
 
 You'll be greeted with an immersive, cpomprehensive and interactive menu for all dataset operations!
 
+  <img src="https://pomf2.lain.la/f/sjazby9a.png" width="600"/>  
+
 ---
 
 ## ⚙️ Configuration
@@ -117,8 +119,6 @@ You'll be greeted with an immersive, cpomprehensive and interactive menu for all
 ---
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/mocha.png" width="120"/>
-  <br/>
   <b>Enjoy your dataset journey!</b>
 </p>
 
