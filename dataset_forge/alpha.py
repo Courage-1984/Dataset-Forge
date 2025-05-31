@@ -1,5 +1,5 @@
 import os
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.io_utils_old import is_image_file
 from PIL import Image
 import shutil
 from tqdm import tqdm

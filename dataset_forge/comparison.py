@@ -1,10 +1,20 @@
 import os
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.io_utils_old import is_image_file
 from dataset_forge.common import get_destination_path
 from PIL import Image, ImageFont, ImageDraw
 import random
 import numpy as np
 from tqdm import tqdm
+import gc
+import torch
+
+
+def release_memory():
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
+
 
 def create_comparison_images(hq_folder, lq_folder):
     """Create side-by-side comparison images of HQ/LQ pairs."""
@@ -173,6 +183,7 @@ def create_comparison_images(hq_folder, lq_folder):
             print(f"  ... and {len(errors) - 5} more errors")
     print("-" * 30)
     print("=" * 30)
+    release_memory()
 
 
 def create_gif_comparison(hq_folder, lq_folder):
@@ -180,6 +191,14 @@ def create_gif_comparison(hq_folder, lq_folder):
     print("\n" + "=" * 30)
     print("  Creating HQ/LQ Animated Comparisons")
     print("=" * 30)
+
+    # --- New: Allow user to set HQ/LQ input paths for this operation ---
+    def get_folder_with_default(prompt, default):
+        val = input(f"{prompt} [default: {default}]: ").strip()
+        return val if val else default
+
+    hq_folder = get_folder_with_default("Enter HQ folder path", hq_folder)
+    lq_folder = get_folder_with_default("Enter LQ folder path", lq_folder)
 
     # Get output format
     while True:
@@ -329,13 +348,18 @@ def create_gif_comparison(hq_folder, lq_folder):
     processed_count = 0
     errors = []
 
-    def apply_easing(progress, mode="ease-in-out"):
-        # Simple cubic ease-in-out
-        if mode == "ease-in-out":
-            if progress < 0.5:
-                return 4 * progress * progress * progress
-            else:
-                return 1 - pow(-2 * progress + 2, 3) / 2
+    # --- S-curve (sigmoid) easing for smoother transition ---
+    import math
+
+    def s_curve(progress):
+        # Sigmoid centered at 0.5, steeper for more S-like
+        steepness = 10
+        return 1 / (1 + math.exp(-steepness * (progress - 0.5)))
+
+    def apply_easing(progress, mode="s-curve"):
+        if mode == "s-curve":
+            return s_curve(progress)
+        # fallback to linear if needed
         return progress
 
     for filename in tqdm(selected_pairs, desc="Creating Animated Comparisons"):
@@ -359,16 +383,16 @@ def create_gif_comparison(hq_folder, lq_folder):
 
             frames = []
 
-            # Add static LQ frames
-            frames.extend([np.array(lq_img)] * num_static_frames)
+            # Add static HQ frames (before)
+            frames.extend([np.array(hq_img)] * num_static_frames)
 
-            # Add transition frames with easing
+            # Add transition frames with S-curve easing (HQ -> LQ)
             for i in range(num_transition_frames):
                 progress = i / (num_transition_frames - 1)
-                eased_progress = apply_easing(progress, "ease-in-out")
+                eased_progress = apply_easing(progress, "s-curve")
 
                 if transition == "1":  # Fade
-                    frame = Image.blend(lq_img, hq_img, eased_progress)
+                    frame = Image.blend(hq_img, lq_img, eased_progress)
                     frames.append(np.array(frame))
 
                 elif transition in ["2", "3"]:  # Slide transitions
@@ -376,14 +400,14 @@ def create_gif_comparison(hq_folder, lq_folder):
                     offset = int(target_size[0] * eased_progress)  # Use eased progress
 
                     if transition == "2":  # Left to Right
-                        frame.paste(lq_img, (0, 0))
-                        frame.paste(hq_img.crop((0, 0, offset, target_size[1])), (0, 0))
+                        frame.paste(hq_img, (0, 0))
+                        frame.paste(lq_img.crop((0, 0, offset, target_size[1])), (0, 0))
                         frame = create_separator(frame, offset, 2, "white")
                     else:  # Right to Left
                         reverse_offset = target_size[0] - offset
-                        frame.paste(hq_img, (0, 0))
+                        frame.paste(lq_img, (0, 0))
                         frame.paste(
-                            lq_img.crop(
+                            hq_img.crop(
                                 (reverse_offset, 0, target_size[0], target_size[1])
                             ),
                             (reverse_offset, 0),
@@ -397,8 +421,8 @@ def create_gif_comparison(hq_folder, lq_folder):
                         int(target_size[1] * (1 + 0.2 * (1 - eased_progress))),
                     )
                     zoomed = Image.blend(
-                        lq_img.resize(zoom_size, Image.Resampling.LANCZOS),
                         hq_img.resize(zoom_size, Image.Resampling.LANCZOS),
+                        lq_img.resize(zoom_size, Image.Resampling.LANCZOS),
                         eased_progress,
                     )
                     # Center crop
@@ -430,9 +454,9 @@ def create_gif_comparison(hq_folder, lq_folder):
                         cut_sequence.extend([current_frame % 2] * cut_duration)
                         current_frame += cut_duration
 
-                    # Add cut transition frames
-                    for is_hq in cut_sequence[:num_transition_frames]:
-                        frames.append(np.array(hq_img if is_hq else lq_img))
+                    # Add cut transition frames (HQ first, then LQ)
+                    for is_lq in cut_sequence[:num_transition_frames]:
+                        frames.append(np.array(lq_img if is_lq else hq_img))
 
                 elif transition == "6":  # Special Creative Transition
                     third = num_transition_frames // 3
@@ -440,16 +464,16 @@ def create_gif_comparison(hq_folder, lq_folder):
                     # Phase 1: Fade with slight zoom (first third)
                     for i in range(third):
                         progress = i / third
-                        zoom_progress = apply_easing(progress, "ease-in-out")
+                        zoom_progress = apply_easing(progress, "s-curve")
                         zoom_size = (
                             int(target_size[0] * (1 + 0.1 * (1 - zoom_progress))),
                             int(target_size[1] * (1 + 0.1 * (1 - zoom_progress))),
                         )
 
-                        zoomed_lq = lq_img.resize(zoom_size, Image.Resampling.LANCZOS)
                         zoomed_hq = hq_img.resize(zoom_size, Image.Resampling.LANCZOS)
+                        zoomed_lq = lq_img.resize(zoom_size, Image.Resampling.LANCZOS)
 
-                        blended = Image.blend(zoomed_lq, zoomed_hq, zoom_progress * 0.5)
+                        blended = Image.blend(zoomed_hq, zoomed_lq, zoom_progress * 0.5)
 
                         # Center crop
                         left = (zoom_size[0] - target_size[0]) // 2
@@ -461,29 +485,29 @@ def create_gif_comparison(hq_folder, lq_folder):
 
                     # Phase 2: Quick cuts with fade (second third)
                     for i in range(third):
-                        progress = apply_easing(i / third, "ease-in-out")
+                        progress = apply_easing(i / third, "s-curve")
                         if i % 3 == 0:  # Quick cut every 3 frames
-                            frame = Image.blend(lq_img, hq_img, 0.5 + (progress * 0.5))
+                            frame = Image.blend(hq_img, lq_img, 0.5 + (progress * 0.5))
                         else:
-                            frame = Image.blend(lq_img, hq_img, progress)
+                            frame = Image.blend(hq_img, lq_img, progress)
                         frames.append(np.array(frame))
 
                     # Phase 3: Slide with fade (final third)
                     for i in range(third):
-                        progress = apply_easing(i / third, "ease-in-out")
+                        progress = apply_easing(i / third, "s-curve")
                         frame = Image.new("RGB", target_size)
                         offset = int(target_size[0] * progress)
 
                         # Create base frame with fade
-                        base = Image.blend(lq_img, hq_img, progress)
+                        base = Image.blend(hq_img, lq_img, progress)
                         frame.paste(base, (0, 0))
 
-                        # Add sliding HQ portion
-                        frame.paste(hq_img.crop((0, 0, offset, target_size[1])), (0, 0))
+                        # Add sliding LQ portion
+                        frame.paste(lq_img.crop((0, 0, offset, target_size[1])), (0, 0))
                         frames.append(np.array(frame))
 
-            # Add static HQ frames
-            frames.extend([np.array(hq_img)] * num_static_frames)
+            # Add static LQ frames (after)
+            frames.extend([np.array(lq_img)] * num_static_frames)
 
             # Adjust frame timing based on speed multiplier
             adjusted_duration = (1.0 / fps) / speed_multiplier
@@ -525,3 +549,4 @@ def create_gif_comparison(hq_folder, lq_folder):
             print(f"  ... and {len(errors) - 5} more errors")
     print("-" * 30)
     print("=" * 30)
+    release_memory()

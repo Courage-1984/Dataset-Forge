@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.io_utils_old import is_image_file
 from collections import Counter, defaultdict
 import cv2
 import shutil

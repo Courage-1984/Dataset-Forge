@@ -1,5 +1,5 @@
 import os
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.io_utils_old import is_image_file
 from dataset_forge.common import (
     get_file_operation_choice,
     get_destination_path,

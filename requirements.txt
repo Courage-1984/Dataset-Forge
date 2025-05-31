@@ -1,5 +1,8 @@
 numpy
 opencv-python
 Pillow
+spandrel
+spandrel_extra_arches
+chainner-ext
 tqdm
 imageio

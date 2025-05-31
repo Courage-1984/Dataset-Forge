@@ -1,5 +1,5 @@
 ./venv
 venv
-
+./configs
+configs
 __pycache__
-

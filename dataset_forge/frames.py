@@ -1,5 +1,7 @@
 import os
 import torch
+import gc
+
 
 class LayerNorm(torch.nn.Module):
     def __init__(self, normalized_shape, eps=1e-6, data_format="channels_last"):
@@ -26,6 +28,13 @@ class LayerNorm(torch.nn.Module):
 
 
 # --- Extract Frames Utility ---
+def release_memory():
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        torch.cuda.ipc_collect()
+
+
 def extract_frames_menu():
     print("\n--- Extract Frames from Video ---")
     video_path = input("Enter path to video file: ").strip()
@@ -403,5 +412,7 @@ def extract_frames_menu():
             pbar.update(1)
     capture.release()
     print(f"\nDone. Extracted up to {n_s} frames to {out_dir}.")
+    release_memory()
+
 
 # --- END Extract Frames Utility ---
