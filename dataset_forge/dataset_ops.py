@@ -73,7 +73,8 @@ class DatasetCombiner(DatasetOperation):
 
         # Get destination root for the NEW combined dataset
         dest_root_prompt = "Enter path for the NEW combined dataset root directory: "
-        dest_root = get_destination_path(prompt=dest_root_prompt)
+        print(dest_root_prompt, end="")
+        dest_root = get_destination_path()
 
         if not dest_root:  # User left it blank or path creation failed
             print("No valid destination root provided. Aborting combine operation.")

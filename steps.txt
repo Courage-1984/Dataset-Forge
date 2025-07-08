@@ -1,5 +1,3 @@
-python -m venv venv
-
 C:\Users\Dieter\AppData\Local\Programs\Python\Python311\python.exe -m venv venv
 
 python.exe -m pip install --upgrade pip
@@ -15,4 +13,6 @@ pip install C:\Users\Dieter\Downloads\_torch_wheels\torch-2.1.2+cu121-cp311-cp31
 pip install C:\Users\Dieter\Downloads\_torch_wheels\torchvision-0.16.2+cu121-cp311-cp311-win_amd64.whl
 
 pip install C:\Users\Dieter\Downloads\_torch_wheels\torchaudio-2.1.2+cu121-cp311-cp311-win_amd64.whl
+
+pip install "numpy<2"
 

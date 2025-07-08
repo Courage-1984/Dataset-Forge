@@ -98,3 +98,89 @@ class ColorAdjuster(ImageOperation):
                 return True, save_path
         except Exception as e:
             return False, str(e)
+
+
+class ICCToSRGBConverter(ImageOperation):
+    def process(self, input_path, output_path=None, operation="copy"):
+        """
+        Convert image(s) from ICC profile to sRGB, preserving alpha and directory structure.
+        If input_path is a file, output_path is the output file or folder (if operation is 'copy').
+        If input_path is a folder, output_path is the output folder.
+        operation: 'copy' (default, outputs to output_path), 'inplace' (overwrites input files)
+        """
+        from PIL import Image, ImageCms
+        from io import BytesIO
+        import os
+
+        def convert_image(img_path, out_path):
+            try:
+                img = Image.open(img_path)
+                has_alpha = "A" in img.getbands()
+                if has_alpha:
+                    alpha = img.split()[-1]
+                    rgb_img = img.convert("RGB")
+                else:
+                    rgb_img = img
+                if "icc_profile" in img.info:
+                    input_profile = ImageCms.ImageCmsProfile(
+                        BytesIO(img.info["icc_profile"])
+                    )
+                    srgb_profile = ImageCms.createProfile("sRGB")
+                    rgb_converted = ImageCms.profileToProfile(
+                        rgb_img, input_profile, srgb_profile, outputMode="RGB"
+                    )
+                else:
+                    rgb_converted = rgb_img
+                if has_alpha:
+                    channels = list(rgb_converted.split())
+                    channels.append(alpha)
+                    final_image = Image.merge("RGBA", channels)
+                else:
+                    final_image = rgb_converted
+                os.makedirs(os.path.dirname(out_path), exist_ok=True)
+                final_image.save(out_path, "PNG", icc_profile=None)
+                return True, out_path
+            except Exception as e:
+                return False, f"Error processing {img_path}: {str(e)}"
+
+        if os.path.isfile(input_path):
+            if operation == "inplace":
+                out_path = input_path
+            else:
+                if output_path and os.path.isdir(output_path):
+                    base = os.path.splitext(os.path.basename(input_path))[0] + ".png"
+                    out_path = os.path.join(output_path, base)
+                else:
+                    out_path = output_path or input_path
+            return convert_image(input_path, out_path)
+        elif os.path.isdir(input_path):
+            if not output_path:
+                return False, "Output folder must be specified for folder input."
+            results = []
+            for root, dirs, files in os.walk(input_path):
+                for file in files:
+                    if file.lower().endswith(
+                        (".png", ".jpg", ".jpeg", ".tiff", ".bmp", ".webp")
+                    ):
+                        in_file = os.path.join(root, file)
+                        rel_path = os.path.relpath(in_file, input_path)
+                        out_file = os.path.join(
+                            output_path, os.path.splitext(rel_path)[0] + ".png"
+                        )
+                        if operation == "inplace":
+                            result = convert_image(in_file, in_file)
+                        else:
+                            result = convert_image(in_file, out_file)
+                        results.append(result)
+            return True, results
+        else:
+            return (
+                False,
+                f"Invalid input: {input_path} is neither a file nor a directory.",
+            )
+
+
+def get_image_size(image_path):
+    """Returns (width, height) of the image at image_path."""
+    with Image.open(image_path) as img:
+        return img.width, img.height

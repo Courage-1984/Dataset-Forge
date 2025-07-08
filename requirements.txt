@@ -1,4 +1,5 @@
-numpy
+# numpy
+numpy<2
 opencv-python
 Pillow
 spandrel
@@ -9,3 +10,9 @@ imageio
 pyyaml
 tqdm
 ffmpeg
+imagehash
+PyExifTool
+pipeline
+pepeline
+pepedpid
+pyiqa

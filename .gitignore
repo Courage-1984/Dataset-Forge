@@ -2,4 +2,11 @@
 venv
 ./configs
 configs
+./__pycache__
 __pycache__
+./dpid
+dpid
+./Dataset_Preprocessing
+Dataset_Preprocessing
+./run_best_tile_ic9600.py
+run_best_tile_ic9600.py
