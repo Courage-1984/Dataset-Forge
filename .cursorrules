@@ -1,0 +1,49 @@
+# Ignore Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Ignore Python bytecode and cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+dataset_forge/__pycache__/
+dataset_forge/actions/__pycache__/
+dataset_forge/menus/__pycache__/
+dataset_forge/utils/__pycache__/
+
+# Ignore OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Ignore test output, logs, and temporary files
+*.log
+*.tmp
+*.bak
+
+# Ignore dataset and large data folders (if not source)
+Dataset_Preprocessing/
+store/
+dpid/
+run_best_tile_ic9600.py
+
+# Ignore configs except example
+configs/
+!configs/_example_config.json
+
+# Ignore build and distribution folders
+build/
+dist/
+*.egg-info/
+
+# Ignore Jupyter notebooks (if not used for source)
+*.ipynb
+
+# Ignore any other user-specific or generated files
+.idea/
+.vscode/ 

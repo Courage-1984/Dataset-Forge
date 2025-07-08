@@ -1,12 +1,14 @@
-<!-- <p align="center">
-  <img src="https://pomf2.lain.la/f/k7pch.png" width="600" alt="Catppuccin Mocha Banner"/>
-</p> -->
 
-<h1 align="center">
+<h3 align="center">
   Dataset Forge
-  </br>
-  <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600"/>  
-</h1>
+</h3>
+<p align="center">
+  <img src="Dataset_Forge_thumb.png" width="300" alt="Dataset Forge Thumbnail"/>
+</p>
+<div align="center">
+  <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600"/>
+</div>
+
 <p align="center"><i>The all-in-one, modular image dataset utility for ML, with a focus on HQ/LQ image pairs for SISR and general computer vision. CLI-first, highly extensible, and packed with advanced tools for dataset curation, analysis, transformation, and validation.</i></p>
 
 ---

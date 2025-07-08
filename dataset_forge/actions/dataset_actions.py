@@ -23,6 +23,8 @@ from dataset_forge.operations import (
 )
 import os
 from tqdm import tqdm
+from dataset_forge.ic9600_tiling import run_ic9600_tiling
+from dataset_forge.utils.printing import print_header, print_success, print_error
 
 
 def create_multiscale_dataset(*args, **kwargs):
@@ -30,9 +32,73 @@ def create_multiscale_dataset(*args, **kwargs):
     pass
 
 
-def image_tiling(*args, **kwargs):
-    """Perform image tiling on a folder or HQ/LQ pair. (Stub: see tiling.py/tiling_grid.py)"""
-    pass
+def image_tiling():
+    """Perform image tiling on a folder or HQ/LQ pair using IC9600."""
+    print_header("Image Tiling (IC9600)")
+    mode = input("Select mode: [1] HQ/LQ paired folders, [2] Single folder: ").strip()
+    try:
+        if mode == "1":
+            hq_folder = input("Enter HQ folder path: ").strip()
+            lq_folder = input("Enter LQ folder path: ").strip()
+            out_hq_folder = input("Enter output HQ tiles folder: ").strip()
+            out_lq_folder = input("Enter output LQ tiles folder: ").strip()
+            tile_size = int(input("Tile size (default 1024): ").strip() or "1024")
+            scale = int(input("Scale factor (default 1): ").strip() or "1")
+            dynamic_n_tiles = (
+                input("Dynamic number of tiles per image? [Y/n]: ").strip().lower()
+                != "n"
+            )
+            laplacian_thread = float(
+                input("Laplacian threshold (default 0.01): ").strip() or "0.01"
+            )
+            image_gray = (
+                input("Process images as grayscale? [y/N]: ").strip().lower() == "y"
+            )
+            device = input("Device [cuda/cpu] (default cuda): ").strip() or "cuda"
+            run_ic9600_tiling(
+                hq_folder=hq_folder,
+                lq_folder=lq_folder,
+                out_hq_folder=out_hq_folder,
+                out_lq_folder=out_lq_folder,
+                tile_size=tile_size,
+                scale=scale,
+                dynamic_n_tiles=dynamic_n_tiles,
+                laplacian_thread=laplacian_thread,
+                image_gray=image_gray,
+                device=device,
+            )
+            print_success("HQ/LQ tiling complete.")
+        elif mode == "2":
+            single_folder = input("Enter folder path: ").strip()
+            out_folder = input("Enter output tiles folder: ").strip()
+            tile_size = int(input("Tile size (default 1024): ").strip() or "1024")
+            scale = int(input("Scale factor (default 1): ").strip() or "1")
+            dynamic_n_tiles = (
+                input("Dynamic number of tiles per image? [Y/n]: ").strip().lower()
+                != "n"
+            )
+            laplacian_thread = float(
+                input("Laplacian threshold (default 0.01): ").strip() or "0.01"
+            )
+            image_gray = (
+                input("Process images as grayscale? [y/N]: ").strip().lower() == "y"
+            )
+            device = input("Device [cuda/cpu] (default cuda): ").strip() or "cuda"
+            run_ic9600_tiling(
+                single_folder=single_folder,
+                out_folder=out_folder,
+                tile_size=tile_size,
+                scale=scale,
+                dynamic_n_tiles=dynamic_n_tiles,
+                laplacian_thread=laplacian_thread,
+                image_gray=image_gray,
+                device=device,
+            )
+            print_success("Single-folder tiling complete.")
+        else:
+            print_error("Invalid mode selected.")
+    except Exception as e:
+        print_error(f"Error during tiling: {e}")
 
 
 def combine_datasets():
