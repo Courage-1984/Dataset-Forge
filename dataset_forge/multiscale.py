@@ -1,5 +1,5 @@
 import os
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.file_utils import is_image_file
 from dataset_forge.dpid_phhofm import (
     downscale_folder as dpid_phhofm_downscale_folder,
     downscale_hq_lq_pair as dpid_phhofm_downscale_hq_lq_pair,

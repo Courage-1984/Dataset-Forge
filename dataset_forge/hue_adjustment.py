@@ -3,8 +3,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageEnhance
 from tqdm import tqdm
-from dataset_forge.common import get_unique_filename
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.file_utils import get_unique_filename
+from dataset_forge.utils.file_utils import is_image_file
 
 
 def adjust_image(img, brightness=None, contrast=None, hue=None):

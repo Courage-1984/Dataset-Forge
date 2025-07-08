@@ -2,7 +2,7 @@ import os
 import shutil
 import random
 from tqdm import tqdm
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.file_utils import is_image_file
 
 
 def move_or_copy_files(

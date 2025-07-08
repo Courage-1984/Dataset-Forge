@@ -104,25 +104,54 @@ Dataset-Forge/
 ├── configs/                   # Configuration files
 ├── dataset_forge/             # Core modules (see below)
 │   ├── __init__.py
+│   ├── actions/               # Business logic for each menu (see below)
+│   │   ├── __init__.py
+│   │   ├── analysis_actions.py
+│   │   ├── batch_rename_actions.py
+│   │   ├── comparison_actions.py
+│   │   ├── config_actions.py
+│   │   ├── dataset_actions.py
+│   │   ├── metadata_actions.py
+│   │   ├── settings_actions.py
+│   │   ├── transform_actions.py
+│   ├── utils/                 # Utility/helper modules (see below)
+│   │   ├── __init__.py
+│   │   ├── color.py
+│   │   ├── file_utils.py
+│   │   ├── input_utils.py
+│   │   ├── logging_utils.py
+│   │   ├── menu.py
+│   │   ├── printing.py
+│   ├── menus/                 # UI/menu modules (thin UI layer)
+│   │   ├── __init__.py
+│   │   ├── main_menu.py
+│   │   ├── analysis_menu.py
+│   │   ├── batch_rename_menu.py
+│   │   ├── comparison_menu.py
+│   │   ├── config_menu.py
+│   │   ├── dataset_menu.py
+│   │   ├── metadata_menu.py
+│   │   ├── settings_menu.py
+│   │   ├── transform_menu.py
 │   ├── alpha.py               # Alpha channel utilities
 │   ├── analysis.py            # Dataset analysis & validation
 │   ├── analysis_ops.py        # Analysis operations
-│   ├── batch_rename.py        # Batch renaming (single/paired)
+│   ├── batch_rename.py        # Batch renaming (legacy, now in actions)
 │   ├── bhi_filtering.py       # BHI filtering (Blockiness, HyperIQA, IC9600)
 │   ├── combine.py             # Dataset merging
-│   ├── common.py              # Common utilities
-│   ├── comparison.py          # Visual comparison tools
-│   ├── config_menu.py         # Config menu logic (add/load/view/validate configs, model management)
+│   ├── common.py              # (Legacy) Common utilities (now in utils)
+│   ├── comparison.py          # Visual comparison tools (legacy, now in actions)
+│   ├── config_menu.py         # (Legacy) Config menu logic
 │   ├── corruption.py          # Corruption detection & fixing
 │   ├── dataset_ops.py         # Dataset operations
 │   ├── de_dupe.py             # Duplicate/near-duplicate detection
 │   ├── dpid_phhofm.py         # DPID degradation kernels
-│   ├── exif_scrubber.py       # EXIF metadata scrubbing
+│   ├── exif_scrubber.py       # EXIF metadata scrubbing (legacy, now in actions)
 │   ├── folder_compare.py      # Folder comparison utilities
 │   ├── frames.py              # Video frame extraction
 │   ├── hue_adjustment.py      # Hue/brightness/contrast adjustment
 │   ├── image_ops.py           # Image processing utilities (incl. ICCToSRGBConverter)
-│   ├── io_utils.py            # I/O and menu helpers
+│   ├── io_utils.py            # (Legacy) I/O and menu helpers (now in utils)
 │   ├── misalignment.py        # Misalignment detection
 │   ├── move_copy.py           # Move/copy utilities
 │   ├── multiscale.py          # Multiscale dataset generation
@@ -135,182 +164,52 @@ Dataset-Forge/
 
 ---
 
-## 🚀 Quickstart
+## 🏗️ Modular Architecture (NEW)
 
-### 1. Clone & Setup
+Dataset Forge now uses a clean, modular architecture for maintainability and extensibility:
 
-```sh
-git clone https://github.com/yourname/Dataset-Forge.git
-cd Dataset-Forge
-python -m venv venv
+- **menus/**: Thin UI layers for each menu (main, dataset, analysis, transform, metadata, comparison, config, settings, batch rename). These only handle user interaction and call into actions.
+- **actions/**: Business logic for each menu, grouped by domain (e.g., `analysis_actions.py`, `transform_actions.py`). All core operations are here.
+- **utils/**: Reusable utility/helper modules (e.g., file operations, input handling, logging, printing, color, menu rendering).
+- **(legacy modules)**: Some older modules remain for backward compatibility or as lower-level helpers, but all new logic should go in actions/ or utils/.
 
-# Activate virtual environment:
-# Windows:
-venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
+**Benefits:**
 
-# Install dependencies:
-pip install -r requirements.txt
-
-# For CUDA support (optional):
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-```
-
-### 2. Run the Utility
-
-```sh
-python main.py
-```
-
-You'll be greeted with an immersive, comprehensive, and interactive menu for all dataset operations!
+- Clear separation of UI, business logic, and helpers/utilities
+- Easier to test, maintain, and extend
+- No more duplicated helpers or mixed UI/logic code
 
 ---
 
-## 📋 Complete Menu Overview
+## 📚 Module Deep Dive (Updated)
 
-### **Main Menu**
+### `menus/`
 
-- **1. DATASET**: Creation & management (multiscale, tiling, combine, extract, shuffle, split, remove, dedupe, rename, extract frames, orientation org)
-- **2. ANALYSIS**: Reporting & validation (report, scale, consistency, dimensions, extremes, verify, fix, misalignment, alpha, BHI filtering)
-- **3. TRANSFORM**: Image transformations (downsample, HDR->SDR, color/tone, hue/brightness/contrast, grayscale, remove alpha, custom transforms)
-- **4. METADATA**: EXIF & ICC tools (scrub EXIF, ICC to sRGB)
-- **5. COMPARISON**: Visual tools (side-by-side, GIF, folder compare)
-- **6. CONFIG**: Configuration & model management (add, load, view, validate configs, run external tools, edit config files, model upscaling)
-- **7. SETTINGS**: Set HQ/LQ folders
-- **0. EXIT**
+- UI entry points for each menu (main, dataset, analysis, transform, metadata, comparison, config, settings, batch rename). Only handles user interaction and delegates to actions.
 
-#### **CONFIG Menu**
+### `actions/`
 
-- Add Config File: Create a new configuration interactively via CLI
-- Load Config File: Load an existing config
-- View Config Info: Display current config
-- Validate HQ/LQ Dataset from Config: Validate datasets using config
-- Validate Val Dataset HQ/LQ Pair: Validate validation datasets
-- Run wtp_dataset_destroyer: Execute WTP Dataset Destroyer
-- Edit .hcl config file: Edit HCL configuration files
-- Run traiNNer-redux: Execute traiNNer-redux training
-- Edit .yml config file: Edit YAML configuration files
-- List/Run Upscale with Model: Manage and run upscaling models
+- `analysis_actions.py`: All dataset analysis and validation logic (reports, scale, consistency, misalignment, BHI, etc.)
+- `transform_actions.py`: Image transformation logic (downsampling, HDR->SDR, color/tone, grayscale, alpha removal, custom transforms)
+- `metadata_actions.py`: EXIF scrubbing, ICC to sRGB conversion
+- `comparison_actions.py`: Visual comparison tools (side-by-side, GIF, folder compare)
+- `batch_rename_actions.py`: Batch renaming logic (single/paired, prefix, padding, dry run)
+- `settings_actions.py`: HQ/LQ folder management
+- `config_actions.py`: Config file management, validation, model management
+- `dataset_actions.py`: Dataset operations (combine, extract, shuffle, split, remove, dedupe, orientation, frames)
 
-#### **Submenus**
+### `utils/`
 
-- Each main menu option opens a submenu with 10+ advanced operations. See in-app help for details.
+- `file_utils.py`: File operations, image type checks, unique naming, etc.
+- `input_utils.py`: Input helpers (folder selection, file operation choice, destination path, pair processing)
+- `logging_utils.py`: Logging setup and uncaught exception handling
+- `menu.py`: Menu rendering helpers
+- `printing.py`: Colorful/sectioned printing helpers
+- `color.py`: Catppuccin Mocha color constants
 
----
+### (Legacy modules)
 
-## 📚 Module Deep Dive
-
-### `alpha.py`
-
-- Find and remove alpha channels in HQ/LQ datasets.
-- Bulk processing, preserves alignment.
-
-### `analysis.py` / `analysis_ops.py`
-
-- Scale detection, consistency checks, dimension reporting, misalignment, and full dataset reports.
-- Advanced validation and statistics.
-
-### `batch_rename.py`
-
-- Batch renaming for single or paired HQ/LQ folders.
-- Supports custom prefixes, zero padding, dry run.
-
-### `bhi_filtering.py`
-
-- Blockiness, HyperIQA, and IC9600-based filtering.
-- Move, delete, or report filtered images.
-
-### `combine.py`
-
-- Safely merge multiple HQ/LQ datasets.
-
-### `common.py`
-
-- Utility functions for file naming, etc.
-
-### `comparison.py`
-
-- Create side-by-side and animated (GIF/WebP) HQ/LQ comparisons.
-- Custom effects, labels, and transitions.
-
-### `corruption.py`
-
-- Detect and fix corrupted images in bulk.
-
-### `dataset_ops.py`
-
-- Core dataset operations (filtering, extraction, etc).
-
-### `de_dupe.py`
-
-- Detect exact and near-duplicate images using multiple hash types.
-- Move, copy, or delete duplicates.
-
-### `dpid_phhofm.py`
-
-- DPID degradation kernels for downsampling.
-
-### `exif_scrubber.py`
-
-- Remove EXIF metadata from images (single/paired).
-- Uses ExifTool if available.
-
-### `folder_compare.py`
-
-- Compare two folders and report missing files.
-
-### `frames.py`
-
-- Extract frames from video using deep embeddings (ConvNeXt, DINOv2, VIT).
-- Multi-model, multi-distance, batch support.
-
-### `hue_adjustment.py`
-
-- Batch hue, brightness, and contrast adjustment.
-- Supports duplicates, real file names, paired folders.
-
-### `image_ops.py`
-
-- Image processing utilities (alpha removal, corruption fixing, color adjustment).
-- **ICCToSRGBConverter**: Convert images/folders from ICC profile to sRGB, preserving alpha and structure.
-
-### `io_utils.py`
-
-- I/O helpers, menu utilities, file type checks.
-
-### `misalignment.py`
-
-- Detect misaligned HQ/LQ pairs using phase correlation.
-
-### `move_copy.py`
-
-- Move/copy files (single/paired, by % or extension).
-
-### `multiscale.py`
-
-- Multiscale dataset generation (DPID downscale, tiling, batch support).
-
-### `operations.py`
-
-- Batch operations: filtering, extraction, shuffling, splitting, color/tone, grayscale, optimization, format conversion, custom transforms.
-
-### `orientation_organizer.py`
-
-- Organize images by orientation (landscape, portrait, square).
-- Copy/move, single or paired folders.
-
-### `tiling.py`
-
-- Advanced tiling: BestTile (Laplacian/IC9600), single/paired, multi-threaded.
-
-### `tiling_grid.py`
-
-- Grid, random, and overlap tiling (single/paired, batch support).
-
-### `upscale-script.py`
-
-- Advanced upscaling script for custom models (traiNNer-redux), with tiling, alpha, gamma, and precision control.
+- Some modules like `common.py`, `io_utils.py`, `comparison.py`, `batch_rename.py`, `exif_scrubber.py` remain for backward compatibility or as low-level helpers, but all new logic is in `actions/` and `utils/`.
 
 ---
 
@@ -356,6 +255,7 @@ Dataset Forge supports multiple configuration formats:
 - Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
 - Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer)
 - Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
+- Thanks [Phhofm](https://github.com/Phhofm)❤️ for [sisr](https://github.com/Phhofm/sisr)
 
 ---
 

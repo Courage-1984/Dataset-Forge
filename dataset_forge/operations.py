@@ -4,7 +4,16 @@ import random
 from subprocess import CalledProcessError
 from tqdm import tqdm
 from PIL import Image
-from dataset_forge.io_utils import is_image_file, get_pairs_to_process
+from dataset_forge.utils.file_utils import (
+    is_image_file,
+    get_unique_filename,
+    IMAGE_TYPES,
+)
+from dataset_forge.utils.input_utils import (
+    get_pairs_to_process,
+    get_file_operation_choice,
+    get_destination_path,
+)
 import logging
 import numpy as np
 from tqdm import tqdm
@@ -12,12 +21,6 @@ from collections import Counter, defaultdict
 import cv2
 import concurrent.futures
 from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
-from dataset_forge.io_utils import (
-    get_file_operation_choice,
-    get_destination_path,
-    IMAGE_TYPES,
-)
-from dataset_forge.common import get_unique_filename
 import subprocess
 from dataset_forge.image_ops import ColorAdjuster
 

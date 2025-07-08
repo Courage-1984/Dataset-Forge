@@ -3,7 +3,7 @@ from tqdm import tqdm
 import numpy as np
 from numpy.random import randint, shuffle
 from dataset_forge.image_ops import get_image_size
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.file_utils import is_image_file
 
 
 # --- Tiling Functions ---
@@ -219,7 +219,7 @@ def tile_hq_lq_dataset_grid(
     import numpy as np
     import os
     from tqdm import tqdm
-    from dataset_forge.io_utils import is_image_file
+    from dataset_forge.utils.file_utils import is_image_file
     from dataset_forge.image_ops import get_image_size
 
     hq_files = set([f for f in os.listdir(hq_folder) if is_image_file(f)])

@@ -1,10 +1,10 @@
 import os
 from dataset_forge.io_utils import is_image_file
-from dataset_forge.common import (
+from dataset_forge.utils.input_utils import (
     get_file_operation_choice,
     get_destination_path,
-    get_unique_filename,
 )
+from dataset_forge.utils.file_utils import get_unique_filename
 from tqdm import tqdm
 from dataset_forge.image_ops import CorruptionFixer
 
