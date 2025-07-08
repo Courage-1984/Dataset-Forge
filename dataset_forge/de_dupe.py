@@ -2,6 +2,7 @@ import os
 from PIL import Image
 from collections import defaultdict
 import imagehash
+from tqdm import tqdm
 
 
 def compute_hashes(folder, hash_func="phash"):
@@ -18,12 +19,9 @@ def compute_hashes(folder, hash_func="phash"):
     }
     func = hash_funcs.get(hash_func, imagehash.phash)
     hashes = {}
-    for fname in os.listdir(folder):
+    files = [fname for fname in os.listdir(folder) if os.path.isfile(os.path.join(folder, fname)) and fname.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".webp"))]
+    for fname in tqdm(files, desc="Hashing images"):
         fpath = os.path.join(folder, fname)
-        if not os.path.isfile(fpath) or not fname.lower().endswith(
-            (".png", ".jpg", ".jpeg", ".bmp", ".webp")
-        ):
-            continue
         try:
             with Image.open(fpath) as img:
                 hashes[fname] = func(img)

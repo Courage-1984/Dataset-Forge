@@ -2624,3 +2624,156 @@ def hdr_to_sdr_menu():
     algorithm = algo_map.get(algo_choice, "hable")
     tonemapper = ToneMapper(algorithm=algorithm)
     tonemapper.run(input_path, output_path)
+
+
+def split_single_folder_in_sets(folder):
+    print("\n" + "=" * 30)
+    print("  Splitting Single Folder Dataset")
+    print("=" * 30)
+
+    files = sorted(
+        [
+            f
+            for f in os.listdir(folder)
+            if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
+        ]
+    )
+
+    if not files:
+        print("No images found in the folder.")
+        print("=" * 30)
+        return
+
+    num_files = len(files)
+    # Ask user for number of splits
+    while True:
+        n_splits_input = input("How many splits? (default: 2): ").strip()
+        if not n_splits_input:
+            n_splits = 2
+            break
+        try:
+            n_splits = int(n_splits_input)
+            if n_splits >= 2:
+                break
+            else:
+                print("Please enter a number >= 2.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+    # Ask user for split ratios
+    while True:
+        if n_splits == 2:
+            prompt = "Enter split ratio as percentage for first set (e.g., 50 for 50/50, 80 for 80/20) [default: 50]: "
+        else:
+            prompt = f"Enter split ratios as comma-separated percentages for {n_splits} sets (e.g., 60,20,20): "
+        split_input = input(prompt).strip()
+        if not split_input and n_splits == 2:
+            split_ratios = [0.5, 0.5]
+            break
+        try:
+            if n_splits == 2 and split_input:
+                split_val = float(split_input)
+                if 0 < split_val < 100:
+                    split_ratios = [split_val / 100.0, 1 - (split_val / 100.0)]
+                    break
+                else:
+                    print("Please enter a value between 1 and 99.")
+            else:
+                parts = [float(x.strip()) for x in split_input.split(",") if x.strip()]
+                if len(parts) != n_splits:
+                    print(f"Please enter {n_splits} values.")
+                    continue
+                total = sum(parts)
+                if abs(total - 100.0) > 1e-3:
+                    print("Split ratios must sum to 100.")
+                    continue
+                split_ratios = [x / 100.0 for x in parts]
+                break
+        except ValueError:
+            print("Invalid input. Please enter numbers.")
+
+    # Shuffle before splitting to ensure random distribution if desired
+    shuffle_choice = (
+        input("Shuffle files before splitting? (y/n) [n]: ").strip().lower() or "n"
+    )
+    if shuffle_choice == "y":
+        import random
+
+        random.shuffle(files)
+
+    # Compute split indices
+    split_indices = [0]
+    acc = 0
+    for ratio in split_ratios:
+        acc += int(round(ratio * num_files))
+        split_indices.append(acc)
+    # Adjust last index to ensure all files are included (due to rounding)
+    split_indices[-1] = num_files
+
+    split_file_lists = [
+        files[split_indices[i] : split_indices[i + 1]] for i in range(n_splits)
+    ]
+
+    print(
+        f"Found {num_files} images. Splitting into {[len(lst) for lst in split_file_lists]} for each set."
+    )
+
+    # Ask for operation
+    while True:
+        operation = (
+            input("Operation [copy/move] (default: copy): ").strip().lower() or "copy"
+        )
+        if operation in ("copy", "move"):
+            break
+        print("Invalid operation. Please enter 'copy' or 'move'.")
+
+    # Ask for destination folder
+    while True:
+        output_base_dir = input("Enter destination folder for split output: ").strip()
+        if output_base_dir:
+            break
+        print("Destination folder is required.")
+
+    output_dirs = []
+    for i in range(n_splits):
+        d = os.path.join(output_base_dir, f"split_{i+1}")
+        os.makedirs(d, exist_ok=True)
+        output_dirs.append(d)
+
+    processed_counts = [0] * n_splits
+    error_lists = [[] for _ in range(n_splits)]
+
+    for i, file_list in enumerate(split_file_lists):
+        print(f"\nProcessing set {i+1} ({len(file_list)} images) using {operation}...")
+        for filename in tqdm(file_list, desc=f"{operation.capitalize()}ing Set {i+1}"):
+            src = os.path.join(folder, filename)
+            try:
+                dest = os.path.join(
+                    output_dirs[i], get_unique_filename(output_dirs[i], filename)
+                )
+                if operation == "copy":
+                    shutil.copy2(src, dest)
+                elif operation == "move":
+                    if os.path.exists(src):
+                        shutil.move(src, dest)
+                    else:
+                        error_lists[i].append(
+                            f"Source file {filename} already moved or missing for set {i+1}."
+                        )
+                        continue
+                processed_counts[i] += 1
+            except Exception as e:
+                error_lists[i].append(
+                    f"Error {operation}ing file {filename} to split_{i+1}: {e}"
+                )
+
+    print("\nSplit operation complete.")
+    for i, count in enumerate(processed_counts):
+        print(f"Total processed into set {i+1}: {count}")
+    any_errors = any(error_lists)
+    if any_errors:
+        print("Errors encountered during split:")
+        for i, errors in enumerate(error_lists):
+            for e in errors:
+                print(f"  [Set {i+1}] {e}")
+    print("=" * 30)

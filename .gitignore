@@ -13,3 +13,5 @@ dpid
 Dataset_Preprocessing
 ./run_best_tile_ic9600.py
 run_best_tile_ic9600.py
+./store
+store

@@ -52,6 +52,8 @@ def exif_scrubber_menu():
 
 def icc_to_srgb_menu():
     """Convert ICC profile to sRGB for images in a file or folder."""
+    from dataset_forge.image_ops import ICCToSRGBConverter
+
     print("\n=== ICC to sRGB Conversion ===")
     input_path = input("Enter input file or folder path: ").strip()
     if not os.path.exists(input_path):
@@ -62,30 +64,22 @@ def icc_to_srgb_menu():
     print("  2. Copy to new folder (preserve originals)")
     op_choice = input("Select mode [1-2]: ").strip()
     if op_choice == "1":
-        operation = "inplace"
-        output_path = None
+        # In-place: overwrite original files
+        if os.path.isfile(input_path):
+            ICCToSRGBConverter.process_image(input_path, input_path)
+        elif os.path.isdir(input_path):
+            ICCToSRGBConverter.process_folder(input_path, input_path)
+        else:
+            print(f"Invalid input: {input_path} is neither a file nor a directory.")
+            return
     elif op_choice == "2":
-        operation = "copy"
         output_path = input("Enter output folder path: ").strip()
         if not output_path:
             print("Output folder path required for copy mode.")
             return
         os.makedirs(output_path, exist_ok=True)
+        ICCToSRGBConverter.process_input(input_path, output_path)
     else:
         print("Invalid choice.")
         return
-    # TODO: Import and use ICCToSRGBConverter if available
-    try:
-        from dataset_forge.icc_to_srgb import ICCToSRGBConverter
-    except ImportError:
-        print("ICCToSRGBConverter not available. Please implement or add this module.")
-        return
-    converter = ICCToSRGBConverter()
-    print(f"Processing {input_path} ...")
-    success, result = converter.process(
-        input_path, output_path=output_path, operation=operation
-    )
-    if success:
-        print("ICC to sRGB conversion completed successfully.")
-    else:
-        print(f"Error: {result}")
+    print("ICC to sRGB conversion completed.")

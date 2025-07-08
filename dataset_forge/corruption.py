@@ -63,3 +63,10 @@ def fix_corrupted_images(folder_path, grayscale=False):
             print(f"  ... and {len(errors) - 5} more errors")
     print("-" * 30)
     print("=" * 30)
+
+
+def fix_corrupted_images_hq_lq(hq_folder, lq_folder, grayscale=False):
+    print("\n=== Fixing Corrupted Images in HQ Folder ===")
+    fix_corrupted_images(hq_folder, grayscale=grayscale)
+    print("\n=== Fixing Corrupted Images in LQ Folder ===")
+    fix_corrupted_images(lq_folder, grayscale=grayscale)

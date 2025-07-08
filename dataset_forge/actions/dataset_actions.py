@@ -19,7 +19,10 @@ from dataset_forge.operations import (
     shuffle_image_pairs as _shuffle_image_pairs,
     split_adjust_dataset as _split_adjust_dataset,
     remove_small_image_pairs as _remove_small_image_pairs,
+    split_single_folder_in_sets as _split_single_folder_in_sets,
 )
+import os
+from tqdm import tqdm
 
 
 def create_multiscale_dataset(*args, **kwargs):
@@ -48,8 +51,15 @@ def shuffle_image_pairs(hq_folder, lq_folder):
     return _shuffle_image_pairs(hq_folder, lq_folder)
 
 
+def split_single_folder_in_sets(folder):
+    """Split a single folder of images into N sets with progress bar and operation choice."""
+    return _split_single_folder_in_sets(folder)
+
+
 def split_adjust_dataset(hq_folder, lq_folder):
     """Split and adjust the dataset according to user parameters."""
+    if not lq_folder:
+        return split_single_folder_in_sets(hq_folder)
     return _split_adjust_dataset(hq_folder, lq_folder)
 
 
@@ -60,14 +70,14 @@ def remove_small_image_pairs(hq_folder, lq_folder):
 
 def de_dupe(
     hq_folder,
-    lq_folder,
+    lq_folder=None,
     hash_type="phash",
     mode="exact",
     max_dist=5,
     op="move",
     dest_dir=None,
 ):
-    """Detect and handle duplicate or near-duplicate images."""
+    """Detect and handle duplicate or near-duplicate images. If lq_folder is None or blank, only dedupe in hq_folder."""
     hq_hashes = compute_hashes(hq_folder, hash_func=hash_type)
     if not hq_hashes:
         print("No images found in HQ folder.")
@@ -79,7 +89,34 @@ def de_dupe(
     if not groups:
         print("No duplicates or near-duplicates found.")
         return
-    align_and_operate_on_pairs(groups, hq_folder, lq_folder, op=op, dest_dir=dest_dir)
+    if lq_folder:
+        # Progress bar for paired deduplication
+        for group in tqdm(groups, desc="Processing duplicate groups"):
+            align_and_operate_on_pairs(
+                [group], hq_folder, lq_folder, op=op, dest_dir=dest_dir
+            )
+    else:
+        # Only operate on HQ folder, with progress bar
+        for group in tqdm(groups, desc="Processing duplicate groups"):
+            to_operate = list(group)[1:]
+            for fname in to_operate:
+                hq_path = os.path.join(hq_folder, fname)
+                if op == "delete":
+                    if os.path.exists(hq_path):
+                        os.remove(hq_path)
+                        print(f"Deleted {hq_path}")
+                elif op in ("move", "copy"):
+                    if dest_dir and "hq" in dest_dir:
+                        dest = os.path.join(dest_dir["hq"], fname)
+                        os.makedirs(dest_dir["hq"], exist_ok=True)
+                        if op == "move":
+                            os.rename(hq_path, dest)
+                            print(f"Moved {hq_path} -> {dest}")
+                        elif op == "copy":
+                            import shutil
+
+                            shutil.copy2(hq_path, dest)
+                            print(f"Copied {hq_path} -> {dest}")
     print("Done!")
 
 

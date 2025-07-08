@@ -2,6 +2,7 @@ import os
 import shutil
 from PIL import Image
 from typing import List, Tuple, Dict, Optional
+from tqdm import tqdm
 
 
 def get_image_orientation(image_path: str) -> Optional[str]:
@@ -26,9 +27,10 @@ def scan_folder_for_orientations(
 ) -> Dict[str, List[str]]:
     """Scan a folder and return a dict with keys 'landscape', 'portrait', 'square' mapping to lists of file paths."""
     result = {"landscape": [], "portrait": [], "square": []}
-    for fname in os.listdir(folder):
-        if not fname.lower().endswith(extensions):
-            continue
+    files = [
+        fname for fname in os.listdir(folder) if fname.lower().endswith(extensions)
+    ]
+    for fname in tqdm(files, desc="Checking image orientations"):
         fpath = os.path.join(folder, fname)
         orientation = get_image_orientation(fpath)
         if orientation:
@@ -50,7 +52,8 @@ def organize_images_by_orientation(
     for orientation in orientations:
         out_dir = os.path.join(output_folder, orientation)
         os.makedirs(out_dir, exist_ok=True)
-        for fpath in found.get(orientation, []):
+        files = found.get(orientation, [])
+        for fpath in tqdm(files, desc=f"{operation.title()}ing {orientation} images"):
             dest = os.path.join(out_dir, os.path.basename(fpath))
             if operation == "move":
                 shutil.move(fpath, dest)

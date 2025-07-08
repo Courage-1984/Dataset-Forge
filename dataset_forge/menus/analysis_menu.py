@@ -20,7 +20,7 @@ from dataset_forge.actions.analysis_actions import (
     find_misaligned_images,
 )
 from dataset_forge.alpha import find_alpha_channels
-from dataset_forge.corruption import fix_corrupted_images
+from dataset_forge.corruption import fix_corrupted_images, fix_corrupted_images_hq_lq
 from dataset_forge.menus.bhi_filtering_menu import bhi_filtering_menu
 from dataset_forge.menus import session_state
 
@@ -100,7 +100,20 @@ def analysis_menu():
         ),
         "8": (
             "Fix Corrupted Images",
-            require_hq_lq(lambda: fix_corrupted_images(session_state.hq_folder)),
+            lambda: (
+                (
+                    lambda hq, lq: (
+                        fix_corrupted_images_hq_lq(hq, lq)
+                        if lq
+                        else fix_corrupted_images(hq)
+                    )
+                )(
+                    input("Enter HQ folder path (or single folder): ").strip(),
+                    input(
+                        "Enter LQ folder path (leave blank for single-folder): "
+                    ).strip(),
+                )
+            ),
         ),
         "9": (
             "Find Misaligned Images",
