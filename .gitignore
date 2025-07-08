@@ -4,6 +4,8 @@ venv
 configs
 ./__pycache__
 __pycache__
+./__pycache__*
+__pycache__*
 ./dpid
 dpid
 ./Dataset_Preprocessing
