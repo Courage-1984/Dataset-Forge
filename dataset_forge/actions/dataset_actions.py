@@ -25,11 +25,124 @@ import os
 from tqdm import tqdm
 from dataset_forge.ic9600_tiling import run_ic9600_tiling
 from dataset_forge.utils.printing import print_header, print_success, print_error
+from dataset_forge.dpid import (
+    run_basicsr_dpid_single_folder,
+    run_basicsr_dpid_hq_lq,
+    run_openmmlab_dpid_single_folder,
+    run_openmmlab_dpid_hq_lq,
+    run_phhofm_dpid_single_folder,
+    run_phhofm_dpid_hq_lq,
+)
 
 
 def create_multiscale_dataset(*args, **kwargs):
-    """Create a multiscale dataset from input images/folders. (Stub: see multiscale.py)"""
-    pass
+    print("\n--- Create Multiscale Dataset (DPID) ---")
+    print("Select DPID method:")
+    print("[1] BasicSR DPID")
+    print("[2] OpenMMLab DPID")
+    print("[3] Phhofm DPID")
+    method = input("Enter choice [1-3]: ").strip()
+    if method not in {"1", "2", "3"}:
+        print("Invalid method.")
+        return
+    print("\nSelect mode:")
+    print("[1] Single folder")
+    print("[2] HQ/LQ paired folders")
+    mode = input("Enter choice [1-2]: ").strip()
+    if mode not in {"1", "2"}:
+        print("Invalid mode.")
+        return
+    print("\nSelect downscale factor:")
+    print("[1] 25% (0.25)")
+    print("[2] 50% (0.5)")
+    print("[3] 75% (0.75)")
+    print("[4] 25%, 50% AND 75% (all)")
+    scale_choice = input("Enter choice [1-4]: ").strip()
+    if scale_choice == "1":
+        scales = [0.25]
+    elif scale_choice == "2":
+        scales = [0.5]
+    elif scale_choice == "3":
+        scales = [0.75]
+    elif scale_choice == "4":
+        scales = [0.25, 0.5, 0.75]
+    else:
+        print("Invalid scale choice.")
+        return
+    overwrite = input("Overwrite existing files? [y/N]: ").strip().lower() == "y"
+
+    # Prompt for DPID kernel parameters with defaults
+    dpid_kwargs = {}
+    if method in {"1", "2"}:  # BasicSR or OpenMMLab
+        kernel_size = input("DPID kernel size [default 21]: ").strip()
+        sigma = input("DPID sigma [default 2.0]: ").strip()
+        lambd = input("DPID lambda [default 0.5]: ").strip()
+        dpid_kwargs["kernel_size"] = int(kernel_size) if kernel_size else 21
+        dpid_kwargs["sigma"] = float(sigma) if sigma else 2.0
+        dpid_kwargs["lambd"] = float(lambd) if lambd else 0.5
+        isotropic = input("Isotropic kernel? [Y/n]: ").strip().lower()
+        if isotropic in ("", "y", "yes"):
+            dpid_kwargs["isotropic"] = True
+        else:
+            dpid_kwargs["isotropic"] = False
+            sig_x = input("sig_x [default 2.0]: ").strip()
+            sig_y = input("sig_y [default 2.0]: ").strip()
+            theta = input("theta (radians, default 0.0): ").strip()
+            dpid_kwargs["sig_x"] = float(sig_x) if sig_x else 2.0
+            dpid_kwargs["sig_y"] = float(sig_y) if sig_y else 2.0
+            dpid_kwargs["theta"] = float(theta) if theta else 0.0
+    # Phhofm DPID does not use these parameters in the stub, but could be extended
+
+    if mode == "1":
+        input_folder = input("Enter input folder path: ").strip()
+        output_base = input("Enter output base folder path: ").strip()
+        if method == "1":
+            run_basicsr_dpid_single_folder(
+                input_folder, output_base, scales, overwrite=overwrite, **dpid_kwargs
+            )
+        elif method == "2":
+            run_openmmlab_dpid_single_folder(
+                input_folder, output_base, scales, overwrite=overwrite, **dpid_kwargs
+            )
+        elif method == "3":
+            run_phhofm_dpid_single_folder(
+                input_folder, output_base, scales, overwrite=overwrite
+            )
+    else:
+        hq_folder = input("Enter HQ folder path: ").strip()
+        lq_folder = input("Enter LQ folder path: ").strip()
+        out_hq_base = input("Enter output HQ base folder path: ").strip()
+        out_lq_base = input("Enter output LQ base folder path: ").strip()
+        if method == "1":
+            run_basicsr_dpid_hq_lq(
+                hq_folder,
+                lq_folder,
+                out_hq_base,
+                out_lq_base,
+                scales,
+                overwrite=overwrite,
+                **dpid_kwargs,
+            )
+        elif method == "2":
+            run_openmmlab_dpid_hq_lq(
+                hq_folder,
+                lq_folder,
+                out_hq_base,
+                out_lq_base,
+                scales,
+                overwrite=overwrite,
+                **dpid_kwargs,
+            )
+        elif method == "3":
+            run_phhofm_dpid_hq_lq(
+                hq_folder,
+                lq_folder,
+                out_hq_base,
+                out_lq_base,
+                scales,
+                overwrite=overwrite,
+            )
+    print("\nDone!")
 
 
 def image_tiling():

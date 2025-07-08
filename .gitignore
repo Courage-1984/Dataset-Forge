@@ -15,3 +15,7 @@ Dataset_Preprocessing
 run_best_tile_ic9600.py
 ./store
 store
+./.cursorrules
+.cursorrules
+./dpid_implementation_examples
+dpid_implementation_examples
