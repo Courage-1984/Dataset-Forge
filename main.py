@@ -12,7 +12,7 @@ import sys
 import traceback
 import imageio
 import torch
-from dataset_forge.io_utils_old import (
+from dataset_forge.io_utils import (
     log_uncaught_exceptions,
     get_folder_path,
     get_file_operation_choice,
@@ -41,6 +41,8 @@ from dataset_forge.operations import (
     split_adjust_dataset,
     optimize_png_menu,
     convert_to_webp_menu,
+    downsample_images_menu,
+    hdr_to_sdr_menu,
 )
 from dataset_forge.common import get_unique_filename
 from dataset_forge.combine import combine_datasets
@@ -48,10 +50,10 @@ from dataset_forge.alpha import find_alpha_channels, remove_alpha_channels
 from dataset_forge.comparison import create_comparison_images, create_gif_comparison
 from dataset_forge.corruption import fix_corrupted_images
 from dataset_forge.tiling import (
-    tile_dataset_menu,
-    tile_hq_lq_dataset,
-    tile_aligned_pairs,
-    tile_images,
+    tile_single_folder as best_tile_single_folder,
+    tile_hq_lq_dataset as best_tile_hq_lq_dataset,
+    Tiler,
+    TilingStrategyFactory,
 )
 from dataset_forge.frames import extract_frames_menu
 from subprocess import run, CalledProcessError
@@ -654,6 +656,65 @@ def main_menu():
             except Exception as e:
                 print(f"Error upscaling {input_path}: {e}")
 
+    def tiling_menu():
+        print("\n=== BestTile Tiling Menu ===")
+        print("1. Single Folder Tiling")
+        print("2. HQ/LQ Pair Tiling")
+        mode = input("Select mode (1=single, 2=pair): ").strip()
+        if mode == "1":
+            in_folder = input("Enter input folder: ").strip()
+            out_folder = input("Enter output folder: ").strip()
+            tile_size = int(input("Enter tile size (default 512): ") or 512)
+            process_type = (
+                input("Process type (thread/process/for, default thread): ").strip()
+                or "thread"
+            )
+            func_type = (
+                input(
+                    "Complexity function (laplacian/ic9600, default laplacian): "
+                ).strip()
+                or "laplacian"
+            )
+            strategy = TilingStrategyFactory.get_strategy(func_type)
+            tiler = Tiler(strategy)
+            tiler.run(
+                in_folder=in_folder,
+                out_folder=out_folder,
+                tile_size=tile_size,
+                process_type=process_type,
+            )
+        elif mode == "2":
+            hq_folder = input("Enter HQ folder: ").strip()
+            lq_folder = input("Enter LQ folder: ").strip()
+            out_hq_folder = input("Enter HQ output folder: ").strip()
+            out_lq_folder = input("Enter LQ output folder: ").strip()
+            tile_size = int(input("Enter tile size (default 512): ") or 512)
+            process_type = (
+                input("Process type (thread/process/for, default thread): ").strip()
+                or "thread"
+            )
+            func_type = (
+                input(
+                    "Complexity function (laplacian/ic9600, default laplacian): "
+                ).strip()
+                or "laplacian"
+            )
+            # For HQ/LQ pair tiling, you can extend the Tiler class or keep using the old function for now
+            # Here, we use the old function for HQ/LQ pair tiling for compatibility
+            from dataset_forge.tiling import tile_hq_lq_dataset
+
+            tile_hq_lq_dataset(
+                hq_folder=hq_folder,
+                lq_folder=lq_folder,
+                out_hq_folder=out_hq_folder,
+                out_lq_folder=out_lq_folder,
+                tile_size=tile_size,
+                process_type=process_type,
+                func_type=func_type,
+            )
+        else:
+            print("Invalid mode.")
+
     option_map = {
         "0": ("Add Config File", add_config_file),
         "00": ("Load Config File", load_config_file),
@@ -729,17 +790,15 @@ def main_menu():
         "20": ("Fix Corrupted Images", lambda: fix_corrupted_images(hq_folder)),
         "21": ("Optimize PNG", lambda: optimize_png_menu(hq_folder, lq_folder)),
         "22": ("Convert to WebP", lambda: convert_to_webp_menu(hq_folder, lq_folder)),
-        "23": (
-            "HQ/LQ Dataset Image Tiling",
-            lambda: tile_dataset_menu(hq_folder, lq_folder),
-        ),
+        "23": ("BestTile Image Tiling (Single/Pair)", tiling_menu),
         "24": (
             "Create HQ/LQ Animated gif/webp Comparisons",
             lambda: create_gif_comparison(hq_folder, lq_folder),
         ),
         "25": ("Extract Frames", extract_frames_menu),
         "26": ("Exit", None),
-        "27": ("Exit", None),
+        "27": ("Downsample Images (Batch/Single, DPID/Other)", downsample_images_menu),
+        "28": ("HDR to SDR Tone Mapping (ffmpeg)", hdr_to_sdr_menu),
     }
 
     while True:
@@ -756,85 +815,66 @@ def main_menu():
             print(
                 f"  {Mocha.rosewater}Config:{Mocha.reset} {config_path if config_path else Mocha.red + 'Not loaded' + Mocha.reset}"
             )
-            print_section("Menu", "=")
-            for choice, (label, _) in option_map.items():
-                print(Mocha.flamingo + f"  {choice}. {label}")
-            print_section("HQ/LQ Dataset Analysis", "-")
-            if hq_folder and lq_folder:
-                print(f"  {Mocha.green}1. Find HQ/LQ Scale{Mocha.reset}")
-                print(f"  {Mocha.green}2. Test HQ/LQ Scale{Mocha.reset}")
-                print(
-                    f"  {Mocha.green}3. Check Image Consistency (Formats/Modes in HQ & LQ){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}4. Report Image Dimensions (Stats for HQ & LQ){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}5. Find Extreme Dimensions (Biggest/Smallest in HQ & LQ){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}6. Verify Image Integrity (Corrupted Files in HQ & LQ){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}7. Find Misaligned Images (using Phase Correlation){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}8. Generate Full HQ/LQ Dataset REPORT{Mocha.reset}"
-                )
-                print_section("HQ/LQ Dataset Operations", "-")
-                print(
-                    f"  {Mocha.green}9. Remove Small Image Pairs (based on min dimension){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}10. Extract Random Image Pairs (subset to new location){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}11. Shuffle Image Pairs (renames to sequential in place or new location){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}12. Transform Dataset (Rotate, Flip, Brightness, etc. on subset){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}13. Dataset Color Adjustment (Contrast, Saturation, etc. on subset){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}14. Grayscale Conversion (convert subset to grayscale){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}15. Advanced Split/Adjust Dataset (Remove by criteria, Split){Mocha.reset}"
-                )
-                print_section("General Dataset Operations", "-")
-                print(
-                    f"  {Mocha.green}16. Combine Multiple Datasets (merges several HQ/LQ paired datasets){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}17. Find Alpha (detect images with alpha channels){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}18. Remove Alpha (remove alpha channels from images){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}19. Comparisons (create side-by-side HQ/LQ comparisons){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}20. Fix Corrupted Images (re-save images to fix corruption){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}21. Optimize PNG (convert all to PNG and optimize with oxipng){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}22. Convert to WebP (convert all images to WebP format){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}23. HQ/LQ Dataset Image Tiling (create image tiles){Mocha.reset}"
-                )
-                print(
-                    f"  {Mocha.green}24. Create HQ/LQ Animated gif/webp Comparisons (animated gifs/webps of pairs){Mocha.reset}"
-                )
-                print(f"  {Mocha.green}25. Extract Frames (from video){Mocha.reset}")
-                print(f"  {Mocha.green}26. Exit{Mocha.reset}")
-            print_section("General Dataset Operations", "-")
-            print(f"  {Mocha.green}27. Exit{Mocha.reset}")
+
+            # --- Menu Groupings ---
+            print_section("Core & Config", "=", Mocha.mauve)
+            for key in [
+                "0",
+                "00",
+                "000",
+                "0000",
+                "00000",
+                "00001",
+                "00002",
+                "00003",
+                "00004",
+                "00005",
+            ]:
+                if key in option_map:
+                    print(f"  {Mocha.flamingo}{key}. {option_map[key][0]}{Mocha.reset}")
+
+            print_section("Dataset Analysis", "-", Mocha.sapphire)
+            for key in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+                if key in option_map:
+                    print(f"  {Mocha.green}{key}. {option_map[key][0]}{Mocha.reset}")
+
+            print_section("Dataset Operations", "-", Mocha.teal)
+            for key in [
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "23",
+                "24",
+                "25",
+            ]:
+                if key in option_map:
+                    print(f"  {Mocha.yellow}{key}. {option_map[key][0]}{Mocha.reset}")
+
+            print_section("Image Processing", "-", Mocha.pink)
+            for key in ["27"]:
+                if key in option_map:
+                    print(f"  {Mocha.mauve}{key}. {option_map[key][0]}{Mocha.reset}")
+
+            print_section("Video Processing", "-", Mocha.blue)
+            for key in ["28"]:
+                if key in option_map:
+                    print(f"  {Mocha.sky}{key}. {option_map[key][0]}{Mocha.reset}")
+
+            print_section("Exit", "-", Mocha.red)
+            for key in ["26"]:
+                if key in option_map:
+                    print(f"  {Mocha.green}{key}. {option_map[key][0]}{Mocha.reset}")
             print("-" * 40)
 
             choice = input_with_cancel(
@@ -859,7 +899,7 @@ def main_menu():
 
             if choice not in [
                 "1",
-                "27",
+                "26",
             ]:
                 input_with_cancel(
                     "\nPress Enter to return to the main menu (or type 'cancel'): "

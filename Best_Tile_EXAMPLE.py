@@ -1,36 +1,28 @@
 import os
-from dataset_forge.io_utils import is_image_file
 import cv2
-from dataset_forge.common import get_file_operation_choice, get_destination_path
 import numpy as np
-import imageio
-from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
-from tqdm import tqdm
-import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import resnet18, ResNet18_Weights
 from enum import Enum
 from abc import ABC, abstractmethod
+from tqdm import tqdm
 from tqdm.contrib.concurrent import process_map, thread_map
-import time
-import gc
-from typing import Tuple, Any
-
-# Set CUDA timeout and memory management
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"  # For better error reporting
-os.environ["CUDA_LAUNCH_TIMEOUT"] = "300"  # 5 minutes timeout (default is 2 seconds)
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # src/enum.py
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class ProcessType(Enum):
     PROCESS = 0
     THREAD = 1
     FOR = 2
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # src/scripts/utils/complexity/object.py
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class BaseComplexity(ABC):
     @staticmethod
     @abstractmethod
@@ -39,13 +31,15 @@ class BaseComplexity(ABC):
     @abstractmethod
     def get_tile_comp_score(
         self, image, complexity, y: int, x: int, tile_size: int
-    ) -> Tuple[Any, Any, float]: ...
+    ): ...
 
     @abstractmethod
     def __call__(self, img: np.ndarray): ...
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # src/scripts/archs/ICNet.py
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class slam(nn.Module):
     def __init__(self, spatial_dim):
         super(slam, self).__init__()
@@ -231,122 +225,63 @@ def ic9600():
     return model
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # src/scripts/utils/complexity/ic9600.py
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class IC9600Complexity(BaseComplexity):
-    def __init__(
-        self, device: str = "cuda", max_retries: int = 3, retry_delay: float = 1.0
-    ):
+    def __init__(self, device: str = "cuda"):
         super().__init__()
         self.device = torch.device(device)
         self.arch = ic9600().to(self.device)
-        self.max_retries = max_retries
-        self.retry_delay = retry_delay
 
     @staticmethod
     def image_to_tensor(image: np.ndarray):
-        if not isinstance(image, np.ndarray):
-            raise ValueError("Input is not a numpy array")
-        if image.ndim not in (2, 3):
-            raise ValueError(f"Input image must be 2D or 3D, got shape {image.shape}")
-        if image.dtype != np.float32:
-            image = image.astype(np.float32)
         image = image.squeeze()
         if image.ndim == 2:
-            image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+            return torch.tensor(
+                cv2.cvtColor(image, cv2.COLOR_GRAY2RGB).transpose((2, 0, 1))
+            )[None, :, :, :]
         return torch.tensor(image.transpose((2, 0, 1)))[None, :, :, :]
 
     @staticmethod
     def type():
         return "IC9600"
 
-    def _clear_cuda_cache(self):
-        """Clear CUDA cache to prevent memory issues"""
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            gc.collect()
-
-    def _safe_cuda_operation(self, operation, *args, **kwargs):
-        """Execute CUDA operation with retry logic"""
-        for attempt in range(self.max_retries):
-            try:
-                self._clear_cuda_cache()
-                result = operation(*args, **kwargs)
-                return result
-            except torch.cuda.CudaError as e:
-                if "timeout" in str(e).lower() or "launch timed out" in str(e):
-                    print(
-                        f"CUDA timeout on attempt {attempt + 1}/{self.max_retries}, retrying..."
-                    )
-                    if attempt < self.max_retries - 1:
-                        time.sleep(
-                            self.retry_delay * (attempt + 1)
-                        )  # Exponential backoff
-                        self._clear_cuda_cache()
-                        continue
-                    else:
-                        print(f"Failed after {self.max_retries} attempts, skipping...")
-                        raise
-                else:
-                    raise
-            except Exception as e:
-                print(f"Unexpected error: {e}")
-                raise
-
     @torch.inference_mode()
-    def get_tile_comp_score(
-        self, image, complexity, y, x, tile_size
-    ) -> Tuple[Any, Any, float]:
-        try:
-            img_tile = image[
-                y * 8 : y * 8 + tile_size,
-                x * 8 : x * 8 + tile_size,
-            ]
-
-            def score_operation():
-                return self.arch.score(
-                    complexity[1][
-                        :,
-                        :,
-                        y : y + tile_size // 8,
-                        x : x + tile_size // 8,
-                    ]
-                )
-
-            score_tensor = self._safe_cuda_operation(score_operation)
-            if score_tensor is None:
-                raise RuntimeError(
-                    "_safe_cuda_operation returned None for score_tensor"
-                )
-            score = score_tensor.detach().cpu().item()
-
-            complexity[0][
-                y : y + tile_size // 8,
-                x : x + tile_size // 8,
-            ] = -1.0
-            return img_tile, complexity, score
-        except Exception as e:
-            print(f"Error in get_tile_comp_score: {e}")
-            raise
+    def get_tile_comp_score(self, image, complexity, y, x, tile_size):
+        img_tile = image[
+            y * 8 : y * 8 + tile_size,
+            x * 8 : x * 8 + tile_size,
+        ]
+        score = (
+            self.arch.score(
+                complexity[1][
+                    :,
+                    :,
+                    y : y + tile_size // 8,
+                    x : x + tile_size // 8,
+                ]
+            )
+            .detach()
+            .cpu()
+            .item()
+        )
+        complexity[0][
+            y : y + tile_size // 8,
+            x : x + tile_size // 8,
+        ] = -1.0
+        return img_tile, complexity, score
 
     @torch.inference_mode()
     def __call__(self, img):
-        try:
-            img_tensor = self.image_to_tensor(img).to(self.device)
-
-            def forward_operation():
-                return self.arch(img_tensor)
-
-            result = self._safe_cuda_operation(forward_operation)
-            if result is None:
-                raise RuntimeError("_safe_cuda_operation returned None")
-            x_cat, cly_map = result
-            return cly_map.detach().cpu().squeeze().numpy(), x_cat
-        except Exception as e:
-            print(f"Error in IC9600Complexity.__call__: {e}")
-            raise
+        img = self.image_to_tensor(img).to(self.device)
+        x_cat, cly_map = self.arch(img)
+        return cly_map.detach().cpu().squeeze().numpy(), x_cat
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # src/scripts/utils/complexity/laplacian.py
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class LaplacianComplexity(BaseComplexity):
     def __init__(self, median_blur: int = 1):
         super().__init__()
@@ -378,9 +313,7 @@ class LaplacianComplexity(BaseComplexity):
         return "Laplacian"
 
     @staticmethod
-    def get_tile_comp_score(
-        image, complexity, y, x, tile_size
-    ) -> Tuple[Any, Any, float]:
+    def get_tile_comp_score(image, complexity, y, x, tile_size):
         img_tile = image[
             y : y + tile_size,
             x : x + tile_size,
@@ -404,8 +337,10 @@ class LaplacianComplexity(BaseComplexity):
         return np.abs(cv2.Laplacian(img, cv2.CV_64F))
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Dummy implementations for pepeline and chainner_ext as they are not standard libraries
 # You will need to replace these with your actual implementation or install them if they are packages.
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 class ImgColor(Enum):
@@ -470,7 +405,9 @@ def resize(image, dsize, interpolation=ResizeFilter.Linear, *args, **kwargs):
     return cv2.resize(image, dsize, interpolation=interpolation)
 
 
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # src/best_tile.py
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class BestTile:
     def __init__(
         self,
@@ -483,7 +420,6 @@ class BestTile:
         laplacian_thread: float = 0,
         image_gray: bool = False,
         func: BaseComplexity = LaplacianComplexity(),
-        max_image_size: int = 8192,  # Maximum image dimension to prevent timeouts
     ):
         self.scale = scale
         self.in_folder = in_folder
@@ -491,71 +427,43 @@ class BestTile:
         os.makedirs(out_folder, exist_ok=True)
         self.out_list = os.listdir(out_folder)
         self.tile_size = tile_size
-        self.all_images = [
-            f
-            for f in os.listdir(in_folder)
-            if f.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"))
-        ]
+        self.all_images = os.listdir(in_folder)
         self.process_type = process_type
         self.dynamic_n_tiles = dynamic_n_tiles
         self.laplacian_thread = laplacian_thread
         self.image_gray = image_gray
         self.func = func
-        self.max_image_size = max_image_size
         if func.type() == "IC9600":
             self.process_type = ProcessType.FOR
 
     def save_result(self, img, img_name) -> None:
         save(img, os.path.join(self.out_folder, img_name))
 
-    def resize_if_too_large(self, img):
-        """Resize image if it's too large to prevent CUDA timeouts"""
-        h, w = img.shape[:2]
-        if h > self.max_image_size or w > self.max_image_size:
-            scale_factor = min(self.max_image_size / h, self.max_image_size / w)
-            new_h, new_w = int(h * scale_factor), int(w * scale_factor)
-            print(f"Resizing image from {h}x{w} to {new_h}x{new_w} to prevent timeout")
-            return resize(img, (new_w, new_h), ResizeFilter.Linear)
-        return img
-
     def get_tile(self, img, complexity):
-        try:
-            if self.func.type() != "Laplacian":
-                y_cord, x_cord = best_tile(complexity[0], self.tile_size // 8)
-                result = self.func.get_tile_comp_score(
-                    img, complexity, y_cord, x_cord, self.tile_size
-                )
-                if result is None:
-                    raise RuntimeError("get_tile_comp_score returned None")
-                img_tile, complexity, score = result
-            elif self.scale > 1:
-                img_shape = complexity.shape
-                complexity_r = resize(
-                    complexity,
-                    (img_shape[1] // self.scale, img_shape[0] // self.scale),
-                    ResizeFilter.Linear,
-                ).squeeze()
-                y_cord, x_cord = best_tile(complexity_r, self.tile_size // self.scale)
-                y_cord *= self.scale
-                x_cord *= self.scale
-                result = self.func.get_tile_comp_score(
-                    img, complexity, y_cord, x_cord, self.tile_size
-                )
-                if result is None:
-                    raise RuntimeError("get_tile_comp_score returned None")
-                img_tile, complexity, score = result
-            else:
-                y_cord, x_cord = best_tile(complexity, self.tile_size)
-                result = self.func.get_tile_comp_score(
-                    img, complexity, y_cord, x_cord, self.tile_size
-                )
-                if result is None:
-                    raise RuntimeError("get_tile_comp_score returned None")
-                img_tile, complexity, score = result
-            return img_tile, complexity, score
-        except Exception as e:
-            print(f"Error in get_tile: {e}")
-            raise
+        if self.func.type() != "Laplacian":
+            y_cord, x_cord = best_tile(complexity[0], self.tile_size // 8)
+            img_tile, complexity, score = self.func.get_tile_comp_score(
+                img, complexity, y_cord, x_cord, self.tile_size
+            )
+        elif self.scale > 1:
+            img_shape = complexity.shape
+            complexity_r = resize(
+                complexity,
+                (img_shape[1] // self.scale, img_shape[0] // self.scale),
+                ResizeFilter.Linear,
+            ).squeeze()
+            y_cord, x_cord = best_tile(complexity_r, self.tile_size // self.scale)
+            y_cord *= self.scale
+            x_cord *= self.scale
+            img_tile, complexity, score = self.func.get_tile_comp_score(
+                img, complexity, y_cord, x_cord, self.tile_size
+            )
+        else:
+            y_cord, x_cord = best_tile(complexity, self.tile_size)
+            img_tile, complexity, score = self.func.get_tile_comp_score(
+                img, complexity, y_cord, x_cord, self.tile_size
+            )
+        return img_tile, complexity, score
 
     def read_img(self, img_name):
         image = read(
@@ -574,51 +482,37 @@ class BestTile:
                 print(f"Warning: Could not read image {img_name}. Skipping.")
                 return
             img_shape = img.shape
+            result_name = ".".join(img_name.split(".")[:-1]) + ".png"
+
+            # If the image is smaller than the tile size, save it directly
             if img_shape[0] < self.tile_size or img_shape[1] < self.tile_size:
-                print(
-                    f"Skipping {img_name}: Image too small ({img_shape[0]}x{img_shape[1]})"
-                )
+                self.save_result(img, result_name)
                 return
 
-            # Resize if too large to prevent timeouts
-            img = self.resize_if_too_large(img)
-            img_shape = img.shape
-
-            result_name = ".".join(img_name.split(".")[:-1]) + ".png"
+            # If the image is exactly the tile size, save it directly
             if img_shape[0] == self.tile_size and img_shape[1] == self.tile_size:
                 self.save_result(img, result_name)
                 return
 
-            try:
-                complexity = self.func(img)
-            except Exception as e:
-                print(f"Error computing complexity for {img_name}: {e}")
-                return
-
+            # For images larger than the tile size, proceed with tile extraction
+            complexity = self.func(img)
             if (
                 img_shape[0] * img_shape[1] > self.tile_size**2 * 4
                 and self.dynamic_n_tiles
             ):
                 num_tiles = (img_shape[0] * img_shape[1]) // (self.tile_size**2 * 2)
                 for i in range(num_tiles):
-                    try:
-                        tile, complexity, score = self.get_tile(img, complexity)
-                        if self.laplacian_thread and score < self.laplacian_thread:
-                            break
-                        self.save_result(
-                            tile, ".".join(img_name.split(".")[:-1]) + f"_{i}" + ".png"
-                        )
-                    except Exception as e:
-                        print(f"Error processing tile {i} for {img_name}: {e}")
-                        break
-            else:
-                try:
                     tile, complexity, score = self.get_tile(img, complexity)
                     if self.laplacian_thread and score < self.laplacian_thread:
-                        return
-                    self.save_result(tile, result_name)
-                except Exception as e:
-                    print(f"Error processing single tile for {img_name}: {e}")
+                        break
+                    self.save_result(
+                        tile, ".".join(img_name.split(".")[:-1]) + f"_{i}" + ".png"
+                    )
+            else:
+                tile, complexity, score = self.get_tile(img, complexity)
+                if self.laplacian_thread and score < self.laplacian_thread:
+                    return
+                self.save_result(tile, result_name)
         except Exception as e:
             print(f"Error processing {img_name}: {e}")
 
@@ -635,108 +529,64 @@ class BestTile:
                 self.process(img_name)
 
 
-# --- API for main.py integration ---
-def tile_single_folder(
-    in_folder,
-    out_folder,
-    tile_size=512,
-    process_type="thread",
-    func_type="laplacian",
-    **kwargs,
-):
-    """
-    Tiling for a single directory using the BestTile logic.
-    """
-    if func_type == "ic9600":
+if __name__ == "__main__":
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # HOW TO USE IN GOOGLE COLAB
+    # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    # 1. Mount your Google Drive
+    # from google.colab import drive
+    # drive.mount('/content/drive')
+
+    # 2. Define your input and output folders
+    #    These folders should exist in your Google Drive.
+    #    For example, if you have a folder named 'my_images' in your Drive's root,
+    #    the path would be '/content/drive/My Drive/my_images'.
+    input_folder = (
+        "E:/_dataset/dataset_2x_re-animeV1_RealPLKSR/_1 DragonBall_before/test/og"
+    )
+    output_folder = (
+        "E:/_dataset/dataset_2x_re-animeV1_RealPLKSR/_1 DragonBall_before/test/tiles"
+    )
+
+    # 3. Choose your complexity function
+    #    Options are LaplacianComplexity() or IC9600Complexity()
+    #    - LaplacianComplexity is faster and runs on the CPU.
+    #    - IC9600Complexity is more advanced, requires a GPU, and is slower.
+    #      If using IC9600, make sure your Colab notebook is set to use a GPU runtime.
+    #      (Runtime -> Change runtime type -> Hardware accelerator -> GPU)
+    use_ic9600 = True  # Set to True to use IC9600, False for Laplacian
+
+    if use_ic9600:
+        # Check for GPU
         if not torch.cuda.is_available():
-            raise SystemExit("IC9600 requires a GPU. Please enable GPU.")
-        func = IC9600Complexity(device="cuda")
-        process_type_enum = ProcessType.FOR
+            raise SystemExit(
+                "IC9600 requires a GPU. Please enable GPU in Colab's runtime settings."
+            )
+        complexity_function = IC9600Complexity(device="cuda")
     else:
-        func = LaplacianComplexity()
-        process_type_enum = (
-            ProcessType.THREAD if process_type == "thread" else ProcessType.PROCESS
-        )
+        complexity_function = LaplacianComplexity(median_blur=3)
+
+    # 4. Configure the BestTile processor
+    #    - tile_size: The size of the square tile to extract (e.g., 512, 1024).
+    #    - process_type: How to process multiple images.
+    #      - ProcessType.THREAD: Use multiple threads (good for I/O bound tasks).
+    #      - ProcessType.PROCESS: Use multiple processes (good for CPU-bound tasks).
+    #      - ProcessType.FOR: A simple loop (useful for debugging or when using GPU).
+    #    - dynamic_n_tiles: If True, extract multiple tiles from very large images.
+    #    - laplacian_thread: A threshold to discard tiles with low complexity.
     processor = BestTile(
-        in_folder=in_folder,
-        out_folder=out_folder,
-        tile_size=tile_size,
-        process_type=process_type_enum,
-        func=func,
-        **kwargs,
+        in_folder=input_folder,
+        out_folder=output_folder,
+        tile_size=1024,
+        process_type=ProcessType.FOR if use_ic9600 else ProcessType.THREAD,
+        dynamic_n_tiles=True,
+        laplacian_thread=0.01,  # Adjust as needed
+        func=complexity_function,
     )
+
+    # 5. Run the process
+    print(f"Starting processing for images in: {input_folder}")
+    print(f"Output will be saved to: {output_folder}")
     processor.run()
-
-
-def tile_hq_lq_dataset(
-    hq_folder,
-    lq_folder,
-    out_hq_folder,
-    out_lq_folder,
-    tile_size=512,
-    process_type="thread",
-    func_type="laplacian",
-    **kwargs,
-):
-    """
-    Tiling for HQ/LQ paired directories. Each folder is tiled separately but with the same logic.
-    """
-    tile_single_folder(
-        hq_folder, out_hq_folder, tile_size, process_type, func_type, **kwargs
-    )
-    tile_single_folder(
-        lq_folder, out_lq_folder, tile_size, process_type, func_type, **kwargs
-    )
-
-
-# Existing complexity classes remain, but we add a strategy interface
-
-
-class TilingStrategy(ABC):
-    @abstractmethod
-    def tile(self, *args, **kwargs):
-        pass
-
-
-class LaplacianTilingStrategy(TilingStrategy):
-    def tile(self, in_folder, out_folder, tile_size=512, **kwargs):
-        # Use the existing LaplacianComplexity logic
-        return tile_single_folder(
-            in_folder=in_folder,
-            out_folder=out_folder,
-            tile_size=tile_size,
-            process_type=kwargs.get("process_type", "thread"),
-            func_type="laplacian",
-        )
-
-
-class IC9600TilingStrategy(TilingStrategy):
-    def tile(self, in_folder, out_folder, tile_size=512, **kwargs):
-        # Use the existing IC9600Complexity logic
-        return tile_single_folder(
-            in_folder=in_folder,
-            out_folder=out_folder,
-            tile_size=tile_size,
-            process_type=kwargs.get("process_type", "thread"),
-            func_type="ic9600",
-        )
-
-
-class Tiler:
-    def __init__(self, strategy: TilingStrategy):
-        self.strategy = strategy
-
-    def run(self, in_folder, out_folder, tile_size=512, **kwargs):
-        return self.strategy.tile(in_folder, out_folder, tile_size, **kwargs)
-
-
-# Factory for tiling strategies
-class TilingStrategyFactory:
-    @staticmethod
-    def get_strategy(name: str) -> TilingStrategy:
-        if name == "laplacian":
-            return LaplacianTilingStrategy()
-        elif name == "ic9600":
-            return IC9600TilingStrategy()
-        else:
-            raise ValueError(f"Unknown tiling strategy: {name}")
+    print("Processing complete.")

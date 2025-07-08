@@ -1,6 +1,11 @@
 import os
 import torch
 import gc
+import cv2
+import numpy as np
+from tqdm import tqdm
+from enum import Enum
+import torch.nn.functional as F
 
 
 class LayerNorm(torch.nn.Module):
@@ -36,63 +41,99 @@ def release_memory():
 
 
 def extract_frames_menu():
-    print("\n--- Extract Frames from Video ---")
+    print("\n--- Extract Frames from Video (Batch/Multi-Model) ---")
     video_path = input("Enter path to video file: ").strip()
     if not os.path.isfile(video_path):
         print("Error: Video file does not exist.")
         return
-    out_dir = input("Enter output directory for frames: ").strip()
-    if not out_dir:
+    base_out_dir = input("Enter base output directory for frames: ").strip()
+    if not base_out_dir:
         print("Error: Output directory required.")
         return
-    os.makedirs(out_dir, exist_ok=True)
+    os.makedirs(base_out_dir, exist_ok=True)
 
-    # Model selection
+    # Model selection (multi-select)
     model_options = [
-        ("ConvNextS", 0),
-        ("ConvNextL", 1),
-        ("VITS", 2),
-        ("VITB", 3),
-        ("VITL", 4),
-        ("VITG", 5),
+        ("ConvNextS", EmbeddedModel.ConvNextS),
+        ("ConvNextL", EmbeddedModel.ConvNextL),
+        ("VITS", EmbeddedModel.VITS),
+        ("VITB", EmbeddedModel.VITB),
+        ("VITL", EmbeddedModel.VITL),
+        ("VITG", EmbeddedModel.VITG),
     ]
-    print("Select embedding model:")
+    print("Select embedding model(s) (comma separated, e.g. 1,3):")
     for i, (name, _) in enumerate(model_options):
         print(f"  {i+1}. {name}")
     while True:
-        model_choice = input("Model [1-6, default 1]: ").strip() or "1"
-        if model_choice in [str(i + 1) for i in range(6)]:
-            model_idx = int(model_choice) - 1
-            break
-        print("Invalid choice.")
-    model_name = model_options[model_idx][0]
+        model_choices = input("Model(s) [1-6, default 1]: ").strip() or "1"
+        try:
+            model_idxs = [
+                int(x.strip()) - 1 for x in model_choices.split(",") if x.strip()
+            ]
+            if all(0 <= idx < len(model_options) for idx in model_idxs):
+                break
+        except Exception:
+            pass
+        print("Invalid input. Please enter valid model numbers, e.g. 1,3.")
+    selected_models = [model_options[idx] for idx in model_idxs]
 
-    # Distance function
+    # Distance function selection (multi-select, same count as models or one for all)
     dist_options = [
         ("euclid", "Euclidean Distance"),
         ("cosine", "Cosine Distance"),
     ]
-    print("Select distance function:")
+    print("Select distance function(s) for each model (comma separated, e.g. 1,2):")
     for i, (_, desc) in enumerate(dist_options):
         print(f"  {i+1}. {desc}")
     while True:
-        dist_choice = input("Distance [1-2, default 1]: ").strip() or "1"
-        if dist_choice in ["1", "2"]:
-            dist_idx = int(dist_choice) - 1
-            break
-        print("Invalid choice.")
-    dist_name = dist_options[dist_idx][0]
+        dist_choices = input("Distance(s) [1-2, default 1]: ").strip() or "1"
+        try:
+            dist_idxs = [
+                int(x.strip()) - 1 for x in dist_choices.split(",") if x.strip()
+            ]
+            if len(dist_idxs) == 1:
+                dist_idxs = dist_idxs * len(selected_models)
+            if len(dist_idxs) == len(selected_models) and all(
+                0 <= idx < len(dist_options) for idx in dist_idxs
+            ):
+                break
+        except Exception:
+            pass
+        print("Invalid input. Please enter valid distance numbers, e.g. 1,2 or just 1.")
+    selected_dists = [dist_options[idx][0] for idx in dist_idxs]
 
-    # Threshold
-    default_threshold = 2.3 if dist_name == "euclid" else 0.3
-    threshold = input(f"Enter threshold (default {default_threshold}): ").strip()
+    # Batch size
+    batch_size = input("Batch size (default 5000): ").strip()
     try:
-        threshold = float(threshold) if threshold else default_threshold
+        batch_size = int(batch_size) if batch_size else 5000
     except Exception:
-        print("Invalid threshold, using default.")
-        threshold = default_threshold
+        print("Invalid batch size, using 5000.")
+        batch_size = 5000
 
-    # Scale
+    # Max frames per batch
+    max_len = input("Max frames to extract per batch (default 1000): ").strip()
+    try:
+        max_len = int(max_len) if max_len else 1000
+    except Exception:
+        print("Invalid max, using 1000.")
+        max_len = 1000
+
+    # Thresholds (per model)
+    thresholds = []
+    for i, (model_name, _) in enumerate(selected_models):
+        dist = selected_dists[i]
+        default_threshold = 2.3 if dist == "euclid" else 0.3
+        t = input(
+            f"Enter threshold for {model_name} ({dist}) (default {default_threshold}): "
+        ).strip()
+        try:
+            t = float(t) if t else default_threshold
+        except Exception:
+            print(f"Invalid threshold, using default {default_threshold}.")
+            t = default_threshold
+        thresholds.append(t)
+
+    # Scale (per model, or one for all)
     scale = input("Enter scale factor (default 4): ").strip()
     try:
         scale = int(scale) if scale else 4
@@ -100,319 +141,208 @@ def extract_frames_menu():
         print("Invalid scale, using 4.")
         scale = 4
 
-    # Max frames
-    max_len = input("Max frames to extract (default 1000): ").strip()
-    try:
-        max_len = int(max_len) if max_len else 1000
-    except Exception:
-        print("Invalid max, using 1000.")
-        max_len = 1000
-
     # Device
     device = input("Device (cuda/cpu, default cuda): ").strip() or "cuda"
 
-    # --- Inline enum, model, and distance logic ---
-    class EmbeddedModel:
-        ConvNextS = 0
-        ConvNextL = 1
-        VITS = 2
-        VITB = 3
-        VITL = 4
-        VITG = 5
-
-    def enum_to_model(enum):
-        import torch
-
-        if enum == EmbeddedModel.ConvNextS:
-            # convnext_small
-            state = torch.hub.load_state_dict_from_url(
-                url="https://github.com/umzi2/Dataset_Preprocessing/releases/download/SPARK_model_duplication/convnextS_1kpretrained_official_style.pth",
-                map_location="cpu",
-                weights_only=True,
-            )
-            from timm.layers import trunc_normal_, DropPath
-
-            class Block(torch.nn.Module):
-                def __init__(self, dim, drop_path=0.0, layer_scale_init_value=1e-6):
-                    super().__init__()
-                    self.dwconv = torch.nn.Conv2d(
-                        dim, dim, kernel_size=7, padding=3, groups=dim
-                    )
-                    self.norm = LayerNorm(dim, eps=1e-6, data_format="channels_last")
-                    self.pwconv1 = torch.nn.Linear(dim, 4 * dim)
-                    self.act = torch.nn.GELU()
-                    self.pwconv2 = torch.nn.Linear(4 * dim, dim)
-                    self.gamma = (
-                        torch.nn.Parameter(
-                            layer_scale_init_value * torch.ones((dim)),
-                            requires_grad=True,
-                        )
-                        if layer_scale_init_value > 0
-                        else None
-                    )
-                    self.drop_path = (
-                        DropPath(drop_path) if drop_path > 0.0 else torch.nn.Identity()
-                    )
-
-                def forward(self, x):
-                    input = x
-                    x = self.dwconv(x)
-                    x = x.permute(0, 2, 3, 1)
-                    x = self.norm(x)
-                    x = self.pwconv1(x)
-                    x = self.act(x)
-                    x = self.pwconv2(x)
-                    if self.gamma is not None:
-                        x = self.gamma * x
-                    x = x.permute(0, 3, 1, 2)
-                    x = input + self.drop_path(x)
-                    return x
-
-            class ConvNeXt(torch.nn.Module):
-                def __init__(
-                    self, in_chans=3, depths=[3, 3, 27, 3], dims=[96, 192, 384, 768]
-                ):
-                    super().__init__()
-                    self.downsample_layers = torch.nn.ModuleList()
-                    stem = torch.nn.Sequential(
-                        torch.nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4),
-                        LayerNorm(dims[0], eps=1e-6, data_format="channels_first"),
-                    )
-                    self.downsample_layers.append(stem)
-                    for i in range(3):
-                        downsample_layer = torch.nn.Sequential(
-                            LayerNorm(dims[i], eps=1e-6, data_format="channels_first"),
-                            torch.nn.Conv2d(
-                                dims[i], dims[i + 1], kernel_size=2, stride=2
-                            ),
-                        )
-                        self.downsample_layers.append(downsample_layer)
-                    self.stages = torch.nn.ModuleList()
-                    for i in range(4):
-                        stage = torch.nn.Sequential(
-                            *[Block(dim=dims[i]) for _ in range(depths[i])]
-                        )
-                        self.stages.append(stage)
-
-                def forward(self, x):
-                    for i in range(4):
-                        x = self.downsample_layers[i](x)
-                        x = self.stages[i](x)
-                    return x.mean([-2, -1])
-
-            model = ConvNeXt()
-            model.load_state_dict(state)
-            return model.eval()
-        elif enum == EmbeddedModel.ConvNextL:
-            state = torch.hub.load_state_dict_from_url(
-                url="https://github.com/umzi2/Dataset_Preprocessing/releases/download/SPARK_model_duplication/convnextL_384_1kpretrained_official_style.pth",
-                map_location="cpu",
-                weights_only=True,
-            )
-            # ... (same as above, with different dims)
-            # For brevity, use ConvNextS logic but with dims=[192, 384, 768, 1536]
-            from timm.layers import trunc_normal_, DropPath
-
-            class Block(torch.nn.Module):
-                def __init__(self, dim, drop_path=0.0, layer_scale_init_value=1e-6):
-                    super().__init__()
-                    self.dwconv = torch.nn.Conv2d(
-                        dim, dim, kernel_size=7, padding=3, groups=dim
-                    )
-                    self.norm = LayerNorm(dim, eps=1e-6, data_format="channels_first")
-                    self.pwconv1 = torch.nn.Linear(dim, 4 * dim)
-                    self.act = torch.nn.GELU()
-                    self.pwconv2 = torch.nn.Linear(4 * dim, dim)
-                    self.gamma = (
-                        torch.nn.Parameter(
-                            layer_scale_init_value * torch.ones((dim)),
-                            requires_grad=True,
-                        )
-                        if layer_scale_init_value > 0
-                        else None
-                    )
-                    self.drop_path = (
-                        DropPath(drop_path) if drop_path > 0.0 else torch.nn.Identity()
-                    )
-
-                def forward(self, x):
-                    input = x
-                    x = self.dwconv(x)
-                    x = x.permute(0, 2, 3, 1)
-                    x = self.norm(x)
-                    x = self.pwconv1(x)
-                    x = self.act(x)
-                    x = self.pwconv2(x)
-                    if self.gamma is not None:
-                        x = self.gamma * x
-                    x = x.permute(0, 3, 1, 2)
-                    x = input + self.drop_path(x)
-                    return x
-
-            class ConvNeXt(torch.nn.Module):
-                def __init__(
-                    self, in_chans=3, depths=[3, 3, 27, 3], dims=[192, 384, 768, 1536]
-                ):
-                    super().__init__()
-                    self.downsample_layers = torch.nn.ModuleList()
-                    stem = torch.nn.Sequential(
-                        torch.nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4),
-                        LayerNorm(dims[0], eps=1e-6, data_format="channels_first"),
-                    )
-                    self.downsample_layers.append(stem)
-                    for i in range(3):
-                        downsample_layer = torch.nn.Sequential(
-                            LayerNorm(dims[i], eps=1e-6, data_format="channels_first"),
-                            torch.nn.Conv2d(
-                                dims[i], dims[i + 1], kernel_size=2, stride=2
-                            ),
-                        )
-                        self.downsample_layers.append(downsample_layer)
-                    self.stages = torch.nn.ModuleList()
-                    for i in range(4):
-                        stage = torch.nn.Sequential(
-                            *[Block(dim=dims[i]) for _ in range(depths[i])]
-                        )
-                        self.stages.append(stage)
-
-                def forward(self, x):
-                    for i in range(4):
-                        x = self.downsample_layers[i](x)
-                        x = self.stages[i](x)
-                    return x.mean([-2, -1])
-
-            model = ConvNeXt(dims=[192, 384, 768, 1536])
-            model.load_state_dict(state)
-            return model.eval()
-        elif enum == EmbeddedModel.VITS:
-            return (
-                __import__("torch")
-                .hub.load("facebookresearch/dinov2", "dinov2_vits14")
-                .eval()
-            )
-        elif enum == EmbeddedModel.VITB:
-            return (
-                __import__("torch")
-                .hub.load("facebookresearch/dinov2", "dinov2_vitb14")
-                .eval()
-            )
-        elif enum == EmbeddedModel.VITL:
-            return (
-                __import__("torch")
-                .hub.load("facebookresearch/dinov2", "dinov2_vitl14")
-                .eval()
-            )
-        elif enum == EmbeddedModel.VITG:
-            return (
-                __import__("torch")
-                .hub.load("facebookresearch/dinov2", "dinov2_vitg14")
-                .eval()
-            )
-
-    def cosine_dist(emb1, emb2):
-        import torch.nn.functional as F
-
-        emb1_norm = F.normalize(emb1, dim=-1)
-        emb2_norm = F.normalize(emb2, dim=-1)
-        return 1 - F.cosine_similarity(emb1_norm, emb2_norm).item()
-
-    def euclid_dist(emb1, emb2):
-        import torch
-
-        return torch.cdist(emb1, emb2).item()
-
-    # --- Embedding class ---
-    class ImgToEmbedding:
-        def __init__(
-            self, model=EmbeddedModel.ConvNextS, amp=True, scale=4, device="cuda"
-        ):
-            import torch
-
-            self.device = torch.device(device)
-            self.scale = scale
-            self.amp = amp
-            self.model = enum_to_model(model).to(self.device)
-            self.vit = model in [
-                EmbeddedModel.VITS,
-                EmbeddedModel.VITB,
-                EmbeddedModel.VITL,
-                EmbeddedModel.VITG,
-            ]
-
-        @staticmethod
-        def check_img_size(x):
-            import torch.nn.functional as F
-
-            b, c, h, w = x.shape
-            mod_pad_h = (14 - h % 14) % 14
-            mod_pad_w = (14 - w % 14) % 14
-            return F.pad(x, (0, mod_pad_w, 0, mod_pad_h), "reflect")
-
-        def img_to_tensor(self, x):
-            import torch
-
-            if self.vit:
-                return self.check_img_size(
-                    torch.tensor(x.transpose((2, 0, 1)))[None, :, :, :].to(self.device)
-                )
-            return torch.tensor(x.transpose((2, 0, 1)))[None, :, :, :].to(self.device)
-
-        def __call__(self, x):
-            import torch
-
-            if self.scale > 1:
-                h, w = x.shape[:2]
-                # No resize, just use as is (or implement if chainner_ext is available)
-            with torch.amp.autocast(self.device.__str__(), torch.float16, self.amp):
-                x = self.img_to_tensor(x)
-                return self.model(x)
-
-    # Select model enum
-    model_enum = [
-        EmbeddedModel.ConvNextS,
-        EmbeddedModel.ConvNextL,
-        EmbeddedModel.VITS,
-        EmbeddedModel.VITB,
-        EmbeddedModel.VITL,
-        EmbeddedModel.VITG,
-    ][model_idx]
-    embedder = ImgToEmbedding(model=model_enum, amp=True, scale=scale, device=device)
-    dist_fn = euclid_dist if dist_name == "euclid" else cosine_dist
-
-    # --- Video to frames logic ---
+    # Get total frames
     import cv2
-    import numpy as np
-    from tqdm import tqdm
 
-    capture = cv2.VideoCapture(video_path)
-    total_frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    ref = None
-    n = 0
-    n_s = 0
-    with tqdm(total=total_frames) as pbar:
-        while capture.isOpened():
-            ret, frame = capture.read()
-            if n_s > max_len:
-                break
-            if not ret:
-                break
-            if ref is None:
-                ref = embedder(
-                    cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
-                )
-            else:
-                temp_embedd = embedder(
-                    cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
-                )
-                if dist_fn(ref, temp_embedd) > threshold:
-                    cv2.imwrite(os.path.join(out_dir, f"frame_{n}.png"), frame)
-                    ref = temp_embedd
-                    n_s += 1
-            n += 1
-            pbar.update(1)
-    capture.release()
-    print(f"\nDone. Extracted up to {n_s} frames to {out_dir}.")
-    release_memory()
+    cap = cv2.VideoCapture(video_path)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    cap.release()
+
+    # Distance function mapping
+    def get_dist_fn(name):
+        if name == "euclid":
+            return euclid_dist
+        else:
+            return cosine_dist
+
+    # For each model+distance, process in batches
+    for i, ((model_name, model_enum), dist_name) in enumerate(
+        zip(selected_models, selected_dists)
+    ):
+        print(f"\nProcessing with {model_name} ({dist_name})...")
+        out_dir = os.path.join(base_out_dir, f"frames_{model_name}_{dist_name}")
+        os.makedirs(out_dir, exist_ok=True)
+        embedder = ImgToEmbedding(
+            model=model_enum, amp=True, scale=scale, device=device
+        )
+        dist_fn = get_dist_fn(dist_name)
+        video_to_frame = VideoToFrame(
+            embedder,
+            thread=thresholds[i],
+            distance_fn=dist_fn,
+            max_len=max_len,
+        )
+        for start in range(0, total_frames, batch_size):
+            end = min(start + batch_size, total_frames)
+            # Check how many frames from this batch already exist
+            existing = [
+                fname
+                for fname in os.listdir(out_dir)
+                if fname.startswith("frame_")
+                and fname.endswith(".png")
+                and start <= int(fname[len("frame_") : -len(".png")]) < end
+            ]
+            if len(existing) >= max_len:
+                print(f"Skipping frames {start} to {end} (already processed)")
+                continue
+            print(f"Processing frames {start} to {end} ({model_name})")
+            video_to_frame(video_path, out_dir, start_frame=start, end_frame=end)
+
+    print("\nAll selected models processed.")
 
 
 # --- END Extract Frames Utility ---
+
+
+class EmbeddedModel(Enum):
+    ConvNextS = 0
+    ConvNextL = 1
+    VITS = 2
+    VITB = 3
+    VITL = 4
+    VITG = 5
+
+
+def euclid_dist(emb1, emb2):
+    return torch.cdist(emb1, emb2).item()
+
+
+def cosine_dist(emb1, emb2):
+    emb1_norm = F.normalize(emb1, dim=-1)
+    emb2_norm = F.normalize(emb2, dim=-1)
+    return 1 - F.cosine_similarity(emb1_norm, emb2_norm).item()
+
+
+def enum_to_model(enum):
+    if enum == EmbeddedModel.ConvNextS:
+        # Replace with your actual ConvNextS model loading logic
+        raise NotImplementedError("ConvNextS model loading not implemented.")
+    elif enum == EmbeddedModel.ConvNextL:
+        # Replace with your actual ConvNextL model loading logic
+        raise NotImplementedError("ConvNextL model loading not implemented.")
+    elif enum == EmbeddedModel.VITS:
+        return torch.hub.load("facebookresearch/dinov2", "dinov2_vits14").eval()
+    elif enum == EmbeddedModel.VITB:
+        return torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14").eval()
+    elif enum == EmbeddedModel.VITL:
+        return torch.hub.load("facebookresearch/dinov2", "dinov2_vitl14").eval()
+    elif enum == EmbeddedModel.VITG:
+        return torch.hub.load("facebookresearch/dinov2", "dinov2_vitg14").eval()
+    else:
+        raise ValueError(f"Unknown EmbeddedModel: {enum}")
+
+
+class ImgToEmbedding:
+    def __init__(
+        self,
+        model: EmbeddedModel = EmbeddedModel.ConvNextS,
+        amp: bool = True,
+        scale: int = 4,
+        device: str = "cuda",
+    ):
+        self.device = torch.device(device)
+        self.scale = scale
+        self.amp = amp
+        self.model = enum_to_model(model).to(self.device)
+        self.vit = model in [
+            EmbeddedModel.VITS,
+            EmbeddedModel.VITB,
+            EmbeddedModel.VITL,
+            EmbeddedModel.VITG,
+        ]
+
+    @staticmethod
+    def check_img_size(x):
+        b, c, h, w = x.shape
+        mod_pad_h = (14 - h % 14) % 14
+        mod_pad_w = (14 - w % 14) % 14
+        return F.pad(x, (0, mod_pad_w, 0, mod_pad_h), "reflect")
+
+    def img_to_tensor(self, x):
+        if self.vit:
+            return self.check_img_size(
+                torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
+                    None, :, :, :
+                ].to(self.device)
+            )
+        return torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
+            None, :, :, :
+        ].to(self.device)
+
+    @torch.inference_mode()
+    def __call__(self, x):
+        # Optionally add resizing logic here if needed
+        with torch.amp.autocast(self.device.__str__(), torch.float16, self.amp):
+            x = self.img_to_tensor(x)
+            return self.model(x)
+
+
+class VideoToFrame:
+    def __init__(
+        self,
+        embedder: ImgToEmbedding,
+        thread: float = 1.5,
+        distance_fn=euclid_dist,
+        max_len=1000,
+    ):
+        self.embedder = embedder
+        self.thread = thread
+        self.distance_fn = distance_fn
+        self.max_len = max_len
+
+    def __call__(self, video_path, out_path, start_frame=0, end_frame=None):
+        os.makedirs(out_path, exist_ok=True)
+        capture = cv2.VideoCapture(video_path)
+        total_frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        if end_frame is None or end_frame > total_frames:
+            end_frame = total_frames
+        capture.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
+        ref = None
+        n = start_frame
+        n_s = 0
+        # Get already saved frames for resume
+        existing_frames = set()
+        for fname in os.listdir(out_path):
+            if fname.startswith("frame_") and fname.endswith(".png"):
+                try:
+                    idx = int(fname[len("frame_") : -len(".png")])
+                    existing_frames.add(idx)
+                except ValueError:
+                    continue
+        with tqdm(total=end_frame - start_frame) as pbar:
+            while capture.isOpened() and n < end_frame:
+                ret, frame = capture.read()
+                if n_s > self.max_len:
+                    break
+                if not ret:
+                    break
+                if n in existing_frames:
+                    n += 1
+                    pbar.update(1)
+                    continue
+                if ref is None:
+                    rgb_normalized = (
+                        cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(np.float32)
+                        / 255.0
+                    )
+                    ref = self.embedder(rgb_normalized)
+                    cv2.imwrite(os.path.join(out_path, f"frame_{n}.png"), frame)
+                    n_s += 1
+                else:
+                    rgb_normalized = (
+                        cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(np.float32)
+                        / 255.0
+                    )
+                    temp_embedd = self.embedder(rgb_normalized)
+                    if self.distance_fn(ref, temp_embedd) > self.thread:
+                        cv2.imwrite(os.path.join(out_path, f"frame_{n}.png"), frame)
+                        ref = temp_embedd
+                        n_s += 1
+                n += 1
+                pbar.update(1)
+        capture.release()
+        print(f"\nDone. Extracted up to {n_s} frames to {out_path}.")
+        release_memory()

@@ -6,3 +6,6 @@ spandrel_extra_arches
 chainner-ext
 tqdm
 imageio
+pyyaml
+tqdm
+ffmpeg

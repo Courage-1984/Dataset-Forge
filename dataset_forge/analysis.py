@@ -3,12 +3,18 @@ import logging
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-from dataset_forge.io_utils_old import is_image_file
+from dataset_forge.io_utils import is_image_file
 from collections import Counter, defaultdict
 import cv2
 import shutil
 import concurrent.futures
 from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
+from dataset_forge.analysis_ops import (
+    ScaleAnalyzer,
+    DimensionAnalyzer,
+    ConsistencyAnalyzer,
+)
+
 
 def get_file_operation_choice():
     while True:
@@ -54,148 +60,22 @@ def get_unique_filename(dest_dir, filename):
     return unique_name
 
 
-# --- Function from hq_lq_scale.py ---
+# Wrappers for backward compatibility
+
+
 def find_hq_lq_scale(hq_folder, lq_folder, verbose=True):
-    if verbose:
-        print("\n" + "=" * 30)
-        print("   Finding HQ/LQ Scale")
-        print("=" * 30)
+    analyzer = ScaleAnalyzer()
+    return analyzer.analyze(hq_folder, lq_folder, verbose=verbose)
 
-    hq_files = sorted(
-        [
-            f
-            for f in os.listdir(hq_folder)
-            if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
-        ]
-    )
-    lq_files = sorted(
-        [
-            f
-            for f in os.listdir(lq_folder)
-            if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
-        ]
-    )
 
-    scales = []
-    inconsistent_scales = []
-    missing_lq = []
-    missing_hq = []
+def report_dimensions(folder_path, folder_name, verbose=True):
+    analyzer = DimensionAnalyzer()
+    return analyzer.analyze(folder_path, folder_name, verbose=verbose)
 
-    if verbose:
-        print(f"Processing {len(hq_files)} HQ files and {len(lq_files)} LQ files...")
 
-    for hq_file in tqdm(hq_files, desc="Finding Scale", disable=not verbose):
-        if hq_file in lq_files:
-            hq_path = os.path.join(hq_folder, hq_file)
-            lq_path = os.path.join(
-                lq_folder, hq_file
-            )  # Assuming same filename in LQ folder
-
-            try:
-                with Image.open(hq_path) as hq_img:
-                    hq_width, hq_height = hq_img.size
-                with Image.open(lq_path) as lq_img:
-                    lq_width, lq_height = lq_img.size
-
-                if lq_width == 0 or lq_height == 0:
-                    inconsistent_scales.append(
-                        f"{hq_file}: Division by zero in LQ dimension"
-                    )
-                    continue
-
-                width_scale = hq_width / lq_width
-                height_scale = hq_height / lq_height
-
-                if abs(width_scale - height_scale) < 1e-9:
-                    scales.append(
-                        round(width_scale, 2)
-                    )  # Round for consistent grouping
-                else:
-                    inconsistent_scales.append(
-                        f"{hq_file}: Inconsistent Scale: Width {width_scale:.2f}, Height {height_scale:.2f}"
-                    )
-
-            except Exception as e:
-                inconsistent_scales.append(f"Could not process file {hq_file}: {e}")
-        else:
-            missing_lq.append(hq_file)
-
-    for lq_file in lq_files:
-        if lq_file not in hq_files:
-            missing_hq.append(lq_file)
-
-    if verbose:
-        print("\n" + "-" * 30)
-        print("  Scale Analysis Summary")
-        print("-" * 30)
-        print(f"Total HQ files found: {len(hq_files)}")
-        print(f"Total LQ files found: {len(lq_files)}")
-        print(f"Processed image pairs: {len(scales) + len(inconsistent_scales)}")
-
-        if scales:
-            scale_counts = Counter(scales)
-            most_common_scale = scale_counts.most_common(1)[0]
-            print(
-                f"Most common consistent scale found: {most_common_scale[0]:.2f} (occurred {most_common_scale[1]} times)"
-            )
-            if len(scale_counts) > 1:
-                print("Other consistent scales found:")
-                for scale, count in scale_counts.most_common(
-                    min(len(scale_counts) - 1, 5)
-                )[
-                    1:
-                ]:  # Start from the second item
-                    if (
-                        count > 0
-                    ):  # ensure we don't print if most_common was the only one
-                        print(f"  - {scale:.2f} ({count} times)")
-                if (
-                    len(scale_counts) - 1 > 5
-                ):  # Adjust for the already printed most common
-                    print(
-                        f"  ... and {len(scale_counts) - 1 - 5} more unique scales."
-                    )  # -1 for most_common, -5 for printed
-        else:
-            print("No consistent scales found among processed pairs.")
-
-        if inconsistent_scales:
-            print(
-                f"\nFiles with inconsistent width/height scales or processing errors: {len(inconsistent_scales)}"
-            )
-            for i, item in enumerate(inconsistent_scales[:5]):
-                print(f"  - {item}")
-            if len(inconsistent_scales) > 5:
-                print(f"  ... and {len(inconsistent_scales) - 5} more files.")
-
-        if missing_lq:
-            print(
-                f"\nFiles in HQ folder with no corresponding file in LQ folder: {len(missing_lq)}"
-            )
-            for item in missing_lq[:5]:
-                print(f"  - {item}")
-            if len(missing_lq) > 5:
-                print(f"  ... and {len(missing_lq) - 5} more files.")
-
-        if missing_hq:
-            print(
-                f"\nFiles in LQ folder with no corresponding file in HQ folder: {len(missing_hq)}"
-            )
-            for item in missing_hq[:5]:
-                print(f"  - {item}")
-            if len(missing_hq) > 5:
-                print(f"  ... and {len(missing_hq) - 5} more files.")
-        print("-" * 30)
-        print("=" * 30)
-
-    return {
-        "total_hq_files": len(hq_files),
-        "total_lq_files": len(lq_files),
-        "processed_pairs": len(scales) + len(inconsistent_scales),
-        "scales": scales,
-        "inconsistent_scales": inconsistent_scales,
-        "missing_lq": missing_lq,
-        "missing_hq": missing_hq,
-    }
+def check_consistency(folder_path, folder_name, verbose=True):
+    analyzer = ConsistencyAnalyzer()
+    return analyzer.analyze(folder_path, folder_name, verbose=verbose)
 
 
 # --- Function from hq_lq_scale.py ---

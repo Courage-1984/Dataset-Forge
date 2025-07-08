@@ -1,5 +1,5 @@
 import os
-from dataset_forge.io_utils_old import is_image_file
+from dataset_forge.io_utils import is_image_file
 from dataset_forge.common import get_destination_path
 from PIL import Image, ImageFont, ImageDraw
 import random

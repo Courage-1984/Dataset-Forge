@@ -4,7 +4,7 @@ import random
 from subprocess import CalledProcessError
 from tqdm import tqdm
 from PIL import Image
-from dataset_forge.io_utils_old import is_image_file, get_pairs_to_process
+from dataset_forge.io_utils import is_image_file, get_pairs_to_process
 import logging
 import numpy as np
 from tqdm import tqdm
@@ -12,12 +12,15 @@ from collections import Counter, defaultdict
 import cv2
 import concurrent.futures
 from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
-from dataset_forge.io_utils_old import (
+from dataset_forge.io_utils import (
     get_file_operation_choice,
     get_destination_path,
     IMAGE_TYPES,
 )
 from dataset_forge.common import get_unique_filename
+import subprocess
+from dataset_forge.image_ops import ColorAdjuster
+
 
 def split_dataset_in_half(hq_folder, lq_folder):
     print("\n" + "=" * 30)
@@ -1987,369 +1990,202 @@ def transform_dataset(hq_folder, lq_folder):
 
 
 def dataset_colour_adjustment(hq_folder, lq_folder):
+    """Adjust color properties of HQ/LQ images using ColorAdjuster class."""
     print("\n" + "=" * 30)
     print("  Dataset Color Adjustment")
     print("=" * 30)
 
-    BATCH_SIZE = 1000  # Process this many pairs at a time
-
-    hq_files_list = sorted(
-        [
-            f
-            for f in os.listdir(hq_folder)
-            if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
-        ]
+    adjustment_type = (
+        input("Enter adjustment type (brightness/contrast/color/sharpness): ")
+        .strip()
+        .lower()
     )
-    lq_files_list = sorted(
-        [
-            f
-            for f in os.listdir(lq_folder)
-            if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
-        ]
-    )
-    matching_files = [f for f in hq_files_list if f in lq_files_list]
-
-    if not matching_files:
-        print("No matching HQ/LQ pairs found for color adjustment.")
-        print("=" * 30)
+    try:
+        factor = float(input("Enter adjustment factor (e.g., 1.2 for +20%): ").strip())
+    except Exception:
+        print("Invalid factor. Aborting.")
         return
-
-    files_to_process = get_pairs_to_process(
-        matching_files, operation_name="apply color adjustment to"
-    )
-    if not files_to_process:
-        print("=" * 30)
-        return
-    num_selected_for_adjust = len(files_to_process)
-
-    adjustment_options = {
-        "1": "brightness",
-        "2": "contrast",
-        "3": "saturation",
-        "4": "sharpness",
-        "5": "grayscale",
-        "6": "hue",
-    }
-
-    print("\nSelect an adjustment type:")
-    for key, value in adjustment_options.items():
-        print(f"  {key}. {value.capitalize()}")
-
-    while True:
-        adj_choice = input("Enter the number of your choice: ").strip()
-        if adj_choice in adjustment_options:
-            selected_adjustment = adjustment_options[adj_choice]
-            break
-        else:
-            print("Invalid choice. Please enter a valid number.")
-
-    # HUE: Accept degrees and allow random per-pair
-    if selected_adjustment == "hue":
-        while True:
-            hue_input = (
-                input(
-                    "Enter hue shift in degrees (0-179), or 'random' for random shift per pair: "
-                )
-                .strip()
-                .lower()
-            )
-            if hue_input == "random":
-                hue_shift_value = "random"
-                break
-            try:
-                hue_shift_value = int(hue_input)
-                if 0 <= hue_shift_value <= 179:
-                    break
-                else:
-                    print("Hue shift must be between 0 and 179.")
-            except ValueError:
-                print("Invalid input. Enter a number (0-179) or 'random'.")
-    else:
-        while True:
-            try:
-                factor_str = input(
-                    f"Enter adjustment factor for {selected_adjustment} (e.g., 0.5 for less, 1.0 for original, 1.5 for 50% more): "
-                ).strip()
-                factor = float(factor_str)
-                if factor >= 0:  # Allow 0, e.g. brightness to black
-                    break
-                else:
-                    print("Factor must be non-negative.")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-
     operation = get_file_operation_choice()
-
-    destination_hq_folder = ""
-    destination_lq_folder = ""
+    dest_dir = ""
     if operation != "inplace":
-        output_base_dir_prompt = (
-            f"Enter base destination directory for {operation}ed color-adjusted pairs: "
-        )
-        output_base_dir = (
-            get_destination_path(prompt=output_base_dir_prompt)
-            if callable(get_destination_path)
-            else get_destination_path()
-        )
-        if not output_base_dir:
+        dest_dir = get_destination_path()
+        if not dest_dir:
             print(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
+        os.makedirs(dest_dir, exist_ok=True)
 
-        sane_adjust_name = selected_adjustment.replace("_", "-")
-        destination_hq_folder = os.path.join(
-            output_base_dir, f"adjusted_{sane_adjust_name}_hq"
-        )
-        destination_lq_folder = os.path.join(
-            output_base_dir, f"adjusted_{sane_adjust_name}_lq"
-        )
-        os.makedirs(destination_hq_folder, exist_ok=True)
-        os.makedirs(destination_lq_folder, exist_ok=True)
-        print(
-            f"Adjusted pairs will be {operation}d to respective subfolders in {output_base_dir}"
-        )
-    else:
-        print(
-            f"Performing '{selected_adjustment}' adjustment in-place on {num_selected_for_adjust} selected pairs."
-        )
-
-    processed_count = 0
-    errors = []
-
-    print(
-        f"\nApplying {selected_adjustment} adjustment to {num_selected_for_adjust} randomly selected and ordered pairs..."
-    )
-
-    # Batching loop
-    for batch_start in range(0, len(files_to_process), BATCH_SIZE):
-        batch = files_to_process[batch_start : batch_start + BATCH_SIZE]
-        print(f"Processing batch {batch_start//BATCH_SIZE+1} ({len(batch)} pairs)...")
-        for filename in tqdm(
-            batch,
-            desc=f"Adjusting Pairs ({selected_adjustment}) [Batch {batch_start//BATCH_SIZE+1}]",
-        ):
-            hq_src_path = os.path.join(hq_folder, filename)
-            lq_src_path = os.path.join(lq_folder, filename)
-
-            hq_dest_path_for_apply = None
-            lq_dest_path_for_apply = None
-            if operation != "inplace":
-                hq_dest_path_for_apply = os.path.join(
-                    destination_hq_folder,
-                    get_unique_filename(destination_hq_folder, filename),
-                )
-                lq_dest_path_for_apply = os.path.join(
-                    destination_lq_folder,
-                    get_unique_filename(destination_lq_folder, filename),
-                )
-            else:
-                hq_dest_path_for_apply = hq_src_path
-                lq_dest_path_for_apply = lq_src_path
-
-            # HUE: handle random per-pair and pass degrees
-            if selected_adjustment == "hue":
-                if hue_shift_value == "random":
-                    hue_deg = random.randint(0, 179)
-                else:
-                    hue_deg = int(hue_shift_value)  # Ensure always int for both HQ/LQ
-                hq_success = adjust_image_color(
-                    hq_src_path,
-                    selected_adjustment,
-                    hue_deg,
-                    operation,
-                    hq_dest_path_for_apply,
-                )
-                lq_success = adjust_image_color(
-                    lq_src_path,
-                    selected_adjustment,
-                    hue_deg,
-                    operation,
-                    lq_dest_path_for_apply,
-                )
-            else:
-                hq_success = adjust_image_color(
-                    hq_src_path,
-                    selected_adjustment,
-                    factor,
-                    operation,
-                    hq_dest_path_for_apply,
-                )
-                lq_success = False
-                if hq_success or operation != "move":
-                    lq_success = adjust_image_color(
-                        lq_src_path,
-                        selected_adjustment,
-                        factor,
-                        operation,
-                        lq_dest_path_for_apply,
-                    )
-
-            if hq_success and lq_success:
-                processed_count += 1
-            else:
-                err_msg = f"Pair {filename}: "
-                if not hq_success:
-                    err_msg += f"HQ failed adjustment. "
-                if not lq_success:
-                    err_msg += f"LQ failed adjustment."
-                errors.append(err_msg)
-                logging.warning(
-                    f"Failed to fully adjust pair {filename}. HQ status: {hq_success}, LQ status: {lq_success}"
-                )
-
-    print("\n" + "-" * 30)
-    print("  Dataset Color Adjustment Summary")
-    print("-" * 30)
-    if selected_adjustment == "hue":
-        print(
-            f"Adjustment Type: hue (Degrees: {'random per pair' if hue_shift_value == 'random' else hue_shift_value})"
-        )
-    else:
-        print(f"Adjustment Type: {selected_adjustment} (Factor: {factor})")
-    print(f"Operation: {operation.capitalize()}")
-    print(f"Total matching pairs in source: {len(matching_files)}")
-    print(f"Number of pairs selected for adjustment: {num_selected_for_adjust}")
-    print(f"Successfully adjusted: {processed_count} pairs.")
-    if errors:
-        print(f"Errors or partial failures encountered for {len(errors)} pairs:")
-        for i, error_msg in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error_msg}")
-        if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more issues.")
-    print("-" * 30)
-    print("=" * 30)
+    adjuster = ColorAdjuster(adjustment_type, factor)
+    for folder, label in [(hq_folder, "HQ"), (lq_folder, "LQ")]:
+        image_files = [
+            f
+            for f in os.listdir(folder)
+            if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
+        ]
+        for filename in tqdm(image_files, desc=f"Adjusting {label}"):
+            src_path = os.path.join(folder, filename)
+            dest_path = (
+                src_path
+                if operation == "inplace"
+                else os.path.join(dest_dir, get_unique_filename(dest_dir, filename))
+            )
+            success, msg = adjuster.process(
+                src_path, output_path=dest_path, operation=operation
+            )
+            if not success:
+                print(f"Error adjusting {label} {filename}: {msg}")
+    print("Adjustment complete.")
 
 
-# --- New Function: Grayscale Conversion ---
 def grayscale_conversion(hq_folder, lq_folder):
+    """Convert HQ/LQ images to grayscale using ColorAdjuster class."""
     print("\n" + "=" * 30)
     print("  Grayscale Conversion")
     print("=" * 30)
 
-    hq_files_list = sorted(
-        [
+    operation = get_file_operation_choice()
+    dest_dir = ""
+    if operation != "inplace":
+        dest_dir = get_destination_path()
+        if not dest_dir:
+            print(
+                f"Operation aborted as no destination path was provided for {operation}."
+            )
+            return
+        os.makedirs(dest_dir, exist_ok=True)
+
+    for folder, label in [(hq_folder, "HQ"), (lq_folder, "LQ")]:
+        image_files = [
             f
-            for f in os.listdir(hq_folder)
-            if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
+            for f in os.listdir(folder)
+            if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
         ]
-    )
-    lq_files_list = sorted(
+        for filename in tqdm(image_files, desc=f"Converting {label}"):
+            src_path = os.path.join(folder, filename)
+            dest_path = (
+                src_path
+                if operation == "inplace"
+                else os.path.join(dest_dir, get_unique_filename(dest_dir, filename))
+            )
+            # Use ColorAdjuster with adjustment_type 'color' and factor 0 for grayscale
+            adjuster = ColorAdjuster("color", 0)
+            success, msg = adjuster.process(
+                src_path, output_path=dest_path, operation=operation
+            )
+            if not success:
+                print(f"Error converting {label} {filename}: {msg}")
+    print("Grayscale conversion complete.")
+
+
+def remove_small_image_pairs(hq_folder, lq_folder):
+    print("\n" + "=" * 30)
+    print("  Removing Small Image Pairs")
+    print("=" * 30)
+
+    while True:
+        try:
+            min_size = int(input("Enter the minimum allowed dimension (e.g., 80): "))
+            if min_size >= 0:
+                break
+            else:
+                print("Please enter a non-negative integer.")
+        except ValueError:
+            print("Invalid input. Please enter an integer.")
+
+    operation = get_file_operation_choice()
+    destination = ""
+    if operation == "move":
+        destination = get_destination_path()
+        if not destination:
+            print("Operation aborted as no destination path was provided for move.")
+            return
+        os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
+        os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
+    elif operation == "copy":
+        destination = get_destination_path()
+        if not destination:
+            print("Operation aborted as no destination path was provided for copy.")
+            return
+        os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
+        os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
+
+    removed_count = 0
+    checked_count = 0
+    errors = []
+
+    lq_files = sorted(
         [
             f
             for f in os.listdir(lq_folder)
             if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
         ]
     )
-    matching_files = [f for f in hq_files_list if f in lq_files_list]
+    # Filter to only include pairs that exist in both folders
+    hq_files_set = set(os.listdir(hq_folder))
+    matching_files = [f for f in lq_files if f in hq_files_set and is_image_file(f)]
 
-    if not matching_files:
-        print("No matching HQ/LQ pairs found for grayscale conversion.")
-        print("=" * 30)
-        return
+    print(f"Checking {len(matching_files)} HQ/LQ pairs...")
 
-    files_to_process = get_pairs_to_process(
-        matching_files, operation_name="convert to grayscale"
-    )
-    if not files_to_process:
-        print("=" * 30)
-        return
-    num_selected_for_grayscale = len(files_to_process)
+    for filename in tqdm(matching_files, desc="Processing Small Pairs"):
+        lq_path = os.path.join(lq_folder, filename)
+        hq_path = os.path.join(hq_folder, filename)
 
-    operation = get_file_operation_choice()
+        # This check is redundant due to pre-filtering, but kept for safety.
+        if not os.path.isfile(hq_path):
+            # errors.append(f"Skipping {filename}: HQ pair not found.") # Should not happen with matching_files
+            continue
 
-    destination_hq_folder = ""
-    destination_lq_folder = ""
-    if operation != "inplace":
-        output_base_dir_prompt = (
-            f"Enter base destination directory for {operation}ed grayscale pairs: "
-        )
-        output_base_dir = (
-            get_destination_path(prompt=output_base_dir_prompt)
-            if callable(get_destination_path)
-            else get_destination_path()
-        )
-        if not output_base_dir:
-            print(
-                f"Operation aborted as no destination path was provided for {operation}."
-            )
-            return
-        destination_hq_folder = os.path.join(output_base_dir, "grayscale_hq")
-        destination_lq_folder = os.path.join(output_base_dir, "grayscale_lq")
-        os.makedirs(destination_hq_folder, exist_ok=True)
-        os.makedirs(destination_lq_folder, exist_ok=True)
-        print(
-            f"Grayscale pairs will be {operation}d to respective subfolders in {output_base_dir}"
-        )
-    else:
-        print(
-            f"Performing grayscale conversion in-place on {num_selected_for_grayscale} selected pairs."
-        )
+        checked_count += 1
 
-    processed_count = 0
-    errors = []
+        lq_is_small = is_small(lq_path, min_size)
+        hq_is_small = is_small(hq_path, min_size)
 
-    print(
-        f"\nConverting {num_selected_for_grayscale} randomly selected and ordered pairs to grayscale (Operation: {operation})..."
-    )
+        if lq_is_small or hq_is_small:
+            try:
+                if operation == "inplace":
+                    # For remove, inplace means direct deletion
+                    os.remove(lq_path)
+                    os.remove(hq_path)
+                    # logging.info(f"Removed (inplace) small pair: {filename}")
+                else:  # copy or move
+                    hq_dest_folder = os.path.join(destination, "hq")
+                    lq_dest_folder = os.path.join(destination, "lq")
+                    hq_dest_path = os.path.join(
+                        hq_dest_folder,
+                        get_unique_filename(hq_dest_folder, filename),
+                    )
+                    lq_dest_path = os.path.join(
+                        lq_dest_folder,
+                        get_unique_filename(lq_dest_folder, filename),
+                    )
 
-    for filename in tqdm(files_to_process, desc="Converting to Grayscale"):
-        hq_src_path = os.path.join(hq_folder, filename)
-        lq_src_path = os.path.join(lq_folder, filename)
-
-        hq_dest_path_for_apply = None
-        lq_dest_path_for_apply = None
-        if operation != "inplace":
-            hq_dest_path_for_apply = os.path.join(
-                destination_hq_folder,
-                get_unique_filename(destination_hq_folder, filename),
-            )
-            lq_dest_path_for_apply = os.path.join(
-                destination_lq_folder,
-                get_unique_filename(destination_lq_folder, filename),
-            )
-        else:
-            hq_dest_path_for_apply = hq_src_path
-            lq_dest_path_for_apply = lq_src_path
-
-        # "grayscale" is a transform type in apply_transformation_to_image, value is not used.
-        hq_success = apply_transformation_to_image(
-            hq_src_path, "grayscale", None, operation, hq_dest_path_for_apply
-        )
-        lq_success = False
-        if hq_success or operation != "move":
-            lq_success = apply_transformation_to_image(
-                lq_src_path, "grayscale", None, operation, lq_dest_path_for_apply
-            )
-
-        if hq_success and lq_success:
-            processed_count += 1
-        else:
-            err_msg = f"Pair {filename}: "
-            if not hq_success:
-                err_msg += f"HQ failed grayscale. "
-            if not lq_success:
-                err_msg += f"LQ failed grayscale."
-            errors.append(err_msg)
-            logging.warning(
-                f"Failed to fully convert pair {filename} to grayscale. HQ: {hq_success}, LQ: {lq_success}"
-            )
+                    if operation == "copy":
+                        shutil.copy2(hq_path, hq_dest_path)
+                        shutil.copy2(lq_path, lq_dest_path)
+                        # logging.info(f"Copied small pair {filename} to {destination}")
+                    elif operation == "move":
+                        shutil.move(hq_path, hq_dest_path)
+                        shutil.move(lq_path, lq_dest_path)
+                        # logging.info(f"Moved small pair {filename} to {destination}")
+                removed_count += 1
+            except Exception as e:
+                errors.append(f"Error {operation}ing {filename}: {e}")
+                logging.error(f"Error {operation}ing small pair {filename}: {e}")
 
     print("\n" + "-" * 30)
-    print("  Grayscale Conversion Summary")
+    print("  Remove Small Pairs Summary")
     print("-" * 30)
-    print(f"Operation: {operation.capitalize()}")
-    print(f"Total matching pairs in source: {len(matching_files)}")
+    print(f"Checked {checked_count} pairs.")
     print(
-        f"Number of pairs selected for grayscale conversion: {num_selected_for_grayscale}"
+        f"Processed ({operation}ed) {removed_count} image pairs where either dimension was smaller than {min_size}."
     )
-    print(f"Successfully converted to grayscale: {processed_count} pairs.")
     if errors:
-        print(f"Errors or partial failures encountered for {len(errors)} pairs:")
-        for i, error_msg in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error_msg}")
+        print(f"Errors encountered: {len(errors)}")
+        for i, error in enumerate(errors[: min(len(errors), 5)]):
+            print(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more issues.")
+            print(f"  ... and {len(errors) - 5} more errors.")
     print("-" * 30)
     print("=" * 30)
 
@@ -2548,3 +2384,196 @@ def convert_to_webp_menu(hq_folder, lq_folder):
         )
     print("\nWebP conversion finished.")
     print("=" * 30)
+
+
+# --- DPID Implementation: BasicSR ---
+def dpid_basicsr(img, h, w, l=0.5):
+    # img: float32, range [0, 1]
+    img = np.clip(img, 0, 1)
+    img_lr = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
+    img_sr = cv2.resize(
+        img_lr, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LINEAR
+    )
+    detail = img - img_sr
+    img_lr = img_lr + l * cv2.resize(detail, (w, h), interpolation=cv2.INTER_LINEAR)
+    img_lr = np.clip(img_lr, 0, 1)
+    return img_lr
+
+
+# --- DPID Implementation: OpenMMLab ---
+def dpid_openmmlab(img, h, w, l=0.5):
+    # img: float32, range [0, 1]
+    # This is a direct adaptation of the BasicSR version, as OpenMMLab's is nearly identical for DPID
+    img = np.clip(img, 0, 1)
+    img_lr = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
+    img_sr = cv2.resize(
+        img_lr, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LINEAR
+    )
+    detail = img - img_sr
+    img_lr = img_lr + l * cv2.resize(detail, (w, h), interpolation=cv2.INTER_LINEAR)
+    img_lr = np.clip(img_lr, 0, 1)
+    return img_lr
+
+
+# --- Downsampling Menu ---
+def downsample_images_menu():
+    print("\n=== Downsample Images (Batch/Single, Multiple Methods) ===")
+    input_folder = input("Enter path to HR (100%) images folder: ").strip()
+    if not os.path.isdir(input_folder):
+        print(f"Input folder '{input_folder}' does not exist.")
+        return
+    output_folder = input(
+        "Enter base output folder (subfolders will be created for each scale): "
+    ).strip()
+    if not output_folder:
+        print("Output folder is required.")
+        return
+    os.makedirs(output_folder, exist_ok=True)
+    # Scales
+    scale_str = input(
+        "Enter scale factors (comma-separated, e.g. 0.75,0.5,0.25): "
+    ).strip()
+    try:
+        scales = [float(s) for s in scale_str.split(",") if 0 < float(s) < 1]
+    except Exception:
+        print("Invalid scale factors.")
+        return
+    if not scales:
+        print("No valid scales provided.")
+        return
+    # Method
+    print("Select downsampling method:")
+    print("  1. DPID (BasicSR)")
+    print("  2. DPID (OpenMMLab)")
+    print("  3. OpenCV INTER_AREA")
+    print("  4. OpenCV INTER_LANCZOS4")
+    print("  5. OpenCV INTER_CUBIC")
+    print("  6. PIL LANCZOS")
+    method = input("Enter method number (default 1): ").strip() or "1"
+    dpid_lambda = 0.5
+    if method in ["1", "2"]:
+        try:
+            dpid_lambda = float(
+                input("Enter DPID lambda (0=smooth, 1=detail, default 0.5): ").strip()
+                or 0.5
+            )
+        except Exception:
+            dpid_lambda = 0.5
+    # Process
+    supported_formats = (".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff")
+    files = [
+        f
+        for f in os.listdir(input_folder)
+        if os.path.isfile(os.path.join(input_folder, f))
+        and f.lower().endswith(supported_formats)
+    ]
+    if not files:
+        print("No supported images found in input folder.")
+        return
+    for scale in scales:
+        scale_folder = os.path.join(output_folder, f"downsampled_{int(scale*100)}")
+        os.makedirs(scale_folder, exist_ok=True)
+        print(f"\nProcessing scale {scale*100:.0f}% -> {scale_folder}")
+        for filename in files:
+            file_path = os.path.join(input_folder, filename)
+            try:
+                # Read image as float32, normalized
+                img = cv2.imread(file_path, cv2.IMREAD_UNCHANGED)
+                if img is None:
+                    print(f"Failed to read {filename}")
+                    continue
+                if img.dtype != np.float32:
+                    img = img.astype(np.float32) / 255.0
+                h, w = img.shape[:2]
+                new_w = max(1, int(w * scale))
+                new_h = max(1, int(h * scale))
+                if method == "1":
+                    out_img = dpid_basicsr(img, new_h, new_w, l=dpid_lambda)
+                elif method == "2":
+                    out_img = dpid_openmmlab(img, new_h, new_w, l=dpid_lambda)
+                elif method == "3":
+                    out_img = cv2.resize(
+                        img, (new_w, new_h), interpolation=cv2.INTER_AREA
+                    )
+                elif method == "4":
+                    out_img = cv2.resize(
+                        img, (new_w, new_h), interpolation=cv2.INTER_LANCZOS4
+                    )
+                elif method == "5":
+                    out_img = cv2.resize(
+                        img, (new_w, new_h), interpolation=cv2.INTER_CUBIC
+                    )
+                elif method == "6":
+                    from PIL import Image
+
+                    img_pil = Image.fromarray((img * 255).astype(np.uint8))
+                    out_img = img_pil.resize((new_w, new_h), Image.LANCZOS)
+                    out_img = np.array(out_img).astype(np.float32) / 255.0
+                else:
+                    print(f"Unknown method {method}, skipping.")
+                    continue
+                # Save
+                out_img_save = (np.clip(out_img, 0, 1) * 255).astype(np.uint8)
+                out_path = os.path.join(scale_folder, filename)
+                cv2.imwrite(out_path, out_img_save)
+                print(f"  {filename} -> {out_path}")
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+    print("\nDownsampling complete!")
+
+
+class ToneMapper:
+    """Base class for HDR to SDR tone mapping using ffmpeg."""
+
+    def __init__(self, algorithm="hable"):
+        self.algorithm = algorithm
+
+    def ffmpeg_command(self, input_path, output_path):
+        # Compose the ffmpeg command for the selected algorithm
+        return [
+            "ffmpeg",
+            "-i",
+            input_path,
+            "-vf",
+            f"zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap={self.algorithm}:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p",
+            "-c:v",
+            "libx264",
+            "-crf",
+            "18",
+            "-preset",
+            "fast",
+            "-c:a",
+            "copy",
+            output_path,
+        ]
+
+    def run(self, input_path, output_path):
+        cmd = self.ffmpeg_command(input_path, output_path)
+        print("\nRunning ffmpeg command:")
+        print(" ".join(cmd))
+        try:
+            subprocess.run(cmd, check=True)
+            print(f"\nTone mapping complete! Output: {output_path}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error running ffmpeg: {e}")
+
+
+def hdr_to_sdr_menu():
+    print("\n=== HDR to SDR Tone Mapping ===")
+    input_path = input("Enter path to input HDR video: ").strip()
+    if not input_path or not os.path.isfile(input_path):
+        print(f"Input file '{input_path}' does not exist.")
+        return
+    output_path = input("Enter path for output SDR video: ").strip()
+    if not output_path:
+        print("Output path is required.")
+        return
+    print("Select tone mapping algorithm:")
+    print("  1. hable (default)")
+    print("  2. reinhard")
+    print("  3. mobius")
+    algo_choice = input("Enter algorithm number (1/2/3): ").strip() or "1"
+    algo_map = {"1": "hable", "2": "reinhard", "3": "mobius"}
+    algorithm = algo_map.get(algo_choice, "hable")
+    tonemapper = ToneMapper(algorithm=algorithm)
+    tonemapper.run(input_path, output_path)
