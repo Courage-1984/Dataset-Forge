@@ -1,0 +1,38 @@
+{
+    "_comment_model_name": "A unique name for your model/config. Used as the config filename.",
+    "model_name": "example_model",
+    "_comment_scale": "The scale factor between HQ and LQ images (e.g., 2, 4).",
+    "scale": 2.0,
+    "_comment_hq_path": "Absolute or relative path to the High-Quality (HQ) image folder.",
+    "hq_path": "./datasets/hq",
+    "_comment_lq_path": "Absolute or relative path to the Low-Quality (LQ) image folder.",
+    "lq_path": "./datasets/lq",
+    "_comment_yml_path": "Path to the traiNNer-redux .yml config file for model training.",
+    "yml_path": "./trainner_configs/example_trainner.yml",
+    "_comment_hcl_path": "Path to the wtp_dataset_destroyer .hcl config file for dataset destruction/processing.",
+    "hcl_path": "./wtp_configs/example_wtp.hcl",
+    "_comment_min_lq_w": "Minimum width (in pixels) for LQ images. Images below this will be flagged/filtered.",
+    "min_lq_w": 96,
+    "_comment_min_lq_h": "Minimum height (in pixels) for LQ images. Images below this will be flagged/filtered.",
+    "min_lq_h": 96,
+    "_comment_val_hq_path": "(Optional) Path to validation HQ dataset, if available.",
+    "val_hq_path": "./datasets/val_hq",
+    "_comment_val_lq_path": "(Optional) Path to validation LQ dataset, if available.",
+    "val_lq_path": "./datasets/val_lq",
+    "_comment_model_dir": "(Optional) Path to the traiNNer-redux experiment directory for this model.",
+    "model_dir": "./experiments/example_model",
+    "_comment_model_files": "(Optional) List of model checkpoint files (e.g., .safetensors) for upscaling or inference.",
+    "model_files": [
+        "./experiments/example_model/models/net_g_ema_100000.safetensors",
+        "./experiments/example_model/models/net_g_ema_200000.safetensors"
+    ],
+    "_comment_hcl_input": "(Optional) Input path as parsed from .hcl config, if available.",
+    "hcl_input": "./datasets/input",
+    "_comment_hcl_output": "(Optional) Output path as parsed from .hcl config, if available.",
+    "hcl_output": "./datasets/output",
+    "_comment_hcl_global": "(Optional) Global settings parsed from .hcl config, if available.",
+    "hcl_global": {
+        "some_setting": 123,
+        "another_setting": "value"
+    }
+}

@@ -7,13 +7,13 @@
   </br>
   <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600"/>  
 </h1>
-<p align="center"><i>Your all-in-one image dataset utility helper for ML, with a focus on hq/lq image pairs intended for SISR.</i></p>
+<p align="center"><i>The all-in-one, modular image dataset utility for ML, with a focus on HQ/LQ image pairs for SISR and general computer vision. CLI-first, highly extensible, and packed with advanced tools for dataset curation, analysis, transformation, and validation.</i></p>
 
 ---
 
 ## ✨ TL;DR
 
-> Dataset Forge is a comprehensive Python CLI utility designed to help you efficiently manage, analyze, and transform image datasets, particularly High-Quality (HQ) and Low-Quality (LQ) pairs for machine learning tasks like super-resolution. Features an immersive Catppuccin Mocha-themed interface with 28+ powerful operations.
+> **Dataset Forge** is a comprehensive Python CLI utility for managing, analyzing, and transforming image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution and related ML tasks. It features a beautiful Catppuccin Mocha-themed interface, deep validation, and 30+ powerful operations.
 
 ---
 
@@ -21,72 +21,76 @@
 
 ### 🎯 **Core & Configuration**
 
-- **Multi-Format Config Support**: JSON, INI, YAML, and HCL configuration files
-- **External Tool Integration**: Direct integration with [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) and [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
-- **Model Management**: List and run upscaling with trained models from traiNNer-redux experiments
-- **Validation Tools**: Validate HQ/LQ datasets and validation datasets from config files
-- **Config Editor**: Built-in editors for .hcl and .yml configuration files
+- Multi-format config support: JSON, YAML, HCL
+- External tool integration: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
+- Model management: List, select, and run upscaling with trained models
+- Validation tools: Validate HQ/LQ and validation datasets from config
+- Built-in config editors for .hcl and .yml
 
 ### 📊 **Dataset Analysis & Validation**
 
-- **Scale Detection**: Find and test HQ/LQ scale ratios with tolerance checking
-- **Consistency Analysis**: Check image formats, modes, and metadata consistency
-- **Dimension Reporting**: Detailed statistics on image dimensions with histograms
-- **Extreme Dimension Detection**: Find images with unusual sizes
-- **Image Integrity Verification**: Detect and report corrupted images
-- **Misalignment Detection**: Use Phase Correlation to find misaligned HQ/LQ pairs
-- **Comprehensive Reports**: Generate full HQ/LQ dataset analysis reports
+- Scale detection and testing for HQ/LQ pairs
+- Consistency checks: format, mode, metadata
+- Dimension reporting and histograms
+- Extreme dimension detection
+- Corruption and misalignment detection
+- Comprehensive HQ/LQ dataset reports
+- BHI filtering: Blockiness, HyperIQA, IC9600
 
 ### 🔧 **Dataset Operations**
 
-- **Smart Filtering**: Remove image pairs by size, dimensions, file type, or percentage
-- **Random Extraction**: Extract random subsets of image pairs
-- **Shuffling**: Randomize dataset order while maintaining pair integrity
-- **Transformations**: Rotate, flip, adjust brightness/contrast/sharpness
-- **Color Adjustments**: Fine-tune contrast, saturation, and brightness
-- **Grayscale Conversion**: Convert datasets to grayscale
-- **Advanced Splitting**: Split datasets with custom ratios and adjustments
-- **Dataset Combination**: Safely merge multiple HQ/LQ datasets
-- **Alpha Channel Tools**: Find and remove alpha channels in bulk
-- **Corruption Handling**: Detect and fix corrupted images automatically
-- **Format Optimization**: Optimize PNG files and convert to WebP
+- Remove small/invalid image pairs
+- Extract random pairs, shuffle, split/adjust datasets
+- Combine/merge datasets safely
+- Batch renaming (single/paired)
+- De-duplication (exact/near-duplicate detection)
+- Orientation-based organization (landscape/portrait/square)
+- Move/copy utilities
 
-### 🎨 **Visualization & Comparison**
+### 🎨 **Image Processing & Transformation**
 
-- **Side-by-Side Comparisons**: Create labeled HQ/LQ comparison images
-- **Animated Comparisons**: Generate GIF/WebP animations with smooth transitions
-- **Custom Effects**: Apply easing curves and visual effects to comparisons
+- Color/tone/hue/brightness/contrast adjustments
+- Grayscale conversion
+- Remove/find alpha channels
+- Custom transformation pipeline
+- Downsampling (DPID, batch/single)
+- HDR to SDR conversion
 
-### 🧩 **Advanced Image Processing**
+### 🧩 **Advanced Tiling & Multiscale**
 
-- **BestTile Tiling**: Intelligent image tiling using Laplacian complexity or IC9600 neural network
-- **DPID Degradation**: Apply realistic degradations using BasicSR and OpenMMLab kernels
-- **Batch Processing**: Process single images or entire datasets
-- **Multi-Strategy Tiling**: Choose between Laplacian complexity and neural network-based tiling
+- BestTile: Laplacian/IC9600 neural tiling
+- Linear, random, overlap tiling (single/paired)
+- Multiscale dataset generation (DPID downscale + tiling)
+- Batch and parallel processing
 
-### 🎬 **Video Processing**
+### 🎬 **Video & Frame Extraction**
 
-- **Frame Extraction**: Extract diverse frames using deep embeddings (ConvNeXt, DINOv2)
-- **Multi-Model Support**: Use VITS, VITB, VITL, VITG models for frame selection
-- **Distance-Based Selection**: Euclidean and cosine distance functions
-- **Batch Processing**: Process videos in configurable batches
-- **HDR to SDR**: Tone mapping for HDR video content using ffmpeg
+- Extract frames using deep embeddings (ConvNeXt, DINOv2, VIT variants)
+- Multi-model, multi-distance support
+- Batch and threshold controls
 
 ### 🚀 **Upscaling & Enhancement**
 
-- **Advanced Upscaling**: Custom models with tiling, alpha handling, and gamma correction
-- **Multi-Format Support**: PNG, JPG, JPEG, WebP, TGA, BMP, TIFF
-- **Precision Control**: FP32, FP16, and BF16 precision modes
-- **Alpha Channel Handling**: Upscale, resize, or discard alpha channels
-- **Gamma Correction**: Proper gamma handling for accurate color reproduction
+- Advanced upscaling with custom models (traiNNer-redux)
+- Tiling, alpha handling, gamma correction
+- Multi-format support: PNG, JPG, JPEG, WebP, TGA, BMP, TIFF
+- Precision control: FP32, FP16, BF16
 
-### 🎨 **Beautiful Interface**
+### 🗂️ **Metadata & ICC Tools**
 
-- **Catppuccin Mocha Theme**: Immersive color scheme with ANSI colors
-- **Interactive Menu**: 28+ operations organized in logical sections
-- **Progress Tracking**: Real-time progress bars and status updates
-- **Error Handling**: Graceful error handling with detailed reporting
-- **Memory Management**: Automatic GPU memory cleanup and optimization
+- EXIF scrubbing (single/paired)
+- ICC to sRGB conversion (preserves alpha, batch/folder support)
+
+### 🖼️ **Visualization & Comparison**
+
+- Side-by-side and animated (GIF/WebP) comparisons
+- Folder comparison (show missing files)
+
+### 🖥️ **Beautiful CLI Interface**
+
+- Catppuccin Mocha ANSI color theme
+- Interactive, logical menu system
+- Progress bars, error handling, memory management
 
 ---
 
@@ -95,28 +99,38 @@
 ```text
 Dataset-Forge/
 ├── main.py                    # Main CLI utility with interactive menu
-├── Best_Tile_EXAMPLE.py       # Standalone BestTile implementation example
 ├── requirements.txt           # Python dependencies
 ├── steps.txt                  # Setup instructions
 ├── configs/                   # Configuration files
-│   └── test_config.json      # Example configuration
-├── dataset_forge/            # Core modules
-│   ├── analysis.py           # Dataset analysis & validation
-│   ├── analysis_ops.py       # Analysis operations
-│   ├── operations.py         # Batch operations & transformations
-│   ├── tiling.py            # Advanced image tiling
-│   ├── comparison.py        # Visual comparison tools
-│   ├── alpha.py             # Alpha channel utilities
-│   ├── combine.py           # Dataset merging
-│   ├── corruption.py        # Corruption detection & fixing
-│   ├── frames.py            # Video frame extraction
-│   ├── upscale-script.py    # Advanced upscaling
-│   ├── image_ops.py         # Image processing utilities
-│   ├── io_utils.py          # I/O utilities
-│   └── common.py            # Common utilities
-└── dpid/                    # DPID degradation modules
-    ├── BasicSR's_degradations.py    # BasicSR degradation kernels
-    └── OpenMMLab's_blur_kernels.py  # OpenMMLab blur kernels
+├── dataset_forge/             # Core modules (see below)
+│   ├── __init__.py
+│   ├── alpha.py               # Alpha channel utilities
+│   ├── analysis.py            # Dataset analysis & validation
+│   ├── analysis_ops.py        # Analysis operations
+│   ├── batch_rename.py        # Batch renaming (single/paired)
+│   ├── bhi_filtering.py       # BHI filtering (Blockiness, HyperIQA, IC9600)
+│   ├── combine.py             # Dataset merging
+│   ├── common.py              # Common utilities
+│   ├── comparison.py          # Visual comparison tools
+│   ├── config_menu.py         # Config menu logic (add/load/view/validate configs, model management)
+│   ├── corruption.py          # Corruption detection & fixing
+│   ├── dataset_ops.py         # Dataset operations
+│   ├── de_dupe.py             # Duplicate/near-duplicate detection
+│   ├── dpid_phhofm.py         # DPID degradation kernels
+│   ├── exif_scrubber.py       # EXIF metadata scrubbing
+│   ├── folder_compare.py      # Folder comparison utilities
+│   ├── frames.py              # Video frame extraction
+│   ├── hue_adjustment.py      # Hue/brightness/contrast adjustment
+│   ├── image_ops.py           # Image processing utilities (incl. ICCToSRGBConverter)
+│   ├── io_utils.py            # I/O and menu helpers
+│   ├── misalignment.py        # Misalignment detection
+│   ├── move_copy.py           # Move/copy utilities
+│   ├── multiscale.py          # Multiscale dataset generation
+│   ├── operations.py          # Batch operations & transformations
+│   ├── orientation_organizer.py # Orientation-based organization
+│   ├── tiling.py              # Advanced image tiling (BestTile, etc.)
+│   ├── tiling_grid.py         # Grid/random/overlap tiling
+│   ├── upscale-script.py      # Advanced upscaling script
 ```
 
 ---
@@ -149,65 +163,154 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 python main.py
 ```
 
-You'll be greeted with an immersive, comprehensive and interactive menu for all dataset operations!
-
-  <img src="https://pomf2.lain.la/f/sjazby9a.png" width="600"/>
+You'll be greeted with an immersive, comprehensive, and interactive menu for all dataset operations!
 
 ---
 
 ## 📋 Complete Menu Overview
 
-### **Core & Config** (Options 0-00005)
+### **Main Menu**
 
-- **0**: Add Config File - Create new configuration files
-- **00**: Load Config File - Load existing configurations
-- **000**: View Config Info - Display current configuration
-- **0000**: Validate HQ/LQ Dataset from Config - Validate datasets using config
-- **00000**: Validate Val Dataset HQ/LQ Pair - Validate validation datasets
-- **00001**: Run wtp_dataset_destroyer - Execute WTP Dataset Destroyer
-- **00002**: Edit .hcl config file - Edit HCL configuration files
-- **00003**: Run traiNNer-redux - Execute traiNNer-redux training
-- **00004**: Edit .yml config file - Edit YAML configuration files
-- **00005**: List/Run Upscale with Model - Manage and run upscaling models
+- **1. DATASET**: Creation & management (multiscale, tiling, combine, extract, shuffle, split, remove, dedupe, rename, extract frames, orientation org)
+- **2. ANALYSIS**: Reporting & validation (report, scale, consistency, dimensions, extremes, verify, fix, misalignment, alpha, BHI filtering)
+- **3. TRANSFORM**: Image transformations (downsample, HDR->SDR, color/tone, hue/brightness/contrast, grayscale, remove alpha, custom transforms)
+- **4. METADATA**: EXIF & ICC tools (scrub EXIF, ICC to sRGB)
+- **5. COMPARISON**: Visual tools (side-by-side, GIF, folder compare)
+- **6. CONFIG**: Configuration & model management (add, load, view, validate configs, run external tools, edit config files, model upscaling)
+- **7. SETTINGS**: Set HQ/LQ folders
+- **0. EXIT**
 
-### **Dataset Analysis** (Options 1-8)
+#### **CONFIG Menu**
 
-- **1**: Find HQ/LQ Scale - Detect scale ratios between HQ/LQ pairs
-- **2**: Test HQ/LQ Scale - Test specific scale ratios with tolerance
-- **3**: Check Image Consistency - Verify format and metadata consistency
-- **4**: Report Image Dimensions - Generate detailed dimension statistics
-- **5**: Find Extreme Dimensions - Identify unusually sized images
-- **6**: Verify Image Integrity - Detect corrupted images
-- **7**: Find Misaligned Images - Use Phase Correlation for alignment detection
-- **8**: Generate Full HQ/LQ Dataset REPORT - Comprehensive dataset analysis
+- Add Config File: Create a new configuration interactively via CLI
+- Load Config File: Load an existing config
+- View Config Info: Display current config
+- Validate HQ/LQ Dataset from Config: Validate datasets using config
+- Validate Val Dataset HQ/LQ Pair: Validate validation datasets
+- Run wtp_dataset_destroyer: Execute WTP Dataset Destroyer
+- Edit .hcl config file: Edit HCL configuration files
+- Run traiNNer-redux: Execute traiNNer-redux training
+- Edit .yml config file: Edit YAML configuration files
+- List/Run Upscale with Model: Manage and run upscaling models
 
-### **Dataset Operations** (Options 9-25)
+#### **Submenus**
 
-- **9**: Remove Small Image Pairs - Filter by minimum size
-- **10**: Extract Random Image Pairs - Create random subsets
-- **11**: Shuffle Image Pairs - Randomize dataset order
-- **12**: Transform Dataset - Apply rotations, flips, and adjustments
-- **13**: Dataset Color Adjustment - Fine-tune color parameters
-- **14**: Grayscale Conversion - Convert to grayscale
-- **15**: Advanced Split/Adjust Dataset - Complex dataset splitting
-- **16**: Combine Multiple Datasets - Merge datasets safely
-- **17**: Find Alpha - Detect alpha channels
-- **18**: Remove Alpha - Remove alpha channels
-- **19**: Comparisons - Create side-by-side comparisons
-- **20**: Fix Corrupted Images - Repair damaged images
-- **21**: Optimize PNG - Compress PNG files
-- **22**: Convert to WebP - Convert to WebP format
-- **23**: BestTile Image Tiling - Advanced intelligent tiling
-- **24**: Create HQ/LQ Animated gif/webp Comparisons - Animated comparisons
-- **25**: Extract Frames - Extract video frames using deep embeddings
+- Each main menu option opens a submenu with 10+ advanced operations. See in-app help for details.
 
-### **Image Processing** (Options 27)
+---
 
-- **27**: Downsample Images - Apply DPID degradations
+## 📚 Module Deep Dive
 
-### **Video Processing** (Options 28)
+### `alpha.py`
 
-- **28**: HDR to SDR Tone Mapping - Convert HDR video to SDR
+- Find and remove alpha channels in HQ/LQ datasets.
+- Bulk processing, preserves alignment.
+
+### `analysis.py` / `analysis_ops.py`
+
+- Scale detection, consistency checks, dimension reporting, misalignment, and full dataset reports.
+- Advanced validation and statistics.
+
+### `batch_rename.py`
+
+- Batch renaming for single or paired HQ/LQ folders.
+- Supports custom prefixes, zero padding, dry run.
+
+### `bhi_filtering.py`
+
+- Blockiness, HyperIQA, and IC9600-based filtering.
+- Move, delete, or report filtered images.
+
+### `combine.py`
+
+- Safely merge multiple HQ/LQ datasets.
+
+### `common.py`
+
+- Utility functions for file naming, etc.
+
+### `comparison.py`
+
+- Create side-by-side and animated (GIF/WebP) HQ/LQ comparisons.
+- Custom effects, labels, and transitions.
+
+### `corruption.py`
+
+- Detect and fix corrupted images in bulk.
+
+### `dataset_ops.py`
+
+- Core dataset operations (filtering, extraction, etc).
+
+### `de_dupe.py`
+
+- Detect exact and near-duplicate images using multiple hash types.
+- Move, copy, or delete duplicates.
+
+### `dpid_phhofm.py`
+
+- DPID degradation kernels for downsampling.
+
+### `exif_scrubber.py`
+
+- Remove EXIF metadata from images (single/paired).
+- Uses ExifTool if available.
+
+### `folder_compare.py`
+
+- Compare two folders and report missing files.
+
+### `frames.py`
+
+- Extract frames from video using deep embeddings (ConvNeXt, DINOv2, VIT).
+- Multi-model, multi-distance, batch support.
+
+### `hue_adjustment.py`
+
+- Batch hue, brightness, and contrast adjustment.
+- Supports duplicates, real file names, paired folders.
+
+### `image_ops.py`
+
+- Image processing utilities (alpha removal, corruption fixing, color adjustment).
+- **ICCToSRGBConverter**: Convert images/folders from ICC profile to sRGB, preserving alpha and structure.
+
+### `io_utils.py`
+
+- I/O helpers, menu utilities, file type checks.
+
+### `misalignment.py`
+
+- Detect misaligned HQ/LQ pairs using phase correlation.
+
+### `move_copy.py`
+
+- Move/copy files (single/paired, by % or extension).
+
+### `multiscale.py`
+
+- Multiscale dataset generation (DPID downscale, tiling, batch support).
+
+### `operations.py`
+
+- Batch operations: filtering, extraction, shuffling, splitting, color/tone, grayscale, optimization, format conversion, custom transforms.
+
+### `orientation_organizer.py`
+
+- Organize images by orientation (landscape, portrait, square).
+- Copy/move, single or paired folders.
+
+### `tiling.py`
+
+- Advanced tiling: BestTile (Laplacian/IC9600), single/paired, multi-threaded.
+
+### `tiling_grid.py`
+
+- Grid, random, and overlap tiling (single/paired, batch support).
+
+### `upscale-script.py`
+
+- Advanced upscaling script for custom models (traiNNer-redux), with tiling, alpha, gamma, and precision control.
 
 ---
 
@@ -215,7 +318,7 @@ You'll be greeted with an immersive, comprehensive and interactive menu for all 
 
 Dataset Forge supports multiple configuration formats:
 
-### JSON Configuration Example
+### JSON Example
 
 ```json
 {
@@ -230,11 +333,9 @@ Dataset Forge supports multiple configuration formats:
 }
 ```
 
-### Supported Configuration Features
-
-- **Multi-format support**: JSON, INI, YAML, HCL
-- **External tool paths**: WTP Dataset Destroyer and traiNNer-redux integration
-- **Dataset validation**: Automatic path validation and pair checking
+- **Multi-format**: JSON, YAML, HCL
+- **External tool paths**: WTP Dataset Destroyer, traiNNer-redux
+- **Validation**: Path validation, pair checking
 - **Model management**: Integration with traiNNer-redux experiment directories
 
 ---
@@ -244,75 +345,17 @@ Dataset Forge supports multiple configuration formats:
 - **Python**: 3.8+
 - **CUDA**: 12.1+ (for GPU acceleration)
 - **Core Dependencies**:
-  - `numpy` - Numerical computing
-  - `opencv-python` - Computer vision
-  - `Pillow` - Image processing
-  - `spandrel` & `spandrel_extra_arches` - Model loading
-  - `chainner-ext` - Advanced image processing
-  - `tqdm` - Progress bars
-  - `imageio` - Video/image I/O
-  - `pyyaml` - YAML configuration
-  - `ffmpeg` - Video processing
-
----
-
-## 📚 Key Modules Deep Dive
-
-| Module              | Purpose                       | Key Features                                                        |
-| ------------------- | ----------------------------- | ------------------------------------------------------------------- |
-| `main.py`           | Interactive CLI utility       | 28+ operations, Catppuccin theme, external tool integration         |
-| `analysis.py`       | Dataset analysis & validation | Scale detection, misalignment detection, comprehensive reporting    |
-| `operations.py`     | Batch operations              | Transformations, filtering, color adjustments, format conversion    |
-| `tiling.py`         | Advanced image tiling         | Laplacian complexity, IC9600 neural network, multi-strategy support |
-| `comparison.py`     | Visual comparison tools       | Side-by-side, animated GIF/WebP, custom effects                     |
-| `alpha.py`          | Alpha channel utilities       | Detection, removal, bulk processing                                 |
-| `combine.py`        | Dataset merging               | Safe merging with validation                                        |
-| `corruption.py`     | Corruption handling           | Detection and automatic fixing                                      |
-| `frames.py`         | Video frame extraction        | Deep embeddings, multi-model support, distance-based selection      |
-| `upscale-script.py` | Advanced upscaling            | Custom models, tiling, alpha handling, gamma correction             |
-| `dpid/`             | DPID degradation              | BasicSR and OpenMMLab kernels for realistic degradation             |
-
----
-
-## 🎯 Advanced Features
-
-### **BestTile Tiling System**
-
-- **Laplacian Complexity**: Traditional complexity-based tiling
-- **IC9600 Neural Network**: Advanced neural network-based tiling
-- **Multi-threading**: Process, thread, and sequential processing modes
-- **Dynamic Tile Selection**: Intelligent tile size optimization
-- **GPU Acceleration**: CUDA-optimized neural network inference
-
-### **Video Frame Extraction**
-
-- **Deep Embedding Models**: ConvNeXt and DINOv2 variants
-- **Distance Functions**: Euclidean and cosine distance metrics
-- **Batch Processing**: Configurable batch sizes and frame limits
-- **Multi-Model Support**: Process with multiple models simultaneously
-- **Threshold Control**: Fine-tune frame selection sensitivity
-
-### **DPID Degradation Pipeline**
-
-- **BasicSR Kernels**: Comprehensive blur and noise kernels
-- **OpenMMLab Kernels**: Advanced degradation algorithms
-- **Realistic Degradation**: Simulate real-world image degradation
-- **Batch Processing**: Process entire datasets efficiently
-
-### **External Tool Integration**
-
-- **WTP Dataset Destroyer**: Direct execution from menu
-- **traiNNer-redux**: Training pipeline integration
-- **Model Management**: Automatic model discovery and execution
-- **Configuration Sync**: Seamless config file management
+  - `numpy`, `opencv-python`, `Pillow`, `tqdm`, `imageio`, `pyyaml`, `ffmpeg`
+  - `spandrel`, `spandrel_extra_arches`, `chainner-ext` (for advanced features)
+  - `torch`, `torchvision`, `torchaudio` (for GPU/ML features)
 
 ---
 
 ## 💜 Credits
 
-- Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts); inspiring many functionality and for all their assistance.
-- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer); [Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing); inspiring many functionality and for all their assistance.
-- Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux); [img-ab](https://github.com/the-database/img-ab); creating awesome software inspiring me to make something neat.
+- Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
+- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer)
+- Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
 
 ---
 

@@ -512,11 +512,20 @@ def create_gif_comparison(hq_folder, lq_folder):
             # Adjust frame timing based on speed multiplier
             adjusted_duration = (1.0 / fps) / speed_multiplier
 
+            # --- Enforce minimum GIF frame delay for compatibility ---
+            MIN_GIF_FRAME_DELAY = 0.04  # 40ms per frame (25 FPS), widely supported
+            gif_duration = adjusted_duration
+            if format_choice == "gif" and adjusted_duration < MIN_GIF_FRAME_DELAY:
+                print(
+                    f"[Warning] Requested frame delay ({adjusted_duration:.3f}s) is too short for many GIF viewers. Using minimum supported delay: {MIN_GIF_FRAME_DELAY:.3f}s per frame."
+                )
+                gif_duration = MIN_GIF_FRAME_DELAY
+
             # Save as GIF or WebP
             import imageio
 
             if format_choice == "gif":
-                imageio.mimsave(output_path, frames, duration=adjusted_duration, loop=0)
+                imageio.mimsave(output_path, frames, duration=gif_duration, loop=0)
             else:  # webp
                 imageio.mimsave(
                     output_path,
