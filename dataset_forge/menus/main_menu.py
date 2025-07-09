@@ -10,6 +10,8 @@ from dataset_forge.utils.printing import print_info
 from dataset_forge.actions.batch_rename_actions import batch_rename_menu
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
+from dataset_forge.menus.compress_menu import compress_menu
+from dataset_forge.menus.compress_dir_menu import compress_dir_menu
 
 
 def main_menu():
@@ -23,6 +25,8 @@ def main_menu():
         "6": ("\U0001f4dd BATCH RENAME", batch_rename_menu),
         "7": ("\U0001f4c1 CONFIG", config_menu),
         "8": ("\u2699\ufe0f  SETTINGS", settings_menu),
+        "9": ("\U0001f4e6 COMPRESS IMAGES", compress_menu),
+        "10": ("\U0001f4e6 COMPRESS DIRECTORY", compress_dir_menu),
         "0": ("\U0001f6aa EXIT", None),
     }
     while True:

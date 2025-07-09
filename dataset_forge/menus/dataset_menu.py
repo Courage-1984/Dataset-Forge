@@ -23,11 +23,17 @@ def dataset_menu():
         "3": ("Combine Datasets", dataset_actions.combine_datasets),
         "4": (
             "Extract Random Pairs",
-            lambda: dataset_actions.extract_random_pairs(hq_folder, lq_folder),
+            lambda: dataset_actions.extract_random_pairs(
+                input("Enter HQ folder path: ").strip(),
+                input("Enter LQ folder path: ").strip(),
+            ),
         ),
         "5": (
             "Shuffle Image Pairs",
-            lambda: dataset_actions.shuffle_image_pairs(hq_folder, lq_folder),
+            lambda: dataset_actions.shuffle_image_pairs(
+                input("Enter HQ folder path: ").strip(),
+                input("Enter LQ folder path: ").strip(),
+            ),
         ),
         "6": (
             "Split and Adjust Dataset",
@@ -42,10 +48,18 @@ def dataset_menu():
         ),
         "7": (
             "Remove Small Image Pairs",
-            lambda: dataset_actions.remove_small_image_pairs(hq_folder, lq_folder),
+            lambda: dataset_actions.remove_small_image_pairs(
+                input("Enter HQ folder path: ").strip(),
+                input("Enter LQ folder path: ").strip(),
+            ),
         ),
         "8": ("De-Duplicate", dedupe_menu),
-        "9": ("Batch Rename", lambda: dataset_actions.batch_rename(hq_folder)),
+        "9": (
+            "Batch Rename",
+            lambda: dataset_actions.batch_rename(
+                input("Enter folder path to batch rename: ").strip()
+            ),
+        ),
         "10": ("Extract Frames from Video", dataset_actions.extract_frames_from_video),
         "11": (
             "Images Orientation Organization (Extract by Landscape/Portrait/Square)",
