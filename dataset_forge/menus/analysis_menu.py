@@ -18,11 +18,14 @@ from dataset_forge.actions.analysis_actions import (
     find_extreme_dimensions,
     verify_images,
     find_misaligned_images,
+    test_aspect_ratio,
 )
 from dataset_forge.alpha import find_alpha_channels
 from dataset_forge.corruption import fix_corrupted_images, fix_corrupted_images_hq_lq
 from dataset_forge.menus.bhi_filtering_menu import bhi_filtering_menu
 from dataset_forge.menus import session_state
+from dataset_forge.utils.input_utils import get_path_with_history
+from dataset_forge.actions.analysis_actions import progressive_dataset_validation
 
 # Assume require_hq_lq, hq_folder, lq_folder are available in the global scope for now
 
@@ -39,9 +42,49 @@ def require_hq_lq(func):
     return wrapper
 
 
+def test_aspect_ratio_menu():
+    print_info("\nTest Aspect Ratio:")
+    print_info("You can test aspect ratio for:")
+    print_info("  1. HQ/LQ folder pair (compare matching files)")
+    print_info("  2. Single folder (report all image aspect ratios)")
+    print_info("  3. Single image (report aspect ratio)")
+    print_info("")
+    mode = input(
+        "Select mode: [1] HQ/LQ pair, [2] Single folder, [3] Single image: "
+    ).strip()
+    if mode == "1":
+        hq = get_path_with_history(
+            "Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        lq = get_path_with_history(
+            "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        test_aspect_ratio(hq_folder=hq, lq_folder=lq)
+    elif mode == "2":
+        folder = get_path_with_history(
+            "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        test_aspect_ratio(single_path=folder)
+    elif mode == "3":
+        image = get_path_with_history(
+            "Enter image path:", allow_hq_lq=False, allow_single_folder=False
+        )
+        test_aspect_ratio(single_path=image)
+    else:
+        print_warning("Invalid mode selected.")
+
+
 def analysis_menu():
     options = {
         "1": (
+            "Progressive Dataset Validation (All Checks)",
+            require_hq_lq(
+                lambda: progressive_dataset_validation(
+                    session_state.hq_folder, session_state.lq_folder
+                )
+            ),
+        ),
+        "2": (
             "Generate HQ/LQ Dataset Report",
             require_hq_lq(
                 lambda: generate_hq_lq_dataset_report(
@@ -49,7 +92,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "2": (
+        "3": (
             "Find HQ/LQ Scale",
             require_hq_lq(
                 lambda: find_hq_lq_scale(
@@ -57,7 +100,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "3": (
+        "4": (
             "Test HQ/LQ Scale",
             require_hq_lq(
                 lambda: test_hq_lq_scale(
@@ -65,7 +108,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "4": (
+        "5": (
             "Check Dataset Consistency",
             require_hq_lq(
                 lambda: (
@@ -74,7 +117,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "5": (
+        "6": (
             "Report Image Dimensions",
             require_hq_lq(
                 lambda: (
@@ -83,7 +126,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "6": (
+        "7": (
             "Find Extreme Image Dimensions",
             require_hq_lq(
                 lambda: (
@@ -92,13 +135,13 @@ def analysis_menu():
                 )
             ),
         ),
-        "7": (
+        "8": (
             "Verify Images (Corruption Check)",
             require_hq_lq(
                 lambda: verify_images(session_state.hq_folder, session_state.lq_folder)
             ),
         ),
-        "8": (
+        "9": (
             "Fix Corrupted Images",
             lambda: (
                 (
@@ -115,7 +158,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "9": (
+        "10": (
             "Find Misaligned Images",
             require_hq_lq(
                 lambda: find_misaligned_images(
@@ -123,7 +166,7 @@ def analysis_menu():
                 )
             ),
         ),
-        "10": (
+        "11": (
             "Find Images with Alpha Channel",
             require_hq_lq(
                 lambda: find_alpha_channels(
@@ -131,7 +174,8 @@ def analysis_menu():
                 )
             ),
         ),
-        "11": ("BHI Filtering (Blockiness, HyperIQA, IC9600)", bhi_filtering_menu),
+        "12": ("BHI Filtering (Blockiness, HyperIQA, IC9600)", bhi_filtering_menu),
+        "13": ("Test Aspect Ratio", test_aspect_ratio_menu),
         "0": ("Back to Main Menu", None),
     }
     while True:

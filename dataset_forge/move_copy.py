@@ -3,6 +3,7 @@ import shutil
 import random
 from tqdm import tqdm
 from dataset_forge.utils.file_utils import is_image_file
+from dataset_forge.utils.history_log import log_operation
 
 
 def move_or_copy_files(
@@ -46,8 +47,10 @@ def move_or_copy_files(
         try:
             if operation == "move":
                 shutil.move(source_path, destination_path)
+                log_operation("move", f"{source_path} -> {destination_path}")
             elif operation == "copy":
                 shutil.copy2(source_path, destination_path)
+                log_operation("copy", f"{source_path} -> {destination_path}")
         except Exception as e:
             print(f"Error {operation}ing {source_path} to {destination_path}: {e}")
 
@@ -101,8 +104,12 @@ def move_or_copy_hq_lq_pairs(
             if operation == "move":
                 shutil.move(hq_src, hq_dest)
                 shutil.move(lq_src, lq_dest)
+                log_operation("move_hq", f"{hq_src} -> {hq_dest}")
+                log_operation("move_lq", f"{lq_src} -> {lq_dest}")
             elif operation == "copy":
                 shutil.copy2(hq_src, hq_dest)
                 shutil.copy2(lq_src, lq_dest)
+                log_operation("copy_hq", f"{hq_src} -> {hq_dest}")
+                log_operation("copy_lq", f"{lq_src} -> {lq_dest}")
         except Exception as e:
             print(f"Error {operation}ing pair {fname}: {e}")

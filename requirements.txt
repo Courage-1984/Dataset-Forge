@@ -18,3 +18,8 @@ pepedpid
 pyiqa
 timm
 webbrowser
+matplotlib
+seaborn
+jinja2
+lpips
+open-clip-torch

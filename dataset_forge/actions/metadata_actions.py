@@ -1,5 +1,6 @@
 import os
 from dataset_forge import exif_scrubber
+from dataset_forge.utils.history_log import log_operation
 
 # If ICCToSRGBConverter is not available, leave a TODO stub
 

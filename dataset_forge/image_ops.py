@@ -11,6 +11,7 @@ from dataset_forge.utils.input_utils import (
 )
 import PIL.ImageCms as ImageCms
 from io import BytesIO
+from dataset_forge.utils.history_log import log_operation
 
 
 class ImageOperation(ABC):
@@ -131,6 +132,7 @@ class ICCToSRGBConverter:
             else:
                 final_image = rgb_converted
             final_image.save(output_path, "PNG", icc_profile=None)
+            log_operation("icc_to_srgb", f"Converted ICC to sRGB for {input_path}")
         except Exception as e:
             print(f"Error processing {input_path}: {str(e)}")
 

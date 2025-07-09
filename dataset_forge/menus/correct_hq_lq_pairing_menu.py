@@ -14,6 +14,9 @@ from dataset_forge.actions.analysis_actions import (
 )
 from dataset_forge.actions.transform_actions import downsample_images_menu
 from tqdm import tqdm
+from dataset_forge.actions.correct_hq_lq_pairing_actions import (
+    fuzzy_hq_lq_pairing_logic,
+)
 
 
 def correct_hq_lq_pairing_menu():
@@ -209,3 +212,20 @@ def correct_hq_lq_pairing_menu():
     test_hq_lq_scale(hq_folder, out_lq_folder)
 
     print_success("\nHQ/LQ pairing correction workflow complete!")
+
+
+def fuzzy_hq_lq_pairing_menu():
+    print_header("Automatic HQ/LQ Pairing (Fuzzy Matching)", color=Mocha.lavender)
+    print_info(
+        "This tool uses perceptual hashes or embeddings to pair HQ and LQ images even if filenames differ.\n"
+    )
+    hq_folder = input("Enter path to HQ folder: ").strip()
+    lq_folder = input("Enter path to LQ folder: ").strip()
+    if not os.path.isdir(hq_folder) or not os.path.isdir(lq_folder):
+        print_error("Both HQ and LQ paths must be valid directories.")
+        return
+    print_info("\nRunning fuzzy HQ/LQ pairing... (progress bar will be shown)")
+    pairs = fuzzy_hq_lq_pairing_logic(hq_folder, lq_folder)
+    print_info(f"\nFound {len(pairs)} HQ/LQ pairs using fuzzy matching.")
+    # TODO: Display results, allow user to review/save pairs
+    input("\nPress Enter to return to the main menu...")

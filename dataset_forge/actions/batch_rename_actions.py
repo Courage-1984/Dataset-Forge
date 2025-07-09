@@ -1,6 +1,7 @@
 import os
 import shutil
 import uuid
+from dataset_forge.utils.history_log import log_operation
 
 
 def batch_rename_menu():
@@ -86,11 +87,13 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
     print("Phase 1: Renaming to temporary names...")
     for src, temp_path in temp_renames:
         os.rename(src, temp_path)
+        log_operation("rename_temp", f"{src} -> {temp_path}")
 
     # Phase 3: Execute final renames
     print("Phase 2: Renaming to final names...")
     for temp_path, final_path in final_renames:
         os.rename(temp_path, final_path)
+        log_operation("rename_final", f"{temp_path} -> {final_path}")
 
     print("Batch renaming complete.")
 
@@ -142,14 +145,18 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
     print("Phase 1: Renaming to temporary names...")
     for hq_src, hq_temp_path in hq_temp_renames:
         os.rename(hq_src, hq_temp_path)
+        log_operation("rename_temp_hq", f"{hq_src} -> {hq_temp_path}")
     for lq_src, lq_temp_path in lq_temp_renames:
         os.rename(lq_src, lq_temp_path)
+        log_operation("rename_temp_lq", f"{lq_src} -> {lq_temp_path}")
 
     # Phase 3: Execute final renames
     print("Phase 2: Renaming to final names...")
     for hq_temp_path, hq_final_path in hq_final_renames:
         os.rename(hq_temp_path, hq_final_path)
+        log_operation("rename_final_hq", f"{hq_temp_path} -> {hq_final_path}")
     for lq_temp_path, lq_final_path in lq_final_renames:
         os.rename(lq_temp_path, lq_final_path)
+        log_operation("rename_final_lq", f"{lq_temp_path} -> {lq_final_path}")
 
     print("Batch renaming complete.")

@@ -3,6 +3,7 @@ import shutil
 from PIL import Image
 from typing import List, Tuple, Dict, Optional
 from tqdm import tqdm
+from dataset_forge.utils.history_log import log_operation
 
 
 def get_image_orientation(image_path: str) -> Optional[str]:
@@ -60,6 +61,10 @@ def organize_images_by_orientation(
             else:
                 shutil.copy2(fpath, dest)
             result[orientation].append(dest)
+    log_operation(
+        "orientation_organize",
+        f"Organized {input_folder} by orientation: {', '.join(orientations)}",
+    )
     return result
 
 

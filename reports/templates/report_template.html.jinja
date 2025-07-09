@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dataset Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        .samples { display: flex; flex-wrap: wrap; gap: 10px; }
+        .sample-img { width: 180px; border: 1px solid #ccc; padding: 4px; background: #fafafa; }
+    </style>
+</head>
+<body>
+    <h1>Dataset Report</h1>
+    <p><b>Number of images:</b> {{ num_images }}</p>
+    <p><b>Average width:</b> {{ avg_width|round(2) }} px</p>
+    <p><b>Average height:</b> {{ avg_height|round(2) }} px</p>
+    <h2>Dimension Histogram</h2>
+    <img src="{{ plot_path }}" alt="Dimension Histogram" style="max-width:600px;">
+    <h2>Quality Score Histograms</h2>
+    {% if quality_hist_paths %}
+        {% for metric, path in quality_hist_paths.items() %}
+            <div><b>{{ metric|capitalize }}</b><br><img src="{{ path }}" style="max-width:400px;"></div>
+        {% endfor %}
+    {% endif %}
+    {% if lq_quality_hist_paths %}
+        <h3>LQ Quality Score Histograms</h3>
+        {% for metric, path in lq_quality_hist_paths.items() %}
+            <div><b>{{ metric|capitalize }}</b><br><img src="{{ path }}" style="max-width:400px;"></div>
+        {% endfor %}
+    {% endif %}
+    <h2>Class Balance</h2>
+    {% if class_balance_path %}
+        <img src="{{ class_balance_path }}" style="max-width:600px;">
+    {% endif %}
+    {% if lq_class_balance_path %}
+        <h3>LQ Class Balance</h3>
+        <img src="{{ lq_class_balance_path }}" style="max-width:600px;">
+    {% endif %}
+    <h2>Sample Images</h2>
+    <div class="samples">
+        {% for path in sample_paths %}
+        <div><img src="{{ path }}" class="sample-img"><br>{{ path }}</div>
+        {% endfor %}
+    </div>
+</body>
+</html> 

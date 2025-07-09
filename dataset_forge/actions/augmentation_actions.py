@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 import random
 from typing import Callable, List, Dict, Any, Optional, Tuple
+from dataset_forge.utils.history_log import log_operation
 
 
 # --- Augmentation Operations ---
@@ -185,7 +186,9 @@ def apply_augmentation_pipeline(
             img1 = Image.open(os.path.join(input_dir, files[i])).convert("RGB")
             img2 = Image.open(os.path.join(input_dir, files[i + 1])).convert("RGB")
             mixed = mixup(img1, img2)
-            mixed.save(os.path.join(output_dir, f"mixup_{files[i]}_{files[i+1]}"))
+            out_path = os.path.join(output_dir, f"mixup_{files[i]}_{files[i+1]}")
+            mixed.save(out_path)
+            log_operation("augment_mixup", f"{files[i]}, {files[i+1]} -> {out_path}")
         return
     if hq_lq_mode and lq_input_dir and lq_output_dir:
         os.makedirs(lq_output_dir, exist_ok=True)
@@ -199,21 +202,27 @@ def apply_augmentation_pipeline(
                 )
             ]
         )
-        paired = list(zip(hq_files, lq_files))
-        for hq_name, lq_name in tqdm(paired, desc=progress_desc):
-            hq_img = Image.open(os.path.join(input_dir, hq_name)).convert("RGB")
-            lq_img = Image.open(os.path.join(lq_input_dir, lq_name)).convert("RGB")
+        for hq_file, lq_file in zip(hq_files, lq_files):
+            hq_img = Image.open(os.path.join(input_dir, hq_file)).convert("RGB")
+            lq_img = Image.open(os.path.join(lq_input_dir, lq_file)).convert("RGB")
             for fn, params in recipe:
                 hq_img = fn(hq_img, **params)
                 lq_img = fn(lq_img, **params)
-            hq_img.save(os.path.join(output_dir, hq_name))
-            lq_img.save(os.path.join(lq_output_dir, lq_name))
-    else:
-        for fname in tqdm(files, desc=progress_desc):
-            img = Image.open(os.path.join(input_dir, fname)).convert("RGB")
-            for fn, params in recipe:
-                img = fn(img, **params)
-            img.save(os.path.join(output_dir, fname))
+            hq_out = os.path.join(output_dir, hq_file)
+            lq_out = os.path.join(lq_output_dir, lq_file)
+            hq_img.save(hq_out)
+            lq_img.save(lq_out)
+            log_operation(
+                "augment_hq_lq", f"{hq_file}, {lq_file} -> {hq_out}, {lq_out}"
+            )
+        return
+    for f in files:
+        img = Image.open(os.path.join(input_dir, f)).convert("RGB")
+        for fn, params in recipe:
+            img = fn(img, **params)
+        out_path = os.path.join(output_dir, f)
+        img.save(out_path)
+        log_operation("augment", f"{f} -> {out_path}")
 
 
 # --- Utilities ---

@@ -698,9 +698,7 @@ def find_misaligned_images(hq_folder, lq_folder):
         if status == "ok" and score is not None and score > threshold
     ]
     errors = [
-        (rel_path, status)
-        for rel_path, score, status in results
-        if status != "ok"
+        (rel_path, status) for rel_path, score, status in results if status != "ok"
     ]
 
     print(f"\nMisaligned pairs above threshold ({threshold}): {len(misaligned)}")
@@ -743,3 +741,172 @@ def find_alpha_channels(*args, **kwargs):
 def bhi_filtering(*args, **kwargs):
     """Perform BHI filtering (Blockiness, HyperIQA, IC9600) on a dataset."""
     pass
+
+
+def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, tolerance=0.01):
+    """
+    Test aspect ratio for HQ/LQ folder pair, single folder, or single image.
+    - If hq_folder and lq_folder are provided: compare aspect ratios for matching files.
+    - If single_path is a folder: report aspect ratios for all images in the folder.
+    - If single_path is a file: report aspect ratio for the image.
+    """
+    from dataset_forge.utils.file_utils import is_image_file
+    from dataset_forge.image_ops import get_image_size
+    from dataset_forge.utils.printing import (
+        print_info,
+        print_error,
+        print_success,
+        print_warning,
+    )
+    import os
+    from tqdm import tqdm
+
+    if hq_folder and lq_folder:
+        # HQ/LQ folder pair mode
+        print_info("\nTesting aspect ratios for HQ/LQ folder pair...")
+        hq_files = {
+            f
+            for f in os.listdir(hq_folder)
+            if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
+        }
+        lq_files = {
+            f
+            for f in os.listdir(lq_folder)
+            if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
+        }
+        matching_files = sorted(hq_files & lq_files)
+        mismatches = []
+        for fname in tqdm(matching_files, desc="Comparing aspect ratios"):
+            hq_path = os.path.join(hq_folder, fname)
+            lq_path = os.path.join(lq_folder, fname)
+            try:
+                hq_w, hq_h = get_image_size(hq_path)
+                lq_w, lq_h = get_image_size(lq_path)
+                hq_aspect = hq_w / hq_h if hq_h != 0 else 0
+                lq_aspect = lq_w / lq_h if lq_h != 0 else 0
+                if abs(hq_aspect - lq_aspect) > tolerance:
+                    mismatches.append((fname, hq_aspect, lq_aspect))
+            except Exception as e:
+                print_error(f"Failed to get aspect ratio for {fname}: {e}")
+        print_info(f"\nChecked {len(matching_files)} HQ/LQ pairs.")
+        if mismatches:
+            print_warning(
+                f"{len(mismatches)} pairs have mismatched aspect ratios (tolerance {tolerance}):"
+            )
+            for fname, hq_aspect, lq_aspect in mismatches[:10]:
+                print_info(f"  {fname}: HQ {hq_aspect:.4f}, LQ {lq_aspect:.4f}")
+            if len(mismatches) > 10:
+                print_info(f"  ...and {len(mismatches)-10} more.")
+        else:
+            print_success("All HQ/LQ pairs have matching aspect ratios.")
+        return
+    if single_path:
+        if os.path.isdir(single_path):
+            # Single folder mode
+            print_info(
+                f"\nTesting aspect ratios for all images in folder: {single_path}"
+            )
+            files = [
+                f
+                for f in os.listdir(single_path)
+                if os.path.isfile(os.path.join(single_path, f)) and is_image_file(f)
+            ]
+            aspects = []
+            for fname in tqdm(files, desc="Calculating aspect ratios"):
+                path = os.path.join(single_path, fname)
+                try:
+                    w, h = get_image_size(path)
+                    aspect = w / h if h != 0 else 0
+                    aspects.append((fname, aspect, w, h))
+                except Exception as e:
+                    print_error(f"Failed to get aspect ratio for {fname}: {e}")
+            print_info(f"\nChecked {len(aspects)} images.")
+            if aspects:
+                aspect_counts = {}
+                for _, aspect, _, _ in aspects:
+                    rounded = round(aspect, 4)
+                    aspect_counts[rounded] = aspect_counts.get(rounded, 0) + 1
+                print_info("Aspect ratio distribution (rounded to 4 decimals):")
+                for aspect, count in sorted(aspect_counts.items(), key=lambda x: -x[1]):
+                    print_info(f"  {aspect}: {count} images")
+                print_info("Examples:")
+                for fname, aspect, w, h in aspects[:5]:
+                    print_info(f"  {fname}: {w}x{h} (aspect {aspect:.4f})")
+            return
+        elif os.path.isfile(single_path):
+            # Single image mode
+            print_info(f"\nTesting aspect ratio for image: {single_path}")
+            try:
+                w, h = get_image_size(single_path)
+                aspect = w / h if h != 0 else 0
+                print_info(f"Image size: {w}x{h}")
+                print_info(f"Aspect ratio: {aspect:.4f}")
+            except Exception as e:
+                print_error(f"Failed to get aspect ratio: {e}")
+            return
+        else:
+            print_error(f"Path does not exist: {single_path}")
+            return
+    print_error(
+        "You must provide either HQ/LQ folders or a single path (folder or image)."
+    )
+
+
+def progressive_dataset_validation(hq_folder, lq_folder):
+    """
+    Runs all relevant dataset checks (consistency, corruption, scale, etc.) and produces a single report.
+    """
+    from dataset_forge.utils.printing import (
+        print_header,
+        print_section,
+        print_success,
+        print_warning,
+        print_error,
+    )
+
+    print_header("\n=== Progressive Dataset Validation ===")
+    results = {}
+    # 1. Scale Analysis
+    print_section("\n[1/6] Scale Analysis")
+    scale_results = find_hq_lq_scale(hq_folder, lq_folder, verbose=False)
+    results["scale"] = scale_results
+    # 2. Consistency Check
+    print_section("\n[2/6] Consistency Check (HQ)")
+    hq_consistency = check_consistency(hq_folder, "HQ", verbose=False)
+    results["hq_consistency"] = hq_consistency
+    print_section("\n[3/6] Consistency Check (LQ)")
+    lq_consistency = check_consistency(lq_folder, "LQ", verbose=False)
+    results["lq_consistency"] = lq_consistency
+    # 3. Corruption Check
+    print_section("\n[4/6] Corruption Check")
+    corrupted = verify_images(hq_folder, lq_folder)
+    results["corruption"] = corrupted
+    # 4. Dimension Report
+    print_section("\n[5/6] Dimension Report (HQ)")
+    hq_dim = report_dimensions(hq_folder, "HQ", verbose=False)
+    results["hq_dimensions"] = hq_dim
+    print_section("\n[6/6] Dimension Report (LQ)")
+    lq_dim = report_dimensions(lq_folder, "LQ", verbose=False)
+    results["lq_dimensions"] = lq_dim
+    print_success("\n=== Progressive Validation Complete ===")
+    print_info = print_success  # Use green for summary
+    print_info("\nSummary:")
+    print_info(f"  HQ images: {len(hq_dim.get('dimensions', []))}")
+    print_info(f"  LQ images: {len(lq_dim.get('dimensions', []))}")
+    print_info(f"  Matching HQ/LQ pairs: {len(scale_results.get('scales', []))}")
+    if scale_results.get("inconsistent_scales"):
+        print_warning(
+            f"  Inconsistent scales: {len(scale_results['inconsistent_scales'])}"
+        )
+    if corrupted:
+        print_warning(f"  Corrupted/problematic images found: {len(corrupted)}")
+    if hq_consistency.get("errors"):
+        print_warning(
+            f"  HQ files with processing errors: {len(hq_consistency['errors'])}"
+        )
+    if lq_consistency.get("errors"):
+        print_warning(
+            f"  LQ files with processing errors: {len(lq_consistency['errors'])}"
+        )
+    print_success("\nSee above for detailed results.")
+    return results

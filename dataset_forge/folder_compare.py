@@ -1,5 +1,6 @@
 import os
 from typing import List, Tuple, Optional
+from dataset_forge.utils.history_log import log_operation
 
 
 def compare_folders(
@@ -22,6 +23,8 @@ def compare_folders(
 
     missing_in_folder1 = sorted(list(files2 - files1))
     missing_in_folder2 = sorted(list(files1 - files2))
+    result = f"Missing in {folder1}: {missing_in_folder1}, Missing in {folder2}: {missing_in_folder2}"
+    log_operation("folder_compare", f"Compared {folder1} and {folder2}: {result}")
     return missing_in_folder1, missing_in_folder2
 
 

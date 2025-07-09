@@ -1,0 +1,41 @@
+# Dataset Report
+
+- **Number of images:** {{ num_images }}
+- **Average width:** {{ avg_width|round(2) }} px
+- **Average height:** {{ avg_height|round(2) }} px
+
+## Dimension Histogram
+
+![Dimension Histogram]({{ plot_path }})
+
+## Quality Score Histograms
+{% if quality_hist_paths %}
+{% for metric, path in quality_hist_paths.items() %}
+**{{ metric|capitalize }}**
+
+![{{ metric|capitalize }} Histogram]({{ path }})
+{% endfor %}
+{% endif %}
+{% if lq_quality_hist_paths %}
+### LQ Quality Score Histograms
+{% for metric, path in lq_quality_hist_paths.items() %}
+**{{ metric|capitalize }}**
+
+![{{ metric|capitalize }} Histogram]({{ path }})
+{% endfor %}
+{% endif %}
+
+## Class Balance
+{% if class_balance_path %}
+![Class Balance]({{ class_balance_path }})
+{% endif %}
+{% if lq_class_balance_path %}
+### LQ Class Balance
+![LQ Class Balance]({{ lq_class_balance_path }})
+{% endif %}
+
+## Sample Images
+
+{% for path in sample_paths %}
+![Sample Image]({{ path }})
+{% endfor %} 

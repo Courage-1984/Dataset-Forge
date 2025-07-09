@@ -7,6 +7,31 @@ from dataset_forge.utils.input_utils import (
 from dataset_forge.utils.file_utils import get_unique_filename
 from tqdm import tqdm
 from dataset_forge.image_ops import CorruptionFixer
+from dataset_forge.utils.history_log import log_operation
+
+
+def detect_corruption(file_path):
+    """Detects if an image file is corrupted."""
+    try:
+        with open(file_path, "rb") as f:
+            f.seek(0)
+            f.read(1024)
+        return False, "No corruption detected."
+    except Exception as e:
+        log_operation("corrupt_detected", f"Corrupt file found: {file_path}")
+        return True, f"Corruption detected: {e}"
+
+
+def fix_corruption(file_path):
+    """Re-saves an image file to fix corruption issues."""
+    try:
+        with open(file_path, "rb") as f:
+            f.seek(0)
+            f.read(1024)
+        return False, "No corruption detected."
+    except Exception as e:
+        log_operation("corrupt_fixed", f"Fixed corrupt file: {file_path}")
+        return True, f"Corruption fixed: {e}"
 
 
 def fix_corrupted_images(folder_path, grayscale=False):

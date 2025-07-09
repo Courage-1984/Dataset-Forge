@@ -1,6 +1,7 @@
 import os
 import subprocess
 from typing import List, Tuple, Optional
+from dataset_forge.utils.history_log import log_operation
 
 SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp")
 
@@ -33,6 +34,7 @@ def scrub_exif_single_folder(
                     stderr=subprocess.PIPE,
                 )
             count += 1
+            log_operation("exif_scrub", f"Scrubbed EXIF from {fpath}")
         except Exception as e:
             failed.append(fname)
     return count, failed
