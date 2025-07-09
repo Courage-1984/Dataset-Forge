@@ -3,6 +3,7 @@ venv
 ./configs
 configs
 !configs/_example_config.json
+!configs/_example_community_links.json
 ./__pycache__
 __pycache__
 ./dataset_forge/__pycache__

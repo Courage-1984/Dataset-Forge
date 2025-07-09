@@ -1,4 +1,3 @@
-
 <h3 align="center">
   Dataset Forge
 </h3>
@@ -104,6 +103,10 @@
   - Use HQ/LQ paths from settings
 - Supports both HQ/LQ parent_path and single-folder path workflows
 - Progress bars are shown for path scanning operations
+
+### 🔗 **Links Menu**
+
+- Community and Personal links, with extensible config files and browser opening
 
 ---
 

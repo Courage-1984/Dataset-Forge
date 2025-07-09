@@ -80,6 +80,11 @@ def get_folder_path(prompt):
         print("Error: Invalid path. Please enter a valid directory.")
 
 
+def select_folder(prompt):
+    """Prompt the user to select a folder, with history support."""
+    return get_folder_path(prompt)
+
+
 def get_file_operation_choice():
     """Prompt the user to choose a file operation: copy, move, or inplace."""
     while True:
@@ -170,3 +175,89 @@ def get_pairs_to_process(matching_files, operation_name="process"):
     selected_files = random.sample(matching_files, num_to_process)
     random.shuffle(selected_files)
     return selected_files
+
+
+def ask_yes_no(prompt, default=None):
+    """Prompt the user for a yes/no answer. Returns True for yes, False for no. Default can be True/False/None."""
+    while True:
+        if default is True:
+            suffix = " [Y/n]"
+        elif default is False:
+            suffix = " [y/N]"
+        else:
+            suffix = " [y/n]"
+        resp = input(f"{prompt}{suffix}: ").strip().lower()
+        if not resp and default is not None:
+            return default
+        if resp in ("y", "yes"):
+            return True
+        if resp in ("n", "no"):
+            return False
+        print("Please enter 'y' or 'n'.")
+
+
+def ask_int(prompt, default=None, min_value=None, max_value=None):
+    """Prompt the user for an integer, with optional default, min, and max values."""
+    while True:
+        suffix = f" [default: {default}]" if default is not None else ""
+        resp = input(f"{prompt}{suffix}: ").strip()
+        if not resp and default is not None:
+            value = default
+        else:
+            try:
+                value = int(resp)
+            except ValueError:
+                print("Please enter a valid integer.")
+                continue
+        if min_value is not None and value < min_value:
+            print(f"Value must be at least {min_value}.")
+            continue
+        if max_value is not None and value > max_value:
+            print(f"Value must be at most {max_value}.")
+            continue
+        return value
+
+
+def ask_float(prompt, default=None, min_value=None, max_value=None):
+    """Prompt the user for a float, with optional default, min, and max values."""
+    while True:
+        suffix = f" [default: {default}]" if default is not None else ""
+        resp = input(f"{prompt}{suffix}: ").strip()
+        if not resp and default is not None:
+            value = default
+        else:
+            try:
+                value = float(resp)
+            except ValueError:
+                print("Please enter a valid number.")
+                continue
+        if min_value is not None and value < min_value:
+            print(f"Value must be at least {min_value}.")
+            continue
+        if max_value is not None and value > max_value:
+            print(f"Value must be at most {max_value}.")
+            continue
+        return value
+
+
+def ask_choice(prompt, choices, default=None, return_index=False):
+    """Prompt the user to select from a list of choices. Returns the selected value or index."""
+    if not choices:
+        raise ValueError("No choices provided.")
+    while True:
+        print(prompt)
+        for i, choice in enumerate(choices):
+            print(f"  [{i}] {choice}")
+        suffix = f" [default: {default}]" if default is not None else ""
+        resp = input(f"Select option (0-{len(choices)-1}){suffix}: ").strip()
+        if not resp and default is not None:
+            idx = default
+        else:
+            try:
+                idx = int(resp)
+            except ValueError:
+                print("Please enter a valid number.")
+                continue
+        if 0 <= idx < len(choices):
+            return idx if return_index else choices[idx]
+        print(f"Please enter a number between 0 and {len(choices)-1}.")

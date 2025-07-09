@@ -17,3 +17,4 @@ pepeline
 pepedpid
 pyiqa
 timm
+webbrowser
