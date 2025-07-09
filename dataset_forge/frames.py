@@ -6,6 +6,9 @@ import numpy as np
 from tqdm import tqdm
 from enum import Enum
 import torch.nn.functional as F
+import timm
+import torchvision.transforms as T
+import torch.nn as nn
 
 
 class LayerNorm(torch.nn.Module):
@@ -207,30 +210,58 @@ class EmbeddedModel(Enum):
 
 
 def euclid_dist(emb1, emb2):
-    return torch.cdist(emb1, emb2).item()
+    return torch.cdist(emb1.float(), emb2.float()).item()
 
 
 def cosine_dist(emb1, emb2):
-    emb1_norm = F.normalize(emb1, dim=-1)
-    emb2_norm = F.normalize(emb2, dim=-1)
+    emb1_norm = F.normalize(emb1.float(), dim=-1)
+    emb2_norm = F.normalize(emb2.float(), dim=-1)
     return 1 - F.cosine_similarity(emb1_norm, emb2_norm).item()
 
 
 def enum_to_model(enum):
     if enum == EmbeddedModel.ConvNextS:
-        # Replace with your actual ConvNextS model loading logic
-        raise NotImplementedError("ConvNextS model loading not implemented.")
+        model = timm.create_model("convnext_small_384_in22ft1k", pretrained=True)
+        model.eval()
+        preprocess = T.Compose(
+            [
+                T.ToTensor(),
+                T.Resize((384, 384)),
+                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
+        return model, preprocess
     elif enum == EmbeddedModel.ConvNextL:
-        # Replace with your actual ConvNextL model loading logic
-        raise NotImplementedError("ConvNextL model loading not implemented.")
+        model = timm.create_model("convnext_large_384_in22ft1k", pretrained=True)
+        model.eval()
+        preprocess = T.Compose(
+            [
+                T.ToTensor(),
+                T.Resize((384, 384)),
+                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
+        return model, preprocess
     elif enum == EmbeddedModel.VITS:
-        return torch.hub.load("facebookresearch/dinov2", "dinov2_vits14").eval()
+        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14")
+        if isinstance(model, nn.Module):
+            model = model.eval()
+        return model, None
     elif enum == EmbeddedModel.VITB:
-        return torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14").eval()
+        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
+        if isinstance(model, nn.Module):
+            model = model.eval()
+        return model, None
     elif enum == EmbeddedModel.VITL:
-        return torch.hub.load("facebookresearch/dinov2", "dinov2_vitl14").eval()
+        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vitl14")
+        if isinstance(model, nn.Module):
+            model = model.eval()
+        return model, None
     elif enum == EmbeddedModel.VITG:
-        return torch.hub.load("facebookresearch/dinov2", "dinov2_vitg14").eval()
+        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vitg14")
+        if isinstance(model, nn.Module):
+            model = model.eval()
+        return model, None
     else:
         raise ValueError(f"Unknown EmbeddedModel: {enum}")
 
@@ -246,7 +277,12 @@ class ImgToEmbedding:
         self.device = torch.device(device)
         self.scale = scale
         self.amp = amp
-        self.model = enum_to_model(model).to(self.device)
+        model_obj, preprocess = enum_to_model(model)
+        if isinstance(model_obj, nn.Module):
+            self.model = model_obj.to(self.device)
+        else:
+            self.model = model_obj
+        self.preprocess = preprocess
         self.vit = model in [
             EmbeddedModel.VITS,
             EmbeddedModel.VITB,
@@ -262,6 +298,14 @@ class ImgToEmbedding:
         return F.pad(x, (0, mod_pad_w, 0, mod_pad_h), "reflect")
 
     def img_to_tensor(self, x):
+        if self.preprocess is not None:
+            # Use model's preprocess pipeline
+            tensor = (
+                self.preprocess(T.ToPILImage()(x.astype("uint8")))
+                .unsqueeze(0)
+                .to(self.device)
+            )
+            return tensor
         if self.vit:
             return self.check_img_size(
                 torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
@@ -277,6 +321,10 @@ class ImgToEmbedding:
         # Optionally add resizing logic here if needed
         with torch.amp.autocast(self.device.__str__(), torch.float16, self.amp):
             x = self.img_to_tensor(x)
+            if not callable(self.model):
+                raise RuntimeError(
+                    "Loaded model is not callable. Check model loading logic."
+                )
             return self.model(x)
 
 

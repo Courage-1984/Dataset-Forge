@@ -1,4 +1,6 @@
 import os
+import shutil
+import uuid
 
 
 def batch_rename_menu():
@@ -44,34 +46,6 @@ def batch_rename_menu():
         )
 
 
-def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=True):
-    """Batch rename HQ/LQ paired folders with sequential numbers or custom prefix."""
-    hq_files = sorted(
-        [f for f in os.listdir(hq_path) if os.path.isfile(os.path.join(hq_path, f))]
-    )
-    lq_files = sorted(
-        [f for f in os.listdir(lq_path) if os.path.isfile(os.path.join(lq_path, f))]
-    )
-    matching_files = [f for f in hq_files if f in lq_files]
-    print(f"Found {len(matching_files)} matching HQ/LQ pairs.")
-    for idx, filename in enumerate(matching_files, 1):
-        ext = os.path.splitext(filename)[1]
-        new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
-        hq_src = os.path.join(hq_path, filename)
-        lq_src = os.path.join(lq_path, filename)
-        hq_dst = os.path.join(hq_path, new_name)
-        lq_dst = os.path.join(lq_path, new_name)
-        if dry_run:
-            print(f"Would rename: {filename} -> {new_name}")
-        else:
-            os.rename(hq_src, hq_dst)
-            os.rename(lq_src, lq_dst)
-    if dry_run:
-        print("Dry run complete. No files were renamed.")
-    else:
-        print("Batch renaming complete.")
-
-
 def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
     """Batch rename files in a single folder with sequential numbers or custom prefix."""
     files = sorted(
@@ -82,16 +56,100 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
         ]
     )
     print(f"Found {len(files)} files in {folder_path}.")
+
+    if dry_run:
+        for idx, filename in enumerate(files, 1):
+            ext = os.path.splitext(filename)[1]
+            new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
+            print(f"Would rename: {filename} -> {new_name}")
+        print("Dry run complete. No files were renamed.")
+        return
+
+    # Two-phase approach: first rename all to temporary names, then to final names
+    temp_renames = []
+    final_renames = []
+
+    # Phase 1: Create temporary names and plan final names
     for idx, filename in enumerate(files, 1):
         ext = os.path.splitext(filename)[1]
-        new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
+        final_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
+        temp_name = f"temp_{uuid.uuid4().hex[:12]}{ext}"
+
         src = os.path.join(folder_path, filename)
-        dst = os.path.join(folder_path, new_name)
-        if dry_run:
-            print(f"Would rename: {filename} -> {new_name}")
-        else:
-            os.rename(src, dst)
+        temp_path = os.path.join(folder_path, temp_name)
+        final_path = os.path.join(folder_path, final_name)
+
+        temp_renames.append((src, temp_path))
+        final_renames.append((temp_path, final_path))
+
+    # Phase 2: Execute temporary renames
+    print("Phase 1: Renaming to temporary names...")
+    for src, temp_path in temp_renames:
+        os.rename(src, temp_path)
+
+    # Phase 3: Execute final renames
+    print("Phase 2: Renaming to final names...")
+    for temp_path, final_path in final_renames:
+        os.rename(temp_path, final_path)
+
+    print("Batch renaming complete.")
+
+
+def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=True):
+    """Batch rename HQ/LQ paired folders with sequential numbers or custom prefix."""
+    hq_files = sorted(
+        [f for f in os.listdir(hq_path) if os.path.isfile(os.path.join(hq_path, f))]
+    )
+    lq_files = sorted(
+        [f for f in os.listdir(lq_path) if os.path.isfile(os.path.join(lq_path, f))]
+    )
+    matching_files = [f for f in hq_files if f in lq_files]
+    print(f"Found {len(matching_files)} matching HQ/LQ pairs.")
+
     if dry_run:
+        for idx, filename in enumerate(matching_files, 1):
+            ext = os.path.splitext(filename)[1]
+            new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
+            print(f"Would rename: {filename} -> {new_name}")
         print("Dry run complete. No files were renamed.")
-    else:
-        print("Batch renaming complete.")
+        return
+
+    # Two-phase approach for HQ/LQ folders
+    hq_temp_renames = []
+    lq_temp_renames = []
+    hq_final_renames = []
+    lq_final_renames = []
+
+    # Phase 1: Create temporary names and plan final names
+    for idx, filename in enumerate(matching_files, 1):
+        ext = os.path.splitext(filename)[1]
+        final_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
+        temp_name = f"temp_{uuid.uuid4().hex[:12]}{ext}"
+
+        hq_src = os.path.join(hq_path, filename)
+        lq_src = os.path.join(lq_path, filename)
+        hq_temp_path = os.path.join(hq_path, temp_name)
+        lq_temp_path = os.path.join(lq_path, temp_name)
+        hq_final_path = os.path.join(hq_path, final_name)
+        lq_final_path = os.path.join(lq_path, final_name)
+
+        hq_temp_renames.append((hq_src, hq_temp_path))
+        lq_temp_renames.append((lq_src, lq_temp_path))
+        hq_final_renames.append((hq_temp_path, hq_final_path))
+        lq_final_renames.append((lq_temp_path, lq_final_path))
+
+    # Phase 2: Execute temporary renames
+    print("Phase 1: Renaming to temporary names...")
+    for hq_src, hq_temp_path in hq_temp_renames:
+        os.rename(hq_src, hq_temp_path)
+    for lq_src, lq_temp_path in lq_temp_renames:
+        os.rename(lq_src, lq_temp_path)
+
+    # Phase 3: Execute final renames
+    print("Phase 2: Renaming to final names...")
+    for hq_temp_path, hq_final_path in hq_final_renames:
+        os.rename(hq_temp_path, hq_final_path)
+    for lq_temp_path, lq_final_path in lq_final_renames:
+        os.rename(lq_temp_path, lq_final_path)
+
+    print("Batch renaming complete.")
