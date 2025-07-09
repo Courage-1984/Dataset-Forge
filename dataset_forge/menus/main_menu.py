@@ -14,6 +14,8 @@ from dataset_forge.menus import session_state
 from dataset_forge.menus.compress_menu import compress_menu
 from dataset_forge.menus.compress_dir_menu import compress_dir_menu
 from dataset_forge.menus.links_menu import links_menu
+from dataset_forge.menus.user_profile_menu import user_profile_menu
+from dataset_forge.menus.correct_hq_lq_pairing_menu import correct_hq_lq_pairing_menu
 
 
 def main_menu():
@@ -31,6 +33,8 @@ def main_menu():
         "10": ("\U0001f4e6 COMPRESS IMAGES", compress_menu),
         "11": ("\U0001f4e6 COMPRESS DIRECTORY", compress_dir_menu),
         "12": ("\U0001f517 LINKS", links_menu),
+        "13": ("\U0001f464 USER PROFILE", user_profile_menu),
+        "14": ("\U0001f527 CORRECT/CREATE HQ LQ PAIRING", correct_hq_lq_pairing_menu),
         "0": ("\U0001f6aa EXIT", None),
     }
     while True:
