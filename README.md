@@ -94,6 +94,17 @@
 - Interactive, logical menu system
 - Progress bars, error handling, memory management
 
+### 🗂️ **Path History & Selection**
+
+- Every time you enter a path, it is added to a path history file (no duplicates; most recent at top)
+- When prompted for a path, you can:
+  - Enter manually
+  - Use last used path
+  - View and select from history
+  - Use HQ/LQ paths from settings
+- Supports both HQ/LQ parent_path and single-folder path workflows
+- Progress bars are shown for path scanning operations
+
 ---
 
 ## 🧩 Project Structure

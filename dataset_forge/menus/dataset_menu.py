@@ -12,6 +12,7 @@ from dataset_forge.utils.color import Mocha
 from dataset_forge.actions import dataset_actions
 from dataset_forge.menus import session_state
 from tqdm import tqdm
+from dataset_forge.utils.input_utils import get_folder_path
 
 # Assume hq_folder, lq_folder are available in the global scope for now
 
@@ -24,40 +25,40 @@ def dataset_menu():
         "4": (
             "Extract Random Pairs",
             lambda: dataset_actions.extract_random_pairs(
-                input("Enter HQ folder path: ").strip(),
-                input("Enter LQ folder path: ").strip(),
+                get_folder_path("Enter HQ folder path: "),
+                get_folder_path("Enter LQ folder path: "),
             ),
         ),
         "5": (
             "Shuffle Image Pairs",
             lambda: dataset_actions.shuffle_image_pairs(
-                input("Enter HQ folder path: ").strip(),
-                input("Enter LQ folder path: ").strip(),
+                get_folder_path("Enter HQ folder path: "),
+                get_folder_path("Enter LQ folder path: "),
             ),
         ),
         "6": (
             "Split and Adjust Dataset",
             lambda: (
                 (lambda hq, lq: split_adjust_dataset_menu(hq, lq))(
-                    input("Enter HQ folder path (or single folder): ").strip(),
-                    input(
+                    get_folder_path("Enter HQ folder path (or single folder): "),
+                    get_folder_path(
                         "Enter LQ folder path (leave blank for single-folder): "
-                    ).strip(),
+                    ),
                 )
             ),
         ),
         "7": (
             "Remove Small Image Pairs",
             lambda: dataset_actions.remove_small_image_pairs(
-                input("Enter HQ folder path: ").strip(),
-                input("Enter LQ folder path: ").strip(),
+                get_folder_path("Enter HQ folder path: "),
+                get_folder_path("Enter LQ folder path: "),
             ),
         ),
         "8": ("De-Duplicate", dedupe_menu),
         "9": (
             "Batch Rename",
             lambda: dataset_actions.batch_rename(
-                input("Enter folder path to batch rename: ").strip()
+                get_folder_path("Enter folder path to batch rename: ")
             ),
         ),
         "10": ("Extract Frames from Video", dataset_actions.extract_frames_from_video),
@@ -85,8 +86,8 @@ def images_orientation_organization_menu():
     print_header(
         "Images Orientation Organization (Extract by Landscape/Portrait/Square)"
     )
-    input_folder = input("Enter the path to the input folder: ").strip()
-    output_folder = input("Enter the path to the output folder: ").strip()
+    input_folder = get_folder_path("Enter the path to the input folder: ")
+    output_folder = get_folder_path("Enter the path to the output folder: ")
     orientations = input(
         "Enter orientations to extract (comma-separated: landscape,portrait,square): "
     ).strip()
@@ -106,12 +107,12 @@ def images_orientation_organization_menu():
 
 def dedupe_menu():
     print("\n=== De-Duplicate Images ===")
-    hq_folder = input(
+    hq_folder = get_folder_path(
         "Enter HQ folder path (or single folder for single deduplication): "
-    ).strip()
-    lq_folder = input(
+    )
+    lq_folder = get_folder_path(
         "Enter LQ folder path (leave blank for single-folder deduplication): "
-    ).strip()
+    )
     hash_type = (
         input("Hash type [phash/ahash/dhash/whash] (default: phash): ").strip().lower()
         or "phash"
@@ -133,13 +134,13 @@ def dedupe_menu():
     )
     dest_dir = None
     if op in ("move", "copy"):
-        dest_hq = input(
+        dest_hq = get_folder_path(
             "Destination directory for HQ (leave blank for no move/copy): "
-        ).strip()
+        )
         dest_lq = (
-            input(
+            get_folder_path(
                 "Destination directory for LQ (leave blank for no move/copy): "
-            ).strip()
+            )
             if lq_folder
             else None
         )
