@@ -88,36 +88,7 @@ def rich_reports_menu():
 
 def main_menu():
     """Main menu for the Image Dataset Utility."""
-    main_options = {
-        "1": ("\U0001f4c2 DATASET", dataset_menu),
-        "2": ("\U0001f4ca ANALYSIS", analysis_menu),
-        "3": ("\U0001f4c8 RICH REPORTS", rich_reports_menu),
-        "4": ("\U0001f4a1 AUTOMATED DATASET QUALITY SCORING", quality_scoring_menu),
-        "5": ("\U0001f4be PROGRESSIVE DATASET VALIDATION", progressive_validation_menu),
-        "6": ("\U0001f50e OUTLIER & ANOMALY DETECTION", outlier_detection_menu),
-        "7": ("\u2728 TRANSFORM", transform_menu),
-        "8": ("\U0001f347 AUGMENTATION RECIPES", augmentation_menu),
-        "9": ("\U0001f5c2\ufe0f  METADATA", metadata_menu),
-        "10": ("\U0001f50d COMPARISON", comparison_menu),
-        "11": ("\U0001f4dd BATCH RENAME", batch_rename_menu),
-        "12": ("\U0001f4c1 CONFIG", config_menu),
-        "13": ("\u2699\ufe0f  SETTINGS", settings_menu),
-        "14": ("\U0001f4e6 COMPRESS IMAGES", compress_menu),
-        "15": ("\U0001f4e6 COMPRESS DIRECTORY", compress_dir_menu),
-        "16": ("\U0001f517 LINKS", links_menu),
-        "17": ("\U0001f464 USER PROFILE", user_profile_menu),
-        "18": ("\U0001f4d3 VIEW CHANGE/HISTORY LOG", history_log_menu),
-        "19": ("\U0001f527 CORRECT/CREATE HQ LQ PAIRING", correct_hq_lq_pairing_menu),
-        "20": (
-            "\U0001f50a AUTOMATIC HQ/LQ PAIRING (FUZZY MATCHING)",
-            fuzzy_hq_lq_pairing_menu,
-        ),
-        "21": (
-            "\U0001f5d1\ufe0f  VISUAL DUPLICATE & NEAR-DUPLICATE DETECTION",
-            visual_dedup_menu,
-        ),
-        "0": ("\U0001f6aa EXIT", None),
-    }
+    main_options = main_menu.__menu_options__
     while True:
         try:
             action = show_menu(
@@ -132,3 +103,36 @@ def main_menu():
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting...")
             break
+
+
+# Register a static menu for favorites
+main_menu.__menu_options__ = {
+    "1": ("\U0001f4c2 DATASET", dataset_menu),
+    "2": ("\U0001f4ca ANALYSIS", analysis_menu),
+    "3": ("\U0001f4c8 RICH REPORTS", rich_reports_menu),
+    "4": ("\U0001f4a1 AUTOMATED DATASET QUALITY SCORING", quality_scoring_menu),
+    "5": ("\U0001f4be PROGRESSIVE DATASET VALIDATION", progressive_validation_menu),
+    "6": ("\U0001f50e OUTLIER & ANOMALY DETECTION", outlier_detection_menu),
+    "7": ("\u2728 TRANSFORM", transform_menu),
+    "8": ("\U0001f347 AUGMENTATION RECIPES", augmentation_menu),
+    "9": ("\U0001f5c2\ufe0f  METADATA", metadata_menu),
+    "10": ("\U0001f50d COMPARISON", comparison_menu),
+    "11": ("\U0001f4dd BATCH RENAME", batch_rename_menu),
+    "12": ("\U0001f4c1 CONFIG", config_menu),
+    "13": ("\u2699\ufe0f  SETTINGS", settings_menu),
+    "14": ("\U0001f4e6 COMPRESS IMAGES", compress_menu),
+    "15": ("\U0001f4e6 COMPRESS DIRECTORY", compress_dir_menu),
+    "16": ("\U0001f517 LINKS", links_menu),
+    "17": ("\U0001f464 USER PROFILE", user_profile_menu),
+    "18": ("\U0001f4d3 VIEW CHANGE/HISTORY LOG", history_log_menu),
+    "19": ("\U0001f527 CORRECT/CREATE HQ LQ PAIRING", correct_hq_lq_pairing_menu),
+    "20": (
+        "\U0001f50a AUTOMATIC HQ/LQ PAIRING (FUZZY MATCHING)",
+        fuzzy_hq_lq_pairing_menu,
+    ),
+    "21": (
+        "\U0001f5d1\ufe0f  VISUAL DUPLICATE & NEAR-DUPLICATE DETECTION",
+        visual_dedup_menu,
+    ),
+    "0": ("\U0001f6aa EXIT", None),
+}

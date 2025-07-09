@@ -2,8 +2,8 @@ import os
 import json
 import subprocess
 import re
-from dataset_forge.analysis import find_hq_lq_scale, report_dimensions
-from dataset_forge.alpha import find_alpha_channels
+from dataset_forge.actions.analysis_actions import find_hq_lq_scale, report_dimensions
+from dataset_forge.actions.alpha_actions import find_alpha_channels
 
 # Helper functions from config_menu.py
 import yaml

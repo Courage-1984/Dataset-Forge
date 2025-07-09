@@ -73,7 +73,7 @@ def correct_hq_lq_pairing_menu():
     nonmatching_aspect = 0
     aspect_details = []
     from PIL import Image, ImageOps
-    from dataset_forge.image_ops import get_image_size
+    from dataset_forge.utils.image_ops import get_image_size
 
     lq_files = {
         f for f in os.listdir(lq_folder) if os.path.isfile(os.path.join(lq_folder, f))
@@ -214,6 +214,13 @@ def correct_hq_lq_pairing_menu():
     print_success("\nHQ/LQ pairing correction workflow complete!")
 
 
+# Register a static menu for favorites
+correct_hq_lq_pairing_menu.__menu_options__ = {
+    "1": ("Run HQ/LQ Pairing Correction Workflow", correct_hq_lq_pairing_menu),
+    "0": ("Back to Main Menu", None),
+}
+
+
 def fuzzy_hq_lq_pairing_menu():
     print_header("Automatic HQ/LQ Pairing (Fuzzy Matching)", color=Mocha.lavender)
     print_info(
@@ -229,3 +236,10 @@ def fuzzy_hq_lq_pairing_menu():
     print_info(f"\nFound {len(pairs)} HQ/LQ pairs using fuzzy matching.")
     # TODO: Display results, allow user to review/save pairs
     input("\nPress Enter to return to the main menu...")
+
+
+# Register a static menu for favorites
+fuzzy_hq_lq_pairing_menu.__menu_options__ = {
+    "1": ("Run Fuzzy HQ/LQ Pairing Workflow", fuzzy_hq_lq_pairing_menu),
+    "0": ("Back to Main Menu", None),
+}

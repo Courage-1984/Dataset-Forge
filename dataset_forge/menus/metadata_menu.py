@@ -18,11 +18,7 @@ from dataset_forge.actions.metadata_actions import (
 
 
 def metadata_menu():
-    options = {
-        "1": ("Scrub EXIF Metadata", exif_scrubber_menu),
-        "2": ("Convert ICC Profile to sRGB", icc_to_srgb_menu),
-        "0": ("Back to Main Menu", None),
-    }
+    options = metadata_menu.__menu_options__
     while True:
         action = show_menu(
             "EXIF & ICC Profile Management",
@@ -35,3 +31,10 @@ def metadata_menu():
         action()
         print_prompt("\nPress Enter to return to the menu...")
         input()
+
+
+metadata_menu.__menu_options__ = {
+    "1": ("Scrub EXIF Metadata", exif_scrubber_menu),
+    "2": ("Convert ICC Profile to sRGB", icc_to_srgb_menu),
+    "0": ("Back to Main Menu", None),
+}

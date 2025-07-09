@@ -1,4 +1,4 @@
-from dataset_forge.bhi_filtering import run_bhi_filtering
+from dataset_forge.actions.bhi_filtering_actions import run_bhi_filtering
 from dataset_forge.utils.input_utils import get_folder_path
 from dataset_forge.utils.printing import (
     print_header,
@@ -42,3 +42,10 @@ def bhi_filtering_menu():
             print_info(f"Results: {results}")
     except Exception as e:
         print_error(f"Error during BHI filtering: {e}")
+
+
+# Register a static menu for favorites
+bhi_filtering_menu.__menu_options__ = {
+    "1": ("Run BHI Filtering Workflow", bhi_filtering_menu),
+    "0": ("Back to Main Menu", None),
+}

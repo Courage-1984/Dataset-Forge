@@ -101,20 +101,21 @@ def personal_links_menu():
 
 
 def links_menu():
-    options = {
-        "1": ("Community Links", community_links_menu),
-        "2": ("Personal Links", personal_links_menu),
-        "0": ("Back", None),
-    }
+    options = links_menu.__menu_options__
     while True:
         action = show_menu("Links Menu", options, header_color=Mocha.lavender)
-        # If show_menu returns the function directly, just call it
         if callable(action):
             action()
             continue
-        # If show_menu returns the key, look up the function
         if action is None or action == "0":
             break
         func = options[action][1]
         if func:
             func()
+
+
+links_menu.__menu_options__ = {
+    "1": ("Community Links", community_links_menu),
+    "2": ("Personal Links", personal_links_menu),
+    "0": ("Back", None),
+}

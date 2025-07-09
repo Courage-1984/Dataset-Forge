@@ -3,16 +3,17 @@ import logging
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.io_utils import is_image_file
 from collections import Counter
 import cv2
 import shutil
 import concurrent.futures
-from dataset_forge.analysis_ops import (
+from dataset_forge.actions.analysis_ops_actions import (
     ScaleAnalyzer,
     DimensionAnalyzer,
     ConsistencyAnalyzer,
 )
+from dataset_forge.utils.image_ops import get_image_size
 
 
 def generate_hq_lq_dataset_report(hq_folder, lq_folder):
@@ -751,7 +752,6 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
     - If single_path is a file: report aspect ratio for the image.
     """
     from dataset_forge.utils.file_utils import is_image_file
-    from dataset_forge.image_ops import get_image_size
     from dataset_forge.utils.printing import (
         print_info,
         print_error,

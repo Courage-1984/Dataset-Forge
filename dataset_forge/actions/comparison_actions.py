@@ -1,5 +1,5 @@
 import os
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.io_utils import is_image_file
 from dataset_forge.utils.input_utils import get_destination_path
 from PIL import Image, ImageFont, ImageDraw
 import random
@@ -7,7 +7,7 @@ import numpy as np
 from tqdm import tqdm
 import gc
 import torch
-from dataset_forge import folder_compare
+from dataset_forge.actions import folder_compare_actions
 
 
 def release_memory():
@@ -553,7 +553,9 @@ def compare_folders_menu():
         if ext_input
         else None
     )
-    missing1, missing2 = folder_compare.compare_folders(folder1, folder2, extensions)
+    missing1, missing2 = folder_compare_actions.compare_folders(
+        folder1, folder2, extensions
+    )
     if not missing1 and not missing2:
         print(
             "Both folders contain the same files"

@@ -1,4 +1,4 @@
-from dataset_forge.hue_adjustment import process_folder
+from dataset_forge.actions.hue_adjustment_actions import process_folder
 from dataset_forge.utils.input_utils import get_folder_path
 from dataset_forge.utils.printing import (
     print_header,
@@ -40,3 +40,10 @@ def hue_adjustment_menu():
         print_success("Hue/Brightness/Contrast adjustment completed.")
     except Exception as e:
         print_error(f"Error during adjustment: {e}")
+
+
+# Register a static menu for favorites
+hue_adjustment_menu.__menu_options__ = {
+    "1": ("Run Hue/Brightness/Contrast Adjustment", hue_adjustment_menu),
+    "0": ("Back to Main Menu", None),
+}

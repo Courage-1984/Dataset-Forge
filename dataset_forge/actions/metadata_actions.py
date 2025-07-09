@@ -1,5 +1,5 @@
 import os
-from dataset_forge import exif_scrubber
+from dataset_forge.actions import exif_scrubber_actions
 from dataset_forge.utils.history_log import log_operation
 
 # If ICCToSRGBConverter is not available, leave a TODO stub
@@ -8,7 +8,7 @@ from dataset_forge.utils.history_log import log_operation
 def exif_scrubber_menu():
     """Scrub EXIF metadata from images in a folder or paired HQ/LQ folders."""
     print("\n=== Metadata (EXIF) Scrubber ===")
-    if not exif_scrubber.has_exiftool():
+    if not exif_scrubber_actions.has_exiftool():
         print(
             "ExifTool is not installed or not in PATH. Please install ExifTool and ensure it is available."
         )
@@ -24,7 +24,7 @@ def exif_scrubber_menu():
             print(f"Folder does not exist: {folder}")
             return
         print(f"Scrubbing EXIF metadata from all images in: {folder}")
-        count, failed = exif_scrubber.scrub_exif_single_folder(folder)
+        count, failed = exif_scrubber_actions.scrub_exif_single_folder(folder)
         print(f"Processed {count} images.")
         if failed:
             print(f"Failed to process {len(failed)} files: {failed}")
@@ -39,7 +39,7 @@ def exif_scrubber_menu():
         print(
             f"Scrubbing EXIF metadata from paired HQ/LQ folders:\n  HQ: {hq_folder}\n  LQ: {lq_folder}"
         )
-        count, failed = exif_scrubber.scrub_exif_hq_lq_folders(hq_folder, lq_folder)
+        count, failed = exif_scrubber_actions.scrub_exif_hq_lq_folders(hq_folder, lq_folder)
         print(f"Processed {count} HQ/LQ image pairs.")
         if failed:
             print(f"Failed to process {len(failed)} pairs:")
@@ -53,7 +53,7 @@ def exif_scrubber_menu():
 
 def icc_to_srgb_menu():
     """Convert ICC profile to sRGB for images in a file or folder."""
-    from dataset_forge.image_ops import ICCToSRGBConverter
+    from dataset_forge.utils.image_ops import ICCToSRGBConverter
 
     print("\n=== ICC to sRGB Conversion ===")
     input_path = input("Enter input file or folder path: ").strip()

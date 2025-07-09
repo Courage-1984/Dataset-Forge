@@ -2,7 +2,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pepeline import read, save, ImgFormat
 from pepedpid import dpid_resize
-from dataset_forge.io_utils import is_image_file
+from dataset_forge.utils.io_utils import is_image_file
 
 SUPPORTED_INPUT_EXTS = {
     ".webp",

@@ -32,26 +32,7 @@ def require_hq_lq(func):
 
 
 def comparison_menu():
-    options = {
-        "1": (
-            "Create Comparison Images",
-            require_hq_lq(
-                lambda: create_comparison_images(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "2": (
-            "Create GIF Comparison",
-            require_hq_lq(
-                lambda: create_gif_comparison(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "3": ("Compare Folders", compare_folders_menu),
-        "0": ("Back to Main Menu", None),
-    }
+    options = comparison_menu.__menu_options__
     while True:
         action = show_menu(
             "Comparison Tools", options, header_color=Mocha.sapphire, char="-"
@@ -61,3 +42,25 @@ def comparison_menu():
         action()
         print_prompt("\nPress Enter to return to the menu...")
         input()
+
+
+comparison_menu.__menu_options__ = {
+    "1": (
+        "Create Comparison Images",
+        require_hq_lq(
+            lambda: create_comparison_images(
+                session_state.hq_folder, session_state.lq_folder
+            )
+        ),
+    ),
+    "2": (
+        "Create GIF Comparison",
+        require_hq_lq(
+            lambda: create_gif_comparison(
+                session_state.hq_folder, session_state.lq_folder
+            )
+        ),
+    ),
+    "3": ("Compare Folders", compare_folders_menu),
+    "0": ("Back to Main Menu", None),
+}

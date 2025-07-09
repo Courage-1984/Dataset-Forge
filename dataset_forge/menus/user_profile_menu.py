@@ -12,53 +12,43 @@ import sys
 import importlib
 
 # Only import menu functions directly
-from dataset_forge.menus.dataset_menu import dataset_menu
-from dataset_forge.menus.analysis_menu import analysis_menu
-from dataset_forge.menus.transform_menu import transform_menu
-from dataset_forge.menus.augmentation_menu import augmentation_menu
-from dataset_forge.menus.metadata_menu import metadata_menu
-from dataset_forge.menus.comparison_menu import comparison_menu
-from dataset_forge.menus.config_menu import config_menu
-from dataset_forge.menus.settings_menu import settings_menu
-from dataset_forge.menus.compress_menu import compress_menu
-from dataset_forge.menus.compress_dir_menu import compress_dir_menu
-from dataset_forge.menus.links_menu import links_menu
-
-MENU_TREE = [
-    ("DATASET", dataset_menu),
-    ("ANALYSIS", analysis_menu),
-    ("TRANSFORM", transform_menu),
-    ("AUGMENTATION RECIPES", augmentation_menu),
-    ("METADATA", metadata_menu),
-    ("COMPARISON", comparison_menu),
-    ("BATCH RENAME", None),
-    ("CONFIG", config_menu),
-    ("SETTINGS", settings_menu),
-    ("COMPRESS IMAGES", compress_menu),
-    ("COMPRESS DIRECTORY", compress_dir_menu),
-    ("LINKS", links_menu),
-]
+# from dataset_forge.menus.main_menu import main_menu # Removed to break circular import
 
 
-# Recursively extract menu options from a menu function
+# Recursively extract menu options from the main menu tree
 # Returns: [("Parent > Child", callable), ...]
 def extract_menu_tree():
+    from dataset_forge.menus.main_menu import (
+        main_menu,
+    )  # moved here to avoid circular import
+
     tree = []
-    for parent_name, menu_func in MENU_TREE:
-        if menu_func is None:
-            continue
-        try:
-            options = getattr(menu_func, "__menu_options__", None)
-            if options is None:
-                # Try to call the menu function with a special flag to get options
-                options = get_menu_options(menu_func)
-            for key, (label, action) in options.items():
-                if callable(action):
-                    tree.append((f"{parent_name} > {label}", action))
-                else:
-                    tree.append((f"{parent_name} > {label}", None))
-        except Exception:
-            continue
+    visited = set()
+
+    def walk_menu(parent_label, menu_func):
+        if menu_func in visited:
+            return
+        visited.add(menu_func)
+        options = getattr(menu_func, "__menu_options__", None)
+        if options is None:
+            # If no static options, treat as a leaf action
+            tree.append((parent_label, menu_func))
+            return
+        for key, (label, action) in options.items():
+            full_label = f"{parent_label} > {label}" if parent_label else label
+            if callable(action):
+                walk_menu(full_label, action)
+            else:
+                tree.append((full_label, action))
+
+    # Start from the main menu's static options
+    main_options = getattr(main_menu, "__menu_options__", None)
+    if main_options:
+        for key, (label, action) in main_options.items():
+            if callable(action):
+                walk_menu(label, action)
+            else:
+                tree.append((label, action))
     return tree
 
 

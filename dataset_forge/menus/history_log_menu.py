@@ -9,21 +9,6 @@ from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.history_log import list_logs, read_log, read_most_recent_log
 
 
-def history_log_menu():
-    while True:
-        options = {
-            "1": ("View most recent log", view_most_recent_log),
-            "2": ("Select a log to view", select_log_to_view),
-            "0": ("Return to main menu", None),
-        }
-        action = show_menu(
-            "Change/History Log Menu", options, header_color=Mocha.lavender
-        )
-        if action is None:
-            break
-        action()
-
-
 def view_most_recent_log():
     print_header("Most Recent Change/History Log", color=Mocha.mauve)
     log = read_most_recent_log()
@@ -57,3 +42,21 @@ def select_log_to_view():
     except Exception:
         print_error("Invalid input.")
     input("\nPress Enter to return...")
+
+
+def history_log_menu():
+    options = history_log_menu.__menu_options__
+    while True:
+        action = show_menu(
+            "Change/History Log Menu", options, header_color=Mocha.lavender
+        )
+        if action is None:
+            break
+        action()
+
+
+history_log_menu.__menu_options__ = {
+    "1": ("View most recent log", view_most_recent_log),
+    "2": ("Select a log to view", select_log_to_view),
+    "0": ("Return to main menu", None),
+}

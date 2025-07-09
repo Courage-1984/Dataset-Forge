@@ -36,37 +36,7 @@ def require_hq_lq(func):
 
 
 def transform_menu():
-    options = {
-        "1": ("Downsample Images", downsample_images_menu),
-        "2": ("Convert HDR to SDR", hdr_to_sdr_menu),
-        "3": (
-            "Color/Tone Adjustments",
-            require_hq_lq(
-                lambda: dataset_colour_adjustment(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "4": ("Hue/Brightness/Contrast Adjustment", hue_adjustment_menu),
-        "5": (
-            "Grayscale Conversion",
-            require_hq_lq(
-                lambda: grayscale_conversion(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "6": (
-            "Remove Alpha Channel",
-            require_hq_lq(
-                lambda: remove_alpha_channels(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "7": ("Apply Custom Transformations", transform_dataset),
-        "0": ("Back to Main Menu", None),
-    }
+    options = transform_menu.__menu_options__
     while True:
         action = show_menu(
             "Image Transformations", options, header_color=Mocha.sapphire, char="-"
@@ -76,3 +46,36 @@ def transform_menu():
         action()
         print_prompt("\nPress Enter to return to the menu...")
         input()
+
+
+transform_menu.__menu_options__ = {
+    "1": ("Downsample Images", downsample_images_menu),
+    "2": ("Convert HDR to SDR", hdr_to_sdr_menu),
+    "3": (
+        "Color/Tone Adjustments",
+        require_hq_lq(
+            lambda: dataset_colour_adjustment(
+                session_state.hq_folder, session_state.lq_folder
+            )
+        ),
+    ),
+    "4": ("Hue/Brightness/Contrast Adjustment", hue_adjustment_menu),
+    "5": (
+        "Grayscale Conversion",
+        require_hq_lq(
+            lambda: grayscale_conversion(
+                session_state.hq_folder, session_state.lq_folder
+            )
+        ),
+    ),
+    "6": (
+        "Remove Alpha Channel",
+        require_hq_lq(
+            lambda: remove_alpha_channels(
+                session_state.hq_folder, session_state.lq_folder
+            )
+        ),
+    ),
+    "7": ("Apply Custom Transformations", transform_dataset),
+    "0": ("Back to Main Menu", None),
+}

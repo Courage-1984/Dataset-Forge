@@ -17,71 +17,6 @@ from dataset_forge.utils.input_utils import get_folder_path
 # Assume hq_folder, lq_folder are available in the global scope for now
 
 
-def dataset_menu():
-    options = {
-        "1": ("Create Multiscale Dataset", dataset_actions.create_multiscale_dataset),
-        "2": ("Image Tiling", dataset_actions.image_tiling),
-        "3": ("Combine Datasets", dataset_actions.combine_datasets),
-        "4": (
-            "Extract Random Pairs",
-            lambda: dataset_actions.extract_random_pairs(
-                get_folder_path("Enter HQ folder path: "),
-                get_folder_path("Enter LQ folder path: "),
-            ),
-        ),
-        "5": (
-            "Shuffle Image Pairs",
-            lambda: dataset_actions.shuffle_image_pairs(
-                get_folder_path("Enter HQ folder path: "),
-                get_folder_path("Enter LQ folder path: "),
-            ),
-        ),
-        "6": (
-            "Split and Adjust Dataset",
-            lambda: (
-                (lambda hq, lq: split_adjust_dataset_menu(hq, lq))(
-                    get_folder_path("Enter HQ folder path (or single folder): "),
-                    get_folder_path(
-                        "Enter LQ folder path (leave blank for single-folder): "
-                    ),
-                )
-            ),
-        ),
-        "7": (
-            "Remove Small Image Pairs",
-            lambda: dataset_actions.remove_small_image_pairs(
-                get_folder_path("Enter HQ folder path: "),
-                get_folder_path("Enter LQ folder path: "),
-            ),
-        ),
-        "8": ("De-Duplicate", dedupe_menu),
-        "9": (
-            "Batch Rename",
-            lambda: dataset_actions.batch_rename(
-                get_folder_path("Enter folder path to batch rename: ")
-            ),
-        ),
-        "10": ("Extract Frames from Video", dataset_actions.extract_frames_from_video),
-        "11": (
-            "Images Orientation Organization (Extract by Landscape/Portrait/Square)",
-            images_orientation_organization_menu,
-        ),
-        "0": ("Back to Main Menu", None),
-    }
-    while True:
-        action = show_menu(
-            "Dataset Creation & Management",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-        )
-        if action is None:
-            break
-        action()
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
-
-
 def images_orientation_organization_menu():
     print_header(
         "Images Orientation Organization (Extract by Landscape/Portrait/Square)"
@@ -162,6 +97,74 @@ def dedupe_menu():
         print_success("De-duplication complete.")
     except Exception as e:
         print_error(f"Error during de-duplication: {e}")
+
+
+def dataset_menu():
+    options = dataset_menu.__menu_options__
+    while True:
+        action = show_menu(
+            "Dataset Creation & Management",
+            options,
+            header_color=Mocha.sapphire,
+            char="-",
+        )
+        if action is None:
+            break
+        action()
+        print_prompt("\nPress Enter to return to the menu...")
+        input()
+
+
+dataset_menu.__menu_options__ = {
+    "1": ("Create Multiscale Dataset", dataset_actions.create_multiscale_dataset),
+    "2": ("Image Tiling", dataset_actions.image_tiling),
+    "3": ("Combine Datasets", dataset_actions.combine_datasets),
+    "4": (
+        "Extract Random Pairs",
+        lambda: dataset_actions.extract_random_pairs(
+            get_folder_path("Enter HQ folder path: "),
+            get_folder_path("Enter LQ folder path: "),
+        ),
+    ),
+    "5": (
+        "Shuffle Image Pairs",
+        lambda: dataset_actions.shuffle_image_pairs(
+            get_folder_path("Enter HQ folder path: "),
+            get_folder_path("Enter LQ folder path: "),
+        ),
+    ),
+    "6": (
+        "Split and Adjust Dataset",
+        lambda: (
+            (lambda hq, lq: split_adjust_dataset_menu(hq, lq))(
+                get_folder_path("Enter HQ folder path (or single folder): "),
+                get_folder_path(
+                    "Enter LQ folder path (leave blank for single-folder): "
+                ),
+            )
+        ),
+    ),
+    "7": (
+        "Remove Small Image Pairs",
+        lambda: dataset_actions.remove_small_image_pairs(
+            get_folder_path("Enter HQ folder path: "),
+            get_folder_path("Enter LQ folder path: "),
+        ),
+    ),
+    "8": ("De-Duplicate", dedupe_menu),
+    "9": (
+        "Batch Rename",
+        lambda: dataset_actions.batch_rename(
+            get_folder_path("Enter folder path to batch rename: ")
+        ),
+    ),
+    "10": ("Extract Frames from Video", dataset_actions.extract_frames_from_video),
+    "11": (
+        "Images Orientation Organization (Extract by Landscape/Portrait/Square)",
+        images_orientation_organization_menu,
+    ),
+    "0": ("Back to Main Menu", None),
+}
 
 
 def split_adjust_dataset_menu(hq_folder, lq_folder):

@@ -65,3 +65,9 @@ def visual_dedup_menu():
             for path in group:
                 print(f"  {path}")
     input("\nPress Enter to return to the main menu...")
+
+# Register a static menu for favorites
+visual_dedup_menu.__menu_options__ = {
+    "1": ("Run Visual Deduplication Workflow", visual_dedup_menu),
+    "0": ("Back to Main Menu", None),
+}

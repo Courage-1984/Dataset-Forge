@@ -1,20 +1,20 @@
-from dataset_forge.dataset_ops import DatasetCombiner
-from dataset_forge.de_dupe import (
+from dataset_forge.actions.dataset_ops_actions import DatasetCombiner
+from dataset_forge.actions.de_dupe_actions import (
     compute_hashes,
     find_duplicates,
     find_near_duplicates,
     align_and_operate_on_pairs,
 )
-from dataset_forge.batch_rename import (
+from dataset_forge.actions.batch_rename_actions import (
     batch_rename_single_folder,
     batch_rename_hq_lq_folders,
 )
-from dataset_forge.frames import extract_frames_menu
-from dataset_forge.orientation_organizer import (
+from dataset_forge.actions.frames_actions import extract_frames_menu
+from dataset_forge.actions.orientation_organizer_actions import (
     organize_images_by_orientation,
     organize_hq_lq_by_orientation,
 )
-from dataset_forge.operations import (
+from dataset_forge.actions.operations_actions import (
     extract_random_pairs as _extract_random_pairs,
     shuffle_image_pairs as _shuffle_image_pairs,
     split_adjust_dataset as _split_adjust_dataset,
@@ -23,7 +23,7 @@ from dataset_forge.operations import (
 )
 import os
 from tqdm import tqdm
-from dataset_forge.ic9600_tiling import run_ic9600_tiling
+from dataset_forge.actions.ic9600_tiling_actions import run_ic9600_tiling
 from dataset_forge.utils.printing import print_header, print_success, print_error
 from dataset_forge.dpid import (
     run_basicsr_dpid_single_folder,

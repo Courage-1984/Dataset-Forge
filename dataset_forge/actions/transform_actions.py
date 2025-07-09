@@ -4,7 +4,7 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from PIL import Image
-from dataset_forge.io_utils import (
+from dataset_forge.utils.io_utils import (
     is_image_file,
 )
 from dataset_forge.utils.input_utils import (
@@ -13,9 +13,9 @@ from dataset_forge.utils.input_utils import (
     get_destination_path,
 )
 from dataset_forge.utils.file_utils import IMAGE_TYPES, get_unique_filename
-from dataset_forge.image_ops import ColorAdjuster
+from dataset_forge.utils.image_ops import ColorAdjuster
 import subprocess
-from dataset_forge import dpid_phhofm
+from dataset_forge.utils import dpid_phhofm
 
 
 # --- Downsample Images ---
