@@ -7,6 +7,7 @@ from dataset_forge.actions.quality_scoring_actions import (
 from dataset_forge.utils.input_utils import get_path_with_history
 from dataset_forge.utils.printing import print_info, print_success, print_error
 from dataset_forge.utils.menu import show_menu
+from dataset_forge.utils.color import Mocha
 
 
 def quality_scoring_menu():
@@ -15,7 +16,7 @@ def quality_scoring_menu():
         action = show_menu(
             "Automated Dataset Quality Scoring",
             options,
-            header_color=None,
+            header_color=Mocha.sapphire,
             char="-",
         )
         if action is None:

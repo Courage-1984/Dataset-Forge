@@ -14,7 +14,7 @@ from dataset_forge.actions.transform_actions import (
     hdr_to_sdr_menu,
     dataset_colour_adjustment,
     grayscale_conversion,
-    remove_alpha_channels,
+    remove_alpha_channels_menu,
     transform_dataset,
 )
 from dataset_forge.menus.hue_adjustment_menu import hue_adjustment_menu
@@ -68,14 +68,7 @@ transform_menu.__menu_options__ = {
             )
         ),
     ),
-    "6": (
-        "Remove Alpha Channel",
-        require_hq_lq(
-            lambda: remove_alpha_channels(
-                session_state.hq_folder, session_state.lq_folder
-            )
-        ),
-    ),
+    "6": ("Remove Alpha Channel", remove_alpha_channels_menu),
     "7": ("Apply Custom Transformations", transform_dataset),
     "0": ("Back to Main Menu", None),
 }

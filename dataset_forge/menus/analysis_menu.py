@@ -20,7 +20,7 @@ from dataset_forge.actions.analysis_actions import (
     find_misaligned_images,
     test_aspect_ratio,
 )
-from dataset_forge.actions.alpha_actions import find_alpha_channels
+from dataset_forge.actions.alpha_actions import find_alpha_channels_menu
 from dataset_forge.actions.corruption_actions import (
     fix_corrupted_images,
     fix_corrupted_images_hq_lq,
@@ -178,14 +178,7 @@ analysis_menu.__menu_options__ = {
             )
         ),
     ),
-    "11": (
-        "Find Images with Alpha Channel",
-        require_hq_lq(
-            lambda: find_alpha_channels(
-                session_state.hq_folder, session_state.lq_folder
-            )
-        ),
-    ),
+    "11": ("Find Images with Alpha Channel", find_alpha_channels_menu),
     "12": ("BHI Filtering (Blockiness, HyperIQA, IC9600)", bhi_filtering_menu),
     "13": ("Test Aspect Ratio", test_aspect_ratio_menu),
     "0": ("Back to Main Menu", None),

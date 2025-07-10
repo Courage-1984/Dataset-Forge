@@ -11,6 +11,7 @@ from dataset_forge.utils.input_utils import (
     get_pairs_to_process,
     get_file_operation_choice,
     get_destination_path,
+    get_path_with_history,
 )
 from dataset_forge.utils.file_utils import IMAGE_TYPES, get_unique_filename
 from dataset_forge.utils.image_ops import ColorAdjuster
@@ -310,72 +311,230 @@ def grayscale_conversion(hq_folder, lq_folder):
     print("Grayscale conversion complete.")
 
 
+# --- Remove Alpha Channels Menu ---
+def remove_alpha_channels_menu():
+    """Menu for removing alpha channels with workflow choice."""
+    print("\n=== Remove Alpha Channels ===")
+    print("Choose input mode:")
+    print("  1. HQ/LQ paired folders")
+    print("  2. Single folder")
+    print("  0. Cancel")
+
+    choice = input("Select mode: ").strip()
+
+    if choice == "1":
+        # HQ/LQ pair workflow
+        hq_folder = get_path_with_history(
+            "Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        lq_folder = get_path_with_history(
+            "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+
+        if not hq_folder or not lq_folder:
+            print("Error: Both HQ and LQ paths are required.")
+            return
+
+        if not os.path.isdir(hq_folder) or not os.path.isdir(lq_folder):
+            print("Error: Both HQ and LQ paths must be valid directories.")
+            return
+
+        remove_alpha_channels(hq_folder=hq_folder, lq_folder=lq_folder)
+
+    elif choice == "2":
+        # Single folder workflow
+        single_folder = get_path_with_history(
+            "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+
+        if not single_folder:
+            print("Error: Folder path is required.")
+            return
+
+        if not os.path.isdir(single_folder):
+            print("Error: Folder path must be a valid directory.")
+            return
+
+        remove_alpha_channels(single_folder=single_folder)
+
+    elif choice == "0":
+        print("Operation cancelled.")
+        return
+
+    else:
+        print("Invalid choice. Operation cancelled.")
+
+
 # --- Remove Alpha Channels ---
-def remove_alpha_channels(hq_folder, lq_folder):
-    """Remove images with alpha channels from HQ/LQ datasets."""
+def remove_alpha_channels(hq_folder=None, lq_folder=None, single_folder=None):
+    """Remove alpha channels from images in datasets. Supports both single folder and HQ/LQ pair workflows."""
     print("\n" + "=" * 30)
-    print("  Removing Images with Alpha Channels")
+    print("  Removing Alpha Channels from Images")
     print("=" * 30)
+
+    # Determine workflow type
+    if single_folder:
+        # Single folder workflow
+        workflow_type = "single"
+        folders_to_process = [(single_folder, "Single")]
+    elif hq_folder and lq_folder:
+        # HQ/LQ pair workflow
+        workflow_type = "paired"
+        folders_to_process = [(hq_folder, "HQ"), (lq_folder, "LQ")]
+    else:
+        print("Error: Invalid folder configuration.")
+        return
+
     operation = get_file_operation_choice()
     destination = ""
-    if operation == "move":
+
+    if operation in ["move", "copy"]:
         destination = get_destination_path()
         if not destination:
-            print("Operation aborted as no destination path was provided for move.")
+            print(
+                f"Operation aborted as no destination path was provided for {operation}."
+            )
             return
-        os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
-        os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
-    elif operation == "copy":
-        destination = get_destination_path()
-        if not destination:
-            print("Operation aborted as no destination path was provided for copy.")
-            return
-        os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
-        os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
-    removed_count = 0
-    checked_count = 0
-    errors = []
-    for folder, label in [(hq_folder, "HQ"), (lq_folder, "LQ")]:
-        files = sorted(
-            [
-                f
-                for f in os.listdir(folder)
-                if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
-            ]
+
+        if workflow_type == "paired":
+            os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
+            os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
+        else:
+            os.makedirs(destination, exist_ok=True)
+
+    def find_images_with_alpha(folder_path, folder_name):
+        """Find all images with alpha channels in a folder (recursively)."""
+        images_with_alpha = []
+        all_images = []
+
+        # Collect all image files recursively
+        image_files = []
+        for root, dirs, files in os.walk(folder_path):
+            for filename in files:
+                if is_image_file(filename):
+                    # Get relative path from the root folder
+                    rel_path = os.path.relpath(
+                        os.path.join(root, filename), folder_path
+                    )
+                    image_files.append((rel_path, os.path.join(root, filename)))
+
+        print(
+            f"\nScanning {folder_name} folder for images with alpha channels (recursively)..."
         )
-        for filename in tqdm(files, desc=f"Checking {label}"):
-            path = os.path.join(folder, filename)
-            checked_count += 1
+        for rel_path, full_path in tqdm(image_files, desc=f"Scanning {folder_name}"):
+            all_images.append(rel_path)
+
             try:
-                with Image.open(path) as img:
+                with Image.open(full_path) as img:
                     if img.mode in ("RGBA", "LA") or (
                         img.mode == "P" and "transparency" in img.info
                     ):
-                        if operation == "inplace":
-                            os.remove(path)
-                        else:
-                            dest_folder = os.path.join(destination, label.lower())
-                            dest_path = os.path.join(
-                                dest_folder, get_unique_filename(dest_folder, filename)
-                            )
-                            if operation == "copy":
-                                shutil.copy2(path, dest_path)
-                            elif operation == "move":
-                                shutil.move(path, dest_path)
-                        removed_count += 1
+                        images_with_alpha.append(rel_path)
             except Exception as e:
-                errors.append(f"Error processing {label} {filename}: {e}")
+                print(f"Warning: Could not check {rel_path}: {e}")
+
+        return images_with_alpha, all_images
+
+    def remove_alpha_from_image(input_path, output_path):
+        """Remove alpha channel from a single image."""
+        try:
+            with Image.open(input_path) as img:
+                # Convert to RGB or L (removing alpha)
+                if img.mode == "RGBA":
+                    # Create white background
+                    background = Image.new("RGB", img.size, (255, 255, 255))
+                    background.paste(
+                        img, mask=img.split()[-1]
+                    )  # Use alpha channel as mask
+                    processed_img = background
+                elif img.mode == "LA":
+                    # Convert to grayscale
+                    processed_img = img.convert("L")
+                elif img.mode == "P" and "transparency" in img.info:
+                    # Convert palette mode to RGB
+                    processed_img = img.convert("RGB")
+                else:
+                    # For other modes, just convert to RGB
+                    processed_img = img.convert("RGB")
+
+                # Save the processed image
+                processed_img.save(output_path, quality=95)
+                return True
+        except Exception as e:
+            raise e
+
+    total_checked = 0
+    total_processed = 0
+    errors = []
+
+    for folder, label in folders_to_process:
+        # First, find images with alpha channels
+        images_with_alpha, all_images = find_images_with_alpha(folder, label)
+        total_checked += len(all_images)
+
+        if not images_with_alpha:
+            print(f"No images with alpha channels found in {label} folder.")
+            continue
+
+        print(
+            f"\nFound {len(images_with_alpha)} images with alpha channels in {label} folder."
+        )
+        print(f"Processing {len(images_with_alpha)} images...")
+
+        # Process only images with alpha channels
+        for rel_path in tqdm(images_with_alpha, desc=f"Processing {label}"):
+            input_path = os.path.join(folder, rel_path)
+
+            try:
+                # Determine output path
+                if operation == "inplace":
+                    output_path = input_path
+                else:
+                    if workflow_type == "paired":
+                        dest_folder = os.path.join(destination, label.lower())
+                    else:
+                        dest_folder = destination
+
+                    # For copy/move operations, preserve directory structure
+                    if os.path.dirname(rel_path):
+                        # Create subdirectories in destination
+                        subdir = os.path.join(dest_folder, os.path.dirname(rel_path))
+                        os.makedirs(subdir, exist_ok=True)
+                        output_path = os.path.join(subdir, os.path.basename(rel_path))
+                    else:
+                        output_path = os.path.join(dest_folder, rel_path)
+
+                # Process the image
+                remove_alpha_from_image(input_path, output_path)
+                total_processed += 1
+
+                # For move operation, remove original after processing
+                if operation == "move":
+                    os.remove(input_path)
+
+            except Exception as e:
+                errors.append(f"Error processing {label} {rel_path}: {e}")
+
     print("\n" + "-" * 30)
     print("  Remove Alpha Channel Summary")
     print("-" * 30)
-    print(f"Checked {checked_count} images.")
-    print(f"Processed ({operation}ed) {removed_count} images with alpha channels.")
+    print(f"Workflow: {workflow_type.upper()}")
+    print(f"Operation: {operation.upper()}")
+    print(f"Scanned {total_checked} total images.")
+    print(
+        f"Found and processed {total_processed} images with alpha channels (alpha removed)."
+    )
+
+    if destination:
+        print(f"Destination: {destination}")
+
     if errors:
         print(f"Errors encountered: {len(errors)}")
         for i, error in enumerate(errors[: min(len(errors), 5)]):
             print(f"  - {error}")
         if len(errors) > 5:
             print(f"  ... and {len(errors) - 5} more errors.")
+
     print("-" * 30)
     print("=" * 30)
 

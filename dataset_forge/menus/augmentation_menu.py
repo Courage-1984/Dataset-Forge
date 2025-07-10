@@ -8,6 +8,7 @@ from dataset_forge.utils.input_utils import (
 )
 from dataset_forge.utils.printing import print_section, print_success, print_warning
 from dataset_forge.utils.menu import show_menu
+from dataset_forge.utils.color import Mocha
 
 # If path history is managed elsewhere, import and use it here
 try:
@@ -30,7 +31,7 @@ def augmentation_menu():
         action = show_menu(
             "Augmentation Recipes",
             options,
-            header_color=None,
+            header_color=Mocha.sapphire,
             char="-",
         )
         if action is None:

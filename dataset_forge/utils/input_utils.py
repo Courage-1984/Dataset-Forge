@@ -18,6 +18,22 @@ def get_path_with_history(
     - is_optional: If True, user can leave blank (for destination paths).
     """
     while True:
+        # First, try direct path entry
+        if is_optional:
+            path = input(f"{prompt} (or press Enter to leave blank): ").strip()
+        else:
+            path = input(f"{prompt}: ").strip()
+
+        # Handle leave blank case
+        if is_optional and path == "":
+            return ""
+
+        # If user entered a path directly, use it
+        if path:
+            path_history.add_path(path)
+            return path
+
+        # If no path entered, show the options menu
         print("\nPath Entry Options:")
         print("[1] Enter path manually")
         print("[2] Use last used path")
@@ -25,7 +41,15 @@ def get_path_with_history(
         if allow_hq_lq:
             print("[4] Use HQ path from settings")
             print("[5] Use LQ path from settings")
-        choice = input(f"{prompt}\nSelect option (1-5): ").strip()
+        if is_optional:
+            print("[Enter] Leave blank")
+
+        choice = input("Select option (1-5): ").strip()
+
+        # Handle leave blank case
+        if is_optional and choice == "":
+            return ""
+
         if choice == "1":
             path = input("Enter path: ").strip()
             if path:
@@ -66,8 +90,6 @@ def get_path_with_history(
                 return session_state.lq_folder
             else:
                 print("LQ folder not set in settings.")
-        elif is_optional and choice == "":
-            return ""
         else:
             print("Invalid choice. Please try again.")
 
