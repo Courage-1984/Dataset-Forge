@@ -46,7 +46,9 @@ def dedupe_menu():
         "Enter HQ folder path (or single folder for single deduplication): "
     )
     lq_folder = get_folder_path(
-        "Enter LQ folder path (leave blank for single-folder deduplication): "
+        "Enter LQ folder path (leave blank for single-folder): ",
+        allow_blank=True,
+        allow_hq_lq_options=False,
     )
     hash_type = (
         input("Hash type [phash/ahash/dhash/whash] (default: phash): ").strip().lower()
@@ -123,14 +125,18 @@ dataset_menu.__menu_options__ = {
         "Extract Random Pairs",
         lambda: dataset_actions.extract_random_pairs(
             get_folder_path("Enter HQ folder path: "),
-            get_folder_path("Enter LQ folder path: "),
+            get_folder_path(
+                "Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+            ),
         ),
     ),
     "5": (
         "Shuffle Image Pairs",
         lambda: dataset_actions.shuffle_image_pairs(
             get_folder_path("Enter HQ folder path: "),
-            get_folder_path("Enter LQ folder path: "),
+            get_folder_path(
+                "Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+            ),
         ),
     ),
     "6": (
@@ -139,7 +145,9 @@ dataset_menu.__menu_options__ = {
             (lambda hq, lq: split_adjust_dataset_menu(hq, lq))(
                 get_folder_path("Enter HQ folder path (or single folder): "),
                 get_folder_path(
-                    "Enter LQ folder path (leave blank for single-folder): "
+                    "Enter LQ folder path (leave blank for single-folder): ",
+                    allow_blank=True,
+                    allow_hq_lq_options=False,
                 ),
             )
         ),
@@ -148,7 +156,9 @@ dataset_menu.__menu_options__ = {
         "Remove Small Image Pairs",
         lambda: dataset_actions.remove_small_image_pairs(
             get_folder_path("Enter HQ folder path: "),
-            get_folder_path("Enter LQ folder path: "),
+            get_folder_path(
+                "Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+            ),
         ),
     ),
     "8": ("De-Duplicate", dedupe_menu),

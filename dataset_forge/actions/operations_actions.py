@@ -1235,6 +1235,46 @@ def adjust_image_color(
         return False
 
 
+def grayscale_conversion(hq_folder, lq_folder):
+    """Convert HQ/LQ images to grayscale using ColorAdjuster class."""
+    print("\n" + "=" * 30)
+    print("  Grayscale Conversion")
+    print("=" * 30)
+
+    operation = get_file_operation_choice()
+    dest_dir = ""
+    if operation != "inplace":
+        dest_dir = get_destination_path()
+        if not dest_dir:
+            print(
+                f"Operation aborted as no destination path was provided for {operation}."
+            )
+            return
+        os.makedirs(dest_dir, exist_ok=True)
+
+    for folder, label in [(hq_folder, "HQ"), (lq_folder, "LQ")]:
+        image_files = [
+            f
+            for f in os.listdir(folder)
+            if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
+        ]
+        for filename in tqdm(image_files, desc=f"Converting {label}"):
+            src_path = os.path.join(folder, filename)
+            dest_path = (
+                src_path
+                if operation == "inplace"
+                else os.path.join(dest_dir, get_unique_filename(dest_dir, filename))
+            )
+            # Use ColorAdjuster with adjustment_type 'color' and factor 0 for grayscale
+            adjuster = ColorAdjuster("color", 0)
+            success, msg = adjuster.process(
+                src_path, output_path=dest_path, operation=operation
+            )
+            if not success:
+                print(f"Error converting {label} {filename}: {msg}")
+    print("Grayscale conversion complete.")
+
+
 def remove_small_image_pairs(hq_folder, lq_folder):
     print("\n" + "=" * 30)
     print("  Removing Small Image Pairs")
@@ -2210,9 +2250,12 @@ def split_adjust_dataset(hq_folder, lq_folder):
         "  5. Remove pairs by file type (deletes or moves/copies to 'filetype_criteria')"
     )
     print("  6. Back to main menu")
+    print(
+        "  7. Split single folder by custom percentages (comma-separated, e.g. 60,20,20)"
+    )
 
     while True:
-        choice = input("Enter your choice for Split/Adjust: ").strip()
+        choice = input("Enter your choice for Split/Adjust (number): ").strip()
         if choice == "1":
             split_dataset_in_half(hq_folder, lq_folder)
         elif choice == "2":
@@ -2225,6 +2268,20 @@ def split_adjust_dataset(hq_folder, lq_folder):
             remove_pairs_by_file_type(hq_folder, lq_folder)
         elif choice == "6":
             break
+        elif choice == "7":
+            # Debug print to show what lq_folder actually is
+            print(f"[DEBUG] lq_folder value: {lq_folder!r}")
+            # Only allow this if LQ folder is blank (single folder mode)
+            if lq_folder is not None and lq_folder.strip() != "":
+                print(
+                    "This option is only available for single-folder splits (leave LQ folder blank)."
+                )
+            else:
+                print("You selected: Split single folder by custom percentages.")
+                print(
+                    "Enter a comma-separated list of percentages (e.g. 60,20,20) for how to split the folder."
+                )
+                split_single_folder_in_sets(hq_folder)
         else:
             print("Invalid choice for Split/Adjust. Please try again.")
         # After an operation, re-display split/adjust menu or break to main?

@@ -49,7 +49,9 @@ def combine_split_menu():
     def split_adjust_dataset_menu():
         hq_folder = get_folder_path("Enter HQ folder path (or single folder): ")
         lq_folder = get_folder_path(
-            "Enter LQ folder path (leave blank for single-folder): "
+            "Enter LQ folder path (leave blank for single-folder): ",
+            allow_blank=True,
+            allow_hq_lq_options=False,
         )
         dataset_actions.split_adjust_dataset(hq_folder, lq_folder)
 
@@ -78,12 +80,16 @@ def hq_lq_pairs_menu():
 
     def extract_random_pairs():
         hq = get_folder_path("Enter HQ folder path: ")
-        lq = get_folder_path("Enter LQ folder path: ")
+        lq = get_folder_path(
+            "Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+        )
         dataset_actions.extract_random_pairs(hq, lq)
 
     def shuffle_image_pairs():
         hq = get_folder_path("Enter HQ folder path: ")
-        lq = get_folder_path("Enter LQ folder path: ")
+        lq = get_folder_path(
+            "Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+        )
         dataset_actions.shuffle_image_pairs(hq, lq)
 
     options = {
@@ -117,7 +123,9 @@ def clean_organize_menu():
             "Enter HQ folder path (or single folder for single deduplication): "
         )
         lq_folder = get_folder_path(
-            "Enter LQ folder path (leave blank for single-folder deduplication): "
+            "Enter LQ folder path (leave blank for single-folder deduplication): ",
+            allow_blank=True,
+            allow_hq_lq_options=False,
         )
         hash_type = (
             input("Hash type [phash/ahash/dhash/whash] (default: phash): ")
@@ -175,7 +183,9 @@ def clean_organize_menu():
 
     def remove_small_pairs():
         hq = get_folder_path("Enter HQ folder path: ")
-        lq = get_folder_path("Enter LQ folder path: ")
+        lq = get_folder_path(
+            "Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+        )
         dataset_actions.remove_small_image_pairs(hq, lq)
 
     def organize_by_orientation():

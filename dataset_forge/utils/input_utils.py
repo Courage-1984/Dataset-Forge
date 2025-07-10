@@ -9,13 +9,18 @@ def get_path_with_history(
     allow_single_folder=True,
     is_destination=False,
     is_optional=False,
+    allow_hq_lq_options=True,
 ):
+    print(
+        f"[DEBUG] get_path_with_history called with is_optional={is_optional}, allow_hq_lq_options={allow_hq_lq_options}"
+    )
     """
     Prompt the user for a path, allowing selection from history, manual entry, or HQ/LQ from settings.
     - allow_hq_lq: If True, user can select HQ/LQ from settings.
     - allow_single_folder: If True, user can select a single folder (not paired HQ/LQ).
     - is_destination: If True, this is a destination path (may allow blank if is_optional).
     - is_optional: If True, user can leave blank (for destination paths).
+    - allow_hq_lq_options: If False, do not show HQ/LQ from settings options (4/5).
     """
     while True:
         # First, try direct path entry
@@ -38,7 +43,7 @@ def get_path_with_history(
         print("[1] Enter path manually")
         print("[2] Use last used path")
         print("[3] View path history")
-        if allow_hq_lq:
+        if allow_hq_lq_options and allow_hq_lq:
             print("[4] Use HQ path from settings")
             print("[5] Use LQ path from settings")
         if is_optional:
@@ -52,6 +57,8 @@ def get_path_with_history(
 
         if choice == "1":
             path = input("Enter path: ").strip()
+            if is_optional and path == "":
+                return ""
             if path:
                 path_history.add_path(path)
                 return path
@@ -74,7 +81,7 @@ def get_path_with_history(
                 path = history[int(sel) - 1]
                 path_history.add_path(path)
                 return path
-        elif allow_hq_lq and choice == "4":
+        elif allow_hq_lq_options and allow_hq_lq and choice == "4":
             from dataset_forge.menus import session_state
 
             if session_state.hq_folder:
@@ -82,7 +89,7 @@ def get_path_with_history(
                 return session_state.hq_folder
             else:
                 print("HQ folder not set in settings.")
-        elif allow_hq_lq and choice == "5":
+        elif allow_hq_lq_options and allow_hq_lq and choice == "5":
             from dataset_forge.menus import session_state
 
             if session_state.lq_folder:
@@ -94,9 +101,13 @@ def get_path_with_history(
             print("Invalid choice. Please try again.")
 
 
-def get_folder_path(prompt):
+def get_folder_path(prompt, allow_blank=False, allow_hq_lq_options=True):
     while True:
-        path = get_path_with_history(prompt)
+        path = get_path_with_history(
+            prompt, is_optional=allow_blank, allow_hq_lq_options=allow_hq_lq_options
+        )
+        if allow_blank and path == "":
+            return ""
         if os.path.isdir(path):
             return path
         print("Error: Invalid path. Please enter a valid directory.")
