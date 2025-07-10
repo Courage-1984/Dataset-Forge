@@ -37,6 +37,7 @@ from dataset_forge.actions.quality_scoring_actions import (
     filter_images_by_quality,
     score_hq_lq_folders,
 )
+from dataset_forge.actions.getnative_actions import find_native_resolution
 
 
 def require_hq_lq(func):
@@ -281,6 +282,16 @@ def analyze_properties_menu():
         find_extreme_dimensions(lq, "LQ")
         input("\nPress Enter to return to the menu...")
 
+    def find_native_resolution_workflow():
+        print("\n=== Find Native Resolution (getnative) ===")
+        image = get_path_with_history(
+            "Enter image path:", allow_hq_lq=False, allow_single_folder=False
+        )
+        output = find_native_resolution(image)
+        print("\n--- getnative output ---\n")
+        print(output)
+        input("\nPress Enter to return to the menu...")
+
     options = {
         "1": ("Check Dataset Consistency", check_consistency_workflow),
         "2": ("Check/Test Aspect Ratios", test_aspect_ratio_workflow),
@@ -290,6 +301,7 @@ def analyze_properties_menu():
             "BHI Filtering Analysis (Blockiness, HyperIQA, etc.)",
             bhi_filtering_menu,
         ),
+        "6": ("Find Native Resolution (getnative)", find_native_resolution_workflow),
         "0": ("Back", None),
     }
 
@@ -309,7 +321,10 @@ def analysis_validation_menu():
     """Main analysis and validation menu with hierarchical structure."""
     options = {
         "1": ("Run Comprehensive Validation Suite", comprehensive_validation_menu),
-        "2": ("Generate Detailed Report (HTML/Markdown)", comprehensive_validation_menu),
+        "2": (
+            "Generate Detailed Report (HTML/Markdown)",
+            comprehensive_validation_menu,
+        ),
         "3": ("Automated Dataset Quality Scoring", comprehensive_validation_menu),
         "4": ("Find & Fix Issues", find_fix_issues_menu),
         "5": ("Analyze Properties", analyze_properties_menu),

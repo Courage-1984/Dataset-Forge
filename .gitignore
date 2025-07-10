@@ -1,6 +1,9 @@
 ./venv
 venv
 
+./venv312
+venv312
+
 ./configs
 configs
 !configs/_example_config.json
@@ -44,3 +47,5 @@ configs/user_profile.json
 ./logs
 logs
 
+./results
+results
