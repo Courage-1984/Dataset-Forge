@@ -14,7 +14,54 @@
 
 ## ✨ TL;DR
 
-> **Dataset Forge** is a comprehensive Python CLI utility for managing, analyzing, and transforming image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution and related ML tasks. It features a beautiful Catppuccin Mocha-themed interface, deep validation, and 30+ powerful operations.
+> **Dataset Forge** is a comprehensive Python CLI utility for managing, analyzing, and transforming image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution and related ML tasks. It features a beautiful Catppuccin Mocha-themed interface, deep validation, and 40+ powerful operations organized in an intuitive hierarchical menu system.
+
+---
+
+## 🚀 Quick Start
+
+### Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone <repository-url>
+   cd Dataset-Forge
+   ```
+
+2. **Windows (Recommended):**
+
+   ```bash
+   # Run the automated installer
+   install.bat
+   ```
+
+3. **Manual Installation:**
+
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+
+   # Activate virtual environment
+   # Windows:
+   venv\Scripts\activate
+   # Linux/Mac:
+   source venv/bin/activate
+
+   # Install PyTorch with CUDA support (if available)
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+
+   # Install other dependencies
+   pip install -r requirements.txt
+   ```
+
+4. **Run the application:**
+   ```bash
+   # Windows:
+   run.bat
+   # Or manually:
+   python main.py
+   ```
 
 ---
 
@@ -22,210 +69,309 @@
 
 ### 🎯 **Core & Configuration**
 
-- Multi-format config support: JSON, YAML, HCL
-- External tool integration: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
-- Model management: List, select, and run upscaling with trained models
-- Validation tools: Validate HQ/LQ and validation datasets from config
-- Built-in config editors for .hcl and .yml
+- **Multi-format config support**: JSON, YAML, HCL
+- **External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
+- **Model management**: List, select, and run upscaling with trained models
+- **Validation tools**: Validate HQ/LQ and validation datasets from config
+- **Built-in config editors** for .hcl and .yml files
+- **User profiles**: Save favorites, presets, and quick access paths
 
-### 📊 **Dataset Analysis & Validation**
+### 📂 **Dataset Management**
 
-- Scale detection and testing for HQ/LQ pairs
-- Consistency checks: format, mode, metadata
-- Dimension reporting and histograms
-- Extreme dimension detection
-- Corruption and misalignment detection
-- Comprehensive HQ/LQ dataset reports
-- BHI filtering: Blockiness, HyperIQA, IC9600
+- **Dataset Creation**: Multiscale dataset generation (DPID), video frame extraction, image tiling
+- **Dataset Operations**: Combine, split, extract random pairs, shuffle datasets
+- **HQ/LQ Pair Management**: Manual pairing, fuzzy matching, scale correction
+- **Clean & Organize**: Visual deduplication, hash-based deduplication, batch renaming
+- **Orientation Organization**: Sort by landscape/portrait/square
+- **Size Filtering**: Remove small/invalid image pairs
 
-### 🔧 **Dataset Operations**
+### 🔍 **Analysis & Validation**
 
-- Remove small/invalid image pairs
-- Extract random pairs, shuffle, split/adjust datasets
-- Combine/merge datasets safely
-- Batch renaming (single/paired)
-- De-duplication (exact/near-duplicate detection)
-- Orientation-based organization (landscape/portrait/square)
-- Move/copy utilities
+- **Comprehensive Validation**: Progressive dataset validation suite
+- **Rich Reporting**: HTML/Markdown reports with plots and sample images
+- **Quality Scoring**: Automated dataset quality assessment (NIQE, etc.)
+- **Issue Detection**: Corruption detection, misalignment detection, outlier detection
+- **Property Analysis**: Consistency checks, aspect ratio testing, dimension reporting
+- **BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment
+- **Scale Detection**: Find and test HQ/LQ scale relationships
 
-### 🎨 **Image Processing & Transformation**
+### ✨ **Image Processing & Augmentation**
 
-- Color/tone/hue/brightness/contrast adjustments
-- Grayscale conversion
-- Remove/find alpha channels
-- Custom transformation pipeline
-- Downsampling (DPID, batch/single)
-- HDR to SDR conversion
+- **Basic Transformations**: Downsampling (DPID, OpenCV, PIL), HDR to SDR conversion, grayscale conversion, alpha channel removal
+- **Color & Tone Adjustments**: Brightness, contrast, hue, saturation adjustments
+- **Metadata Tools**: EXIF scrubbing, ICC to sRGB conversion
+- **Augmentation Pipeline**: Custom transformation recipes, data augmentation
+- **Advanced Tiling**: BestTile with Laplacian/IC9600 complexity analysis
 
-### 🧩 **Advanced Tiling & Multiscale**
+### 🚀 **Training & Inference**
 
-- BestTile: Laplacian/IC9600 neural tiling
-- Linear, random, overlap tiling (single/paired)
-- Multiscale dataset generation (DPID downscale + tiling)
-- Batch and parallel processing
+- **Config Management**: Add, load, edit, and validate configuration files
+- **Model Integration**: Run traiNNer-redux, list/run upscaling models
+- **Dataset Validation**: Validate training and validation datasets from config
+- **External Tools**: Integration with WTP Dataset Destroyer
 
-### 🎬 **Video & Frame Extraction**
+### 🛠️ **Utilities**
 
-- Extract frames using deep embeddings (ConvNeXt, DINOv2, VIT variants)
-- Multi-model, multi-distance support
-- Batch and threshold controls
-
-### 🚀 **Upscaling & Enhancement**
-
-- Advanced upscaling with custom models (traiNNer-redux)
-- Tiling, alpha handling, gamma correction
-- Multi-format support: PNG, JPG, JPEG, WebP, TGA, BMP, TIFF
-- Precision control: FP32, FP16, BF16
-
-### 🗂️ **Metadata & ICC Tools**
-
-- EXIF scrubbing (single/paired)
-- ICC to sRGB conversion (preserves alpha, batch/folder support)
-
-### 🖼️ **Visualization & Comparison**
-
-- Side-by-side and animated (GIF/WebP) comparisons
-- Folder comparison (show missing files)
+- **Visual Comparison**: Side-by-side comparisons, animated GIF comparisons
+- **Folder Comparison**: Find missing files between folders
+- **Compression Tools**: Image compression, directory archiving
+- **Path History**: Smart path management with history and favorites
 
 ### 🖥️ **Beautiful CLI Interface**
 
-- Catppuccin Mocha ANSI color theme
-- Interactive, logical menu system
-- Progress bars, error handling, memory management
-
-### 🗂️ **Path History & Selection**
-
-- Every time you enter a path, it is added to a path history file (no duplicates; most recent at top)
-- When prompted for a path, you can:
-  - Enter manually
-  - Use last used path
-  - View and select from history
-  - Use HQ/LQ paths from settings
-- Supports both HQ/LQ parent_path and single-folder path workflows
-- Progress bars are shown for path scanning operations
-
-### 🔗 **Links Menu**
-
-- Community and Personal links, with extensible config files and browser opening
+- **Catppuccin Mocha Theme**: Beautiful ANSI color scheme
+- **Hierarchical Menus**: Intuitive 7-category main menu with logical sub-menus
+- **Progress Tracking**: Progress bars, error handling, memory management
+- **Smart Input**: Path history, favorites, and intelligent defaults
 
 ---
 
-## 🧩 Project Structure
+## 🏗️ Modular Architecture
+
+Dataset Forge uses a clean, modular architecture for maintainability and extensibility:
+
+### **menus/** - UI Layer
+
+Thin UI layers for each menu category. Only handles user interaction and delegates to actions.
+
+### **actions/** - Business Logic
+
+Core business logic grouped by domain:
+
+- `analysis_actions.py` - Dataset analysis and validation
+- `dataset_actions.py` - Dataset operations and management
+- `transform_actions.py` - Image transformations and processing
+- `config_actions.py` - Configuration management
+- `comparison_actions.py` - Visual comparison tools
+- `metadata_actions.py` - EXIF and ICC tools
+- `report_actions.py` - Rich reporting functionality
+- `user_profile_actions.py` - User profile management
+- And more...
+
+### **utils/** - Utilities
+
+Reusable helper modules:
+
+- `file_utils.py` - File operations and image type checks
+- `input_utils.py` - Input handling and path management
+- `printing.py` - Colorful output and formatting
+- `color.py` - Catppuccin Mocha color constants
+- `menu.py` - Menu rendering helpers
+- `path_history.py` - Path history management
+- And more...
+
+### **dpid/** - DPID Implementations
+
+Multiple DPID (Degradation Process for Image Downscaling) implementations:
+
+- `basicsr_dpid.py` - BasicSR DPID implementation
+- `openmmlab_dpid.py` - OpenMMLab DPID implementation
+- `phhofm_dpid.py` - Phhofm's DPID implementation
+
+---
+
+## 📚 Project Structure
 
 ```text
 Dataset-Forge/
-├── main.py                    # Main CLI utility with interactive menu
-├── requirements.txt           # Python dependencies
-├── steps.txt                  # Setup instructions
-├── configs/                   # Configuration files
-├── dataset_forge/             # Core modules (see below)
-│   ├── __init__.py
-│   ├── actions/               # Business logic for each menu (see below)
-│   │   ├── __init__.py
-│   │   ├── analysis_actions.py
-│   │   ├── batch_rename_actions.py
-│   │   ├── comparison_actions.py
-│   │   ├── config_actions.py
-│   │   ├── dataset_actions.py
-│   │   ├── metadata_actions.py
-│   │   ├── settings_actions.py
-│   │   ├── transform_actions.py
-│   ├── utils/                 # Utility/helper modules (see below)
-│   │   ├── __init__.py
-│   │   ├── color.py
-│   │   ├── file_utils.py
-│   │   ├── input_utils.py
-│   │   ├── logging_utils.py
-│   │   ├── menu.py
-│   │   ├── printing.py
-│   ├── menus/                 # UI/menu modules (thin UI layer)
-│   │   ├── __init__.py
-│   │   ├── main_menu.py
-│   │   ├── analysis_menu.py
-│   │   ├── batch_rename_menu.py
-│   │   ├── comparison_menu.py
-│   │   ├── config_menu.py
-│   │   ├── dataset_menu.py
-│   │   ├── metadata_menu.py
-│   │   ├── settings_menu.py
-│   │   ├── transform_menu.py
-│   ├── alpha.py               # Alpha channel utilities
-│   ├── analysis.py            # Dataset analysis & validation
-│   ├── analysis_ops.py        # Analysis operations
-│   ├── batch_rename.py        # Batch renaming (legacy, now in actions)
-│   ├── bhi_filtering.py       # BHI filtering (Blockiness, HyperIQA, IC9600)
-│   ├── combine.py             # Dataset merging
-│   ├── common.py              # (Legacy) Common utilities (now in utils)
-│   ├── comparison.py          # Visual comparison tools (legacy, now in actions)
-│   ├── config_menu.py         # (Legacy) Config menu logic
-│   ├── corruption.py          # Corruption detection & fixing
-│   ├── dataset_ops.py         # Dataset operations
-│   ├── de_dupe.py             # Duplicate/near-duplicate detection
-│   ├── dpid_phhofm.py         # DPID degradation kernels
-│   ├── exif_scrubber.py       # EXIF metadata scrubbing (legacy, now in actions)
-│   ├── folder_compare.py      # Folder comparison utilities
-│   ├── frames.py              # Video frame extraction
-│   ├── hue_adjustment.py      # Hue/brightness/contrast adjustment
-│   ├── image_ops.py           # Image processing utilities (incl. ICCToSRGBConverter)
-│   ├── io_utils.py            # (Legacy) I/O and menu helpers (now in utils)
-│   ├── misalignment.py        # Misalignment detection
-│   ├── move_copy.py           # Move/copy utilities
-│   ├── multiscale.py          # Multiscale dataset generation
-│   ├── operations.py          # Batch operations & transformations
-│   ├── orientation_organizer.py # Orientation-based organization
-│   ├── tiling.py              # Advanced image tiling (BestTile, etc.)
-│   ├── tiling_grid.py         # Grid/random/overlap tiling
-│   ├── upscale-script.py      # Advanced upscaling script
+├── main.py                           # Main CLI entry point
+├── run.py                            # Runner script
+├── install.py                        # Installation script
+├── install.bat                       # Windows installer
+├── run.bat                          # Windows runner
+├── requirements.txt                  # Python dependencies
+├── README.md                        # This file
+├── MENU_RESTRUCTURE_SUMMARY.md      # Menu organization details
+├── LICENSE                          # Creative Commons CC-BY-SA-4.0
+├── Dataset_Forge_thumb.png          # Project thumbnail
+├── configs/                         # Configuration files
+│   ├── _example_config.json         # Example configuration
+│   ├── _example_user_profile.json   # Example user profile
+│   ├── _example_community_links.json # Example community links
+│   └── ...                          # User configs (gitignored)
+├── reports/                         # Report templates
+│   └── templates/
+│       ├── report_template.html.jinja
+│       └── report_template.md.jinja
+└── dataset_forge/                   # Core modules
+    ├── __init__.py
+    ├── actions/                     # Business logic (25+ files)
+    │   ├── __init__.py
+    │   ├── analysis_actions.py      # Dataset analysis & validation
+    │   ├── dataset_actions.py       # Dataset operations
+    │   ├── transform_actions.py     # Image transformations
+    │   ├── config_actions.py        # Configuration management
+    │   ├── comparison_actions.py    # Visual comparison tools
+    │   ├── metadata_actions.py      # EXIF & ICC tools
+    │   ├── report_actions.py        # Rich reporting
+    │   ├── user_profile_actions.py  # User profile management
+    │   ├── bhi_filtering_actions.py # Quality assessment
+    │   ├── tiling_actions.py        # Advanced tiling
+    │   ├── frames_actions.py        # Video frame extraction
+    │   ├── augmentation_actions.py  # Data augmentation
+    │   ├── visual_dedup_actions.py  # Visual deduplication
+    │   ├── quality_scoring_actions.py # Quality scoring
+    │   ├── outlier_detection_actions.py # Outlier detection
+    │   ├── alpha_actions.py         # Alpha channel tools
+    │   ├── corruption_actions.py    # Corruption detection
+    │   ├── de_dupe_actions.py       # Hash-based deduplication
+    │   ├── batch_rename_actions.py  # Batch renaming
+    │   ├── hue_adjustment_actions.py # Color adjustments
+    │   ├── orientation_organizer_actions.py # Orientation organization
+    │   ├── ic9600_tiling_actions.py # IC9600 tiling
+    │   ├── compress_actions.py      # Image compression
+    │   ├── compress_dir_actions.py  # Directory compression
+    │   ├── folder_compare_actions.py # Folder comparison
+    │   ├── exif_scrubber_actions.py # EXIF scrubbing
+    │   ├── operations_actions.py    # Batch operations
+    │   ├── correct_hq_lq_pairing_actions.py # HQ/LQ pairing
+    │   ├── dataset_ops_actions.py   # Dataset operations
+    │   └── settings_actions.py      # Settings management
+    ├── menus/                       # UI layer (15+ files)
+    │   ├── __init__.py
+    │   ├── main_menu.py             # Main menu
+    │   ├── dataset_management_menu.py # Dataset management
+    │   ├── analysis_validation_menu.py # Analysis & validation
+    │   ├── image_processing_menu.py # Image processing
+    │   ├── training_inference_menu.py # Training & inference
+    │   ├── utilities_menu.py        # Utilities
+    │   ├── system_settings_menu.py  # System settings
+    │   ├── user_profile_menu.py     # User profile
+    │   ├── visual_dedup_menu.py     # Visual deduplication
+    │   ├── correct_hq_lq_pairing_menu.py # HQ/LQ pairing
+    │   ├── compress_menu.py         # Compression
+    │   ├── compress_dir_menu.py     # Directory compression
+    │   ├── links_menu.py            # Community links
+    │   ├── history_log_menu.py      # History logs
+    │   └── session_state.py         # Session state
+    ├── utils/                       # Utilities (12+ files)
+    │   ├── __init__.py
+    │   ├── file_utils.py            # File operations
+    │   ├── input_utils.py           # Input handling
+    │   ├── printing.py              # Output formatting
+    │   ├── color.py                 # Color constants
+    │   ├── menu.py                  # Menu rendering
+    │   ├── path_history.py          # Path history
+    │   ├── history_log.py           # Operation logging
+    │   ├── image_ops.py             # Image operations
+    │   ├── dpid_phhofm.py           # DPID utilities
+    │   ├── ic9600_tiling.py         # IC9600 utilities
+    │   ├── upscale_script.py        # Upscaling utilities
+    │   └── logging_utils.py         # Logging utilities
+    └── dpid/                        # DPID implementations
+        ├── __init__.py
+        ├── basicsr_dpid.py          # BasicSR DPID
+        ├── openmmlab_dpid.py        # OpenMMLab DPID
+        └── phhofm_dpid.py           # Phhofm DPID
 ```
 
 ---
 
-## 🏗️ Modular Architecture (NEW)
+## 🎮 Menu Structure
 
-Dataset Forge now uses a clean, modular architecture for maintainability and extensibility:
+The application features an intuitive hierarchical menu system:
 
-- **menus/**: Thin UI layers for each menu (main, dataset, analysis, transform, metadata, comparison, config, settings, batch rename). These only handle user interaction and call into actions.
-- **actions/**: Business logic for each menu, grouped by domain (e.g., `analysis_actions.py`, `transform_actions.py`). All core operations are here.
-- **utils/**: Reusable utility/helper modules (e.g., file operations, input handling, logging, printing, color, menu rendering).
-- **(legacy modules)**: Some older modules remain for backward compatibility or as lower-level helpers, but all new logic should go in actions/ or utils/.
+### Main Menu (7 Categories)
 
-**Benefits:**
+```
+[ 1 ] 📂 Dataset Management     (Create, build, and modify dataset structures)
+[ 2 ] 🔍 Analysis & Validation  (Inspect quality, find issues, and generate reports)
+[ 3 ] ✨ Image Processing       (Apply transformations and create variations)
+[ 4 ] 🚀 Training & Inference   (Manage configs and run models)
+[ 5 ] 🛠️ Utilities             (Comparison, compression, and other tools)
+[ 6 ] ⚙️ System & Settings     (Application settings, user profiles, and logs)
+[ 0 ] 🚪 Exit
+```
 
-- Clear separation of UI, business logic, and helpers/utilities
-- Easier to test, maintain, and extend
-- No more duplicated helpers or mixed UI/logic code
+### Detailed Sub-Menu Structure
 
----
+#### 📂 Dataset Management
 
-## 📚 Module Deep Dive (Updated)
+- **Dataset Creation & Modification**
+  - Create Multiscale Dataset (DPID)
+  - Extract Frames from Video
+  - Image Tiling (BestTile, IC9600)
+- **Combine or Split Datasets**
+  - Combine Multiple Datasets
+  - Split and Adjust Dataset
+- **Manage HQ/LQ Pairs**
+  - Create/Correct Manual Pairings
+  - Find Pairs with Fuzzy Matching
+  - Extract Random Pairs
+  - Shuffle Image Pairs
+- **Clean & Organize**
+  - Visual De-duplication (CLIP/LPIPS)
+  - De-Duplicate (File Hash)
+  - Batch Rename
+  - Remove Image Pairs by Size
+  - Organize by Orientation
 
-### `menus/`
+#### 🔍 Analysis & Validation
 
-- UI entry points for each menu (main, dataset, analysis, transform, metadata, comparison, config, settings, batch rename). Only handles user interaction and delegates to actions.
+- **Dataset Analysis & Reporting**
+  - Run Comprehensive Validation Suite
+  - Generate Detailed Report (HTML/Markdown)
+  - Automated Dataset Quality Scoring
+- **Find & Fix Issues**
+  - Verify & Fix Image Corruption
+  - Find Misaligned Image Pairs
+  - Find Outliers & Anomalies
+  - Find Images with Alpha Channel
+- **Analyze Properties**
+  - Check Dataset Consistency
+  - Check/Test Aspect Ratios
+  - Find & Test HQ/LQ Scale
+  - Report Image Dimensions
+  - BHI Filtering Analysis
 
-### `actions/`
+#### ✨ Image Processing & Augmentation
 
-- `analysis_actions.py`: All dataset analysis and validation logic (reports, scale, consistency, misalignment, BHI, etc.)
-- `transform_actions.py`: Image transformation logic (downsampling, HDR->SDR, color/tone, grayscale, alpha removal, custom transforms)
-- `metadata_actions.py`: EXIF scrubbing, ICC to sRGB conversion
-- `comparison_actions.py`: Visual comparison tools (side-by-side, GIF, folder compare)
-- `batch_rename_actions.py`: Batch renaming logic (single/paired, prefix, padding, dry run)
-- `settings_actions.py`: HQ/LQ folder management
-- `config_actions.py`: Config file management, validation, model management
-- `dataset_actions.py`: Dataset operations (combine, extract, shuffle, split, remove, dedupe, orientation, frames)
+- **Basic Transformations**
+  - Downsample Images (DPID, OpenCV, PIL)
+  - Convert HDR to SDR
+  - Convert to Grayscale
+  - Remove Alpha Channel
+- **Color & Tone Adjustments**
+  - General Color/Tone Adjustments
+  - Hue/Brightness/Contrast
+- **Metadata**
+  - Scrub EXIF Data
+  - Convert ICC Profile to sRGB
+- **Augmentation**
+  - Run Augmentation Pipeline/Recipes
+  - Apply Custom Transformations
 
-### `utils/`
+#### 🚀 Training & Inference
 
-- `file_utils.py`: File operations, image type checks, unique naming, etc.
-- `input_utils.py`: Input helpers (folder selection, file operation choice, destination path, pair processing)
-- `logging_utils.py`: Logging setup and uncaught exception handling
-- `menu.py`: Menu rendering helpers
-- `printing.py`: Colorful/sectioned printing helpers
-- `color.py`: Catppuccin Mocha color constants
+- **Manage Config Files (.hcl, .yml)**
+  - Add/Load Config File
+  - Edit Config File
+  - View Config Info
+- **Validate Dataset from Config**
+  - Validate Training HQ/LQ Dataset
+  - Validate Validation HQ/LQ Dataset
+- **Run Training / Models**
+  - Run traiNNer-redux
+  - List/Run Upscale with Model
+  - Run wtp_dataset_destroyer
 
-### (Legacy modules)
+#### 🛠️ Utilities
 
-- Some modules like `common.py`, `io_utils.py`, `comparison.py`, `batch_rename.py`, `exif_scrubber.py` remain for backward compatibility or as low-level helpers, but all new logic is in `actions/` and `utils/`.
+- **Compare Images / Folders**
+  - Create Comparison Images (Side-by-side)
+  - Create GIF Comparison
+  - Compare Folder Contents
+- **Compress Images / Directory**
+  - Compress Images
+  - Compress Directory
+
+#### ⚙️ System & Settings
+
+- **Application Settings & Information**
+  - Set Working Directories (HQ/LQ Folders)
+  - User Profile Management
+  - View Change/History Log
+  - Links (Community & Personal)
 
 ---
 
@@ -248,21 +394,237 @@ Dataset Forge supports multiple configuration formats:
 }
 ```
 
-- **Multi-format**: JSON, YAML, HCL
-- **External tool paths**: WTP Dataset Destroyer, traiNNer-redux
-- **Validation**: Path validation, pair checking
-- **Model management**: Integration with traiNNer-redux experiment directories
+### User Profile Example
+
+```json
+{
+  "name": "default",
+  "favorites": ["Dataset Management", "Analysis & Validation"],
+  "presets": [
+    {
+      "name": "Quick Validation",
+      "type": "validation",
+      "settings": { "sample_count": 10, "max_quality_images": 50 }
+    }
+  ],
+  "favorite_paths": ["/path/to/datasets", "/path/to/models"],
+  "settings": {
+    "default_tile_size": 512,
+    "default_quality": 85
+  }
+}
+```
 
 ---
 
 ## 🛠️ Requirements
 
+### System Requirements
+
 - **Python**: 3.8+
 - **CUDA**: 12.1+ (for GPU acceleration)
-- **Core Dependencies**:
-  - `numpy`, `opencv-python`, `Pillow`, `tqdm`, `imageio`, `pyyaml`, `ffmpeg`
-  - `spandrel`, `spandrel_extra_arches`, `chainner-ext` (for advanced features)
-  - `torch`, `torchvision`, `torchaudio` (for GPU/ML features)
+- **RAM**: 8GB+ (16GB+ recommended for large datasets)
+- **Storage**: SSD recommended for faster I/O
+
+### Core Dependencies
+
+```txt
+# Core image processing
+numpy<2
+opencv-python
+Pillow
+tqdm
+imageio
+pyyaml
+ffmpeg
+
+# ML/AI frameworks
+torch
+torchvision
+torchaudio
+spandrel
+spandrel_extra_arches
+chainner-ext
+
+# Quality assessment
+pyiqa
+timm
+lpips
+open-clip-torch
+
+# Utilities
+imagehash
+PyExifTool
+matplotlib
+seaborn
+jinja2
+webbrowser
+
+# Custom packages
+pipeline
+pepeline
+pepedpid
+```
+
+### Optional Dependencies
+
+- **ExifTool**: For EXIF metadata handling
+- **FFmpeg**: For video processing and HDR conversion
+- **CUDA Toolkit**: For GPU acceleration
+
+---
+
+## 🚀 Usage Examples
+
+### Basic Workflow
+
+1. **Set up your workspace:**
+
+   ```
+   System & Settings → Set Working Directories
+   ```
+
+2. **Create a dataset:**
+
+   ```
+   Dataset Management → Create Dataset from Source → Create Multiscale Dataset
+   ```
+
+3. **Validate your dataset:**
+
+   ```
+   Analysis & Validation → Run Comprehensive Validation Suite
+   ```
+
+4. **Process images:**
+
+   ```
+   Image Processing → Basic Transformations → Downsample Images
+   ```
+
+5. **Generate a report:**
+   ```
+   Analysis & Validation → Generate Detailed Report
+   ```
+
+### Advanced Workflows
+
+#### Super-Resolution Dataset Preparation
+
+1. Create multiscale dataset with DPID
+2. Run comprehensive validation
+3. Apply quality filtering (BHI)
+4. Generate training/validation splits
+5. Create rich HTML report
+
+#### Video Frame Extraction
+
+1. Extract frames using deep embeddings
+2. Filter by quality and similarity
+3. Organize by orientation
+4. Create HQ/LQ pairs
+5. Validate alignment and scale
+
+#### Dataset Augmentation
+
+1. Load existing dataset
+2. Apply augmentation pipeline
+3. Quality assessment
+4. Visual deduplication
+5. Export augmented dataset
+
+---
+
+## 🔧 Advanced Features
+
+### DPID (Degradation Process for Image Downscaling)
+
+Multiple implementations for realistic image degradation:
+
+- **BasicSR DPID**: Industry-standard implementation
+- **OpenMMLab DPID**: Research-focused implementation
+- **Phhofm DPID**: Custom implementation
+
+### BHI Filtering
+
+Quality assessment using multiple metrics:
+
+- **Blockiness**: Detect compression artifacts
+- **HyperIQA**: Perceptual quality assessment
+- **IC9600**: Neural quality assessment
+
+### Advanced Tiling
+
+Intelligent image tiling with complexity analysis:
+
+- **Laplacian Complexity**: Traditional complexity measure
+- **IC9600 Complexity**: Neural complexity assessment
+- **BestTile Algorithm**: Optimal tile selection
+
+### Visual Deduplication
+
+Deep learning-based duplicate detection:
+
+- **CLIP Embeddings**: Fast semantic similarity
+- **LPIPS**: Perceptual similarity
+- **Configurable Thresholds**: Adjustable sensitivity
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **CUDA Out of Memory**
+
+   - Reduce batch sizes in settings
+   - Use CPU-only mode for large datasets
+   - Process images in smaller batches
+
+2. **Missing Dependencies**
+
+   - Run `pip install -r requirements.txt`
+   - Install PyTorch with correct CUDA version
+   - Install ExifTool for metadata features
+
+3. **Path Issues**
+
+   - Use absolute paths for large datasets
+   - Check file permissions
+   - Ensure paths don't contain special characters
+
+4. **Performance Issues**
+   - Use SSD storage for better I/O
+   - Increase RAM if available
+   - Use GPU acceleration when possible
+
+### Getting Help
+
+- Check the operation logs in the System & Settings menu
+- Review the comprehensive validation reports
+- Use the built-in help system in each menu
+
+---
+
+## 🤝 Contributing
+
+Dataset Forge is designed with a modular architecture for easy contribution:
+
+1. **Add new actions**: Create new files in `dataset_forge/actions/`
+2. **Add new menus**: Create new files in `dataset_forge/menus/`
+3. **Add new utilities**: Create new files in `dataset_forge/utils/`
+4. **Follow the architecture**: Keep UI, business logic, and utilities separate
+
+### Development Setup
+
+```bash
+git clone <repository-url>
+cd Dataset-Forge
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+python main.py
+```
 
 ---
 
@@ -275,14 +637,19 @@ Dataset Forge supports multiple configuration formats:
 
 ---
 
-<p align="center">
-  <b>Enjoy your dataset journey!</b>
-</p>
-
----
-
-# License
+## 📄 License
 
 **Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)**
 
+This license allows you to:
+
+- Share: Copy and redistribute the material in any medium or format
+- Adapt: Remix, transform, and build upon the material
+- Attribution: You must give appropriate credit
+- Share Alike: If you remix, transform, or build upon the material, you must distribute your contributions under the same license
+
 ---
+
+<p align="center">
+  <b>Enjoy your dataset journey! 🚀</b>
+</p>
