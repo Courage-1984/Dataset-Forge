@@ -2,10 +2,12 @@
   Dataset Forge
 </h3>
 <p align="center">
-  <img src="Dataset_Forge_thumb.png" width="300" alt="Dataset Forge Thumbnail"/>
+  <img src="https://pomf2.lain.la/f/2ulflln.png" width="300" alt="Dataset Forge Thumbnail"/>
+  <!-- <img src="https://files.catbox.moe/9jaag6.png" width="300" alt="Dataset Forge Thumbnail Backup"/> -->
 </p>
 <div align="center">
-  <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600"/>
+  <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600" alt="Separator"/>
+  <!-- <img src="https://files.catbox.moe/0fyb8o.png" width="600" alt="Separator Backup"/> -->
 </div>
 
 <p align="center"><i>The all-in-one, modular image dataset utility for ML, with a focus on HQ/LQ image pairs for SISR and general computer vision. CLI-first, highly extensible, and packed with advanced tools for dataset curation, analysis, transformation, and validation.</i></p>
@@ -125,6 +127,126 @@
 
 ---
 
+## 🎨 **Advanced Features**
+
+### **AI-Powered Image Analysis**
+
+#### **Sketch Extraction with Deep Learning**
+
+- **Model**: [Sketch-126-DomainNet](https://huggingface.co/prithivMLmods/Sketch-126-DomainNet) from Hugging Face
+- **Capabilities**: Detect and extract sketches, drawings, and line art from images
+- **Features**: Configurable confidence thresholds, support for single folders and HQ/LQ pairs
+- **Operations**: Copy or move detected sketches to separate directories
+- **Performance**: GPU-accelerated inference with automatic memory management
+
+#### **BHI Filtering - Multi-Metric Quality Assessment**
+
+- **Blockiness Detection**: Identify compression artifacts using DCT analysis
+- **HyperIQA**: Perceptual quality assessment using deep learning
+- **IC9600**: Neural quality assessment with ICNet architecture
+- **Preset Thresholds**: Pre-configured moderate, strict, and lenient filtering options
+- **Custom Thresholds**: Adjustable parameters for fine-tuned quality control
+- **Batch Processing**: Efficient GPU-accelerated processing of large datasets
+
+#### **Advanced Tiling with AI Complexity Analysis**
+
+- **IC9600 Complexity**: Neural network-based complexity assessment using ICNet
+- **Laplacian Complexity**: Traditional complexity measure for comparison
+- **BestTile Algorithm**: Dynamic tile selection based on image complexity
+- **Adaptive Tiling**: Automatically adjust tile count based on image characteristics
+- **Dual Strategy Support**: Choose between traditional and AI-powered tiling
+- **Memory Optimization**: Efficient processing with automatic CUDA memory management
+
+### **Advanced Processing & Transformation**
+
+#### **Batch Operations Pipeline**
+
+- **Dataset Splitting**: Split by count, percentage, or random selection
+- **Dimension Filtering**: Remove images based on width/height thresholds
+- **File Type Filtering**: Filter by specific image formats
+- **Advanced Color Adjustments**: Precise control over brightness, contrast, saturation
+- **Format Conversion**: PNG optimization, WebP conversion with quality control
+- **HDR to SDR Conversion**: Multiple tone mapping algorithms (Hable, Reinhard, etc.)
+
+#### **Upscaling with Advanced Model Support**
+
+- **Spandrel Integration**: Support for various upscaling models and architectures
+- **Chainner-ext Processing**: Advanced image processing with high-quality filters
+- **Tile-Based Upscaling**: Configurable tile sizes for memory-efficient processing
+- **Alpha Channel Handling**: Upscale, resize, or discard alpha channels
+- **Precision Control**: FP32, FP16, and BF16 precision options
+- **GPU Memory Management**: Automatic memory optimization for large images
+
+#### **Image Sanitization & Security**
+
+- **Steganography Detection**: Use steghide and zsteg to detect hidden data
+- **ICC Profile Conversion**: Convert to sRGB for consistent color reproduction
+- **Alpha Channel Removal**: Optional transparency channel removal
+- **Metadata Scrubbing**: Comprehensive EXIF data removal
+- **Dry Run Mode**: Preview changes before applying modifications
+- **Security Analysis**: Comprehensive image security assessment
+
+### **Memory & Performance Optimization**
+
+#### **Advanced Memory Management**
+
+- **CUDA Memory Management**: Automatic GPU memory cleanup and optimization
+- **Context Managers**: Memory-safe operations for intensive processing
+- **Safe Tensor Operations**: Device-agnostic tensor handling
+- **Memory Monitoring**: Real-time memory usage tracking and optimization
+- **Automatic Cleanup**: Memory cleanup after large operations
+- **Memory Recommendations**: Intelligent suggestions for optimal settings
+
+#### **Smart Parallel Processing**
+
+- **Processing Type Selection**: Automatic choice between thread/process/sequential
+- **Batch Processing**: Memory-efficient processing of large datasets
+- **GPU Memory Fraction Control**: Configurable GPU memory allocation
+- **Timeout Handling**: Graceful handling of long-running operations
+- **Progress Tracking**: Real-time progress with memory usage monitoring
+- **Error Recovery**: Robust error handling with automatic retry mechanisms
+
+### **Advanced Configuration & Integration**
+
+#### **External Tool Integration**
+
+- **WTP Dataset Destroyer**: Full integration with advanced dataset processing
+- **traiNNer-redux**: Seamless training pipeline integration
+- **VapourSynth**: Required for getnative functionality
+- **ExifTool**: Advanced metadata handling and manipulation
+- **FFmpeg**: Video processing and HDR conversion capabilities
+
+#### **Configuration Management**
+
+- **HCL File Support**: WTP Dataset Destroyer configuration format
+- **YAML Configuration**: traiNNer-redux training configurations
+- **JSON Configuration**: Flexible project and model configurations
+- **User Profile System**: Personalized settings, favorites, and presets
+- **Community Links**: Curated resource collections and external tools
+- **Configuration Validation**: Automatic validation of configuration files
+
+### **Rich Reporting & Analysis**
+
+#### **Advanced Reporting System**
+
+- **HTML Report Templates**: Interactive reports with embedded visualizations
+- **Quality Score Histograms**: Multi-metric quality assessment visualization
+- **Class Balance Analysis**: Dataset composition and distribution analysis
+- **Sample Image Generation**: Automatic sample selection for reports
+- **Dimension Analysis**: Comprehensive size and aspect ratio reporting
+- **Scale Relationship Detection**: HQ/LQ scale analysis and validation
+
+#### **Advanced Analysis Features**
+
+- **Native Resolution Detection**: Automatic detection of original image resolutions
+- **Extreme Dimension Analysis**: Identification of unusually sized images
+- **Aspect Ratio Testing**: Comprehensive aspect ratio validation
+- **Scale Relationship Detection**: Automatic HQ/LQ scale factor detection
+- **Outlier Detection**: Statistical analysis for anomalous images
+- **Corruption Detection**: Comprehensive image integrity checking
+
+---
+
 ## 🏗️ Modular Architecture
 
 Dataset Forge uses a clean, modular architecture for maintainability and extensibility:
@@ -145,6 +267,12 @@ Core business logic grouped by domain:
 - `metadata_actions.py` - EXIF and ICC tools
 - `report_actions.py` - Rich reporting functionality
 - `user_profile_actions.py` - User profile management
+- `bhi_filtering_actions.py` - Multi-metric quality assessment
+- `tiling_actions.py` - Advanced AI-powered tiling
+- `sketch_extraction_actions.py` - Deep learning sketch detection
+- `sanitize_images_actions.py` - Image security and sanitization
+- `operations_actions.py` - Advanced batch operations
+- `imagededup_actions.py` - Advanced duplicate detection
 - And more...
 
 ### **utils/** - Utilities
@@ -157,6 +285,10 @@ Reusable helper modules:
 - `color.py` - Catppuccin Mocha color constants
 - `menu.py` - Menu rendering helpers
 - `path_history.py` - Path history management
+- `memory_utils.py` - Advanced memory management
+- `parallel_utils.py` - Smart parallel processing
+- `upscale_script.py` - Advanced upscaling utilities
+- `ic9600_tiling.py` - AI-powered tiling utilities
 - And more...
 
 ### **dpid/** - DPID Implementations
@@ -226,6 +358,8 @@ Dataset-Forge/
     │   ├── operations_actions.py    # Batch operations
     │   ├── correct_hq_lq_pairing_actions.py # HQ/LQ pairing
     │   ├── dataset_ops_actions.py   # Dataset operations
+    │   ├── sanitize_images_actions.py # Image sanitization
+    │   ├── sketch_extraction_actions.py # Sketch detection
     │   └── settings_actions.py      # Settings management
     ├── menus/                       # UI layer (15+ files)
     │   ├── __init__.py
@@ -244,6 +378,8 @@ Dataset-Forge/
     │   ├── compress_dir_menu.py     # Directory compression
     │   ├── links_menu.py            # Community links
     │   ├── history_log_menu.py      # History logs
+    │   ├── sanitize_images_menu.py  # Image sanitization
+    │   ├── bhi_filtering_menu.py    # BHI filtering
     │   └── session_state.py         # Session state
     ├── utils/                       # Utilities (12+ files)
     │   ├── __init__.py
@@ -258,6 +394,9 @@ Dataset-Forge/
     │   ├── dpid_phhofm.py           # DPID utilities
     │   ├── ic9600_tiling.py         # IC9600 utilities
     │   ├── upscale_script.py        # Upscaling utilities
+    │   ├── memory_utils.py          # Memory management
+    │   ├── parallel_utils.py        # Parallel processing
+    │   ├── progress_utils.py        # Progress tracking
     │   └── logging_utils.py         # Logging utilities
     └── dpid/                        # DPID implementations
         ├── __init__.py
@@ -325,6 +464,7 @@ The application features an intuitive hierarchical menu system:
   - Find & Test HQ/LQ Scale
   - Report Image Dimensions
   - BHI Filtering Analysis
+  - Find Native Resolution
 
 #### ✨ Image Processing & Augmentation
 
@@ -342,6 +482,9 @@ The application features an intuitive hierarchical menu system:
 - **Augmentation**
   - Run Augmentation Pipeline/Recipes
   - Apply Custom Transformations
+- **Advanced Features**
+  - Sketch/Line Art Extraction (AI-powered)
+  - Image Sanitization & Security
 
 #### 🚀 Training & Inference
 
@@ -366,6 +509,10 @@ The application features an intuitive hierarchical menu system:
 - **Compress Images / Directory**
   - Compress Images
   - Compress Directory
+- **Advanced Tools**
+  - Image Sanitization
+  - BHI Filtering
+  - Community Links
 
 #### ⚙️ System & Settings
 
@@ -374,6 +521,14 @@ The application features an intuitive hierarchical menu system:
   - User Profile Management
   - View Change/History Log
   - Links (Community & Personal)
+- **Memory Management**
+  - View Memory Information
+  - Clear Memory & CUDA Cache
+  - Memory Optimization Recommendations
+- **Parallel Processing Configuration**
+  - Configure Processing Type
+  - Set GPU Memory Fraction
+  - Adjust Batch Sizes
 
 ---
 
@@ -415,6 +570,31 @@ Dataset Forge supports multiple configuration formats:
     "default_quality": 85
   }
 }
+```
+
+### Advanced Configuration Examples
+
+#### HCL Configuration (WTP Dataset Destroyer)
+
+```hcl
+input = "./datasets/input"
+output = "./datasets/output"
+scale = 4
+quality = 85
+format = "jpg"
+```
+
+#### YAML Configuration (traiNNer-redux)
+
+```yaml
+name: my_model
+scale: 4
+datasets:
+  train:
+    name: DIV2K
+    mode: LQGT
+    dataroot_GT: ./datasets/GT
+    dataroot_LQ: ./datasets/LQ
 ```
 
 ---
@@ -474,11 +654,20 @@ pepeline
 pepedpid
 ```
 
+### Advanced Dependencies
+
+- **Spandrel & Chainner-ext**: Advanced model loading and image processing
+- **Transformers**: Hugging Face models for sketch detection
+- **VapourSynth**: Required for getnative functionality
+- **ExifTool**: Advanced metadata handling
+- **Steghide & zsteg**: Steganography detection
+
 ### Optional Dependencies
 
 - **ExifTool**: For EXIF metadata handling
 - **FFmpeg**: For video processing and HDR conversion
 - **CUDA Toolkit**: For GPU acceleration
+- **VapourSynth**: For getnative functionality
 
 ---
 
@@ -541,6 +730,22 @@ pepedpid
 4. Visual deduplication
 5. Export augmented dataset
 
+#### AI-Powered Dataset Curation
+
+1. **Sketch Extraction**: Use deep learning to extract sketches and line art
+2. **BHI Filtering**: Apply multi-metric quality assessment
+3. **Advanced Tiling**: Use AI-powered complexity analysis for optimal tiling
+4. **Image Sanitization**: Remove metadata and detect hidden content
+5. **Advanced Deduplication**: Use ImageDedup with multiple hash methods
+
+#### Advanced Processing Pipeline
+
+1. **Batch Operations**: Split datasets by count or percentage
+2. **Format Conversion**: Optimize PNG files and convert to WebP
+3. **HDR Processing**: Convert HDR images to SDR with tone mapping
+4. **Memory Optimization**: Use GPU memory management for large datasets
+5. **Parallel Processing**: Leverage smart processing type selection
+
 ---
 
 ## 🔧 Advanced Features
@@ -557,17 +762,21 @@ Multiple implementations for realistic image degradation:
 
 Quality assessment using multiple metrics:
 
-- **Blockiness**: Detect compression artifacts
-- **HyperIQA**: Perceptual quality assessment
-- **IC9600**: Neural quality assessment
+- **Blockiness**: Detect compression artifacts using DCT analysis
+- **HyperIQA**: Perceptual quality assessment using deep learning
+- **IC9600**: Neural quality assessment with ICNet architecture
+- **Preset Thresholds**: Pre-configured moderate, strict, and lenient filtering options
+- **Custom Thresholds**: Adjustable parameters for fine-tuned quality control
 
 ### Advanced Tiling
 
 Intelligent image tiling with complexity analysis:
 
 - **Laplacian Complexity**: Traditional complexity measure
-- **IC9600 Complexity**: Neural complexity assessment
-- **BestTile Algorithm**: Optimal tile selection
+- **IC9600 Complexity**: Neural complexity assessment using ICNet
+- **BestTile Algorithm**: Optimal tile selection based on image complexity
+- **Dynamic Tiling**: Automatic adjustment of tile count based on complexity
+- **Memory Optimization**: Efficient processing with automatic CUDA memory management
 
 ### Visual Deduplication
 
@@ -587,6 +796,29 @@ Advanced duplicate detection using the imagededup library:
 - **Visual Reports**: Generate duplicate analysis reports
 - **Flexible Operations**: Find, remove, or move duplicates
 - **Dry Run Mode**: Preview changes before applying
+- **Debug Features**: Directory content analysis and troubleshooting
+
+### Memory Management System
+
+Professional-grade memory optimization:
+
+- **CUDA Memory Management**: Automatic GPU memory cleanup and optimization
+- **Context Managers**: Memory-safe operations for intensive processing
+- **Safe Tensor Operations**: Device-agnostic tensor handling
+- **Memory Monitoring**: Real-time memory usage tracking
+- **Automatic Cleanup**: Memory cleanup after large operations
+- **Optimization Recommendations**: Intelligent suggestions for optimal settings
+
+### Parallel Processing System
+
+Smart parallel processing with automatic optimization:
+
+- **Processing Type Selection**: Automatic choice between thread/process/sequential
+- **Batch Processing**: Memory-efficient processing of large datasets
+- **GPU Memory Fraction Control**: Configurable GPU memory allocation
+- **Timeout Handling**: Graceful handling of long-running operations
+- **Progress Tracking**: Real-time progress with memory usage monitoring
+- **Error Recovery**: Robust error handling with automatic retry mechanisms
 
 ---
 
@@ -599,12 +831,14 @@ Advanced duplicate detection using the imagededup library:
    - Reduce batch sizes in settings
    - Use CPU-only mode for large datasets
    - Process images in smaller batches
+   - Enable memory optimization features
 
 2. **Missing Dependencies**
 
    - Run `pip install -r requirements.txt`
    - Install PyTorch with correct CUDA version
    - Install ExifTool for metadata features
+   - Install VapourSynth for getnative functionality
 
 3. **Path Issues**
 
@@ -616,12 +850,16 @@ Advanced duplicate detection using the imagededup library:
    - Use SSD storage for better I/O
    - Increase RAM if available
    - Use GPU acceleration when possible
+   - Configure parallel processing settings
+   - Enable memory optimization features
 
 ### Getting Help
 
 - Check the operation logs in the System & Settings menu
 - Review the comprehensive validation reports
 - Use the built-in help system in each menu
+- Check memory management recommendations
+- Review parallel processing configuration
 
 ---
 
@@ -630,3 +868,18 @@ Advanced duplicate detection using the imagededup library:
 Dataset Forge is designed with a modular architecture for easy contribution:
 
 1. **Add new actions**: Create new files in `dataset_forge/actions/`
+2. **Add new menus**: Create new files in `dataset_forge/menus/`
+3. **Add new utilities**: Create new files in `dataset_forge/utils/`
+4. **Follow coding standards**: Use the established patterns and conventions
+5. **Test thoroughly**: Ensure all features work with memory management and parallel processing
+6. **Document features**: Add comprehensive documentation for new capabilities
+
+### Development Guidelines
+
+- Follow the modular architecture patterns
+- Use centralized memory management utilities
+- Implement parallel processing for performance
+- Follow the Catppuccin Mocha color scheme
+- Include comprehensive error handling
+- Add progress tracking for long operations
+- Document all public functions with Google-style docstrings
