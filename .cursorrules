@@ -1,8 +1,472 @@
+# Dataset Forge - Cursor Rules
+# Comprehensive coding guidelines for the Dataset Forge project
+
 # CRITICAL: ALWAYS activate virtual environment before testing
 # ALWAYS run: venv312\Scripts\activate before testing your new additions
 # This ensures all dependencies are available and the correct Python environment is used
 
 # CRITICAL: ALWAYS look up documentation for packages, modules or software added to this project
+
+# ============================================================================
+# PROJECT OVERVIEW & ARCHITECTURE
+# ============================================================================
+
+# Dataset Forge is a comprehensive Python CLI utility for managing, analyzing, and transforming 
+# image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution 
+# and related ML tasks. It features a beautiful Catppuccin Mocha-themed interface, deep validation, 
+# and 40+ powerful operations organized in an intuitive hierarchical menu system.
+
+# ARCHITECTURE PATTERNS:
+# - Modular design with clear separation of concerns
+# - menus/ (UI layer) - Thin UI layers for user interaction
+# - actions/ (Business logic) - Core business logic grouped by domain
+# - utils/ (Utilities) - Reusable helper modules
+# - dpid/ (DPID implementations) - Multiple DPID implementations
+
+# ============================================================================
+# CODING STANDARDS & CONVENTIONS
+# ============================================================================
+
+# Python Version: 3.8+ (use modern Python features)
+# Code Style: PEP 8 compliant with 4-space indentation
+# Line Length: 88 characters (Black formatter standard)
+# Docstrings: Google-style docstrings for all public functions and classes
+# Type Hints: Use type hints for all function parameters and return values
+
+# ============================================================================
+# IMPORT ORGANIZATION & DEPENDENCIES
+# ============================================================================
+
+# Import order (enforced):
+# 1. Standard library imports
+# 2. Third-party imports
+# 3. Local imports (dataset_forge.*)
+# 4. Relative imports (if within same module)
+
+# Always use absolute imports for dataset_forge modules:
+# ✅ CORRECT: from dataset_forge.utils.memory_utils import clear_memory
+# ❌ WRONG: from ..utils.memory_utils import clear_memory
+
+# ============================================================================
+# MEMORY MANAGEMENT PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized memory management for CUDA and Python memory:
+# - Import: from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+# - Use context managers: with memory_context("Operation Name"):
+# - Use decorators: @auto_cleanup, @monitor_memory_usage
+# - Clear memory after large operations: clear_memory()
+
+# Memory management examples:
+# ```python
+# from dataset_forge.utils.memory_utils import (
+#     clear_memory, memory_context, auto_cleanup, to_device_safe
+# )
+# 
+# @auto_cleanup
+# def process_images(images):
+#     with memory_context("Image Processing"):
+#         # Your code here
+#         pass
+# 
+# # Safe tensor operations
+# tensor = to_device_safe(tensor, "cuda")
+# ```
+
+# ============================================================================
+# PARALLEL PROCESSING PATTERNS
+# ============================================================================
+
+# ALWAYS use the centralized parallel processing system:
+# - Import: from dataset_forge.utils.parallel_utils import parallel_map, ProcessingType
+# - Use smart_map() for automatic optimization
+# - Use image_map() for image-specific operations
+# - Use batch_map() for memory-efficient processing
+
+# Parallel processing examples:
+# ```python
+# from dataset_forge.utils.progress_utils import smart_map, image_map
+# from dataset_forge.utils.parallel_utils import ProcessingType
+# 
+# # Automatic optimization
+# results = smart_map(process_function, items, desc="Processing")
+# 
+# # Image-specific processing
+# results = image_map(process_image, image_paths, desc="Processing Images")
+# 
+# # Batch processing for large datasets
+# results = batch_map(process_batch, items, batch_size=32, desc="Processing")
+# ```
+
+# ============================================================================
+# PROGRESS TRACKING & USER FEEDBACK
+# ============================================================================
+
+# ALWAYS use the centralized progress tracking system:
+# - Import: from dataset_forge.utils.progress_utils import tqdm
+# - Use AudioTqdm for automatic audio notifications
+# - Include descriptive progress messages
+# - Show progress for all long-running operations
+
+# Progress tracking examples:
+# ```python
+# from dataset_forge.utils.progress_utils import tqdm
+# 
+# for item in tqdm(items, desc="Processing items"):
+#     # Process item
+#     pass
+# ```
+
+# ============================================================================
+# COLOR SCHEME & UI PATTERNS
+# ============================================================================
+
+# ALWAYS use the Catppuccin Mocha color scheme:
+# - Import: from dataset_forge.utils.color import Mocha
+# - Use centralized printing functions: print_info, print_success, print_warning, print_error
+# - Use print_header() and print_section() for menu organization
+
+# Color usage examples:
+# ```python
+# from dataset_forge.utils.printing import print_info, print_success, print_warning, print_error
+# from dataset_forge.utils.color import Mocha
+# 
+# print_success("Operation completed successfully")
+# print_warning("Warning: Low memory detected")
+# print_error("Error: File not found")
+# print_info("Processing 1000 images...")
+# ```
+
+# ============================================================================
+# MENU SYSTEM PATTERNS
+# ============================================================================
+
+# ALWAYS follow the hierarchical menu structure:
+# - Main menu has 7 categories (Dataset Management, Analysis & Validation, etc.)
+# - Use show_menu() from dataset_forge.utils.menu
+# - Include descriptive menu options with emojis
+# - Handle KeyboardInterrupt and EOFError gracefully
+
+# Menu structure example:
+# ```python
+# from dataset_forge.utils.menu import show_menu
+# from dataset_forge.utils.color import Mocha
+# 
+# def my_menu():
+#     options = {
+#         "1": ("📂 Option 1", function1),
+#         "2": ("🔍 Option 2", function2),
+#         "0": ("🚪 Exit", None),
+#     }
+#     
+#     while True:
+#         try:
+#             action = show_menu("Menu Title", options, Mocha.lavender)
+#             if action is None:
+#                 break
+#             action()
+#         except (KeyboardInterrupt, EOFError):
+#             print_info("\nExiting...")
+#             break
+# ```
+
+# ============================================================================
+# INPUT HANDLING PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized input utilities:
+# - Import: from dataset_forge.utils.input_utils import get_path_with_history, get_folder_path
+# - Support path history and favorites
+# - Handle HQ/LQ folder selection from settings
+# - Provide intelligent defaults and validation
+
+# Input handling examples:
+# ```python
+# from dataset_forge.utils.input_utils import get_path_with_history, get_folder_path
+# 
+# # Get path with history support
+# path = get_path_with_history("Enter folder path:")
+# 
+# # Get folder with validation
+# folder = get_folder_path("Select folder:")
+# ```
+
+# ============================================================================
+# FILE OPERATIONS PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized file utilities:
+# - Import: from dataset_forge.utils.file_utils import is_image_file, get_unique_filename
+# - Support multiple image formats: .jpg, .jpeg, .png, .gif, .bmp, .ico, .tiff, .webp
+# - Handle file operations safely (copy, move, inplace)
+# - Create unique filenames to prevent conflicts
+
+# File operation examples:
+# ```python
+# from dataset_forge.utils.file_utils import is_image_file, get_unique_filename
+# 
+# if is_image_file(filename):
+#     unique_name = get_unique_filename(dest_dir, filename)
+# ```
+
+# ============================================================================
+# IMAGE PROCESSING PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized image utilities:
+# - Import: from dataset_forge.utils.image_ops import get_image_size
+# - Support multiple image formats and modes
+# - Handle alpha channels properly
+# - Use PIL for image operations, OpenCV for advanced processing
+
+# Image processing examples:
+# ```python
+# from dataset_forge.utils.image_ops import get_image_size
+# from PIL import Image
+# 
+# width, height = get_image_size(image_path)
+# with Image.open(image_path) as img:
+#     # Process image
+#     pass
+# ```
+
+# ============================================================================
+# LOGGING & ERROR HANDLING
+# ============================================================================
+
+# ALWAYS use centralized logging:
+# - Import: from dataset_forge.utils.history_log import log_operation
+# - Log all major operations with timestamps
+# - Use try-except blocks with meaningful error messages
+# - Provide graceful degradation for non-critical errors
+
+# Logging examples:
+# ```python
+# from dataset_forge.utils.history_log import log_operation
+# 
+# try:
+#     # Operation code
+#     log_operation("operation_name", "Operation details")
+# except Exception as e:
+#     print_error(f"Error during operation: {e}")
+#     log_operation("operation_name", f"Failed: {e}")
+# ```
+
+# ============================================================================
+# SESSION STATE & CONFIGURATION
+# ============================================================================
+
+# ALWAYS use centralized session state:
+# - Import: from dataset_forge.menus.session_state import parallel_config, user_preferences
+# - Store user preferences and settings
+# - Maintain parallel processing configuration
+# - Cache expensive operation results
+
+# Session state examples:
+# ```python
+# from dataset_forge.menus.session_state import parallel_config, user_preferences
+# 
+# # Use parallel processing settings
+# max_workers = parallel_config.get("max_workers", 4)
+# 
+# # Use user preferences
+# play_audio = user_preferences.get("play_audio", True)
+# ```
+
+# ============================================================================
+# DPID (DEGRADATION PROCESS FOR IMAGE DOWNSCALING) PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized DPID utilities:
+# - Import: from dataset_forge.utils.dpid_phhofm import process_image, downscale_folder
+# - Support multiple DPID implementations (BasicSR, OpenMMLab, Phhofm)
+# - Handle HQ/LQ pair processing
+# - Use parallel processing for efficiency
+
+# DPID examples:
+# ```python
+# from dataset_forge.utils.dpid_phhofm import process_image, downscale_folder
+# 
+# # Process single image
+# success = process_image(input_path, output_path, scale)
+# 
+# # Process folder
+# processed, skipped, failed = downscale_folder(
+#     input_folder, output_folder, scale, threads=4
+# )
+# ```
+
+# ============================================================================
+# AUDIO & USER FEEDBACK
+# ============================================================================
+
+# ALWAYS use centralized audio utilities:
+# - Import: from dataset_forge.utils.audio_utils import play_done_sound
+# - Play completion sounds for long operations
+# - Respect user audio preferences
+# - Provide visual feedback with progress bars
+
+# Audio examples:
+# ```python
+# from dataset_forge.utils.audio_utils import play_done_sound
+# 
+# # Play completion sound
+# play_done_sound()
+# ```
+
+# ============================================================================
+# TESTING & VALIDATION PATTERNS
+# ============================================================================
+
+# ALWAYS include comprehensive validation:
+# - Validate input paths and file existence
+# - Check image format compatibility
+# - Verify HQ/LQ pair alignment
+# - Provide detailed error messages
+
+# Validation examples:
+# ```python
+# import os
+# from dataset_forge.utils.file_utils import is_image_file
+# 
+# # Validate input
+# if not os.path.exists(input_path):
+#     print_error(f"Input path does not exist: {input_path}")
+#     return
+# 
+# # Validate image files
+# if not is_image_file(filename):
+#     print_warning(f"Skipping non-image file: {filename}")
+#     continue
+# ```
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION
+# ============================================================================
+
+# ALWAYS optimize for performance:
+# - Use parallel processing for I/O and CPU operations
+# - Implement batch processing for large datasets
+# - Use memory-efficient operations
+# - Cache expensive computations
+
+# Performance examples:
+# ```python
+# # Use batch processing for large datasets
+# batch_size = min(32, len(items))
+# for i in range(0, len(items), batch_size):
+#     batch = items[i:i + batch_size]
+#     process_batch(batch)
+# ```
+
+# ============================================================================
+# ERROR HANDLING & RECOVERY
+# ============================================================================
+
+# ALWAYS implement robust error handling:
+# - Catch specific exceptions (FileNotFoundError, PermissionError, etc.)
+# - Provide recovery options when possible
+# - Log errors for debugging
+# - Continue processing when individual items fail
+
+# Error handling examples:
+# ```python
+# try:
+#     # Operation code
+#     pass
+# except FileNotFoundError as e:
+#     print_error(f"File not found: {e}")
+#     continue
+# except PermissionError as e:
+#     print_error(f"Permission denied: {e}")
+#     continue
+# except Exception as e:
+#     print_error(f"Unexpected error: {e}")
+#     log_operation("error", f"Unexpected error: {e}")
+# ```
+
+# ============================================================================
+# DOCUMENTATION REQUIREMENTS
+# ============================================================================
+
+# ALWAYS include comprehensive documentation:
+# - Google-style docstrings for all public functions
+# - Include parameter types and return values
+# - Document exceptions that may be raised
+# - Provide usage examples in docstrings
+
+# Documentation example:
+# ```python
+# def process_images(image_paths: List[str], output_dir: str) -> List[str]:
+#     """
+#     Process a list of images and save results to output directory.
+#     
+#     Args:
+#         image_paths: List of input image file paths
+#         output_dir: Directory to save processed images
+#         
+#     Returns:
+#         List of output image file paths
+#         
+#     Raises:
+#         FileNotFoundError: If input files don't exist
+#         PermissionError: If output directory is not writable
+#         
+#     Example:
+#         >>> paths = process_images(['img1.jpg', 'img2.png'], 'output/')
+#         >>> print(f"Processed {len(paths)} images")
+#     """
+# ```
+
+# ============================================================================
+# SECURITY CONSIDERATIONS
+# ============================================================================
+
+# ALWAYS follow security best practices:
+# - Validate all user inputs
+# - Sanitize file paths to prevent path traversal
+# - Use safe file operations
+# - Handle sensitive data appropriately
+
+# Security examples:
+# ```python
+# import os
+# 
+# # Validate and sanitize paths
+# def safe_path(path: str) -> str:
+#     return os.path.abspath(os.path.expanduser(path))
+# 
+# # Validate file extensions
+# def is_safe_file(filename: str) -> bool:
+#     return filename.lower().endswith(('.jpg', '.png', '.jpeg'))
+# ```
+
+# ============================================================================
+# DEPENDENCY MANAGEMENT
+# ============================================================================
+
+# ALWAYS manage dependencies properly:
+# - Add new dependencies to requirements.txt
+# - Use version constraints for stability
+# - Document optional dependencies
+# - Test with minimal dependency sets
+
+# Dependency examples:
+# ```python
+# # In requirements.txt
+# numpy<2
+# opencv-python
+# Pillow
+# torch
+# 
+# # Optional dependencies
+# # pygame  # For audio playback
+# # ffmpeg  # For video processing
+# ```
+
+# ============================================================================
+# GIT IGNORE PATTERNS
+# ============================================================================
 
 # Ignore Python virtual environments
 venv/
@@ -38,9 +502,11 @@ store/
 dpid/
 run_best_tile_ic9600.py
 
-# # Ignore configs except example
-# configs/
-# !configs/_example_config.json
+# Ignore configs except example
+configs/
+!configs/_example_config.json
+!configs/_example_user_profile.json
+!configs/_example_community_links.json
 
 # Ignore build and distribution folders
 build/
@@ -53,3 +519,21 @@ dist/
 # Ignore any other user-specific or generated files
 .idea/
 .vscode/
+
+# ============================================================================
+# FINAL REMINDERS
+# ============================================================================
+
+# 1. ALWAYS activate virtual environment: venv312\Scripts\activate
+# 2. ALWAYS use centralized utilities from dataset_forge.utils
+# 3. ALWAYS include proper error handling and logging
+# 4. ALWAYS use the Catppuccin Mocha color scheme
+# 5. ALWAYS follow the modular architecture patterns
+# 6. ALWAYS implement parallel processing for performance
+# 7. ALWAYS manage memory properly, especially for CUDA operations
+# 8. ALWAYS provide user-friendly feedback and progress tracking
+# 9. ALWAYS document your code with Google-style docstrings
+# 10. ALWAYS test your changes thoroughly before committing
+
+# Remember: Dataset Forge is a professional-grade tool used by ML researchers
+# and data scientists. Maintain high code quality and user experience standards.
