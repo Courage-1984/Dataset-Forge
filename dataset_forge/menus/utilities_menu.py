@@ -17,6 +17,7 @@ from dataset_forge.actions.comparison_actions import (
 from dataset_forge.menus.compress_menu import compress_menu
 from dataset_forge.menus.compress_dir_menu import compress_dir_menu
 from dataset_forge.menus import session_state
+from dataset_forge.menus.sanitize_images_menu import sanitize_images_menu
 
 
 def require_hq_lq(func):
@@ -93,8 +94,9 @@ def compress_tools_menu():
 def utilities_menu():
     """Main utilities menu with hierarchical structure."""
     options = {
-        "1": ("Compare Images / Folders", compare_images_folders_menu),
-        "2": ("Compress Images / Directory", compress_tools_menu),
+        "1": ("🧹 Sanitize Images", sanitize_images_menu),
+        "2": ("Compare Images / Folders", compare_images_folders_menu),
+        "3": ("Compress Images / Directory", compress_tools_menu),
         "0": ("Back to Main Menu", None),
     }
 
