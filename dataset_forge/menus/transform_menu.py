@@ -9,18 +9,8 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions.transform_actions import (
-    downsample_images_menu,
-    hdr_to_sdr_menu,
-    dataset_colour_adjustment,
-    grayscale_conversion,
-    transform_dataset,
-)
-from dataset_forge.actions.alpha_actions import remove_alpha_channels_menu
 from dataset_forge.menus.hue_adjustment_menu import hue_adjustment_menu
 from dataset_forge.menus import session_state
-
-# Assume require_hq_lq, hq_folder, lq_folder are available in the global scope for now
 
 
 def require_hq_lq(func):
@@ -36,39 +26,46 @@ def require_hq_lq(func):
 
 
 def transform_menu():
-    options = transform_menu.__menu_options__
+    from dataset_forge.actions.transform_actions import (
+        downsample_images_menu,
+        hdr_to_sdr_menu,
+        dataset_colour_adjustment,
+        grayscale_conversion,
+        transform_dataset,
+    )
+    from dataset_forge.actions.alpha_actions import remove_alpha_channels_menu
+
+    options = {
+        "1": ("Downsample Images", downsample_images_menu),
+        "2": ("Convert HDR to SDR", hdr_to_sdr_menu),
+        "3": (
+            "Color/Tone Adjustments",
+            require_hq_lq(
+                lambda: dataset_colour_adjustment(
+                    session_state.hq_folder, session_state.lq_folder
+                )
+            ),
+        ),
+        "4": ("Hue/Brightness/Contrast Adjustment", hue_adjustment_menu),
+        "5": (
+            "Grayscale Conversion",
+            require_hq_lq(
+                lambda: grayscale_conversion(
+                    session_state.hq_folder, session_state.lq_folder
+                )
+            ),
+        ),
+        "6": ("Remove Alpha Channel", remove_alpha_channels_menu),
+        "7": ("Apply Custom Transformations", transform_dataset),
+        "0": ("Back to Main Menu", None),
+    }
     while True:
         action = show_menu(
-            "Image Transformations", options, header_color=Mocha.sapphire, char="-"
+            "Transform Menu",
+            options,
+            header_color=Mocha.sapphire,
+            char="-",
         )
         if action is None:
             break
         action()
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
-
-
-transform_menu.__menu_options__ = {
-    "1": ("Downsample Images", downsample_images_menu),
-    "2": ("Convert HDR to SDR", hdr_to_sdr_menu),
-    "3": (
-        "Color/Tone Adjustments",
-        require_hq_lq(
-            lambda: dataset_colour_adjustment(
-                session_state.hq_folder, session_state.lq_folder
-            )
-        ),
-    ),
-    "4": ("Hue/Brightness/Contrast Adjustment", hue_adjustment_menu),
-    "5": (
-        "Grayscale Conversion",
-        require_hq_lq(
-            lambda: grayscale_conversion(
-                session_state.hq_folder, session_state.lq_folder
-            )
-        ),
-    ),
-    "6": ("Remove Alpha Channel", remove_alpha_channels_menu),
-    "7": ("Apply Custom Transformations", transform_dataset),
-    "0": ("Back to Main Menu", None),
-}

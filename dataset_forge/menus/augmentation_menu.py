@@ -1,5 +1,4 @@
 import os
-from dataset_forge.actions import augmentation_actions as aug
 from dataset_forge.utils.input_utils import (
     select_folder,
     ask_yes_no,
@@ -26,6 +25,8 @@ except ImportError:
 
 
 def augmentation_menu():
+    from dataset_forge.actions import augmentation_actions as aug
+
     options = augmentation_menu.__menu_options__
     while True:
         action = show_menu(

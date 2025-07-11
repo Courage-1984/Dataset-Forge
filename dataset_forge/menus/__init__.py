@@ -1,12 +1,2 @@
-from .compress_menu import compress_menu
-from .compress_dir_menu import compress_dir_menu
-from .links_menu import links_menu
-from .user_profile_menu import user_profile_menu
-from .correct_hq_lq_pairing_menu import correct_hq_lq_pairing_menu
-from .main_menu import main_menu
-from .dataset_management_menu import dataset_management_menu
-from .analysis_validation_menu import analysis_validation_menu
-from .image_processing_menu import image_processing_menu
-from .training_inference_menu import training_inference_menu
-from .utilities_menu import utilities_menu
-from .system_settings_menu import system_settings_menu
+# This file intentionally left empty to prevent eager loading of all menu modules
+# Menu modules are imported on-demand when needed

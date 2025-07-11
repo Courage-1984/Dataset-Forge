@@ -9,35 +9,9 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions.analysis_actions import (
-    progressive_dataset_validation,
-    generate_hq_lq_dataset_report,
-    find_hq_lq_scale,
-    test_hq_lq_scale,
-    check_consistency,
-    report_dimensions,
-    find_extreme_dimensions,
-    verify_images,
-    find_misaligned_images,
-    test_aspect_ratio,
-)
-from dataset_forge.actions.alpha_actions import find_alpha_channels_menu
-from dataset_forge.actions.corruption_actions import (
-    fix_corrupted_images,
-    fix_corrupted_images_hq_lq,
-)
-from dataset_forge.menus.bhi_filtering_menu import bhi_filtering_menu
 from dataset_forge.menus import session_state
+from dataset_forge.menus.bhi_filtering_menu import bhi_filtering_menu
 from dataset_forge.utils.input_utils import get_path_with_history
-from dataset_forge.actions.outlier_detection_actions import detect_outliers
-from dataset_forge.actions.report_actions import generate_rich_report
-from dataset_forge.actions.quality_scoring_actions import (
-    score_images_with_pyiqa,
-    plot_quality_histogram,
-    filter_images_by_quality,
-    score_hq_lq_folders,
-)
-from dataset_forge.actions.getnative_actions import find_native_resolution
 
 
 def require_hq_lq(func):
@@ -65,6 +39,10 @@ def comprehensive_validation_menu():
         )
         session_state.hq_folder = hq
         session_state.lq_folder = lq
+        from dataset_forge.actions.analysis_actions import (
+            progressive_dataset_validation,
+        )
+
         progressive_dataset_validation(hq, lq)
         input("\nPress Enter to return to the menu...")
 
@@ -100,6 +78,8 @@ def comprehensive_validation_menu():
         except ValueError:
             max_quality_images = 100
         # Generate report
+        from dataset_forge.actions.report_actions import generate_rich_report
+
         generate_rich_report(
             hq_path=hq,
             lq_path=lq,
@@ -124,11 +104,19 @@ def comprehensive_validation_menu():
             lq = get_path_with_history(
                 "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
             )
+            from dataset_forge.actions.quality_scoring_actions import (
+                score_hq_lq_folders,
+            )
+
             score_hq_lq_folders(hq, lq)
         elif choice == "2":
             folder = get_path_with_history(
                 "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
             )
+            from dataset_forge.actions.quality_scoring_actions import (
+                score_images_with_pyiqa,
+            )
+
             score_images_with_pyiqa(folder)
         input("\nPress Enter to return to the menu...")
 
@@ -159,8 +147,14 @@ def find_fix_issues_menu():
         hq = input("Enter HQ folder path (or single folder): ").strip()
         lq = input("Enter LQ folder path (leave blank for single-folder): ").strip()
         if lq:
+            from dataset_forge.actions.corruption_actions import (
+                fix_corrupted_images_hq_lq,
+            )
+
             fix_corrupted_images_hq_lq(hq, lq)
         else:
+            from dataset_forge.actions.corruption_actions import fix_corrupted_images
+
             fix_corrupted_images(hq)
         input("\nPress Enter to return to the menu...")
 
@@ -172,6 +166,8 @@ def find_fix_issues_menu():
         lq = get_path_with_history(
             "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
+        from dataset_forge.actions.analysis_actions import find_misaligned_images
+
         find_misaligned_images(hq, lq)
         input("\nPress Enter to return to the menu...")
 
@@ -187,6 +183,8 @@ def find_fix_issues_menu():
             lq = get_path_with_history(
                 "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
             )
+            from dataset_forge.actions.outlier_detection_actions import detect_outliers
+
             detect_outliers(hq_folder=hq, lq_folder=lq)
         elif choice == "2":
             folder = get_path_with_history(
@@ -226,6 +224,8 @@ def analyze_properties_menu():
         lq = get_path_with_history(
             "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
+        from dataset_forge.actions.analysis_actions import check_consistency
+
         check_consistency(hq, "HQ")
         check_consistency(lq, "LQ")
         input("\nPress Enter to return to the menu...")
@@ -243,6 +243,8 @@ def analyze_properties_menu():
             lq = get_path_with_history(
                 "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
             )
+            from dataset_forge.actions.analysis_actions import test_aspect_ratio
+
             test_aspect_ratio(hq_folder=hq, lq_folder=lq)
         elif choice == "2":
             folder = get_path_with_history(
@@ -264,7 +266,11 @@ def analyze_properties_menu():
         lq = get_path_with_history(
             "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
+        from dataset_forge.actions.analysis_actions import find_hq_lq_scale
+
         find_hq_lq_scale(hq, lq)
+        from dataset_forge.actions.analysis_actions import test_hq_lq_scale
+
         test_hq_lq_scale(hq, lq)
         input("\nPress Enter to return to the menu...")
 
@@ -276,8 +282,12 @@ def analyze_properties_menu():
         lq = get_path_with_history(
             "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
+        from dataset_forge.actions.analysis_actions import report_dimensions
+
         report_dimensions(hq, "HQ")
         report_dimensions(lq, "LQ")
+        from dataset_forge.actions.analysis_actions import find_extreme_dimensions
+
         find_extreme_dimensions(hq, "HQ")
         find_extreme_dimensions(lq, "LQ")
         input("\nPress Enter to return to the menu...")
@@ -287,6 +297,8 @@ def analyze_properties_menu():
         image = get_path_with_history(
             "Enter image path:", allow_hq_lq=False, allow_single_folder=False
         )
+        from dataset_forge.actions.getnative_actions import find_native_resolution
+
         output = find_native_resolution(image)
         print("\n--- getnative output ---\n")
         print(output)

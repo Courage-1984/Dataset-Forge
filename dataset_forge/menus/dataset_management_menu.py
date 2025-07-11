@@ -9,10 +9,8 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions import dataset_actions
 from dataset_forge.menus import session_state
 from dataset_forge.utils.input_utils import get_folder_path, get_path_with_history
-from dataset_forge.actions.batch_rename_actions import batch_rename_menu
 from dataset_forge.menus.visual_dedup_menu import visual_dedup_menu
 from dataset_forge.menus.imagededup_menu import imagededup_menu
 from dataset_forge.menus.correct_hq_lq_pairing_menu import (
@@ -23,6 +21,8 @@ from dataset_forge.menus.correct_hq_lq_pairing_menu import (
 
 def dataset_creation_menu():
     """Sub-menu for dataset creation and modification."""
+    from dataset_forge.actions import dataset_actions
+
     options = {
         "1": ("Create Multiscale Dataset", dataset_actions.create_multiscale_dataset),
         "2": ("Extract Frames from Video", dataset_actions.extract_frames_from_video),
@@ -46,6 +46,7 @@ def dataset_creation_menu():
 
 def combine_split_menu():
     """Sub-menu for combining or splitting datasets."""
+    from dataset_forge.actions import dataset_actions
 
     def split_adjust_dataset_menu():
         hq_folder = get_folder_path("Enter HQ folder path (or single folder): ")
@@ -78,6 +79,7 @@ def combine_split_menu():
 
 def hq_lq_pairs_menu():
     """Sub-menu for managing HQ/LQ pairs."""
+    from dataset_forge.actions import dataset_actions
 
     def extract_random_pairs():
         hq = get_folder_path("Enter HQ folder path: ")
@@ -117,6 +119,7 @@ def hq_lq_pairs_menu():
 
 def clean_organize_menu():
     """Sub-menu for cleaning and organizing datasets."""
+    from dataset_forge.actions import dataset_actions
 
     def dedupe_menu():
         print("\n=== De-Duplicate Images ===")

@@ -9,21 +9,9 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions.transform_actions import (
-    downsample_images_menu,
-    hdr_to_sdr_menu,
-    dataset_colour_adjustment,
-    grayscale_conversion,
-    transform_dataset,
-)
-from dataset_forge.actions.alpha_actions import remove_alpha_channels_menu
+from dataset_forge.menus import session_state
 from dataset_forge.menus.hue_adjustment_menu import hue_adjustment_menu
 from dataset_forge.menus.augmentation_menu import augmentation_menu
-from dataset_forge.actions.metadata_actions import (
-    exif_scrubber_menu,
-    icc_to_srgb_menu,
-)
-from dataset_forge.menus import session_state
 
 
 def require_hq_lq(func):
@@ -39,7 +27,15 @@ def require_hq_lq(func):
 
 
 def basic_transformations_menu():
-    """Sub-menu for basic image transformations."""
+    from dataset_forge.actions.transform_actions import (
+        downsample_images_menu,
+        hdr_to_sdr_menu,
+        dataset_colour_adjustment,
+        grayscale_conversion,
+        transform_dataset,
+    )
+    from dataset_forge.actions.alpha_actions import remove_alpha_channels_menu
+
     options = {
         "1": ("Downsample Images", downsample_images_menu),
         "2": ("Convert HDR to SDR", hdr_to_sdr_menu),
@@ -70,7 +66,8 @@ def basic_transformations_menu():
 
 
 def color_tone_adjustments_menu():
-    """Sub-menu for color and tone adjustments."""
+    from dataset_forge.actions.transform_actions import dataset_colour_adjustment
+
     options = {
         "1": (
             "General Color/Tone Adjustments",
@@ -83,7 +80,6 @@ def color_tone_adjustments_menu():
         "2": ("Hue/Brightness/Contrast", hue_adjustment_menu),
         "0": ("Back", None),
     }
-
     while True:
         action = show_menu(
             "Color & Tone Adjustments",
@@ -99,16 +95,19 @@ def color_tone_adjustments_menu():
 
 
 def metadata_menu():
-    """Sub-menu for metadata operations."""
+    from dataset_forge.actions.metadata_actions import (
+        exif_scrubber_menu,
+        icc_to_srgb_menu,
+    )
+
     options = {
         "1": ("Scrub EXIF Data", exif_scrubber_menu),
         "2": ("Convert ICC Profile to sRGB", icc_to_srgb_menu),
         "0": ("Back", None),
     }
-
     while True:
         action = show_menu(
-            "Metadata",
+            "EXIF & ICC Profile Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
@@ -121,32 +120,10 @@ def metadata_menu():
 
 
 def augmentation_submenu():
-    """Sub-menu for augmentation operations."""
-    options = {
-        "1": (
-            "Run Augmentation Pipeline/Recipes",
-            augmentation_menu,
-        ),
-        "2": ("Apply Custom Transformations", transform_dataset),
-        "0": ("Back", None),
-    }
-
-    while True:
-        action = show_menu(
-            "Augmentation",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-        )
-        if action is None:
-            break
-        action()
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
+    augmentation_menu()
 
 
 def extract_sketches_menu():
-    """Menu for extracting sketches/drawings/line art from images."""
     from dataset_forge.actions.sketch_extraction_actions import (
         extract_sketches_workflow,
     )
@@ -195,7 +172,6 @@ def extract_sketches_menu():
 
 
 def image_processing_menu():
-    """Main image processing and augmentation menu with hierarchical structure."""
     options = {
         "1": ("Basic Transformations", basic_transformations_menu),
         "2": ("Color & Tone Adjustments", color_tone_adjustments_menu),

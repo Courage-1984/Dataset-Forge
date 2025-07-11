@@ -1,7 +1,3 @@
-from dataset_forge.actions.imagededup_actions import (
-    imagededup_workflow,
-    imagededup_hq_lq_workflow,
-)
 from dataset_forge.utils.input_utils import get_folder_path, get_path_with_history
 from dataset_forge.utils.printing import (
     print_info,
@@ -20,6 +16,8 @@ def imagededup_menu():
 
     def single_folder_dedup():
         """Handle single folder deduplication."""
+        from dataset_forge.actions.imagededup_actions import imagededup_workflow
+
         print_header("Single Folder Deduplication")
 
         # Get folder path
@@ -141,6 +139,8 @@ def imagededup_menu():
 
     def hq_lq_dedup():
         """Handle HQ/LQ paired dataset deduplication."""
+        from dataset_forge.actions.imagededup_actions import imagededup_hq_lq_workflow
+
         print_header("HQ/LQ Paired Dataset Deduplication")
 
         # Get folder paths

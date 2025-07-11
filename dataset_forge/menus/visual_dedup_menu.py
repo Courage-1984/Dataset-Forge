@@ -1,14 +1,15 @@
-from dataset_forge.actions.visual_dedup_actions import (
-    visual_dedup_workflow,
-    move_duplicate_groups,
-    copy_duplicate_groups,
-    remove_duplicate_groups,
-)
 from dataset_forge.utils.input_utils import get_path_with_history, get_folder_path
 from dataset_forge.utils.printing import print_info, print_warning
 
 
 def visual_dedup_menu():
+    from dataset_forge.actions.visual_dedup_actions import (
+        visual_dedup_workflow,
+        move_duplicate_groups,
+        copy_duplicate_groups,
+        remove_duplicate_groups,
+    )
+
     print("\n=== Visual Duplicate & Near-Duplicate Detection ===")
     print("1. HQ/LQ parent_path workflow")
     print("2. Single-folder workflow")
@@ -59,78 +60,58 @@ def visual_dedup_menu():
     print("2. Remove duplicates")
     print("3. Move duplicates to separate folder")
     print("4. Copy duplicates to separate folder")
-
     op_choice = input("Select operation [1]: ").strip() or "1"
-    operations = {"1": "find", "2": "remove", "3": "move", "4": "copy"}
-    operation = operations.get(op_choice, "find")
-
-    # Get additional parameters based on operation
-    destination_dir = None
-    dry_run = True
-
-    if operation in ["remove", "move", "copy"]:
-        confirm = (
-            input("This will permanently modify files. Continue? (y/n) [n]: ")
-            .strip()
-            .lower()
-            or "n"
+    if op_choice == "1":
+        visual_dedup_workflow(
+            hq_folder=hq,
+            lq_folder=lq,
+            single_folder=folder,
+            method=method,
+            max_images=max_images,
+            threshold=threshold,
+            operation="find",
         )
-        if confirm == "y":
-            dry_run = False
-        else:
-            print_warning("Operation cancelled.")
-            return
-
-    if operation in ["move", "copy"]:
-        destination_dir = get_folder_path("Enter destination folder for duplicates: ")
-
-    print_info("\nRunning visual deduplication... (this may take a while)")
-    results = visual_dedup_workflow(
-        hq_path=hq,
-        lq_path=lq,
-        single_folder_path=folder,
-        method=method,
-        threshold=threshold,
-        max_images=max_images,
-    )
-
-    # Process results based on operation
-    for key, groups in results.items():
-        print(f"\nResults for {key}:")
-        if not groups:
-            print("No near-duplicates found.")
-            continue
-
-        total_duplicates = sum(
-            len(group) - 1 for group in groups
-        )  # -1 to exclude original
-        print(
-            f"Found {len(groups)} duplicate groups with {total_duplicates} total duplicate files."
+    elif op_choice == "2":
+        visual_dedup_workflow(
+            hq_folder=hq,
+            lq_folder=lq,
+            single_folder=folder,
+            method=method,
+            max_images=max_images,
+            threshold=threshold,
+            operation="remove",
         )
-
-        if operation == "find":
-            # Show duplicate groups
-            for i, group in enumerate(groups, 1):
-                print(f"\nGroup {i} ({len(group)} images):")
-                print(f"  Original: {group[0]}")
-                print(f"  Duplicates ({len(group) - 1}):")
-                for path in group[1:]:
-                    print(f"    - {path}")
-
-        elif operation == "remove":
-            removed_files = remove_duplicate_groups(groups, dry_run=dry_run)
-
-        elif operation == "move":
-            moved_files = move_duplicate_groups(
-                groups, destination_dir, dry_run=dry_run
-            )
-
-        elif operation == "copy":
-            copied_files = copy_duplicate_groups(
-                groups, destination_dir, dry_run=dry_run
-            )
-
-    input("\nPress Enter to return to the main menu...")
+    elif op_choice == "3":
+        dest_hq = get_path_with_history("Enter destination HQ folder: ")
+        dest_lq = get_path_with_history("Enter destination LQ folder: ") if lq else None
+        visual_dedup_workflow(
+            hq_folder=hq,
+            lq_folder=lq,
+            single_folder=folder,
+            method=method,
+            max_images=max_images,
+            threshold=threshold,
+            operation="move",
+            dest_hq=dest_hq,
+            dest_lq=dest_lq,
+        )
+    elif op_choice == "4":
+        dest_hq = get_path_with_history("Enter destination HQ folder: ")
+        dest_lq = get_path_with_history("Enter destination LQ folder: ") if lq else None
+        visual_dedup_workflow(
+            hq_folder=hq,
+            lq_folder=lq,
+            single_folder=folder,
+            method=method,
+            max_images=max_images,
+            threshold=threshold,
+            operation="copy",
+            dest_hq=dest_hq,
+            dest_lq=dest_lq,
+        )
+    else:
+        print_warning("Invalid operation selected.")
+        return
 
 
 # Register a static menu for favorites

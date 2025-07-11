@@ -8,12 +8,13 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions import sanitize_images_actions
 from dataset_forge.menus import session_state
 import subprocess
 
 
 def sanitize_images_menu():
+    from dataset_forge.actions import sanitize_images_actions
+
     """Menu for sanitizing images: metadata removal, renaming, normalization, ICC to sRGB, steganography checks."""
     while True:
         print_info("\n=== Sanitize Images ===")
@@ -85,21 +86,9 @@ def sanitize_images_menu():
             dry_run=dry_run,
         )
         if zsteg_results_file:
-            print_prompt("\nView detailed zsteg results? [Y/n]: ")
-            resp = input().strip().lower()
-            if resp in ("", "y", "yes"):
-                try:
-                    import sys, subprocess
-
-                    if sys.platform.startswith("win"):
-                        os.startfile(zsteg_results_file)
-                    elif sys.platform.startswith("darwin"):
-                        subprocess.run(["open", zsteg_results_file], check=False)
-                    else:
-                        subprocess.run(["xdg-open", zsteg_results_file], check=False)
-                except Exception as e:
-                    print_warning(f"Could not open zsteg results file: {e}")
-            else:
-                print_info(f"zsteg results saved to: {zsteg_results_file}")
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
+            print_success(
+                f"Sanitization completed. Results saved to: {zsteg_results_file}"
+            )
+        else:
+            print_success("Sanitization completed.")
+        input("\nPress Enter to return to the menu...")

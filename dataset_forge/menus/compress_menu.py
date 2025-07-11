@@ -1,5 +1,4 @@
 # compress_menu.py - CLI entry for image compression
-from dataset_forge.actions.compress_actions import compress_images
 from dataset_forge.utils.input_utils import (
     get_folder_path,
     get_file_operation_choice,
@@ -16,6 +15,8 @@ from dataset_forge.utils.color import Mocha
 
 
 def compress_menu():
+    from dataset_forge.actions.compress_actions import compress_images
+
     print_header("Compress Images", color=Mocha.lavender)
     print_info("Choose input mode:")
     mode_options = {
@@ -59,63 +60,37 @@ def compress_menu():
             quality = 85
 
     use_oxipng = False
-    oxipng_level = 4
-    oxipng_strip = None
-    oxipng_alpha = False
     if fmt == "png":
-        oxipng = (
-            input("Use Oxipng for PNG optimization? (y/n, default y): ").strip().lower()
+        use_oxipng = (
+            input("Use Oxipng for additional compression? (y/N): ").strip().lower()
+            == "y"
         )
-        use_oxipng = oxipng != "n"
-        if use_oxipng:
-            try:
-                oxipng_level = (
-                    input("Oxipng level (0-6 or 'max', default 4): ").strip() or "4"
-                )
-                if oxipng_level != "max":
-                    oxipng_level = int(oxipng_level)
-                    if not (0 <= oxipng_level <= 6):
-                        print_warning("Invalid level, using 4.")
-                        oxipng_level = 4
-            except Exception:
-                print_warning("Invalid input, using 4.")
-                oxipng_level = 4
-            oxipng_strip = (
-                input(
-                    "Oxipng strip metadata? (none/safe/all or comma-list, default safe): "
-                )
-                .strip()
-                .lower()
-                or "safe"
-            )
-            if oxipng_strip == "none":
-                oxipng_strip = None
-            oxipng_alpha = (
-                input(
-                    "Use Oxipng --alpha for transparent pixel optimization? (y/n, default y): "
-                )
-                .strip()
-                .lower()
-            )
-            oxipng_alpha = oxipng_alpha != "n"
 
-    action = get_file_operation_choice()
-    dest_dir = None
-    if action in ["copy", "move"]:
-        dest_dir = get_destination_path()
+    operation = get_file_operation_choice()
+    if operation is None:
+        print_info("Cancelled.")
+        return
+
+    dest_path = None
+    if operation in ["copy", "move"]:
+        dest_path = get_destination_path("Enter destination folder: ")
+        if dest_path is None:
+            print_info("Cancelled.")
+            return
 
     print_info("\nStarting compression...")
-    compress_images(
-        src_hq=hq_path,
-        src_lq=lq_path,
-        single_folder=single_folder,
-        output_format=fmt,
-        quality=quality,
-        oxipng_level=oxipng_level,
-        action=action,
-        dest_dir=dest_dir,
-        use_oxipng=use_oxipng,
-        oxipng_strip=oxipng_strip,
-        oxipng_alpha=oxipng_alpha,
-    )
-    print_success("Compression complete!")
+    try:
+        compress_images(
+            hq_path=hq_path,
+            lq_path=lq_path,
+            single_folder=single_folder,
+            output_format=fmt,
+            quality=quality,
+            use_oxipng=use_oxipng,
+            operation=operation,
+            dest_path=dest_path,
+        )
+        print_success("Compression completed successfully!")
+    except Exception as e:
+        print_error(f"Compression failed: {e}")
+    input("\nPress Enter to return to the menu...")

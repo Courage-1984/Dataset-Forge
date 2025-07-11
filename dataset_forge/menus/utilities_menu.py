@@ -9,11 +9,6 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions.comparison_actions import (
-    create_comparison_images,
-    create_gif_comparison,
-    compare_folders_menu,
-)
 from dataset_forge.menus.compress_menu import compress_menu
 from dataset_forge.menus.compress_dir_menu import compress_dir_menu
 from dataset_forge.menus import session_state
@@ -32,8 +27,13 @@ def require_hq_lq(func):
     return wrapper
 
 
-def compare_images_folders_menu():
-    """Sub-menu for image and folder comparison tools."""
+def utilities_menu():
+    from dataset_forge.actions.comparison_actions import (
+        create_comparison_images,
+        create_gif_comparison,
+        compare_folders_menu,
+    )
+
     options = {
         "1": (
             "Create Comparison Images (Side-by-side)",
@@ -52,54 +52,11 @@ def compare_images_folders_menu():
             ),
         ),
         "3": ("Compare Folder Contents", compare_folders_menu),
-        "0": ("Back", None),
-    }
-
-    while True:
-        action = show_menu(
-            "Compare Images / Folders",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-        )
-        if action is None:
-            break
-        action()
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
-
-
-def compress_tools_menu():
-    """Sub-menu for compression tools."""
-    options = {
-        "1": ("Compress Images", compress_menu),
-        "2": ("Compress Directory", compress_dir_menu),
-        "0": ("Back", None),
-    }
-
-    while True:
-        action = show_menu(
-            "Compress Images / Directory",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-        )
-        if action is None:
-            break
-        action()
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
-
-
-def utilities_menu():
-    """Main utilities menu with hierarchical structure."""
-    options = {
-        "1": ("🧹 Sanitize Images", sanitize_images_menu),
-        "2": ("Compare Images / Folders", compare_images_folders_menu),
-        "3": ("Compress Images / Directory", compress_tools_menu),
+        "4": ("Compress Images", compress_menu),
+        "5": ("Compress Directory", compress_dir_menu),
+        "6": ("Sanitize Images", sanitize_images_menu),
         "0": ("Back to Main Menu", None),
     }
-
     while True:
         action = show_menu(
             "Utilities",

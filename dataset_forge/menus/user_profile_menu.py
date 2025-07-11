@@ -6,7 +6,6 @@ from dataset_forge.utils.printing import (
     print_success,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.actions import user_profile_actions
 import re
 import sys
 import importlib
@@ -74,17 +73,16 @@ def get_menu_options(menu_func):
 
 
 def user_profile_menu():
+    from dataset_forge.actions import user_profile_actions
+    options = user_profile_menu.__menu_options__
     while True:
-        options = {
-            "1": ("Profile Management", profile_management_menu),
-            "2": ("View/Edit Favorites", favorites_menu),
-            "3": ("Manage Presets", presets_menu),
-            "4": ("Quick Access Paths", favorite_paths_menu),
-            "5": ("View/Edit Settings", settings_menu),
-            "0": ("Back to Main Menu", None),
-        }
-        action = show_menu("User Profile", options, header_color=Mocha.green)
-        if action is None or action == "0":
+        action = show_menu(
+            "User Profile Management",
+            options,
+            header_color=Mocha.mauve,
+            char="=",
+        )
+        if action is None:
             break
         action()
 
