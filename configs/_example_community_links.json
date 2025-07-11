@@ -1,0 +1,72 @@
+{
+    "Models": [
+        {
+            "name": "OpenModelDB",
+            "url": "https://openmodeldb.info/"
+        },
+        {
+            "name": "Upscale Wiki Official Research Models (old)",
+            "url": "https://upscale.wiki/wiki/Official_Research_Models"
+        },
+        {
+            "name": "Upscale Wiki Model Database (old)",
+            "url": "https://upscale.wiki/w/index.php?title=Model_Database&oldid=1571"
+        },
+        {
+            "name": "Kim2091's Models",
+            "url": "https://github.com/Kim2091/Kim2091-Models"
+        },
+        {
+            "name": "Phhofm's Models",
+            "url": "https://github.com/Phhofm/models"
+        }
+    ],
+    "Datasets": [
+        {
+            "name": "Phhofm's Datasets List",
+            "url": "https://github.com/Phhofm/sisr/tree/main/datasets/dataset_list"
+        },
+        {
+            "name": "OpenModelDB's Datasets",
+            "url": "https://openmodeldb.info/docs/training/datasets"
+        }
+    ],
+    "Dataset Manipulation": [
+        {
+            "name": "Dietz's Dataset Forge",
+            "url": "https://github.com/Courage-1984/Dataset-Forge"
+        },
+        {
+            "name": "umzi2's Dataset_Preprocessing",
+            "url": "https://github.com/umzi2/Dataset_Preprocessing"
+        },
+        {
+            "name": "WTP Dataset Destroyer",
+            "url": "https://github.com/umzi2/wtp_dataset_destroyer"
+        },
+        {
+            "name": "Kim2091's helpful-scripts",
+            "url": "https://github.com/Kim2091/helpful-scripts"
+        }
+    ],
+    "Software": [
+        {
+            "name": "traiNNer-redux",
+            "url": "https://github.com/the-database/traiNNer-redux"
+        },
+        {
+            "name": "chaiNNer",
+            "url": "https://github.com/chaiNNer-org/chaiNNer"
+        }
+    ],
+    "General Resources": [
+        {
+            "name": "Frequently asked questions",
+            "url": "https://openmodeldb.info/docs/faq"
+        },
+        {
+            "name": "Upscale Resources",
+            "url": "https://github.com/Upscale-Community/upscale-resources"
+        }
+    ]
+}

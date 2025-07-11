@@ -1,0 +1,23 @@
+{
+    "_comment_favorites": "List of favorite menu items (by name or ID).",
+    "favorites": [
+        "DATASET",
+        "ANALYSIS",
+        "TRANSFORM"
+    ],
+    "_comment_presets": "List of user-defined operation presets (name, details/params).",
+    "presets": [
+        {"name": "Quick Resize", "details": "Resize images to 512x512, keep aspect ratio"},
+        {"name": "Fast Augment", "details": "Apply random flip, rotate, color jitter"}
+    ],
+    "_comment_favorite_paths": "List of frequently used paths for quick access.",
+    "favorite_paths": [
+        "./datasets/hq",
+        "./datasets/lq"
+    ],
+    "_comment_settings": "User-specific settings (theme, default quality, etc.)",
+    "settings": {
+        "theme": "mocha",
+        "default_quality": 85
+    }
+} 

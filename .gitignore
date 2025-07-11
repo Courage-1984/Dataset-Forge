@@ -1,51 +1,51 @@
+# Python virtual environments
 ./venv
 venv
-
 ./venv312
 venv312
 
-./configs
-configs
-!configs/_example_config.json
-!configs/_example_community_links.json
-!configs/_example_user_profile.json
-
+# Python cache files
 ./__pycache__
 __pycache__
 ./dataset_forge/__pycache__
 dataset_forge/__pycache__
 
+# Project-specific directories
 ./dpid
 dpid
 ./Dataset_Preprocessing
 Dataset_Preprocessing
-
-./run_best_tile_ic9600.py
-run_best_tile_ic9600.py
-
 ./store
 store
-
 ./dpid_implementation_examples
 dpid_implementation_examples
 
-./configs/test_config.json
+# Specific files to ignore
+./run_best_tile_ic9600.py
+run_best_tile_ic9600.py
+
+# Config files (ignore all except examples)
+configs/*
+!configs/_example_config.json
+!configs/_example_community_links.json
+!configs/_example_user_profile.json
+
+# User-specific config files
 configs/test_config.json
-./configs/user_profile_active.txt
 configs/user_profile_active.txt
-./configs/user_profile_test.json
 configs/user_profile_test.json
-./configs/user_profile.json
 configs/user_profile.json
 
+# Path history
 ./.path_history
 .path_history
 
+# Logs and results
 ./logs
 logs
-
 ./results
 results
 
 # Cursor rules file (untracked)
 .cursorrules
+
