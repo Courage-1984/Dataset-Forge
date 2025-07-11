@@ -37,13 +37,15 @@ class ImageDataset(Dataset):
         return len(self.image_files)
 
     def __getitem__(self, idx):
+        from dataset_forge.utils.memory_utils import to_device_safe
+
         img_path = os.path.join(self.image_dir, self.image_files[idx])
         image = read(img_path, format=ImgFormat.F32)
         image = torch.tensor(image, dtype=torch.float32, device=self.device).permute(
             2, 0, 1
         )
         if self.transform:
-            image = self.transform(image).to(self.device)
+            image = to_device_safe(self.transform(image), self.device)
         return image, self.image_files[idx]
 
 
@@ -564,7 +566,9 @@ class IC9600Thread(IQANode):
         super().__init__(img_dir, batch_size, thread, median_thread, move_folder, None)
         self.model = ic9600()
         if self.model is not None:
-            self.model = self.model.to(self.device)
+            from dataset_forge.utils.memory_utils import to_device_safe
+
+            self.model = to_device_safe(self.model, self.device)
         else:
             self.model = None
 

@@ -5,16 +5,16 @@ from PIL import Image, ImageFont, ImageDraw
 import random
 import numpy as np
 from dataset_forge.utils.progress_utils import tqdm
-import gc
 import torch
 from dataset_forge.actions import folder_compare_actions
 
+# Import centralized memory management
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache, auto_cleanup
+
 
 def release_memory():
-    gc.collect()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-        torch.cuda.ipc_collect()
+    """Legacy function for backward compatibility."""
+    clear_memory()
 
 
 def create_comparison_images(hq_folder, lq_folder):

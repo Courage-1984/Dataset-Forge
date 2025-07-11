@@ -36,11 +36,18 @@ class LayerNorm(torch.nn.Module):
 
 
 # --- Extract Frames Utility ---
+# Import centralized memory management
+from dataset_forge.utils.memory_utils import (
+    clear_memory,
+    clear_cuda_cache,
+    auto_cleanup,
+    to_device_safe,
+)
+
+
 def release_memory():
-    gc.collect()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-        torch.cuda.ipc_collect()
+    """Legacy function for backward compatibility."""
+    clear_memory()
 
 
 def extract_frames_menu():
@@ -279,7 +286,7 @@ class ImgToEmbedding:
         self.amp = amp
         model_obj, preprocess = enum_to_model(model)
         if isinstance(model_obj, nn.Module):
-            self.model = model_obj.to(self.device)
+            self.model = to_device_safe(model_obj, self.device)
         else:
             self.model = model_obj
         self.preprocess = preprocess
@@ -300,23 +307,20 @@ class ImgToEmbedding:
     def img_to_tensor(self, x):
         if self.preprocess is not None:
             # Use model's preprocess pipeline
-            tensor = (
-                self.preprocess(T.ToPILImage()(x.astype("uint8")))
-                .unsqueeze(0)
-                .to(self.device)
-            )
-            return tensor
+            tensor = self.preprocess(T.ToPILImage()(x.astype("uint8"))).unsqueeze(0)
+            return to_device_safe(tensor, self.device)
         if self.vit:
-            return self.check_img_size(
-                torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
-                    None, :, :, :
-                ].to(self.device)
+            tensor = self.check_img_size(
+                torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[None, :, :, :]
             )
-        return torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
+            return to_device_safe(tensor, self.device)
+        tensor = torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
             None, :, :, :
-        ].to(self.device)
+        ]
+        return to_device_safe(tensor, self.device)
 
     @torch.inference_mode()
+    @auto_cleanup
     def __call__(self, x):
         # Optionally add resizing logic here if needed
         with torch.amp.autocast(self.device.__str__(), torch.float16, self.amp):

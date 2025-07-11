@@ -23,7 +23,6 @@ from enum import Enum
 import numpy as np
 import torch
 
-from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.printing import print_info, print_warning
 
 
@@ -134,10 +133,16 @@ class ParallelProcessor:
             return
 
         if torch.cuda.is_available():
+            # Import centralized memory management
+            from dataset_forge.utils.memory_utils import get_memory_manager
+
             # Set GPU memory fraction to prevent OOM
             torch.cuda.set_per_process_memory_fraction(self.config.gpu_memory_fraction)
             # Set device for current process
             torch.cuda.set_device(0)
+
+            # Clear cache after setup
+            get_memory_manager().clear_cuda_cache()
 
     def process_map(
         self,
@@ -175,6 +180,8 @@ class ParallelProcessor:
 
         # Process items
         with self._create_executor(processing_type) as executor:
+            from dataset_forge.utils.progress_utils import tqdm
+
             if processing_type == ProcessingType.THREAD:
                 results = list(
                     tqdm(executor.map(partial_func, items), total=len(items), desc=desc)
@@ -235,6 +242,8 @@ class ParallelProcessor:
             }
 
             # Collect results with progress bar
+            from dataset_forge.utils.progress_utils import tqdm
+
             with tqdm(total=len(items), desc=desc) as pbar:
                 for future in as_completed(future_to_item, timeout=self.config.timeout):
                     try:
@@ -291,6 +300,8 @@ class ParallelProcessor:
         batches = [items[i : i + batch_size] for i in range(0, len(items), batch_size)]
 
         with self._create_executor(processing_type) as executor:
+            from dataset_forge.utils.progress_utils import tqdm
+
             with tqdm(total=len(items), desc=desc) as pbar:
                 for batch in batches:
                     try:

@@ -17,12 +17,17 @@ from torchvision.models import resnet18, ResNet18_Weights
 from enum import Enum
 from abc import ABC, abstractmethod
 import time
-import gc
 from typing import Tuple, Any
 
-# Set CUDA timeout and memory management
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"  # For better error reporting
-os.environ["CUDA_LAUNCH_TIMEOUT"] = "300"  # 5 minutes timeout (default is 2 seconds)
+# Import centralized memory management
+from dataset_forge.utils.memory_utils import (
+    clear_memory,
+    clear_cuda_cache,
+    safe_cuda_operation,
+    memory_context,
+    auto_cleanup,
+    to_device_safe,
+)
 
 
 # src/enum.py
@@ -263,38 +268,16 @@ class IC9600Complexity(BaseComplexity):
 
     def _clear_cuda_cache(self):
         """Clear CUDA cache to prevent memory issues"""
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            gc.collect()
+        clear_cuda_cache()
 
     def _safe_cuda_operation(self, operation, *args, **kwargs):
         """Execute CUDA operation with retry logic"""
-        for attempt in range(self.max_retries):
-            try:
-                self._clear_cuda_cache()
-                result = operation(*args, **kwargs)
-                return result
-            except torch.cuda.CudaError as e:
-                if "timeout" in str(e).lower() or "launch timed out" in str(e):
-                    print(
-                        f"CUDA timeout on attempt {attempt + 1}/{self.max_retries}, retrying..."
-                    )
-                    if attempt < self.max_retries - 1:
-                        time.sleep(
-                            self.retry_delay * (attempt + 1)
-                        )  # Exponential backoff
-                        self._clear_cuda_cache()
-                        continue
-                    else:
-                        print(f"Failed after {self.max_retries} attempts, skipping...")
-                        raise
-                else:
-                    raise
-            except Exception as e:
-                print(f"Unexpected error: {e}")
-                raise
+        return safe_cuda_operation(
+            operation, self.max_retries, self.retry_delay, *args, **kwargs
+        )
 
     @torch.inference_mode()
+    @auto_cleanup
     def get_tile_comp_score(
         self, image, complexity, y, x, tile_size
     ) -> Tuple[Any, Any, float]:
@@ -331,9 +314,10 @@ class IC9600Complexity(BaseComplexity):
             raise
 
     @torch.inference_mode()
+    @auto_cleanup
     def __call__(self, img):
         try:
-            img_tensor = self.image_to_tensor(img).to(self.device)
+            img_tensor = to_device_safe(self.image_to_tensor(img), self.device)
 
             def forward_operation():
                 return self.arch(img_tensor)

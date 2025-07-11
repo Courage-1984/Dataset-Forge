@@ -1,3 +1,7 @@
+# CRITICAL: ALWAYS activate virtual environment before testing
+# ALWAYS run: venv312\Scripts\activate before testing your new additions
+# This ensures all dependencies are available and the correct Python environment is used
+
 # Ignore Python virtual environments
 venv/
 .venv/
@@ -32,9 +36,9 @@ store/
 dpid/
 run_best_tile_ic9600.py
 
-# Ignore configs except example
-configs/
-!configs/_example_config.json
+# # Ignore configs except example
+# configs/
+# !configs/_example_config.json
 
 # Ignore build and distribution folders
 build/
@@ -46,4 +50,4 @@ dist/
 
 # Ignore any other user-specific or generated files
 .idea/
-.vscode/ 
+.vscode/

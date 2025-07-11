@@ -71,7 +71,9 @@ def load_images_from_folder(
 def get_lpips_model(device: str = "cuda" if torch.cuda.is_available() else "cpu"):
     if lpips is None:
         raise ImportError("lpips is not installed. Please install it via pip.")
-    return lpips.LPIPS(net="vgg").to(device)
+    from dataset_forge.utils.memory_utils import to_device_safe
+
+    return to_device_safe(lpips.LPIPS(net="vgg"), device)
 
 
 def compute_lpips_matrix(
@@ -83,12 +85,15 @@ def compute_lpips_matrix(
     n = len(images)
     matrix = np.zeros((n, n), dtype=np.float32)
 
+    # Import centralized memory management
+    from dataset_forge.utils.memory_utils import to_device_safe
+
     # Prepare image tensors
     imgs_tensor = [
         torch.from_numpy(np.array(img[1]).transpose(2, 0, 1)).float() / 127.5 - 1
         for img in images
     ]
-    imgs_tensor = [img.unsqueeze(0).to(device) for img in imgs_tensor]
+    imgs_tensor = [to_device_safe(img.unsqueeze(0), device) for img in imgs_tensor]
 
     # Compute similarities in parallel batches
     def compute_similarity_batch(
@@ -133,10 +138,12 @@ def get_clip_model(device: str = "cuda" if torch.cuda.is_available() else "cpu")
         raise ImportError(
             "open-clip-torch is not installed. Please install it via pip."
         )
+    from dataset_forge.utils.memory_utils import to_device_safe
+
     model, _, preprocess = open_clip.create_model_and_transforms(
         "ViT-B-32", pretrained="laion2b_s34b_b79k"
     )
-    model = model.to(device)
+    model = to_device_safe(model, device)
     return model, preprocess
 
 
@@ -150,9 +157,12 @@ def compute_clip_embeddings(
 
     def compute_single_embedding(img_tuple: Tuple[str, Image.Image]) -> np.ndarray:
         try:
+            from dataset_forge.utils.memory_utils import to_device_safe
+
             _, img = img_tuple
             with torch.no_grad():
-                emb = model.encode_image(preprocess(img).unsqueeze(0).to(device))
+                img_tensor = to_device_safe(preprocess(img).unsqueeze(0), device)
+                emb = model.encode_image(img_tensor)
                 return emb.cpu().numpy().flatten()
         except Exception as e:
             print_warning(f"Error computing embedding: {e}")

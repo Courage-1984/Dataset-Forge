@@ -110,9 +110,10 @@ def load_model(model_path):
         raise ValueError(f"Model file not found: {model_path}")
 
     try:
+        from dataset_forge.utils.memory_utils import to_device_safe
         model = spandrel.ModelLoader().load_from_file(model_path)
         if isinstance(model, spandrel.ImageModelDescriptor):
-            return model.cuda().eval()
+            return to_device_safe(model, "cuda").eval()
         else:
             raise ValueError(f"Invalid model type for {model_path}")
     except Exception as e:
@@ -127,6 +128,9 @@ def upscale_image(image, model, tile_size, alpha_handling, gamma_correction):
     else:
         rgb_image = image
 
+    # Import centralized memory management
+    from dataset_forge.utils.memory_utils import to_device_safe
+
     # Upscale RGB
     rgb_tensor = (
         torch.from_numpy(np.array(rgb_image))
@@ -134,8 +138,8 @@ def upscale_image(image, model, tile_size, alpha_handling, gamma_correction):
         .float()
         .div_(255.0)
         .unsqueeze(0)
-        .cuda()
     )
+    rgb_tensor = to_device_safe(rgb_tensor, "cuda")
     upscaled_rgb_tensor = upscale_tensor(rgb_tensor, model, tile_size)
     upscaled_rgb = Image.fromarray(
         (upscaled_rgb_tensor[0].permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
@@ -152,8 +156,8 @@ def upscale_image(image, model, tile_size, alpha_handling, gamma_correction):
                 .float()
                 .div_(255.0)
                 .unsqueeze(0)
-                .cuda()
             )
+            alpha_tensor = to_device_safe(alpha_tensor, "cuda")
 
             # Upscale the 3-channel alpha tensor
             upscaled_alpha_tensor = upscale_tensor(alpha_tensor, model, tile_size)
@@ -294,8 +298,10 @@ def main():
         print(f"Error: {str(e)}")
         traceback.print_exc()
     finally:
-        torch.cuda.empty_cache()
-        gc.collect()
+        # Import and use centralized memory management
+        from dataset_forge.utils.memory_utils import clear_memory
+
+        clear_memory()
         print("Cleanup completed.")
 
 
