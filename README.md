@@ -81,7 +81,7 @@
 - **Dataset Creation**: Multiscale dataset generation (DPID), video frame extraction, image tiling
 - **Dataset Operations**: Combine, split, extract random pairs, shuffle datasets
 - **HQ/LQ Pair Management**: Manual pairing, fuzzy matching, scale correction
-- **Clean & Organize**: Visual deduplication, hash-based deduplication, batch renaming
+- **Clean & Organize**: Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, batch renaming
 - **Orientation Organization**: Sort by landscape/portrait/square
 - **Size Filtering**: Remove small/invalid image pairs
 
@@ -210,6 +210,7 @@ Dataset-Forge/
     │   ├── frames_actions.py        # Video frame extraction
     │   ├── augmentation_actions.py  # Data augmentation
     │   ├── visual_dedup_actions.py  # Visual deduplication
+    │   ├── imagededup_actions.py    # ImageDedup integration
     │   ├── quality_scoring_actions.py # Quality scoring
     │   ├── outlier_detection_actions.py # Outlier detection
     │   ├── alpha_actions.py         # Alpha channel tools
@@ -238,6 +239,7 @@ Dataset-Forge/
     │   ├── system_settings_menu.py  # System settings
     │   ├── user_profile_menu.py     # User profile
     │   ├── visual_dedup_menu.py     # Visual deduplication
+    │   ├── imagededup_menu.py       # ImageDedup menu
     │   ├── correct_hq_lq_pairing_menu.py # HQ/LQ pairing
     │   ├── compress_menu.py         # Compression
     │   ├── compress_dir_menu.py     # Directory compression
@@ -302,6 +304,7 @@ The application features an intuitive hierarchical menu system:
 - **Clean & Organize**
   - Visual De-duplication (CLIP/LPIPS)
   - De-Duplicate (File Hash)
+  - ImageDedup - Advanced Duplicate Detection
   - Batch Rename
   - Remove Image Pairs by Size
   - Organize by Orientation
@@ -459,6 +462,7 @@ matplotlib
 seaborn
 jinja2
 webbrowser
+imagededup
 
 # Custom packages
 pipeline
@@ -568,6 +572,17 @@ Deep learning-based duplicate detection:
 - **CLIP Embeddings**: Fast semantic similarity
 - **LPIPS**: Perceptual similarity
 - **Configurable Thresholds**: Adjustable sensitivity
+
+### ImageDedup Integration
+
+Advanced duplicate detection using the imagededup library:
+
+- **Multiple Hash Methods**: PHash, DHash, AHash, WHash
+- **Configurable Thresholds**: Adjustable distance thresholds
+- **HQ/LQ Pair Support**: Handle paired datasets
+- **Visual Reports**: Generate duplicate analysis reports
+- **Flexible Operations**: Find, remove, or move duplicates
+- **Dry Run Mode**: Preview changes before applying
 
 ---
 

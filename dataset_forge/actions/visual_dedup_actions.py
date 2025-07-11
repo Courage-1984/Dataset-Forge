@@ -1,9 +1,17 @@
 import os
+import shutil
 from typing import List, Optional, Tuple, Dict
 from PIL import Image
 import torch
 import numpy as np
 from tqdm import tqdm
+
+from dataset_forge.utils.printing import (
+    print_info,
+    print_error,
+    print_success,
+    print_warning,
+)
 
 try:
     import lpips
@@ -173,3 +181,204 @@ def visual_dedup_workflow(
                 groups = find_near_duplicates_clip(images, threshold, device)
             results[path] = groups
     return results
+
+
+def move_duplicate_groups(
+    groups: List[List[str]], 
+    destination_dir: str, 
+    dry_run: bool = True
+) -> List[str]:
+    """
+    Move duplicate files from groups to destination directory.
+    
+    Args:
+        groups: List of duplicate groups (each group is a list of file paths)
+        destination_dir: Directory to move duplicates to
+        dry_run: If True, only show what would be moved
+        
+    Returns:
+        List of moved file paths
+    """
+    if not groups:
+        print_info("No duplicate groups to process.")
+        return []
+    
+    # Flatten all duplicate files (keep first file in each group as original)
+    files_to_move = []
+    for group in groups:
+        # Skip the first file (original), move the rest (duplicates)
+        duplicates = group[1:]
+        files_to_move.extend(duplicates)
+    
+    if not files_to_move:
+        print_info("No duplicate files to move.")
+        return []
+    
+    print_info(f"Found {len(files_to_move)} duplicate files to move.")
+    
+    if dry_run:
+        print_warning("DRY RUN - No files will be moved. Set dry_run=False to actually move files.")
+        for file_path in files_to_move:
+            print_info(f"Would move: {file_path} -> {destination_dir}")
+        return files_to_move
+    
+    # Create destination directory if it doesn't exist
+    os.makedirs(destination_dir, exist_ok=True)
+    
+    moved_files = []
+    for file_path in tqdm(files_to_move, desc="Moving duplicates"):
+        try:
+            # Check if file exists before trying to move it
+            if not os.path.exists(file_path):
+                print_warning(f"File not found (may have been moved already): {file_path}")
+                continue
+                
+            filename = os.path.basename(file_path)
+            dest_path = os.path.join(destination_dir, filename)
+            
+            # Handle filename conflicts
+            counter = 1
+            while os.path.exists(dest_path):
+                name, ext = os.path.splitext(filename)
+                dest_path = os.path.join(destination_dir, f"{name}_{counter}{ext}")
+                counter += 1
+            
+            shutil.move(file_path, dest_path)
+            moved_files.append(file_path)
+        except Exception as e:
+            print_error(f"Error moving {file_path}: {e}")
+    
+    print_success(f"Moved {len(moved_files)} duplicate files to {destination_dir}.")
+    if len(moved_files) < len(files_to_move):
+        print_info(f"Note: {len(files_to_move) - len(moved_files)} files were not moved (may have been moved already or don't exist)")
+    
+    return moved_files
+
+
+def copy_duplicate_groups(
+    groups: List[List[str]], 
+    destination_dir: str, 
+    dry_run: bool = True
+) -> List[str]:
+    """
+    Copy duplicate files from groups to destination directory.
+    
+    Args:
+        groups: List of duplicate groups (each group is a list of file paths)
+        destination_dir: Directory to copy duplicates to
+        dry_run: If True, only show what would be copied
+        
+    Returns:
+        List of copied file paths
+    """
+    if not groups:
+        print_info("No duplicate groups to process.")
+        return []
+    
+    # Flatten all duplicate files (keep first file in each group as original)
+    files_to_copy = []
+    for group in groups:
+        # Skip the first file (original), copy the rest (duplicates)
+        duplicates = group[1:]
+        files_to_copy.extend(duplicates)
+    
+    if not files_to_copy:
+        print_info("No duplicate files to copy.")
+        return []
+    
+    print_info(f"Found {len(files_to_copy)} duplicate files to copy.")
+    
+    if dry_run:
+        print_warning("DRY RUN - No files will be copied. Set dry_run=False to actually copy files.")
+        for file_path in files_to_copy:
+            print_info(f"Would copy: {file_path} -> {destination_dir}")
+        return files_to_copy
+    
+    # Create destination directory if it doesn't exist
+    os.makedirs(destination_dir, exist_ok=True)
+    
+    copied_files = []
+    for file_path in tqdm(files_to_copy, desc="Copying duplicates"):
+        try:
+            # Check if file exists before trying to copy it
+            if not os.path.exists(file_path):
+                print_warning(f"File not found: {file_path}")
+                continue
+                
+            filename = os.path.basename(file_path)
+            dest_path = os.path.join(destination_dir, filename)
+            
+            # Handle filename conflicts
+            counter = 1
+            while os.path.exists(dest_path):
+                name, ext = os.path.splitext(filename)
+                dest_path = os.path.join(destination_dir, f"{name}_{counter}{ext}")
+                counter += 1
+            
+            shutil.copy2(file_path, dest_path)
+            copied_files.append(file_path)
+        except Exception as e:
+            print_error(f"Error copying {file_path}: {e}")
+    
+    print_success(f"Copied {len(copied_files)} duplicate files to {destination_dir}.")
+    if len(copied_files) < len(files_to_copy):
+        print_info(f"Note: {len(files_to_copy) - len(copied_files)} files were not copied (may not exist)")
+    
+    return copied_files
+
+
+def remove_duplicate_groups(
+    groups: List[List[str]], 
+    dry_run: bool = True
+) -> List[str]:
+    """
+    Remove duplicate files from groups.
+    
+    Args:
+        groups: List of duplicate groups (each group is a list of file paths)
+        dry_run: If True, only show what would be removed
+        
+    Returns:
+        List of removed file paths
+    """
+    if not groups:
+        print_info("No duplicate groups to process.")
+        return []
+    
+    # Flatten all duplicate files (keep first file in each group as original)
+    files_to_remove = []
+    for group in groups:
+        # Skip the first file (original), remove the rest (duplicates)
+        duplicates = group[1:]
+        files_to_remove.extend(duplicates)
+    
+    if not files_to_remove:
+        print_info("No duplicate files to remove.")
+        return []
+    
+    print_info(f"Found {len(files_to_remove)} duplicate files to remove.")
+    
+    if dry_run:
+        print_warning("DRY RUN - No files will be removed. Set dry_run=False to actually remove files.")
+        for file_path in files_to_remove:
+            print_info(f"Would remove: {file_path}")
+        return files_to_remove
+    
+    removed_files = []
+    for file_path in tqdm(files_to_remove, desc="Removing duplicates"):
+        try:
+            # Check if file exists before trying to remove it
+            if not os.path.exists(file_path):
+                print_warning(f"File not found (may have been removed already): {file_path}")
+                continue
+                
+            os.remove(file_path)
+            removed_files.append(file_path)
+        except Exception as e:
+            print_error(f"Error removing {file_path}: {e}")
+    
+    print_success(f"Removed {len(removed_files)} duplicate files.")
+    if len(removed_files) < len(files_to_remove):
+        print_info(f"Note: {len(files_to_remove) - len(removed_files)} files were not removed (may have been removed already or don't exist)")
+    
+    return removed_files

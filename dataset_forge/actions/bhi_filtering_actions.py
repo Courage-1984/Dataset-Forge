@@ -17,7 +17,20 @@ class ImageDataset(Dataset):
     def __init__(self, image_dir, device, transform=None):
         self.image_dir = image_dir
         self.transform = transform
-        self.image_files = os.listdir(image_dir)
+        # Only include files, not directories, and skip _bhi_filtered folder
+        all_items = os.listdir(image_dir)
+        self.image_files = []
+        for item in all_items:
+            item_path = os.path.join(image_dir, item)
+            if os.path.isfile(item_path) and not item.startswith("_bhi_filtered"):
+                # Pre-validate that the file can be read
+                try:
+                    test_image = read(item_path, format=ImgFormat.F32)
+                    if test_image is not None and len(test_image.shape) == 3:
+                        self.image_files.append(item)
+                except Exception as e:
+                    print(f"Skipping {item} during initialization: {e}")
+                    continue
         self.device = device
 
     def __len__(self):
@@ -524,14 +537,19 @@ class ICNet(nn.Module):
 
 
 def ic9600():
-    state = torch.hub.load_state_dict_from_url(
-        url="https://github.com/umzi2/Dataset_Preprocessing/releases/download/IC9600_duplicate/ic9600.pth",
-        map_location="cpu",
-        weights_only=True,
-    )
-    model = ICNet().eval()
-    model.load_state_dict(state)
-    return model
+    try:
+        state = torch.hub.load_state_dict_from_url(
+            url="https://github.com/umzi2/Dataset_Preprocessing/releases/download/IC9600_duplicate/ic9600.pth",
+            map_location="cpu",
+            weights_only=True,
+        )
+        model = ICNet().eval()
+        model.load_state_dict(state)
+        return model
+    except Exception as e:
+        print(f"Warning: Failed to load IC9600 model: {e}")
+        print("IC9600 scoring will be skipped.")
+        return None
 
 
 class IC9600Thread(IQANode):
@@ -544,9 +562,16 @@ class IC9600Thread(IQANode):
         move_folder: str | None = None,
     ):
         super().__init__(img_dir, batch_size, thread, median_thread, move_folder, None)
-        self.model = ic9600().to(self.device)
+        self.model = ic9600()
+        if self.model is not None:
+            self.model = self.model.to(self.device)
+        else:
+            self.model = None
 
     def forward(self, images):
+        if self.model is None:
+            # Return placeholder scores if model failed to load
+            return torch.ones(images.shape[0], device=self.device) * 0.5
         return self.model.get_onlu_score(images)
 
 
@@ -596,16 +621,27 @@ def run_bhi_filtering(
         files = paired_filenames(input_path, lq_folder)
         hq_folder = input_path
     else:
-        files = sorted(os.listdir(input_path))
+        # Only include files, not directories, and skip _bhi_filtered folder
+        all_items = os.listdir(input_path)
+        files = []
+        for item in all_items:
+            item_path = os.path.join(input_path, item)
+            if os.path.isfile(item_path) and not item.startswith("_bhi_filtered"):
+                files.append(item)
+        files = sorted(files)
         hq_folder = input_path
 
     # Prepare move folders if needed
     if action == "move":
         if not move_folder:
-            move_folder = os.path.join(hq_folder, "_bhi_filtered")
+            # Create a unique folder name to avoid conflicts
+            import time
+
+            timestamp = int(time.time())
+            move_folder = os.path.join(hq_folder, f"_bhi_filtered_{timestamp}")
         os.makedirs(move_folder, exist_ok=True)
         if paired:
-            lq_move_folder = os.path.join(lq_folder, "_bhi_filtered")
+            lq_move_folder = os.path.join(lq_folder, f"_bhi_filtered_{timestamp}")
             os.makedirs(lq_move_folder, exist_ok=True)
         else:
             lq_move_folder = None
@@ -626,12 +662,26 @@ def run_bhi_filtering(
 
     # Collect scores for all files
     results = {}
-    for metric, thread in zip(
-        ["blockiness", "hyperiqa", "ic9600"],
-        [blockiness_thread, hyper_thread, ic9600_thread],
-    ):
+    metrics_and_threads = [
+        ("blockiness", blockiness_thread),
+        ("hyperiqa", hyper_thread),
+        ("ic9600", ic9600_thread),
+    ]
+
+    for metric, thread in metrics_and_threads:
         if verbose:
             print(f"Scoring with {metric}...")
+
+        # Skip IC9600 if model failed to load
+        if metric == "ic9600" and hasattr(thread, "model") and thread.model is None:
+            if verbose:
+                print("Skipping IC9600 scoring (model failed to load)")
+            for fname in files:
+                if fname not in results:
+                    results[fname] = {}
+                results[fname][metric] = None
+            continue
+
         scores = {}
         for images, filenames in tqdm(
             thread.data_loader, disable=not verbose, desc=metric
@@ -649,11 +699,16 @@ def run_bhi_filtering(
     for fname in files:
         s = results[fname]
         # If any metric is below threshold, filter
-        if (
-            (s["blockiness"] is not None and s["blockiness"] < thresholds["blockiness"])
-            or (s["hyperiqa"] is not None and s["hyperiqa"] < thresholds["hyperiqa"])
-            or (s["ic9600"] is not None and s["ic9600"] < thresholds["ic9600"])
-        ):
+        # Only consider metrics that have valid scores (not None)
+        should_filter = False
+        if s["blockiness"] is not None and s["blockiness"] < thresholds["blockiness"]:
+            should_filter = True
+        if s["hyperiqa"] is not None and s["hyperiqa"] < thresholds["hyperiqa"]:
+            should_filter = True
+        if s["ic9600"] is not None and s["ic9600"] < thresholds["ic9600"]:
+            should_filter = True
+
+        if should_filter:
             to_filter.append(fname)
 
     # Perform action
@@ -667,18 +722,29 @@ def run_bhi_filtering(
         src_hq = os.path.join(hq_folder, fname)
         if paired:
             src_lq = os.path.join(lq_folder, fname)
-        if action == "move":
-            dst_hq = os.path.join(move_folder, fname)
-            shutil.move(src_hq, dst_hq)
-            if paired:
-                dst_lq = os.path.join(lq_move_folder, fname)
-                shutil.move(src_lq, dst_lq)
+        try:
+            if action == "move":
+                dst_hq = os.path.join(move_folder, fname)
+                shutil.move(src_hq, dst_hq)
+                if paired:
+                    dst_lq = os.path.join(lq_move_folder, fname)
+                    shutil.move(src_lq, dst_lq)
+                if verbose:
+                    print(f"Moved {fname}")
+            elif action == "delete":
+                os.remove(src_hq)
+                if paired:
+                    os.remove(src_lq)
+                if verbose:
+                    print(f"Deleted {fname}")
+        except Exception as e:
             if verbose:
-                print(f"Moved {fname}")
-        elif action == "delete":
-            os.remove(src_hq)
-            if paired:
-                os.remove(src_lq)
-            if verbose:
-                print(f"Deleted {fname}")
+                print(f"Error processing {fname}: {e}")
+            continue
+
+    if verbose:
+        print(
+            f"\nBHI filtering completed. Processed {len(files)} files, filtered {len(to_filter)} files."
+        )
+
     return results

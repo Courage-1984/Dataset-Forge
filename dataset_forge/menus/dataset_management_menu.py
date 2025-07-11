@@ -14,6 +14,7 @@ from dataset_forge.menus import session_state
 from dataset_forge.utils.input_utils import get_folder_path, get_path_with_history
 from dataset_forge.actions.batch_rename_actions import batch_rename_menu
 from dataset_forge.menus.visual_dedup_menu import visual_dedup_menu
+from dataset_forge.menus.imagededup_menu import imagededup_menu
 from dataset_forge.menus.correct_hq_lq_pairing_menu import (
     correct_hq_lq_pairing_menu,
     fuzzy_hq_lq_pairing_menu,
@@ -216,9 +217,10 @@ def clean_organize_menu():
             visual_dedup_menu,
         ),
         "2": ("De-Duplicate (File Hash)", dedupe_menu),
-        "3": ("Batch Rename", batch_rename_menu),
-        "4": ("Remove Image Pairs by Size", remove_small_pairs),
-        "5": (
+        "3": ("ImageDedup - Advanced Duplicate Detection", imagededup_menu),
+        "4": ("Batch Rename", batch_rename_menu),
+        "5": ("Remove Image Pairs by Size", remove_small_pairs),
+        "6": (
             "Organize by Orientation (Landscape/Portrait/Square)",
             organize_by_orientation,
         ),

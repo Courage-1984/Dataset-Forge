@@ -12,7 +12,6 @@ tqdm
 ffmpeg
 imagehash
 PyExifTool
-pipeline
 pepeline
 pepedpid
 pyiqa
@@ -22,5 +21,6 @@ seaborn
 jinja2
 lpips
 open-clip-torch
+imagededup
 # getnative
-# ^ first install VapourSynth
+# ^ first install VapourSynth0
