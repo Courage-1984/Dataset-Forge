@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import os
 import shutil
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.io_utils import is_image_file
 from dataset_forge.utils.input_utils import get_destination_path
 from dataset_forge.utils.file_utils import get_unique_filename

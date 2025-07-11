@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple, Dict
 from PIL import Image
 import torch
 import numpy as np
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 
 from dataset_forge.utils.printing import (
     print_info,

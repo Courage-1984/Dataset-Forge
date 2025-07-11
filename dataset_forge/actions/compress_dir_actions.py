@@ -1,7 +1,7 @@
 # compress_dir_actions.py - Business logic for directory/folder compression
 import os
 import shutil
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 
 
 def compress_directory(

@@ -3,7 +3,7 @@ import torch
 import gc
 import cv2
 import numpy as np
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from enum import Enum
 import torch.nn.functional as F
 import timm

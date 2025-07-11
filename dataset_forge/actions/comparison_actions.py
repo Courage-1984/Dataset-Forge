@@ -4,7 +4,7 @@ from dataset_forge.utils.input_utils import get_destination_path
 from PIL import Image, ImageFont, ImageDraw
 import random
 import numpy as np
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 import gc
 import torch
 from dataset_forge.actions import folder_compare_actions

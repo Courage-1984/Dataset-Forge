@@ -5,7 +5,7 @@ from dataset_forge.utils.input_utils import (
     get_destination_path,
 )
 from dataset_forge.utils.file_utils import get_unique_filename
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.image_ops import CorruptionFixer
 from dataset_forge.utils.history_log import log_operation
 

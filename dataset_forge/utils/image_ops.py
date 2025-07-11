@@ -3,7 +3,7 @@ import os
 from PIL import Image
 import shutil
 import cv2
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.input_utils import (
     get_file_operation_choice,

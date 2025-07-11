@@ -2,7 +2,7 @@ import os
 import shutil
 from PIL import Image
 from typing import List, Tuple, Dict, Optional
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.history_log import log_operation
 
 

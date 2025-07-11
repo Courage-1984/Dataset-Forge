@@ -1,5 +1,5 @@
 import os
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from PIL import Image
 import imagehash
 

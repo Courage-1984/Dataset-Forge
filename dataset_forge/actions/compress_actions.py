@@ -2,7 +2,7 @@
 import os
 import subprocess
 from PIL import Image
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.file_utils import (
     is_image_file,
     perform_file_operation,

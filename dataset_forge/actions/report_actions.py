@@ -5,7 +5,7 @@ Supports both HQ/LQ parent_path and single-folder workflows.
 """
 import os
 import shutil
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np

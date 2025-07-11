@@ -1,7 +1,7 @@
 import os
 import shutil
 from typing import Optional, Dict, List
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 
 # ===================== Inlined IQA Threads and Dependencies (from src.scripts.iqa and dependencies) =====================
 import torch

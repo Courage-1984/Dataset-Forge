@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import os
 from collections import Counter, defaultdict
 from PIL import Image
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.io_utils import is_image_file
 
 

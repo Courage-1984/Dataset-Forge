@@ -1,5 +1,5 @@
 import os
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from typing import Optional
 
 # You may need to adjust these imports based on your project structure

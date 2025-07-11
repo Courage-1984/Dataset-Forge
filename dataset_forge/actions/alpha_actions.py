@@ -2,7 +2,7 @@ import os
 from dataset_forge.utils.io_utils import is_image_file
 from PIL import Image
 import shutil
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.input_utils import (
     get_file_operation_choice,
     get_destination_path,

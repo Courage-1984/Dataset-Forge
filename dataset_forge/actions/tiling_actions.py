@@ -8,7 +8,7 @@ from dataset_forge.utils.input_utils import (
 import numpy as np
 import imageio
 from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm, process_map, thread_map
 import random
 import torch
 import torch.nn as nn
@@ -16,7 +16,6 @@ import torch.nn.functional as F
 from torchvision.models import resnet18, ResNet18_Weights
 from enum import Enum
 from abc import ABC, abstractmethod
-from tqdm.contrib.concurrent import process_map, thread_map
 import time
 import gc
 from typing import Tuple, Any

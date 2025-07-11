@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 from PIL import Image, ImageEnhance
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.file_utils import is_image_file
 

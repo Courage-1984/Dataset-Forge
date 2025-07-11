@@ -1,7 +1,7 @@
 import os
 from PIL import Image, ImageEnhance, ImageOps
 import numpy as np
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 import random
 from typing import Callable, List, Dict, Any, Optional, Tuple
 from dataset_forge.utils.history_log import log_operation

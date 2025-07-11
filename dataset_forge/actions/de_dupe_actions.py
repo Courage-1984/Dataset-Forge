@@ -2,7 +2,7 @@ import os
 from PIL import Image
 from collections import defaultdict
 import imagehash
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.history_log import log_operation
 
 

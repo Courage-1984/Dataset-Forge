@@ -22,7 +22,7 @@ from dataset_forge.actions.operations_actions import (
     split_single_folder_in_sets as _split_single_folder_in_sets,
 )
 import os
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.actions.ic9600_tiling_actions import run_ic9600_tiling
 from dataset_forge.utils.printing import print_header, print_success, print_error
 from dataset_forge.dpid import (

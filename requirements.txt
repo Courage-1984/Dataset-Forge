@@ -22,5 +22,12 @@ jinja2
 lpips
 open-clip-torch
 imagededup
+
+pygame
+playsound
+playsound2
+
+transformers
+
 # getnative
-# ^ first install VapourSynth0
+# ^ first install VapourSynth

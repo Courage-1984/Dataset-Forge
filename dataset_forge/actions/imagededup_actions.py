@@ -3,7 +3,7 @@ import shutil
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 import pandas as pd
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 
 try:
     from imagededup.methods import PHash, DHash, AHash, WHash
@@ -112,35 +112,37 @@ class ImageDedupHandler:
     def debug_directory_contents(self, image_dir: str) -> None:
         """
         Debug method to check what files are actually in the directory vs what imagededup finds.
-        
+
         Args:
             image_dir: Directory to check
         """
         print_info(f"Debugging directory contents: {image_dir}")
-        
+
         # Get actual files in directory
         actual_files = set()
         for root, dirs, files in os.walk(image_dir):
             for file in files:
-                if file.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.webp')):
+                if file.lower().endswith((".png", ".jpg", ".jpeg", ".bmp", ".webp")):
                     rel_path = os.path.relpath(os.path.join(root, file), image_dir)
                     actual_files.add(rel_path)
-        
+
         print_info(f"Actual files in directory: {len(actual_files)}")
-        
+
         # Get files that imagededup finds
         duplicates = self.find_duplicates(image_dir, max_distance_threshold=10)
         imagededup_files = set()
         for original, duplicate_list in duplicates.items():
             imagededup_files.add(original)
             imagededup_files.update(duplicate_list)
-        
+
         print_info(f"Files found by imagededup: {len(imagededup_files)}")
-        
+
         # Find missing files
         missing_files = imagededup_files - actual_files
         if missing_files:
-            print_warning(f"Files found by imagededup but not in directory: {len(missing_files)}")
+            print_warning(
+                f"Files found by imagededup but not in directory: {len(missing_files)}"
+            )
             for file in list(missing_files)[:10]:  # Show first 10
                 print_warning(f"  Missing: {file}")
             if len(missing_files) > 10:
@@ -221,7 +223,9 @@ class ImageDedupHandler:
 
             print_success(f"Removed {len(removed_files)} duplicate files.")
             if len(removed_files) < len(files_to_remove):
-                print_info(f"Note: {len(files_to_remove) - len(removed_files)} files were not removed (may have been removed already or don't exist)")
+                print_info(
+                    f"Note: {len(files_to_remove) - len(removed_files)} files were not removed (may have been removed already or don't exist)"
+                )
             return removed_files
 
         return files_to_remove

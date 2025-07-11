@@ -11,7 +11,7 @@ import traceback
 import gc
 import argparse
 import sys
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 import chainner_ext
 
 # Install extra architectures

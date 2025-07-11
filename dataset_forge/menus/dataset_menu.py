@@ -11,7 +11,7 @@ from dataset_forge.utils.printing import (
 from dataset_forge.utils.color import Mocha
 from dataset_forge.actions import dataset_actions
 from dataset_forge.menus import session_state
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.input_utils import get_folder_path
 
 # Assume hq_folder, lq_folder are available in the global scope for now

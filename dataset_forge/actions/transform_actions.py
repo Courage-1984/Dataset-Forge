@@ -2,7 +2,7 @@ import os
 import shutil
 import logging
 import numpy as np
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from PIL import Image
 from dataset_forge.utils.io_utils import (
     is_image_file,

@@ -2,7 +2,7 @@ import os
 import shutil
 import random
 from subprocess import CalledProcessError
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from PIL import Image
 from dataset_forge.utils.file_utils import (
     is_image_file,
@@ -16,7 +16,6 @@ from dataset_forge.utils.input_utils import (
 )
 import logging
 import numpy as np
-from tqdm import tqdm
 from collections import Counter, defaultdict
 import cv2
 import concurrent.futures

@@ -2,7 +2,7 @@ import os
 import logging
 import numpy as np
 from PIL import Image
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.io_utils import is_image_file
 from collections import Counter
 import cv2
@@ -759,7 +759,7 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
         print_warning,
     )
     import os
-    from tqdm import tqdm
+    from dataset_forge.utils.progress_utils import tqdm
 
     if hq_folder and lq_folder:
         # HQ/LQ folder pair mode

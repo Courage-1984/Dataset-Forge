@@ -13,7 +13,7 @@ from dataset_forge.actions.analysis_actions import (
     test_hq_lq_scale,
 )
 from dataset_forge.actions.transform_actions import downsample_images_menu
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.actions.correct_hq_lq_pairing_actions import (
     fuzzy_hq_lq_pairing_logic,
 )

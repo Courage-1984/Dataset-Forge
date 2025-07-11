@@ -1,5 +1,5 @@
 import os
-from tqdm import tqdm
+from dataset_forge.utils.progress_utils import tqdm
 import numpy as np
 from dataset_forge.actions.frames_actions import ImgToEmbedding, EmbeddedModel
 from dataset_forge.utils.file_utils import is_image_file
