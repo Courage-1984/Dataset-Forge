@@ -25,6 +25,28 @@ user_preferences = {
     "default_batch_size": 8,
     "default_quality": 85,
     "default_tile_size": 512,
+    # BHI Filtering thresholds
+    "bhi_blockiness_threshold": 0.5,
+    "bhi_hyperiqa_threshold": 0.5,
+    "bhi_ic9600_threshold": 0.5,
+    # BHI Filtering suggested thresholds (for reference)
+    "bhi_suggested_thresholds": {
+        "conservative": {
+            "blockiness": 0.3,
+            "hyperiqa": 0.3,
+            "ic9600": 0.3,
+        },
+        "moderate": {
+            "blockiness": 0.5,
+            "hyperiqa": 0.5,
+            "ic9600": 0.5,
+        },
+        "aggressive": {
+            "blockiness": 0.7,
+            "hyperiqa": 0.7,
+            "ic9600": 0.7,
+        },
+    },
 }
 
 # Operation history

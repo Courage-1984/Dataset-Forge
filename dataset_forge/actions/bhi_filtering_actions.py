@@ -469,7 +469,7 @@ class up_conv_bn_relu(nn.Module):
 
 
 class ICNet(nn.Module):
-    def __init__(self, is_pretrain=True, size1=512, size2=256):
+    def __init__(self, is_pretrain=True, size1=512, size2=256, device=None):
         super(ICNet, self).__init__()
         from torchvision.models import resnet18, ResNet18_Weights
 
@@ -500,6 +500,8 @@ class ICNet(nn.Module):
             nn.Linear(256 * 2, 512), nn.ReLU(), nn.Linear(512, 1), nn.Sigmoid()
         )
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.device = device if device is not None else torch.device("cpu")
+        self.to(self.device)
 
     def check_img_size(self, x):
         b, c, h, w = x.shape
@@ -517,7 +519,9 @@ class ICNet(nn.Module):
         score_feature = self.avgpool(score_feature)
         score_feature = score_feature.squeeze()
         score = self.head(score_feature)
-        score = score.squeeze()
+        # Ensure we return a tensor that can be indexed, not a 0-dim tensor
+        if score.dim() == 0:
+            score = score.unsqueeze(0)
         return score
 
     def body_forward(self, x1):
@@ -538,14 +542,14 @@ class ICNet(nn.Module):
         return x_cat, cly_map
 
 
-def ic9600():
+def ic9600(device=None):
     try:
         state = torch.hub.load_state_dict_from_url(
             url="https://github.com/umzi2/Dataset_Preprocessing/releases/download/IC9600_duplicate/ic9600.pth",
-            map_location="cpu",
+            map_location=device if device is not None else "cpu",
             weights_only=True,
         )
-        model = ICNet().eval()
+        model = ICNet(device=device).eval()
         model.load_state_dict(state)
         return model
     except Exception as e:
@@ -564,7 +568,7 @@ class IC9600Thread(IQANode):
         move_folder: str | None = None,
     ):
         super().__init__(img_dir, batch_size, thread, median_thread, move_folder, None)
-        self.model = ic9600()
+        self.model = ic9600(device=self.device)
         if self.model is not None:
             from dataset_forge.utils.memory_utils import to_device_safe
 
@@ -576,7 +580,19 @@ class IC9600Thread(IQANode):
         if self.model is None:
             # Return placeholder scores if model failed to load
             return torch.ones(images.shape[0], device=self.device) * 0.5
-        return self.model.get_onlu_score(images)
+        try:
+            scores = self.model.get_onlu_score(images)
+            # Ensure we have a proper batch dimension
+            if scores.dim() == 0:
+                scores = scores.unsqueeze(0)
+            elif scores.dim() == 1 and scores.shape[0] != images.shape[0]:
+                # If we got a single score for a batch, repeat it
+                scores = scores.repeat(images.shape[0])
+            return scores
+        except Exception as e:
+            print(f"Warning: Error in IC9600 forward pass: {e}")
+            # Return placeholder scores on error
+            return torch.ones(images.shape[0], device=self.device) * 0.5
 
 
 # ===================== End Inlined IQA Threads and Dependencies =====================
@@ -590,9 +606,139 @@ def paired_filenames(hq_folder: str, lq_folder: str) -> List[str]:
     return sorted(list(hq_files & lq_files))
 
 
+def safe_tensor_to_float(tensor):
+    """Safely convert a tensor to float, handling both 0-dim and 1-dim tensors."""
+    if hasattr(tensor, "item"):
+        return float(tensor.item())
+    elif hasattr(tensor, "__len__") and len(tensor) == 1:
+        return float(tensor[0].item())
+    else:
+        return float(tensor)
+
+
+def get_default_bhi_thresholds():
+    """Get default BHI filtering thresholds from session state."""
+    try:
+        from dataset_forge.menus import session_state
+
+        return {
+            "blockiness": session_state.user_preferences["bhi_blockiness_threshold"],
+            "hyperiqa": session_state.user_preferences["bhi_hyperiqa_threshold"],
+            "ic9600": session_state.user_preferences["bhi_ic9600_threshold"],
+        }
+    except (ImportError, KeyError):
+        # Fallback to hardcoded defaults if session state is not available
+        return {
+            "blockiness": 0.5,
+            "hyperiqa": 0.5,
+            "ic9600": 0.5,
+        }
+
+
+def get_bhi_preset_thresholds(preset_name: str = "moderate"):
+    """Get BHI filtering thresholds for a specific preset."""
+    try:
+        from dataset_forge.menus import session_state
+
+        presets = session_state.user_preferences["bhi_suggested_thresholds"]
+        if preset_name in presets:
+            return presets[preset_name]
+        else:
+            return presets["moderate"]  # Default to moderate if preset not found
+    except (ImportError, KeyError):
+        # Fallback presets if session state is not available
+        fallback_presets = {
+            "conservative": {"blockiness": 0.3, "hyperiqa": 0.3, "ic9600": 0.3},
+            "moderate": {"blockiness": 0.5, "hyperiqa": 0.5, "ic9600": 0.5},
+            "aggressive": {"blockiness": 0.7, "hyperiqa": 0.7, "ic9600": 0.7},
+        }
+        return fallback_presets.get(preset_name, fallback_presets["moderate"])
+
+
+def run_bhi_filtering_with_preset(
+    input_path: str,
+    preset_name: str = "moderate",
+    action: str = "move",
+    batch_size: int = 8,
+    paired: bool = False,
+    lq_folder: Optional[str] = None,
+    move_folder: Optional[str] = None,
+    dry_run: bool = False,
+    verbose: bool = True,
+):
+    """
+    Run BHI filtering with a preset configuration.
+
+    Args:
+        input_path: Path to input folder
+        preset_name: One of 'conservative', 'moderate', 'aggressive'
+        action: 'move', 'delete', or 'report'
+        batch_size: Batch size for processing
+        paired: Whether processing paired HQ/LQ folders
+        lq_folder: Path to LQ folder (if paired)
+        move_folder: Destination for moved files
+        dry_run: Whether to perform a dry run
+        verbose: Whether to print progress
+
+    Returns:
+        Results dictionary from BHI filtering
+    """
+    thresholds = get_bhi_preset_thresholds(preset_name)
+    return run_bhi_filtering(
+        input_path=input_path,
+        thresholds=thresholds,
+        action=action,
+        batch_size=batch_size,
+        paired=paired,
+        lq_folder=lq_folder,
+        move_folder=move_folder,
+        dry_run=dry_run,
+        verbose=verbose,
+    )
+
+
+def run_bhi_filtering_with_defaults(
+    input_path: str,
+    action: str = "move",
+    batch_size: int = 8,
+    paired: bool = False,
+    lq_folder: Optional[str] = None,
+    move_folder: Optional[str] = None,
+    dry_run: bool = False,
+    verbose: bool = True,
+):
+    """
+    Run BHI filtering with default thresholds from user preferences.
+
+    Args:
+        input_path: Path to input folder
+        action: 'move', 'delete', or 'report'
+        batch_size: Batch size for processing
+        paired: Whether processing paired HQ/LQ folders
+        lq_folder: Path to LQ folder (if paired)
+        move_folder: Destination for moved files
+        dry_run: Whether to perform a dry run
+        verbose: Whether to print progress
+
+    Returns:
+        Results dictionary from BHI filtering
+    """
+    return run_bhi_filtering(
+        input_path=input_path,
+        thresholds=None,  # Will use defaults
+        action=action,
+        batch_size=batch_size,
+        paired=paired,
+        lq_folder=lq_folder,
+        move_folder=move_folder,
+        dry_run=dry_run,
+        verbose=verbose,
+    )
+
+
 def run_bhi_filtering(
     input_path: str,
-    thresholds: Dict[str, float],
+    thresholds: Optional[Dict[str, float]] = None,
     action: str = "move",  # 'move', 'delete', or 'report'
     output_folder: Optional[str] = None,
     batch_size: int = 8,
@@ -605,7 +751,7 @@ def run_bhi_filtering(
     """
     Run BHI filtering (Blockiness, HyperIQA, IC9600) on a folder or paired HQ/LQ folders.
     - input_path: single folder or HQ folder if paired=True
-    - thresholds: dict with keys 'blockiness', 'hyperiqa', 'ic9600'
+    - thresholds: dict with keys 'blockiness', 'hyperiqa', 'ic9600' (uses defaults if None)
     - action: 'move', 'delete', or 'report'
     - output_folder: where to move files (if action=='move')
     - batch_size: batch size for IQA threads
@@ -616,6 +762,13 @@ def run_bhi_filtering(
     - verbose: print progress
     """
     assert action in ("move", "delete", "report"), "Invalid action."
+
+    # Use default thresholds if none provided
+    if thresholds is None:
+        thresholds = get_default_bhi_thresholds()
+        if verbose:
+            print(f"Using default thresholds: {thresholds}")
+
     assert all(
         k in thresholds for k in ("blockiness", "hyperiqa", "ic9600")
     ), "Thresholds must include all metrics."
@@ -692,7 +845,7 @@ def run_bhi_filtering(
         ):
             iqa = thread.forward(images)
             for idx, fname in enumerate(filenames):
-                scores[fname] = float(iqa[idx])
+                scores[fname] = safe_tensor_to_float(iqa[idx])
         for fname in files:
             if fname not in results:
                 results[fname] = {}

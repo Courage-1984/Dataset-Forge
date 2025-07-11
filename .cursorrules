@@ -2,6 +2,8 @@
 # ALWAYS run: venv312\Scripts\activate before testing your new additions
 # This ensures all dependencies are available and the correct Python environment is used
 
+# CRITICAL: ALWAYS look up documentation for packages, modules or software added to this project
+
 # Ignore Python virtual environments
 venv/
 .venv/

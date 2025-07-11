@@ -795,11 +795,27 @@ def find_alpha_channels(*args, **kwargs):
 
 
 def bhi_filtering(*args, **kwargs):
-    """Redirect to BHI filtering actions."""
+    """Redirect to BHI filtering actions with enhanced functionality."""
     from dataset_forge.actions.bhi_filtering_actions import (
         run_bhi_filtering as bhi_filter,
+        run_bhi_filtering_with_preset,
+        run_bhi_filtering_with_defaults,
+        get_bhi_preset_thresholds,
+        get_default_bhi_thresholds,
     )
 
+    # Check if preset is specified
+    preset = kwargs.pop("preset", None)
+    if preset:
+        return run_bhi_filtering_with_preset(*args, preset_name=preset, **kwargs)
+
+    # Check if thresholds are provided
+    thresholds = kwargs.get("thresholds", None)
+    if thresholds is None:
+        # Use defaults if no thresholds provided
+        return run_bhi_filtering_with_defaults(*args, **kwargs)
+
+    # Use provided thresholds
     return bhi_filter(*args, **kwargs)
 
 

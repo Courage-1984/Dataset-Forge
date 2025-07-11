@@ -219,6 +219,11 @@ def configure_user_preferences():
         print(f"  Default Batch Size: {user_preferences['default_batch_size']}")
         print(f"  Default Quality: {user_preferences['default_quality']}")
         print(f"  Default Tile Size: {user_preferences['default_tile_size']}")
+        print(
+            f"  BHI Blockiness Threshold: {user_preferences['bhi_blockiness_threshold']}"
+        )
+        print(f"  BHI HyperIQA Threshold: {user_preferences['bhi_hyperiqa_threshold']}")
+        print(f"  BHI IC9600 Threshold: {user_preferences['bhi_ic9600_threshold']}")
 
         print("\n[1] Toggle Audio")
         print("[2] Toggle Progress Display")
@@ -227,7 +232,8 @@ def configure_user_preferences():
         print("[5] Set Default Batch Size")
         print("[6] Set Default Quality")
         print("[7] Set Default Tile Size")
-        print("[8] Reset to Defaults")
+        print("[8] Configure BHI Filtering Thresholds")
+        print("[9] Reset to Defaults")
         print("[0] Back to Settings")
 
         choice = input("Choice: ").strip()
@@ -285,7 +291,118 @@ def configure_user_preferences():
                     "Invalid input. Please enter a number between 64 and 2048."
                 )
         elif choice == "8":
+            configure_bhi_thresholds()
+        elif choice == "9":
             reset_user_preferences()
+        elif choice == "0":
+            break
+        else:
+            print_warning("Invalid choice. Please try again.")
+
+
+def configure_bhi_thresholds():
+    """Configure BHI filtering thresholds."""
+    print_section("BHI Filtering Thresholds", char="-", color=Mocha.sky)
+
+    while True:
+        print_info("Current BHI Thresholds:")
+        print(f"  Blockiness: {user_preferences['bhi_blockiness_threshold']}")
+        print(f"  HyperIQA: {user_preferences['bhi_hyperiqa_threshold']}")
+        print(f"  IC9600: {user_preferences['bhi_ic9600_threshold']}")
+
+        print_info("\nSuggested Threshold Presets:")
+        suggested = user_preferences["bhi_suggested_thresholds"]
+        print(
+            f"  Conservative: Blockiness={suggested['conservative']['blockiness']}, "
+            f"HyperIQA={suggested['conservative']['hyperiqa']}, "
+            f"IC9600={suggested['conservative']['ic9600']}"
+        )
+        print(
+            f"  Moderate: Blockiness={suggested['moderate']['blockiness']}, "
+            f"HyperIQA={suggested['moderate']['hyperiqa']}, "
+            f"IC9600={suggested['moderate']['ic9600']}"
+        )
+        print(
+            f"  Aggressive: Blockiness={suggested['aggressive']['blockiness']}, "
+            f"HyperIQA={suggested['aggressive']['hyperiqa']}, "
+            f"IC9600={suggested['aggressive']['ic9600']}"
+        )
+
+        print("\n[1] Set Blockiness Threshold")
+        print("[2] Set HyperIQA Threshold")
+        print("[3] Set IC9600 Threshold")
+        print("[4] Use Conservative Preset")
+        print("[5] Use Moderate Preset")
+        print("[6] Use Aggressive Preset")
+        print("[0] Back to User Preferences")
+
+        choice = input("Choice: ").strip()
+
+        if choice == "1":
+            try:
+                threshold = float(input("Enter Blockiness threshold (0.0-1.0): "))
+                if 0.0 <= threshold <= 1.0:
+                    user_preferences["bhi_blockiness_threshold"] = threshold
+                    print_success(f"Blockiness threshold set to {threshold}.")
+                else:
+                    print_warning("Threshold must be between 0.0 and 1.0.")
+            except ValueError:
+                print_warning(
+                    "Invalid input. Please enter a number between 0.0 and 1.0."
+                )
+        elif choice == "2":
+            try:
+                threshold = float(input("Enter HyperIQA threshold (0.0-1.0): "))
+                if 0.0 <= threshold <= 1.0:
+                    user_preferences["bhi_hyperiqa_threshold"] = threshold
+                    print_success(f"HyperIQA threshold set to {threshold}.")
+                else:
+                    print_warning("Threshold must be between 0.0 and 1.0.")
+            except ValueError:
+                print_warning(
+                    "Invalid input. Please enter a number between 0.0 and 1.0."
+                )
+        elif choice == "3":
+            try:
+                threshold = float(input("Enter IC9600 threshold (0.0-1.0): "))
+                if 0.0 <= threshold <= 1.0:
+                    user_preferences["bhi_ic9600_threshold"] = threshold
+                    print_success(f"IC9600 threshold set to {threshold}.")
+                else:
+                    print_warning("Threshold must be between 0.0 and 1.0.")
+            except ValueError:
+                print_warning(
+                    "Invalid input. Please enter a number between 0.0 and 1.0."
+                )
+        elif choice == "4":
+            user_preferences["bhi_blockiness_threshold"] = suggested["conservative"][
+                "blockiness"
+            ]
+            user_preferences["bhi_hyperiqa_threshold"] = suggested["conservative"][
+                "hyperiqa"
+            ]
+            user_preferences["bhi_ic9600_threshold"] = suggested["conservative"][
+                "ic9600"
+            ]
+            print_success("Applied conservative preset thresholds.")
+        elif choice == "5":
+            user_preferences["bhi_blockiness_threshold"] = suggested["moderate"][
+                "blockiness"
+            ]
+            user_preferences["bhi_hyperiqa_threshold"] = suggested["moderate"][
+                "hyperiqa"
+            ]
+            user_preferences["bhi_ic9600_threshold"] = suggested["moderate"]["ic9600"]
+            print_success("Applied moderate preset thresholds.")
+        elif choice == "6":
+            user_preferences["bhi_blockiness_threshold"] = suggested["aggressive"][
+                "blockiness"
+            ]
+            user_preferences["bhi_hyperiqa_threshold"] = suggested["aggressive"][
+                "hyperiqa"
+            ]
+            user_preferences["bhi_ic9600_threshold"] = suggested["aggressive"]["ic9600"]
+            print_success("Applied aggressive preset thresholds.")
         elif choice == "0":
             break
         else:
@@ -303,6 +420,9 @@ def reset_user_preferences():
             "default_batch_size": 8,
             "default_quality": 85,
             "default_tile_size": 512,
+            "bhi_blockiness_threshold": 0.5,
+            "bhi_hyperiqa_threshold": 0.5,
+            "bhi_ic9600_threshold": 0.5,
         }
     )
     print_success("User preferences reset to defaults.")

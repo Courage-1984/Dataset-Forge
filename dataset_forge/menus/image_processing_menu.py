@@ -14,9 +14,9 @@ from dataset_forge.actions.transform_actions import (
     hdr_to_sdr_menu,
     dataset_colour_adjustment,
     grayscale_conversion,
-    remove_alpha_channels_menu,
     transform_dataset,
 )
+from dataset_forge.actions.alpha_actions import remove_alpha_channels_menu
 from dataset_forge.menus.hue_adjustment_menu import hue_adjustment_menu
 from dataset_forge.menus.augmentation_menu import augmentation_menu
 from dataset_forge.actions.metadata_actions import (
