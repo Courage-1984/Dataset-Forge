@@ -26,9 +26,6 @@ run_best_tile_ic9600.py
 ./store
 store
 
-./.cursorrules
-.cursorrules
-
 ./dpid_implementation_examples
 dpid_implementation_examples
 
@@ -50,5 +47,5 @@ logs
 ./results
 results
 
-./.cursorrules
+# Cursor rules file (untracked)
 .cursorrules
