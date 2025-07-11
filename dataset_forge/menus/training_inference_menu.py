@@ -20,15 +20,15 @@ def training_inference_menu():
     )
 
     options = {
-        "1": ("Create Training Config", create_training_config),
-        "2": ("Create Inference Config", create_inference_config),
-        "3": ("Validate Config", validate_config),
-        "4": ("List Available Models", list_available_models),
-        "0": ("Back to Main Menu", None),
+        "1": ("📝 Create Training Config", create_training_config),
+        "2": ("🎯 Create Inference Config", create_inference_config),
+        "3": ("✅ Validate Config", validate_config),
+        "4": ("📋 List Available Models", list_available_models),
+        "0": ("⬅️ Back to Main Menu", None),
     }
     while True:
         action = show_menu(
-            "Training & Inference",
+            "🚀 Training & Inference",
             options,
             header_color=Mocha.lavender,
             char="=",
