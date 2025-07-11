@@ -25,42 +25,38 @@
 1. **Clone the repository:**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Courage-1984/Dataset-Forge.git
    cd Dataset-Forge
    ```
 
-2. **Windows (Recommended):**
+2. **Set up the environment:**
 
    ```bash
-   # Run the automated installer
-   install.bat
-   ```
-
-3. **Manual Installation:**
-
-   ```bash
-   # Create virtual environment
-   python -m venv venv
+   # Create virtual environment with Python 3.12
+   py -3.12 -m venv venv
 
    # Activate virtual environment
-   # Windows:
    venv\Scripts\activate
-   # Linux/Mac:
-   source venv/bin/activate
 
-   # Install PyTorch with CUDA support (if available)
+   # Install PyTorch with CUDA 12.1 support
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
    # Install other dependencies
    pip install -r requirements.txt
    ```
 
-4. **Run the application:**
+3. **Run the application:**
+
+   You have two options:
+
    ```bash
-   # Windows:
-   run.bat
-   # Or manually:
-   python main.py
+   # Option 1: Run directly with Python
+   py main.py
+   ```
+
+   ```bash
+   # Option 2: Use the Windows batch file
+   ./run.bat
    ```
 
 ---
