@@ -116,6 +116,7 @@
 - **Folder Comparison**: Find missing files between folders
 - **Compression Tools**: Image compression, directory archiving
 - **Path History**: Smart path management with history and favorites
+- **Parallel Processing**: High-performance multiprocessing and multithreading
 
 ### 🖥️ **Beautiful CLI Interface**
 
@@ -123,6 +124,7 @@
 - **Hierarchical Menus**: Intuitive 7-category main menu with logical sub-menus
 - **Progress Tracking**: Progress bars, error handling, memory management
 - **Smart Input**: Path history, favorites, and intelligent defaults
+- **Parallel Processing**: Multiprocessing and multithreading for speed improvements
 
 ---
 
@@ -463,6 +465,10 @@ seaborn
 jinja2
 webbrowser
 imagededup
+
+# Parallel processing
+psutil
+joblib
 
 # Custom packages
 pipeline

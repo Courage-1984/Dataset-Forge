@@ -29,5 +29,9 @@ playsound2
 
 transformers
 
+# Parallel processing and system monitoring
+psutil
+joblib
+
 # getnative
 # ^ first install VapourSynth

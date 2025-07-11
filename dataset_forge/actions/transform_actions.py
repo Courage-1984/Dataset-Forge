@@ -1,724 +1,502 @@
 import os
-import shutil
-import logging
+import cv2
 import numpy as np
-from dataset_forge.utils.progress_utils import tqdm
-from PIL import Image
-from dataset_forge.utils.io_utils import (
-    is_image_file,
+from PIL import Image, ImageEnhance, ImageFilter
+from dataset_forge.utils.progress_utils import tqdm, image_map, smart_map
+from dataset_forge.utils.parallel_utils import (
+    parallel_image_processing,
+    ProcessingType,
+    ParallelConfig,
+    setup_parallel_environment,
 )
+from dataset_forge.menus.session_state import parallel_config, user_preferences
+from dataset_forge.utils.io_utils import is_image_file
 from dataset_forge.utils.input_utils import (
-    get_pairs_to_process,
     get_file_operation_choice,
     get_destination_path,
-    get_path_with_history,
 )
-from dataset_forge.utils.file_utils import IMAGE_TYPES, get_unique_filename
-from dataset_forge.utils.image_ops import ColorAdjuster
-import subprocess
-from dataset_forge.utils import dpid_phhofm
+from dataset_forge.utils.file_utils import get_unique_filename
+from dataset_forge.utils.history_log import log_operation
 
 
-# --- Downsample Images ---
-def downsample_images_menu():
-    """Downsample images using various methods, including DPID and OpenCV/PIL."""
-    print("\n=== Downsample Images (Batch/Single, Multiple Methods) ===")
-    print("Select downsampling implementation:")
-    print("  1. DPID (BasicSR)")
-    print("  2. DPID (OpenMMLab)")
-    print("  3. OpenCV INTER_AREA")
-    print("  4. OpenCV INTER_LANCZOS4")
-    print("  5. OpenCV INTER_CUBIC")
-    print("  6. PIL LANCZOS")
-    print("  7. Phhofm's DPID Downscaler (pepedpid)")
-    method = input("Enter method number (default 1): ").strip() or "1"
-    if method != "7":
-        input_folder = input("Enter path to HR (100%) images folder: ").strip()
-        if not os.path.isdir(input_folder):
-            print(f"Input folder '{input_folder}' does not exist.")
-            return
-        output_folder = input(
-            "Enter base output folder (subfolders will be created for each scale): "
-        ).strip()
-        if not output_folder:
-            print("Output folder is required.")
-            return
-        os.makedirs(output_folder, exist_ok=True)
-        scale_str = input(
-            "Enter scale factors (comma-separated, e.g. 0.75,0.5,0.25): "
-        ).strip()
-        try:
-            scales = [float(s) for s in scale_str.split(",") if 0 < float(s) < 1]
-        except Exception:
-            print("Invalid scale factors.")
-            return
-        if not scales:
-            print("No valid scales provided.")
-            return
-        dpid_lambda = 0.5
-        if method in ["1", "2"]:
-            try:
-                dpid_lambda = float(
-                    input(
-                        "Enter DPID lambda (0=smooth, 1=detail, default 0.5): "
-                    ).strip()
-                    or 0.5
-                )
-            except Exception:
-                dpid_lambda = 0.5
-        # TODO: Implement the actual downsampling logic for each method (BasicSR, OpenMMLab, OpenCV, PIL)
-        print(
-            "[TODO] Downsampling logic for methods 1-6 not yet implemented in modular actions."
-        )
-        return
-    # --- Phhofm's DPID Downscaler integration ---
-    print("Phhofm's DPID Downscaler selected.")
-    print("Choose mode:")
-    print("  1. Single folder")
-    print("  2. HQ/LQ paired folders (preserve alignment)")
-    mode = input("Select mode (1=single, 2=pair): ").strip()
-    if mode == "2":
-        hq_folder = input("Enter HQ folder path: ").strip()
-        lq_folder = input("Enter LQ folder path: ").strip()
-        out_hq_folder = input("Enter HQ output folder: ").strip()
-        out_lq_folder = input("Enter LQ output folder: ").strip()
-        scale = input("Enter downscale factor (integer >=2, e.g. 2, 3, 4): ").strip()
-        try:
-            scale = int(scale)
-            if scale < 2:
-                raise ValueError
-        except Exception:
-            print("Invalid scale factor.")
-            return
-        output_ext = (
-            input("Output extension (.png/.jpg/.webp, default .png): ").strip()
-            or ".png"
-        )
-        threads = input("Threads (default 4): ").strip()
-        try:
-            threads = int(threads) if threads else 4
-        except Exception:
-            threads = 4
-        skip_existing = (
-            input("Skip existing files? (y/n, default n): ").strip().lower() == "y"
-        )
-        verbose = input("Verbose output? (y/n, default n): ").strip().lower() == "y"
-        processed, skipped, failed = dpid_phhofm.downscale_hq_lq_pair(
-            hq_folder,
-            lq_folder,
-            out_hq_folder,
-            out_lq_folder,
-            scale,
-            output_ext=output_ext,
-            threads=threads,
-            skip_existing=skip_existing,
-            verbose=verbose,
-        )
-        print(f"\nOperation complete:")
-        print(f"  Processed: {processed} pairs")
-        print(f"  Skipped:   {skipped} pairs")
-        print(f"  Failed:    {failed} pairs")
-        print(f"  Output HQ: {out_hq_folder}")
-        print(f"  Output LQ: {out_lq_folder}")
-    else:
-        input_folder = input("Enter input folder path: ").strip()
-        output_folder = input("Enter output folder path: ").strip()
-        scale = input("Enter downscale factor (integer >=2, e.g. 2, 3, 4): ").strip()
-        try:
-            scale = int(scale)
-            if scale < 2:
-                raise ValueError
-        except Exception:
-            print("Invalid scale factor.")
-            return
-        output_ext = (
-            input("Output extension (.png/.jpg/.webp, default .png): ").strip()
-            or ".png"
-        )
-        threads = input("Threads (default 4): ").strip()
-        try:
-            threads = int(threads) if threads else 4
-        except Exception:
-            threads = 4
-        recursive = (
-            input("Process subdirectories recursively? (y/n, default n): ")
-            .strip()
-            .lower()
-            == "y"
-        )
-        skip_existing = (
-            input("Skip existing files? (y/n, default n): ").strip().lower() == "y"
-        )
-        verbose = input("Verbose output? (y/n, default n): ").strip().lower() == "y"
-        processed, skipped, failed = dpid_phhofm.downscale_folder(
-            input_folder,
-            output_folder,
-            scale,
-            output_ext=output_ext,
-            threads=threads,
-            recursive=recursive,
-            skip_existing=skip_existing,
-            verbose=verbose,
-        )
-        print(f"\nOperation complete:")
-        print(f"  Processed: {processed} images")
-        print(f"  Skipped:   {skipped} images")
-        print(f"  Failed:    {failed} images")
-        print(f"  Output:    {output_folder}")
+def apply_transformation_to_image(
+    input_path: str,
+    transform_type: str,
+    value: float,
+    operation: str,
+    output_path: str,
+) -> bool:
+    """
+    Apply a transformation to a single image.
 
+    Args:
+        input_path: Path to input image
+        transform_type: Type of transformation to apply
+        value: Transformation value/parameter
+        operation: Operation type (copy, move, inplace)
+        output_path: Path for output image
 
-# --- HDR to SDR Tone Mapping ---
-class ToneMapper:
-    """Base class for HDR to SDR tone mapping using ffmpeg."""
-
-    def __init__(self, algorithm="hable"):
-        self.algorithm = algorithm
-
-    def ffmpeg_command(self, input_path, output_path):
-        return [
-            "ffmpeg",
-            "-i",
-            input_path,
-            "-vf",
-            f"zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=tonemap={self.algorithm}:desat=0,zscale=t=bt709:m=bt709:r=tv,format=yuv420p",
-            "-c:v",
-            "libx264",
-            "-crf",
-            "18",
-            "-preset",
-            "fast",
-            "-c:a",
-            "copy",
-            output_path,
-        ]
-
-    def run(self, input_path, output_path):
-        cmd = self.ffmpeg_command(input_path, output_path)
-        print("\nRunning ffmpeg command:")
-        print(" ".join(cmd))
-        try:
-            subprocess.run(cmd, check=True)
-            print(f"\nTone mapping complete! Output: {output_path}")
-        except subprocess.CalledProcessError as e:
-            print(f"Error running ffmpeg: {e}")
-
-
-def hdr_to_sdr_menu():
-    """Convert HDR video to SDR using ffmpeg and various tone mapping algorithms."""
-    print("\n=== HDR to SDR Tone Mapping ===")
-    input_path = input("Enter path to input HDR video: ").strip()
-    if not input_path or not os.path.isfile(input_path):
-        print(f"Input file '{input_path}' does not exist.")
-        return
-    output_path = input("Enter path for output SDR video: ").strip()
-    if not output_path:
-        print("Output path is required.")
-        return
-    print("Select tone mapping algorithm:")
-    print("  1. hable (default)")
-    print("  2. reinhard")
-    print("  3. mobius")
-    algo_choice = input("Enter algorithm number (1/2/3): ").strip() or "1"
-    algo_map = {"1": "hable", "2": "reinhard", "3": "mobius"}
-    algorithm = algo_map.get(algo_choice, "hable")
-    tonemapper = ToneMapper(algorithm=algorithm)
-    tonemapper.run(input_path, output_path)
-
-
-# --- Dataset Color Adjustment ---
-def dataset_colour_adjustment(hq_folder, lq_folder):
-    """Adjust color properties of HQ/LQ images using ColorAdjuster class."""
-    print("\n" + "=" * 30)
-    print("  Dataset Color Adjustment")
-    print("=" * 30)
-    adjustment_type = (
-        input("Enter adjustment type (brightness/contrast/color/sharpness): ")
-        .strip()
-        .lower()
-    )
+    Returns:
+        bool: True if successful, False otherwise
+    """
     try:
-        factor = float(input("Enter adjustment factor (e.g., 1.2 for +20%): ").strip())
-    except Exception:
-        print("Invalid factor. Aborting.")
-        return
-    operation = get_file_operation_choice()
-    dest_dir = ""
-    if operation != "inplace":
-        dest_dir = get_destination_path()
-        if not dest_dir:
-            print(
-                f"Operation aborted as no destination path was provided for {operation}."
-            )
-            return
-        os.makedirs(dest_dir, exist_ok=True)
-    adjuster = ColorAdjuster(adjustment_type, factor)
-    for folder, label in [(hq_folder, "HQ"), (lq_folder, "LQ")]:
-        image_files = [
-            f
-            for f in os.listdir(folder)
-            if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
-        ]
-        for filename in tqdm(image_files, desc=f"Adjusting {label}"):
-            src_path = os.path.join(folder, filename)
-            dest_path = (
-                src_path
-                if operation == "inplace"
-                else os.path.join(dest_dir, get_unique_filename(dest_dir, filename))
-            )
-            success, msg = adjuster.process(
-                src_path, output_path=dest_path, operation=operation
-            )
-            if not success:
-                print(f"Error adjusting {label} {filename}: {msg}")
-    print("Adjustment complete.")
+        # Load image
+        with Image.open(input_path) as img:
+            # Convert to RGB if needed
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+
+            # Apply transformation
+            if transform_type == "brightness":
+                enhancer = ImageEnhance.Brightness(img)
+                img = enhancer.enhance(value)
+            elif transform_type == "contrast":
+                enhancer = ImageEnhance.Contrast(img)
+                img = enhancer.enhance(value)
+            elif transform_type == "saturation":
+                enhancer = ImageEnhance.Color(img)
+                img = enhancer.enhance(value)
+            elif transform_type == "sharpness":
+                enhancer = ImageEnhance.Sharpness(img)
+                img = enhancer.enhance(value)
+            elif transform_type == "blur":
+                img = img.filter(ImageFilter.GaussianBlur(radius=value))
+            elif transform_type == "hue":
+                # Convert to HSV, adjust hue, convert back
+                img_array = np.array(img)
+                hsv = cv2.cvtColor(img_array, cv2.COLOR_RGB2HSV)
+                hsv[:, :, 0] = (hsv[:, :, 0] + value) % 180
+                img_array = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+                img = Image.fromarray(img_array)
+            else:
+                print(f"Unknown transformation type: {transform_type}")
+                return False
+
+            # Save image
+            if operation == "inplace":
+                img.save(input_path)
+            else:
+                # Create output directory if needed
+                os.makedirs(os.path.dirname(output_path), exist_ok=True)
+                img.save(output_path)
+
+            return True
+
+    except Exception as e:
+        print(f"Error applying {transform_type} to {input_path}: {e}")
+        return False
 
 
-# --- Grayscale Conversion ---
-def grayscale_conversion(hq_folder, lq_folder):
-    """Convert HQ/LQ images to grayscale using ColorAdjuster class."""
-    print("\n" + "=" * 30)
-    print("  Grayscale Conversion")
-    print("=" * 30)
-    operation = get_file_operation_choice()
-    dest_dir = ""
-    if operation != "inplace":
-        dest_dir = get_destination_path()
-        if not dest_dir:
-            print(
-                f"Operation aborted as no destination path was provided for {operation}."
-            )
-            return
-        os.makedirs(dest_dir, exist_ok=True)
-    for folder, label in [(hq_folder, "HQ"), (lq_folder, "LQ")]:
-        image_files = [
-            f
-            for f in os.listdir(folder)
-            if os.path.isfile(os.path.join(folder, f)) and is_image_file(f)
-        ]
-        for filename in tqdm(image_files, desc=f"Converting {label}"):
-            src_path = os.path.join(folder, filename)
-            dest_path = (
-                src_path
-                if operation == "inplace"
-                else os.path.join(dest_dir, get_unique_filename(dest_dir, filename))
-            )
-            adjuster = ColorAdjuster("color", 0)
-            success, msg = adjuster.process(
-                src_path, output_path=dest_path, operation=operation
-            )
-            if not success:
-                print(f"Error converting {label} {filename}: {msg}")
-    print("Grayscale conversion complete.")
+def transform_single_pair(
+    pair_info: tuple,
+    transform_type: str,
+    value: float,
+    operation: str,
+    dest_hq_dir: str,
+    dest_lq_dir: str,
+) -> bool:
+    """
+    Transform a single HQ/LQ pair.
 
+    Args:
+        pair_info: Tuple of (hq_path, lq_path, filename)
+        transform_type: Type of transformation
+        value: Transformation value
+        operation: Operation type
+        dest_hq_dir: Destination HQ directory
+        dest_lq_dir: Destination LQ directory
 
-# --- Remove Alpha Channels Menu ---
-def remove_alpha_channels_menu():
-    """Menu for removing alpha channels with workflow choice."""
-    print("\n=== Remove Alpha Channels ===")
-    print("Choose input mode:")
-    print("  1. HQ/LQ paired folders")
-    print("  2. Single folder")
-    print("  0. Cancel")
+    Returns:
+        bool: True if both images successful, False otherwise
+    """
+    hq_path, lq_path, filename = pair_info
 
-    choice = input("Select mode: ").strip()
-
-    if choice == "1":
-        # HQ/LQ pair workflow
-        hq_folder = get_path_with_history(
-            "Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
-        )
-        lq_folder = get_path_with_history(
-            "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
-        )
-
-        if not hq_folder or not lq_folder:
-            print("Error: Both HQ and LQ paths are required.")
-            return
-
-        if not os.path.isdir(hq_folder) or not os.path.isdir(lq_folder):
-            print("Error: Both HQ and LQ paths must be valid directories.")
-            return
-
-        remove_alpha_channels(hq_folder=hq_folder, lq_folder=lq_folder)
-
-    elif choice == "2":
-        # Single folder workflow
-        single_folder = get_path_with_history(
-            "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
-        )
-
-        if not single_folder:
-            print("Error: Folder path is required.")
-            return
-
-        if not os.path.isdir(single_folder):
-            print("Error: Folder path must be a valid directory.")
-            return
-
-        remove_alpha_channels(single_folder=single_folder)
-
-    elif choice == "0":
-        print("Operation cancelled.")
-        return
-
+    # Determine output paths
+    if operation == "inplace":
+        hq_output = hq_path
+        lq_output = lq_path
     else:
-        print("Invalid choice. Operation cancelled.")
-
-
-# --- Remove Alpha Channels ---
-def remove_alpha_channels(hq_folder=None, lq_folder=None, single_folder=None):
-    """Remove alpha channels from images in datasets. Supports both single folder and HQ/LQ pair workflows."""
-    print("\n" + "=" * 30)
-    print("  Removing Alpha Channels from Images")
-    print("=" * 30)
-
-    # Determine workflow type
-    if single_folder:
-        # Single folder workflow
-        workflow_type = "single"
-        folders_to_process = [(single_folder, "Single")]
-    elif hq_folder and lq_folder:
-        # HQ/LQ pair workflow
-        workflow_type = "paired"
-        folders_to_process = [(hq_folder, "HQ"), (lq_folder, "LQ")]
-    else:
-        print("Error: Invalid folder configuration.")
-        return
-
-    operation = get_file_operation_choice()
-    destination = ""
-
-    if operation in ["move", "copy"]:
-        destination = get_destination_path()
-        if not destination:
-            print(
-                f"Operation aborted as no destination path was provided for {operation}."
-            )
-            return
-
-        if workflow_type == "paired":
-            os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
-            os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
-        else:
-            os.makedirs(destination, exist_ok=True)
-
-    def find_images_with_alpha(folder_path, folder_name):
-        """Find all images with alpha channels in a folder (recursively)."""
-        images_with_alpha = []
-        all_images = []
-
-        # Collect all image files recursively
-        image_files = []
-        for root, dirs, files in os.walk(folder_path):
-            for filename in files:
-                if is_image_file(filename):
-                    # Get relative path from the root folder
-                    rel_path = os.path.relpath(
-                        os.path.join(root, filename), folder_path
-                    )
-                    image_files.append((rel_path, os.path.join(root, filename)))
-
-        print(
-            f"\nScanning {folder_name} folder for images with alpha channels (recursively)..."
+        hq_output = os.path.join(
+            dest_hq_dir, get_unique_filename(dest_hq_dir, filename)
         )
-        for rel_path, full_path in tqdm(image_files, desc=f"Scanning {folder_name}"):
-            all_images.append(rel_path)
-
-            try:
-                with Image.open(full_path) as img:
-                    if img.mode in ("RGBA", "LA") or (
-                        img.mode == "P" and "transparency" in img.info
-                    ):
-                        images_with_alpha.append(rel_path)
-            except Exception as e:
-                print(f"Warning: Could not check {rel_path}: {e}")
-
-        return images_with_alpha, all_images
-
-    def remove_alpha_from_image(input_path, output_path):
-        """Remove alpha channel from a single image."""
-        try:
-            with Image.open(input_path) as img:
-                # Convert to RGB or L (removing alpha)
-                if img.mode == "RGBA":
-                    # Create white background
-                    background = Image.new("RGB", img.size, (255, 255, 255))
-                    background.paste(
-                        img, mask=img.split()[-1]
-                    )  # Use alpha channel as mask
-                    processed_img = background
-                elif img.mode == "LA":
-                    # Convert to grayscale
-                    processed_img = img.convert("L")
-                elif img.mode == "P" and "transparency" in img.info:
-                    # Convert palette mode to RGB
-                    processed_img = img.convert("RGB")
-                else:
-                    # For other modes, just convert to RGB
-                    processed_img = img.convert("RGB")
-
-                # Save the processed image
-                processed_img.save(output_path, quality=95)
-                return True
-        except Exception as e:
-            raise e
-
-    total_checked = 0
-    total_processed = 0
-    errors = []
-
-    for folder, label in folders_to_process:
-        # First, find images with alpha channels
-        images_with_alpha, all_images = find_images_with_alpha(folder, label)
-        total_checked += len(all_images)
-
-        if not images_with_alpha:
-            print(f"No images with alpha channels found in {label} folder.")
-            continue
-
-        print(
-            f"\nFound {len(images_with_alpha)} images with alpha channels in {label} folder."
+        lq_output = os.path.join(
+            dest_lq_dir, get_unique_filename(dest_lq_dir, filename)
         )
-        print(f"Processing {len(images_with_alpha)} images...")
 
-        # Process only images with alpha channels
-        for rel_path in tqdm(images_with_alpha, desc=f"Processing {label}"):
-            input_path = os.path.join(folder, rel_path)
-
-            try:
-                # Determine output path
-                if operation == "inplace":
-                    output_path = input_path
-                else:
-                    if workflow_type == "paired":
-                        dest_folder = os.path.join(destination, label.lower())
-                    else:
-                        dest_folder = destination
-
-                    # For copy/move operations, preserve directory structure
-                    if os.path.dirname(rel_path):
-                        # Create subdirectories in destination
-                        subdir = os.path.join(dest_folder, os.path.dirname(rel_path))
-                        os.makedirs(subdir, exist_ok=True)
-                        output_path = os.path.join(subdir, os.path.basename(rel_path))
-                    else:
-                        output_path = os.path.join(dest_folder, rel_path)
-
-                # Process the image
-                remove_alpha_from_image(input_path, output_path)
-                total_processed += 1
-
-                # For move operation, remove original after processing
-                if operation == "move":
-                    os.remove(input_path)
-
-            except Exception as e:
-                errors.append(f"Error processing {label} {rel_path}: {e}")
-
-    print("\n" + "-" * 30)
-    print("  Remove Alpha Channel Summary")
-    print("-" * 30)
-    print(f"Workflow: {workflow_type.upper()}")
-    print(f"Operation: {operation.upper()}")
-    print(f"Scanned {total_checked} total images.")
-    print(
-        f"Found and processed {total_processed} images with alpha channels (alpha removed)."
+    # Apply transformations
+    hq_success = apply_transformation_to_image(
+        hq_path, transform_type, value, operation, hq_output
+    )
+    lq_success = apply_transformation_to_image(
+        lq_path, transform_type, value, operation, lq_output
     )
 
-    if destination:
-        print(f"Destination: {destination}")
-
-    if errors:
-        print(f"Errors encountered: {len(errors)}")
-        for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
-        if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-
-    print("-" * 30)
-    print("=" * 30)
+    return hq_success and lq_success
 
 
-# --- Apply Custom Transformations ---
 def transform_dataset(hq_folder, lq_folder):
+    """Transform dataset with parallel processing."""
     print("\n" + "=" * 30)
-    print("  Transforming Dataset")
+    print("  TRANSFORM DATASET")
     print("=" * 30)
-    BATCH_SIZE = 1000
-    hq_files_list = sorted(
-        [
-            f
-            for f in os.listdir(hq_folder)
-            if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
-        ]
-    )
-    lq_files_list = sorted(
-        [
-            f
-            for f in os.listdir(lq_folder)
-            if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
-        ]
-    )
-    matching_files = [f for f in hq_files_list if f in lq_files_list]
-    if not matching_files:
-        print("No matching HQ/LQ pairs found for transformation.")
-        print("=" * 30)
-        return
-    files_to_process = get_pairs_to_process(matching_files, operation_name="transform")
-    if not files_to_process:
-        print("=" * 30)
-        return
-    num_selected_for_transform = len(files_to_process)
-    transform_options = {
+
+    # Get transformation type
+    print("\nAvailable transformations:")
+    print("1. brightness - Adjust image brightness")
+    print("2. contrast - Adjust image contrast")
+    print("3. saturation - Adjust color saturation")
+    print("4. sharpness - Adjust image sharpness")
+    print("5. blur - Apply Gaussian blur")
+    print("6. hue - Adjust hue (color shift)")
+
+    transform_choice = input("\nSelect transformation (1-6): ").strip()
+
+    transform_map = {
         "1": "brightness",
         "2": "contrast",
         "3": "saturation",
         "4": "sharpness",
-        "5": "rotate",
-        "6": "flip_horizontal",
-        "7": "flip_vertical",
-        "8": "grayscale",
+        "5": "blur",
+        "6": "hue",
     }
-    print("\nSelect a transformation:")
-    for key, value in transform_options.items():
-        print(f"  {key}. {value.replace('_', ' ').capitalize()}")
-    while True:
-        transform_choice = input("Enter the number of your choice: ").strip()
-        if transform_choice in transform_options:
-            selected_transform = transform_options[transform_choice]
-            break
-        else:
-            print("Invalid choice. Please enter a valid number.")
-    value = None
-    if selected_transform in ["brightness", "contrast", "saturation", "sharpness"]:
-        while True:
-            try:
-                val_str = input(
-                    f"Enter {selected_transform} factor (e.g., 0.5 for half, 1.0 for original, 1.5 for 50% more): "
-                ).strip()
-                value = float(val_str)
-                if value >= 0:
-                    break
-                else:
-                    print("Factor must be non-negative.")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
-    elif selected_transform == "rotate":
-        while True:
-            try:
-                val_str = input(
-                    "Enter rotation angle in degrees (e.g., 90, -90, 180). Positive = counter-clockwise: "
-                ).strip()
-                value = float(val_str)
-                break
-            except ValueError:
-                print("Invalid input. Please enter a number for angle.")
+
+    if transform_choice not in transform_map:
+        print("Invalid choice.")
+        return
+
+    selected_transform = transform_map[transform_choice]
+
+    # Get transformation value
+    value = float(input(f"Enter {selected_transform} value: "))
+
+    # Get operation type
     operation = get_file_operation_choice()
-    destination_hq_folder = ""
-    destination_lq_folder = ""
+
+    # Get destination directories if needed
+    dest_hq_dir = ""
+    dest_lq_dir = ""
     if operation != "inplace":
-        output_base_dir_prompt = (
-            f"Enter base destination directory for {operation}ed transformed pairs: "
-        )
-        output_base_dir = (
-            get_destination_path(prompt=output_base_dir_prompt)
-            if callable(get_destination_path)
-            else get_destination_path()
-        )
-        if not output_base_dir:
-            print(
-                f"Operation aborted as no destination path was provided for {operation}."
-            )
+        dest_hq_dir = get_destination_path("Enter destination HQ folder: ")
+        dest_lq_dir = get_destination_path("Enter destination LQ folder: ")
+        if not dest_hq_dir or not dest_lq_dir:
+            print("Operation aborted as destination paths were not provided.")
             return
-        sane_transform_name = selected_transform.replace("_", "-")
-        destination_hq_folder = os.path.join(
-            output_base_dir, f"transformed_{sane_transform_name}_hq"
-        )
-        destination_lq_folder = os.path.join(
-            output_base_dir, f"transformed_{sane_transform_name}_lq"
-        )
-        os.makedirs(destination_hq_folder, exist_ok=True)
-        os.makedirs(destination_lq_folder, exist_ok=True)
-        print(
-            f"Transformed pairs will be {operation}d to respective subfolders in {output_base_dir}"
-        )
-    else:
-        print(
-            f"Performing '{selected_transform}' transformation in-place on {num_selected_for_transform} selected pairs."
-        )
-    processed_count = 0
-    errors = []
-    print(
-        f"\nApplying transformation ({selected_transform}) to {num_selected_for_transform} randomly selected and ordered pairs..."
+        os.makedirs(dest_hq_dir, exist_ok=True)
+        os.makedirs(dest_lq_dir, exist_ok=True)
+
+    # Get matching files
+    hq_files = {f for f in os.listdir(hq_folder) if is_image_file(f)}
+    lq_files = {f for f in os.listdir(lq_folder) if is_image_file(f)}
+    matching_files = sorted(hq_files & lq_files)
+
+    if not matching_files:
+        print("No matching HQ/LQ pairs found.")
+        return
+
+    print(f"\nFound {len(matching_files)} matching pairs to transform.")
+
+    # Prepare pair information
+    pairs = []
+    for filename in matching_files:
+        hq_path = os.path.join(hq_folder, filename)
+        lq_path = os.path.join(lq_folder, filename)
+        pairs.append((hq_path, lq_path, filename))
+
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,  # I/O bound task
+        use_gpu=False,  # No GPU needed for basic transformations
+        chunk_size=parallel_config.get("chunk_size", 1),
     )
-    for batch_start in range(0, len(files_to_process), BATCH_SIZE):
-        batch = files_to_process[batch_start : batch_start + BATCH_SIZE]
-        print(f"Processing batch {batch_start//BATCH_SIZE+1} ({len(batch)} pairs)...")
-        for filename in tqdm(
-            batch,
-            desc=f"Transforming Pairs ({selected_transform}) [Batch {batch_start//BATCH_SIZE+1}]",
-        ):
-            hq_src_path = os.path.join(hq_folder, filename)
-            lq_src_path = os.path.join(lq_folder, filename)
-            hq_dest_path_for_apply = None
-            lq_dest_path_for_apply = None
-            if operation != "inplace":
-                hq_dest_path_for_apply = os.path.join(
-                    destination_hq_folder,
-                    get_unique_filename(destination_hq_folder, filename),
-                )
-                lq_dest_path_for_apply = os.path.join(
-                    destination_lq_folder,
-                    get_unique_filename(destination_lq_folder, filename),
-                )
-            else:
-                hq_dest_path_for_apply = hq_src_path
-                lq_dest_path_for_apply = lq_src_path
-            hq_success = apply_transformation_to_image(
-                hq_src_path,
-                selected_transform,
-                value,
-                operation,
-                hq_dest_path_for_apply,
-            )
-            lq_success = False
-            if hq_success or operation != "move":
-                lq_success = apply_transformation_to_image(
-                    lq_src_path,
-                    selected_transform,
-                    value,
-                    operation,
-                    lq_dest_path_for_apply,
-                )
-            if hq_success and lq_success:
-                processed_count += 1
-            else:
-                err_msg = f"Pair {filename}: "
-                if not hq_success:
-                    err_msg += f"HQ failed. "
-                if not lq_success:
-                    err_msg += f"LQ failed."
-                errors.append(err_msg)
-                logging.warning(
-                    f"Failed to fully transform pair {filename}. HQ status: {hq_success}, LQ status: {lq_success}"
-                )
-    print("\n" + "-" * 30)
-    print("  Transform Dataset Summary")
-    print("-" * 30)
-    print(
-        f"Transformation: {selected_transform} (Value: {value if value is not None else 'N/A'})"
+
+    # Process pairs in parallel
+    results = smart_map(
+        lambda pair: transform_single_pair(
+            pair, selected_transform, value, operation, dest_hq_dir, dest_lq_dir
+        ),
+        pairs,
+        desc=f"Transforming pairs ({selected_transform})",
+        max_workers=config.max_workers,
+        processing_type=ProcessingType.THREAD,
     )
-    print(f"Operation: {operation.capitalize()}")
-    print(f"Total matching pairs in source: {len(matching_files)}")
-    print(f"Number of pairs selected for transformation: {num_selected_for_transform}")
-    print(f"Successfully transformed: {processed_count} pairs.")
-    if errors:
-        print(f"Errors or partial failures encountered for {len(errors)} pairs:")
-        for i, error_msg in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error_msg}")
-        if len(errors) > 5:
-            print(
-                f"  ... and {len(errors) - 5} more issues (check console/log for details)."
-            )
-    print("-" * 30)
+
+    # Count results
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+
+    print(f"\nTransformation complete:")
+    print(f"  Successful pairs: {successful}")
+    print(f"  Failed pairs: {failed}")
+
+    # Log operation
+    log_operation(
+        "transform_dataset",
+        f"{selected_transform}={value}, {operation}, {successful}/{len(pairs)} pairs",
+    )
+
+
+def transform_single_folder(folder_path: str):
+    """Transform images in a single folder with parallel processing."""
+    print("\n" + "=" * 30)
+    print("  TRANSFORM SINGLE FOLDER")
     print("=" * 30)
+
+    # Get transformation type
+    print("\nAvailable transformations:")
+    print("1. brightness - Adjust image brightness")
+    print("2. contrast - Adjust image contrast")
+    print("3. saturation - Adjust color saturation")
+    print("4. sharpness - Adjust image sharpness")
+    print("5. blur - Apply Gaussian blur")
+    print("6. hue - Adjust hue (color shift)")
+
+    transform_choice = input("\nSelect transformation (1-6): ").strip()
+
+    transform_map = {
+        "1": "brightness",
+        "2": "contrast",
+        "3": "saturation",
+        "4": "sharpness",
+        "5": "blur",
+        "6": "hue",
+    }
+
+    if transform_choice not in transform_map:
+        print("Invalid choice.")
+        return
+
+    selected_transform = transform_map[transform_choice]
+
+    # Get transformation value
+    value = float(input(f"Enter {selected_transform} value: "))
+
+    # Get operation type
+    operation = get_file_operation_choice()
+
+    # Get destination directory if needed
+    dest_dir = ""
+    if operation != "inplace":
+        dest_dir = get_destination_path("Enter destination folder: ")
+        if not dest_dir:
+            print("Operation aborted as destination path was not provided.")
+            return
+        os.makedirs(dest_dir, exist_ok=True)
+
+    # Get image files
+    image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
+
+    if not image_files:
+        print("No image files found in folder.")
+        return
+
+    print(f"\nFound {len(image_files)} images to transform.")
+
+    # Prepare image paths
+    image_paths = [os.path.join(folder_path, f) for f in image_files]
+
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    # Process images in parallel
+    results = image_map(
+        lambda path: apply_transformation_to_image(
+            path, selected_transform, value, operation, dest_dir
+        ),
+        image_paths,
+        desc=f"Transforming images ({selected_transform})",
+        max_workers=config.max_workers,
+    )
+
+    # Count results
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+
+    print(f"\nTransformation complete:")
+    print(f"  Successful images: {successful}")
+    print(f"  Failed images: {failed}")
+
+    # Log operation
+    log_operation(
+        "transform_single_folder",
+        f"{selected_transform}={value}, {operation}, {successful}/{len(image_files)} images",
+    )
+
+
+def batch_transform_with_parameters(
+    folder_path: str,
+    transform_type: str,
+    parameters: list,
+    operation: str = "copy",
+    dest_dir: str = None,
+):
+    """
+    Apply transformations with multiple parameters to create variations.
+
+    Args:
+        folder_path: Path to folder containing images
+        transform_type: Type of transformation
+        parameters: List of parameter values to try
+        operation: Operation type (copy, move, inplace)
+        dest_dir: Destination directory
+    """
+    # Get image files
+    image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
+
+    if not image_files:
+        print("No image files found in folder.")
+        return
+
+    print(
+        f"Found {len(image_files)} images to transform with {len(parameters)} parameters."
+    )
+
+    # Create destination directory if needed
+    if operation != "inplace" and dest_dir:
+        os.makedirs(dest_dir, exist_ok=True)
+
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    def transform_with_parameter(image_param_tuple):
+        """Transform a single image with a specific parameter."""
+        image_path, param = image_param_tuple
+        filename = os.path.basename(image_path)
+        name, ext = os.path.splitext(filename)
+
+        if operation == "inplace":
+            output_path = image_path
+        else:
+            output_path = os.path.join(
+                dest_dir, f"{name}_{transform_type}_{param}{ext}"
+            )
+
+        return apply_transformation_to_image(
+            image_path, transform_type, param, operation, output_path
+        )
+
+    # Create all image-parameter combinations
+    combinations = []
+    for image_file in image_files:
+        image_path = os.path.join(folder_path, image_file)
+        for param in parameters:
+            combinations.append((image_path, param))
+
+    # Process combinations in parallel
+    results = smart_map(
+        transform_with_parameter,
+        combinations,
+        desc=f"Batch transforming ({transform_type})",
+        max_workers=config.max_workers,
+        processing_type=ProcessingType.THREAD,
+    )
+
+    # Count results
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+
+    print(f"\nBatch transformation complete:")
+    print(f"  Total operations: {len(combinations)}")
+    print(f"  Successful: {successful}")
+    print(f"  Failed: {failed}")
+
+    # Log operation
+    log_operation(
+        "batch_transform",
+        f"{transform_type}, {len(parameters)} params, {operation}, {successful}/{len(combinations)} operations",
+    )
+
+
+def apply_custom_transformation(
+    folder_path: str,
+    transform_func,
+    operation: str = "copy",
+    dest_dir: str = None,
+    **kwargs,
+):
+    """
+    Apply a custom transformation function to all images in a folder.
+
+    Args:
+        folder_path: Path to folder containing images
+        transform_func: Custom transformation function
+        operation: Operation type (copy, move, inplace)
+        dest_dir: Destination directory
+        **kwargs: Additional arguments for transform_func
+    """
+    # Get image files
+    image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
+
+    if not image_files:
+        print("No image files found in folder.")
+        return
+
+    print(f"Found {len(image_files)} images to transform.")
+
+    # Create destination directory if needed
+    if operation != "inplace" and dest_dir:
+        os.makedirs(dest_dir, exist_ok=True)
+
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    def apply_custom_transform(image_path):
+        """Apply custom transformation to a single image."""
+        try:
+            filename = os.path.basename(image_path)
+
+            if operation == "inplace":
+                output_path = image_path
+            else:
+                output_path = os.path.join(dest_dir, filename)
+
+            # Load image
+            with Image.open(image_path) as img:
+                # Apply custom transformation
+                transformed_img = transform_func(img, **kwargs)
+
+                # Save image
+                if operation == "inplace":
+                    transformed_img.save(image_path)
+                else:
+                    transformed_img.save(output_path)
+
+            return True
+
+        except Exception as e:
+            print(f"Error applying custom transformation to {image_path}: {e}")
+            return False
+
+    # Process images in parallel
+    results = image_map(
+        apply_custom_transform,
+        [os.path.join(folder_path, f) for f in image_files],
+        desc="Applying custom transformation",
+        max_workers=config.max_workers,
+    )
+
+    # Count results
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+
+    print(f"\nCustom transformation complete:")
+    print(f"  Successful images: {successful}")
+    print(f"  Failed images: {failed}")
+
+    # Log operation
+    log_operation(
+        "custom_transform",
+        f"custom function, {operation}, {successful}/{len(image_files)} images",
+    )
