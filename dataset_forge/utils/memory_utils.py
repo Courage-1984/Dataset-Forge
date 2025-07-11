@@ -509,34 +509,36 @@ def tensor_context(device: Optional[str] = None, cleanup_on_exit: bool = True):
 
 
 # Memory-efficient tensor operations
-def to_device_safe(
-    tensor: torch.Tensor, device: str, non_blocking: bool = True
-) -> torch.Tensor:
+def to_device_safe(obj: object, device: str, non_blocking: bool = True) -> object:
     """
-    Safely move tensor to device with memory management.
+    Safely move a tensor or model to the specified device with memory management.
 
     Args:
-        tensor: Tensor to move
+        obj: torch.Tensor or torch.nn.Module to move
         device: Target device
-        non_blocking: Whether to use non-blocking transfer
+        non_blocking: Whether to use non-blocking transfer (for tensors)
 
     Returns:
-        Tensor on target device
+        The object on the target device
     """
-    if tensor.device == device:
-        return tensor
+    import torch  # Ensure torch is imported
 
-    try:
-        result = tensor.to(device, non_blocking=non_blocking)
-
-        # Clear cache after transfer if using CUDA
-        if device.startswith("cuda"):
-            clear_cuda_cache()
-
-        return result
-    except Exception as e:
-        print_error(f"Failed to move tensor to {device}: {e}")
-        raise
+    if isinstance(obj, torch.nn.Module):
+        return obj.to(device)
+    elif isinstance(obj, torch.Tensor):
+        if obj.device == device:
+            return obj
+        try:
+            result = obj.to(device, non_blocking=non_blocking)
+            # Clear cache after transfer if using CUDA
+            if device.startswith("cuda"):
+                clear_cuda_cache()
+            return result
+        except Exception as e:
+            print_error(f"Failed to move tensor to {device}: {e}")
+            raise
+    else:
+        return obj  # Optionally, raise an error if strict typing is desired
 
 
 def detach_and_clear(tensor: torch.Tensor) -> torch.Tensor:

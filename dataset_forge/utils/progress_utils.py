@@ -10,7 +10,7 @@ from dataset_forge.utils.parallel_utils import (
     parallel_image_processing,
     ProcessingType,
     ParallelConfig,
-    setup_parallel_environment
+    setup_parallel_environment,
 )
 
 
@@ -65,14 +65,16 @@ def process_map(*args, **kwargs):
     play_audio = kwargs.pop("play_audio", True)
     max_workers = kwargs.pop("max_workers", None)
     processing_type = kwargs.pop("processing_type", ProcessingType.PROCESS)
-    
+
     # Use new parallel processing if advanced options are specified
     if max_workers is not None or processing_type != ProcessingType.PROCESS:
-        config = ParallelConfig(max_workers=max_workers, processing_type=processing_type)
+        config = ParallelConfig(
+            max_workers=max_workers, processing_type=processing_type
+        )
         result = parallel_map(*args, **kwargs, config=config)
     else:
         result = original_process_map(*args, **kwargs)
-    
+
     if play_audio:
         play_done_sound()
     return result
@@ -89,14 +91,16 @@ def thread_map(*args, **kwargs):
     play_audio = kwargs.pop("play_audio", True)
     max_workers = kwargs.pop("max_workers", None)
     processing_type = kwargs.pop("processing_type", ProcessingType.THREAD)
-    
+
     # Use new parallel processing if advanced options are specified
     if max_workers is not None or processing_type != ProcessingType.THREAD:
-        config = ParallelConfig(max_workers=max_workers, processing_type=processing_type)
+        config = ParallelConfig(
+            max_workers=max_workers, processing_type=processing_type
+        )
         result = parallel_map(*args, **kwargs, config=config)
     else:
         result = original_thread_map(*args, **kwargs)
-    
+
     if play_audio:
         play_done_sound()
     return result
@@ -113,7 +117,7 @@ def smart_map(
 ) -> List[Any]:
     """
     Smart parallel processing that automatically chooses the best method.
-    
+
     Args:
         func: Function to apply to each item
         items: List of items to process
@@ -121,14 +125,15 @@ def smart_map(
         max_workers: Maximum number of workers
         processing_type: Type of processing to use
         play_audio: Whether to play audio when finished
-        **kwargs: Additional arguments to pass to func
-        
+        **kwargs: Only arguments intended for the worker function (not config)
+
     Returns:
         List of results
     """
     config = ParallelConfig(max_workers=max_workers, processing_type=processing_type)
-    result = parallel_map(func, items, desc, config=config, **kwargs)
-    
+    # Only pass config to parallel_map, do not forward **kwargs
+    result = parallel_map(func, items, desc, config=config)
+
     if play_audio:
         play_done_sound()
     return result
@@ -144,7 +149,7 @@ def image_map(
 ) -> List[Any]:
     """
     Specialized parallel processing for image operations.
-    
+
     Args:
         func: Function to apply to each image
         image_paths: List of image file paths
@@ -152,12 +157,12 @@ def image_map(
         max_workers: Maximum number of workers
         play_audio: Whether to play audio when finished
         **kwargs: Additional arguments to pass to func
-        
+
     Returns:
         List of results
     """
     result = parallel_image_processing(func, image_paths, desc, max_workers, **kwargs)
-    
+
     if play_audio:
         play_done_sound()
     return result
@@ -175,7 +180,7 @@ def batch_map(
 ) -> List[Any]:
     """
     Parallel processing with batching for memory efficiency.
-    
+
     Args:
         func: Function to apply to each batch
         items: List of items to process
@@ -185,16 +190,16 @@ def batch_map(
         processing_type: Type of processing to use
         play_audio: Whether to play audio when finished
         **kwargs: Additional arguments to pass to func
-        
+
     Returns:
         List of results
     """
     from dataset_forge.utils.parallel_utils import BatchProcessor, ParallelConfig
-    
+
     config = ParallelConfig(max_workers=max_workers, processing_type=processing_type)
     processor = BatchProcessor(config)
     result = processor.process_in_batches(func, items, batch_size, desc, **kwargs)
-    
+
     if play_audio:
         play_done_sound()
     return result

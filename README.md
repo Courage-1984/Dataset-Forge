@@ -102,6 +102,7 @@
 - **Metadata Tools**: EXIF scrubbing, ICC to sRGB conversion
 - **Augmentation Pipeline**: Custom transformation recipes, data augmentation
 - **Advanced Tiling**: BestTile with Laplacian/IC9600 complexity analysis
+- **Sketch/Line Art Extraction**: Find and extract sketches, drawings, and line art from images using a deep learning model ([Sketch-126-DomainNet](https://huggingface.co/prithivMLmods/Sketch-126-DomainNet)). Supports single folder or HQ/LQ pairs, with copy/move options and confidence threshold.
 
 ### 🚀 **Training & Inference**
 
@@ -445,6 +446,7 @@ ffmpeg
 
 # ML/AI frameworks
 torch
+transformers  # For sketch extraction (Hugging Face models)
 torchvision
 torchaudio
 spandrel
@@ -632,45 +634,3 @@ Advanced duplicate detection using the imagededup library:
 Dataset Forge is designed with a modular architecture for easy contribution:
 
 1. **Add new actions**: Create new files in `dataset_forge/actions/`
-2. **Add new menus**: Create new files in `dataset_forge/menus/`
-3. **Add new utilities**: Create new files in `dataset_forge/utils/`
-4. **Follow the architecture**: Keep UI, business logic, and utilities separate
-
-### Development Setup
-
-```bash
-git clone <repository-url>
-cd Dataset-Forge
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
-python main.py
-```
-
----
-
-## 💜 Credits
-
-- Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
-- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) & [Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing)
-- Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
-- Thanks [Phhofm](https://github.com/Phhofm)❤️ for [sisr](https://github.com/Phhofm/sisr)
-
----
-
-## 📄 License
-
-**Creative Commons Attribution Share Alike 4.0 International (CC-BY-SA-4.0)**
-
-This license allows you to:
-
-- Share: Copy and redistribute the material in any medium or format
-- Adapt: Remix, transform, and build upon the material
-- Attribution: You must give appropriate credit
-- Share Alike: If you remix, transform, or build upon the material, you must distribute your contributions under the same license
-
----
-
-<p align="center">
-  <b>Enjoy your dataset journey! 🚀</b>
-</p>

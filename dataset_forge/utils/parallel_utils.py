@@ -99,7 +99,7 @@ class ParallelProcessor:
             return self.config.processing_type
 
         # Check if function uses GPU
-        func_name = func.__name__.lower()
+        func_name = get_func_name(func).lower()
         gpu_keywords = ["cuda", "gpu", "torch", "model", "neural", "ai", "ml"]
         if any(keyword in func_name for keyword in gpu_keywords):
             return ProcessingType.THREAD  # GPU operations should use threads
@@ -474,7 +474,7 @@ def parallel_map(
     """
     config = ParallelConfig(max_workers=max_workers, processing_type=processing_type)
     processor = ParallelProcessor(config)
-    return processor.process_map(func, items, desc, **kwargs)
+    return processor.process_map(func, items, desc)
 
 
 def parallel_submit(
@@ -501,7 +501,7 @@ def parallel_submit(
     """
     config = ParallelConfig(max_workers=max_workers, processing_type=processing_type)
     processor = ParallelProcessor(config)
-    return processor.process_submit(func, items, desc, **kwargs)
+    return processor.process_submit(func, items, desc)
 
 
 def parallel_image_processing(
@@ -528,7 +528,7 @@ def parallel_image_processing(
         max_workers=max_workers, processing_type=ProcessingType.THREAD
     )
     processor = ImageProcessor(config)
-    return processor.process_images(func, image_paths, desc, **kwargs)
+    return processor.process_images(func, image_paths, desc)
 
 
 def get_optimal_worker_count(task_type: str = "auto") -> int:
@@ -577,3 +577,9 @@ def setup_parallel_environment(
         use_gpu=use_gpu,
         gpu_memory_fraction=gpu_memory_fraction,
     )
+
+
+def get_func_name(func):
+    if isinstance(func, functools.partial):
+        return func.func.__name__
+    return func.__name__

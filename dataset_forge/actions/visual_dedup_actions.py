@@ -12,6 +12,7 @@ from dataset_forge.utils.parallel_utils import (
     setup_parallel_environment,
 )
 from dataset_forge.menus.session_state import parallel_config
+from functools import partial
 
 from dataset_forge.utils.printing import (
     print_info,
@@ -147,6 +148,22 @@ def get_clip_model(device: str = "cuda" if torch.cuda.is_available() else "cpu")
     return model, preprocess
 
 
+def compute_single_embedding(
+    img_tuple: Tuple[str, Image.Image], model, preprocess, device: str
+) -> np.ndarray:
+    try:
+        from dataset_forge.utils.memory_utils import to_device_safe
+
+        _, img = img_tuple
+        with torch.no_grad():
+            img_tensor = to_device_safe(preprocess(img).unsqueeze(0), device)
+            emb = model.encode_image(img_tensor)
+            return emb.cpu().numpy().flatten()
+    except Exception as e:
+        print_warning(f"Error computing embedding: {e}")
+        return np.zeros(512)  # Default CLIP embedding size
+
+
 def compute_clip_embeddings(
     images: List[Tuple[str, Image.Image]],
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
@@ -155,19 +172,6 @@ def compute_clip_embeddings(
     model, preprocess = get_clip_model(device)
     model.eval()
 
-    def compute_single_embedding(img_tuple: Tuple[str, Image.Image]) -> np.ndarray:
-        try:
-            from dataset_forge.utils.memory_utils import to_device_safe
-
-            _, img = img_tuple
-            with torch.no_grad():
-                img_tensor = to_device_safe(preprocess(img).unsqueeze(0), device)
-                emb = model.encode_image(img_tensor)
-                return emb.cpu().numpy().flatten()
-        except Exception as e:
-            print_warning(f"Error computing embedding: {e}")
-            return np.zeros(512)  # Default CLIP embedding size
-
     # Use parallel processing for embeddings
     config = ParallelConfig(
         max_workers=parallel_config.get("max_workers"),
@@ -175,8 +179,13 @@ def compute_clip_embeddings(
         use_gpu=parallel_config.get("use_gpu", True),
     )
 
+    # Use functools.partial to bind model, preprocess, and device
+    embedding_func = partial(
+        compute_single_embedding, model=model, preprocess=preprocess, device=device
+    )
+
     embs = smart_map(
-        compute_single_embedding,
+        embedding_func,
         images,
         desc="CLIP embedding",
         max_workers=config.max_workers,
