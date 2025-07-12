@@ -55,6 +55,7 @@ def utilities_menu():
         "4": ("🗜️ Compress Images", compress_menu),
         "5": ("📦 Compress Directory", compress_dir_menu),
         "6": ("🧹 Sanitize Images", sanitize_images_menu),
+        "7": ("🌳 Enhanced Directory Tree", directory_tree_menu),
         "0": ("⬅️ Back to Main Menu", None),
     }
     while True:
@@ -67,3 +68,10 @@ def utilities_menu():
         if action is None:
             break
         action()
+
+
+def directory_tree_menu():
+    """Directory tree menu integration."""
+    from dataset_forge.menus.directory_tree_menu import directory_tree_menu as tree_menu
+
+    tree_menu()

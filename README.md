@@ -61,6 +61,15 @@
    ./run.bat
    ```
 
+4. **Enhanced Directory Tree Setup (Optional but Recommended):**
+
+   For optimal file type detection in the Enhanced Directory Tree Generator, install python-magic system files:
+
+   ```bash
+   # Download and install libmagic files for Windows 64-bit
+   # See "python-magic Setup for Windows 64-bit" section below for detailed instructions
+   ```
+
 ---
 
 ## 🪄 Features
@@ -114,6 +123,7 @@
 - **Visual Comparison**: Side-by-side comparisons, animated GIF comparisons
 - **Folder Comparison**: Find missing files between folders
 - **Compression Tools**: Image compression, directory archiving
+- **Enhanced Directory Tree**: AI-powered directory visualization with emoji categorization, statistics, and multiple output formats
 - **Path History**: Smart path management with history and favorites
 - **Parallel Processing**: High-performance multiprocessing and multithreading
 
@@ -360,6 +370,7 @@ Dataset-Forge/
     │   ├── dataset_ops_actions.py   # Dataset operations
     │   ├── sanitize_images_actions.py # Image sanitization
     │   ├── sketch_extraction_actions.py # Sketch detection
+    │   ├── directory_tree_actions.py # Enhanced directory tree generator
     │   └── settings_actions.py      # Settings management
     ├── menus/                       # UI layer (15+ files)
     │   ├── __init__.py
@@ -376,6 +387,7 @@ Dataset-Forge/
     │   ├── correct_hq_lq_pairing_menu.py # HQ/LQ pairing
     │   ├── compress_menu.py         # Compression
     │   ├── compress_dir_menu.py     # Directory compression
+    │   ├── directory_tree_menu.py   # Enhanced directory tree
     │   ├── links_menu.py            # Community links
     │   ├── history_log_menu.py      # History logs
     │   ├── sanitize_images_menu.py  # Image sanitization
@@ -509,6 +521,15 @@ The application features an intuitive hierarchical menu system:
 - **Compress Images / Directory**
   - Compress Images
   - Compress Directory
+- **🌳 Enhanced Directory Tree**
+  - Quick Tree Generation
+  - Advanced Tree Generation with Custom Settings
+  - Batch Tree Generation for Multiple Directories
+  - Directory Statistics Analysis
+  - Directory Comparison Tools
+  - Enhanced Statistics Analysis with Export Options
+  - Batch Export Analysis with Chart Generation
+  - Advanced Insights Analysis with Recommendations
 - **Advanced Tools**
   - Image Sanitization
   - BHI Filtering
@@ -644,6 +665,11 @@ jinja2
 webbrowser
 imagededup
 
+# Directory tree functionality (Enhanced Directory Tree Generator)
+python-magic==0.4.27
+python-magic-bin==0.4.14
+libmagic==1.0
+
 # Parallel processing
 psutil
 joblib
@@ -746,6 +772,14 @@ pepedpid
 4. **Memory Optimization**: Use GPU memory management for large datasets
 5. **Parallel Processing**: Leverage smart processing type selection
 
+#### Directory Analysis & Visualization
+
+1. **Quick Tree Generation**: Generate visual directory trees with emoji categorization
+2. **Advanced Analysis**: Get detailed statistics on file types, sizes, and distribution
+3. **Batch Processing**: Generate trees for multiple directories simultaneously
+4. **Directory Comparison**: Compare statistics between different datasets
+5. **Export Options**: Save trees as Markdown or JSON for documentation
+
 ---
 
 ## 🔧 Advanced Features
@@ -785,6 +819,277 @@ Deep learning-based duplicate detection:
 - **CLIP Embeddings**: Fast semantic similarity
 - **LPIPS**: Perceptual similarity
 - **Configurable Thresholds**: Adjustable sensitivity
+
+### Enhanced Directory Tree Generator
+
+AI-powered directory visualization and analysis:
+
+- **Emoji Categorization**: Intelligent file type detection with visual emojis
+- **Advanced File Detection**: Uses python-magic for accurate MIME type detection
+- **Multiple Output Formats**: Console display, Markdown files, and JSON export
+- **Comprehensive Statistics**: File counts, sizes, types, and distribution analysis
+- **Batch Processing**: Generate trees for multiple directories simultaneously
+- **Directory Comparison**: Compare statistics between different directories
+- **Customizable Settings**: Ignore patterns, depth limits, and output options
+- **Memory Management**: Integrated with Dataset Forge's memory optimization
+- **Progress Tracking**: Real-time progress with Dataset Forge's progress system
+
+#### 🌳 Enhanced Directory Tree Features
+
+The Enhanced Directory Tree Generator provides comprehensive directory analysis and visualization with the following advanced features:
+
+##### **Core Functionality**
+
+- **Quick Tree Generation**: Fast directory tree generation with default settings
+- **Advanced Tree Generation**: Customizable tree generation with depth limits, ignore patterns, and output formats
+- **Batch Tree Generation**: Process multiple directories simultaneously with progress tracking
+- **Statistics Analysis**: Comprehensive directory statistics with file type breakdown and size analysis
+- **Directory Comparison**: Compare statistics between multiple directories with detailed insights
+
+##### **Advanced Analysis Features**
+
+- **Enhanced Statistics Analysis**: Progress-tracked analysis with export options (JSON, CSV, TXT)
+- **Batch Export Analysis**: Process multiple directories with automatic export and chart generation
+- **Advanced Insights Analysis**: Detailed metrics including file patterns, size distribution, age analysis, and intelligent recommendations
+- **Visual Chart Generation**: Automatic generation of pie charts, histograms, and bar charts for data visualization
+
+##### **File Type Detection & Categorization**
+
+- **python-magic Integration**: Accurate MIME type detection using libmagic
+- **Emoji Categorization**: Visual file type indicators (📁 folders, 🖼️ images, 🎵 audio, 🎬 video, 📄 documents, etc.)
+- **Fallback Detection**: Extension-based detection when python-magic is unavailable
+- **Comprehensive Coverage**: Support for 50+ file types across 12 categories
+
+##### **Export & Visualization**
+
+- **Multiple Export Formats**: JSON, CSV, and TXT export options
+- **Visual Charts**: Automatic generation of:
+  - File type distribution pie charts
+  - File size distribution histograms
+  - File count by type bar charts
+- **Batch Processing**: Export statistics for multiple directories with summary reports
+- **Timestamped Outputs**: Automatic timestamping for all exports and charts
+
+##### **Advanced Insights & Recommendations**
+
+- **Size Analysis**: Total size, average file size, size distribution analysis
+- **Age Analysis**: File modification time analysis, recent vs. old file detection
+- **Pattern Analysis**: Extension distribution, potential duplicate detection
+- **Intelligent Recommendations**: Automated suggestions for:
+  - Large file archiving
+  - Old file cleanup
+  - Duplicate file management
+  - File type organization
+
+##### **Performance & Memory Management**
+
+- **Progress Tracking**: Real-time progress bars for all operations
+- **Memory Optimization**: Integrated with Dataset Forge's memory management system
+- **Parallel Processing**: Efficient processing of large directories
+- **Error Handling**: Robust error handling with graceful degradation
+
+#### 🐍 python-magic Setup for Windows 64-bit
+
+The Enhanced Directory Tree Generator uses python-magic for accurate file type detection. Follow these instructions for proper setup on Windows 64-bit systems:
+
+##### **Installation Steps**
+
+1. **Install Python Packages**:
+
+   ```bash
+   pip install python-magic==0.4.27 python-magic-bin==0.4.14 libmagic==1.0
+   ```
+
+2. **Download libmagic Files**:
+
+   - Download the libmagicwin64 files from: https://github.com/pidydx/libmagicwin64
+   - Extract the following files from the archive:
+     - `libgnurx-0.dll`
+     - `magic.mgc`
+     - `magic1.dll`
+
+3. **Install System Files**:
+
+   - Copy all three files to `C:\Windows\System32\`
+   - These files provide 64-bit Windows compatibility for libmagic
+
+4. **Verify Installation**:
+   - Run the Enhanced Directory Tree Generator
+   - You should see: `✅ python-magic initialized with magic file: C:/Windows/System32/magic.mgc`
+
+##### **Alternative Magic File Locations**
+
+The system automatically searches for magic files in these locations:
+
+- `C:/Windows/System32/magic.mgc`
+- `C:/Program Files/Git/usr/share/misc/magic.mgc`
+- `C:/msys64/usr/share/misc/magic.mgc`
+- `C:/cygwin64/usr/share/misc/magic.mgc`
+
+##### **Manual Magic File Configuration**
+
+If automatic detection fails, you can specify a custom magic file:
+
+```python
+file_magic = magic.Magic(magic_file="c:\path\to\magic.mgc")
+```
+
+##### **Troubleshooting**
+
+- **Import Errors**: Ensure python-magic and python-magic-bin are installed
+- **File Not Found**: Verify magic files are in `C:\Windows\System32\`
+- **Permission Errors**: Run as administrator if needed for system32 access
+- **Fallback Mode**: The system will use extension-based detection if python-magic fails
+
+##### **Benefits of python-magic**
+
+- **Accurate Detection**: MIME type detection based on file content, not just extensions
+- **Security**: Detects file types even when extensions are changed
+- **Comprehensive**: Supports hundreds of file formats
+- **Reliable**: Industry-standard libmagic library
+
+#### 📊 Directory Tree Menu Options
+
+The Enhanced Directory Tree Generator is accessible through the Utilities menu:
+
+```
+[ 5 ] 🛠️ Utilities
+  └── [ 7 ] 🌳 Enhanced Directory Tree
+      ├── [ 1 ] 🌳 Quick Tree Generation
+      ├── [ 2 ] ⚙️ Advanced Tree Generation
+      ├── [ 3 ] 📦 Batch Tree Generation
+      ├── [ 4 ] 📊 Statistics Analysis
+      ├── [ 5 ] 🔍 Compare Directories
+      ├── [ 6 ] 📈 Enhanced Statistics Analysis
+      ├── [ 7 ] 📦 Batch Export Analysis
+      └── [ 8 ] 🔍 Advanced Insights Analysis
+```
+
+##### **Menu Option Details**
+
+1. **🌳 Quick Tree Generation**
+
+   - Fast directory tree with default settings
+   - Emoji categorization and basic statistics
+   - Console output with color formatting
+
+2. **⚙️ Advanced Tree Generation**
+
+   - Customizable depth limits and ignore patterns
+   - Multiple output formats (console, markdown, JSON)
+   - File information and detailed statistics
+   - Progress tracking and memory management
+
+3. **📦 Batch Tree Generation**
+
+   - Process multiple directories simultaneously
+   - Common settings for all directories
+   - Progress tracking and error handling
+   - Summary report of successful/failed operations
+
+4. **📊 Statistics Analysis**
+
+   - Comprehensive directory statistics
+   - File type breakdown with percentages
+   - Largest files and recent modifications
+   - Special statistics (empty dirs, hidden files)
+
+5. **🔍 Compare Directories**
+
+   - Compare statistics between multiple directories
+   - Summary table with key metrics
+   - Detailed per-directory breakdown
+   - Comparison insights and recommendations
+
+6. **📈 Enhanced Statistics Analysis**
+
+   - Progress-tracked analysis with detailed reporting
+   - Export options (JSON, CSV, TXT)
+   - Visual chart generation
+   - Enhanced file type detection
+
+7. **📦 Batch Export Analysis**
+
+   - Batch process multiple directories
+   - Automatic export in multiple formats
+   - Chart generation for each directory
+   - Summary report with batch statistics
+
+8. **🔍 Advanced Insights Analysis**
+   - Deep analysis with intelligent recommendations
+   - Size distribution and age analysis
+   - Pattern detection and duplicate analysis
+   - Automated cleanup recommendations
+
+#### 📈 Usage Examples
+
+##### **Basic Directory Analysis**
+
+```bash
+# Navigate to Utilities → Enhanced Directory Tree
+# Select "Quick Tree Generation"
+# Enter directory path: C:/Users/Dieter/Documents
+# View emoji-categorized tree with statistics
+```
+
+##### **Advanced Analysis with Export**
+
+```bash
+# Select "Enhanced Statistics Analysis"
+# Enter directory path
+# Choose export format: JSON
+# Generate visual charts: Yes
+# Review exported files and charts
+```
+
+##### **Batch Processing**
+
+```bash
+# Select "Batch Export Analysis"
+# Enter multiple directory paths
+# Choose export format: CSV
+# Generate charts: Yes
+# Review batch summary and individual reports
+```
+
+##### **Directory Comparison**
+
+```bash
+# Select "Compare Directories"
+# Enter directories to compare
+# Review comparison table and insights
+# Export comparison report if needed
+```
+
+#### 🎯 Advanced Features
+
+##### **Custom Ignore Patterns**
+
+- Ignore specific file types or patterns
+- Support for wildcards and regex
+- Common patterns: `*.tmp`, `__pycache__`, `.git`
+
+##### **Depth Control**
+
+- Limit tree depth for large directories
+- Configurable depth limits (1-10 levels)
+- Memory-efficient processing
+
+##### **Output Customization**
+
+- Console output with color formatting
+- Markdown files for documentation
+- JSON export for programmatic analysis
+- Custom file naming with timestamps
+
+##### **Memory Optimization**
+
+- Integrated with Dataset Forge's memory management
+- Automatic cleanup after large operations
+- Progress tracking with memory monitoring
+- Efficient processing of large directories
+
+The Enhanced Directory Tree Generator provides professional-grade directory analysis capabilities, making it an essential tool for dataset management, documentation, and organization in the Dataset Forge ecosystem.
 
 ### ImageDedup Integration
 

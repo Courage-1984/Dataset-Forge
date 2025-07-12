@@ -35,3 +35,8 @@ joblib
 
 # getnative
 # ^ first install VapourSynth
+
+# Directory tree functionality
+python-magic==0.4.27
+python-magic-bin==0.4.14
+libmagic==1.0
