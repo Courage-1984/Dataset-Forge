@@ -8,9 +8,9 @@ Welcome to the **Dataset Forge** documentation hub! Here you'll find detailed gu
 
 ## 📚 Table of Contents
 
-- [Features](features.md)
-- [Usage Guide](usage.md)
-- [Advanced Features & Configuration](advanced.md)
+- [Features](features.md) (now includes OpenModelDB integration)
+- [Usage Guide](usage.md) (see OpenModelDB Model Browser section)
+- [Advanced Features & Configuration](advanced.md) (advanced OpenModelDB workflows)
 - [Project Architecture](architecture.md)
 - [Troubleshooting](troubleshooting.md)
 - [Contributing](contributing.md)
@@ -23,6 +23,7 @@ Welcome to the **Dataset Forge** documentation hub! Here you'll find detailed gu
 
 ## About This Documentation
 
+- Now includes full documentation for the OpenModelDB model management and upscaling system, supporting both classic and CLI-interactive workflows.
 - The main [README.md](../README.md) in the project root is a concise landing page with quick start and overview.
 - All detailed documentation is split into separate markdown files in this `docs/` folder for clarity and maintainability.
 - Each file includes navigation links at the top for easy movement between docs and back to the main README.

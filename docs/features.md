@@ -43,10 +43,17 @@
 
 ## Training & Inference
 
-- **Config Management**: Add, load, edit, and validate configuration files
-- **Model Integration**: Run traiNNer-redux, list/run upscaling models
-- **Dataset Validation**: Validate training and validation datasets from config
-- **External Tools**: Integration with WTP Dataset Destroyer
+- **OpenModelDB Model Browser**: Browse, search, filter, and manage models from [OpenModelDB](https://openmodeldb.info) directly in the CLI.
+  - Hierarchical menu and modern CLI-interactive mode (arrow keys, live search, dynamic actions)
+  - Search/filter by tag, architecture, scale, or free text
+  - View model details, resources, and sample images
+  - Download models (with SHA256 verification, OneDrive/Google Drive/manual fallback)
+  - Test models on user images (with Spandrel/ONNX support, robust upscaling pipeline)
+  - Batch upscaling and directory support
+  - Open model page in browser
+  - List and manage already downloaded models
+  - Catppuccin Mocha-themed interface and progress bars
+  - Robust error handling and user feedback
 
 ## Utilities
 
