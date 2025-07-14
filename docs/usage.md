@@ -68,3 +68,13 @@ All menu load times are recorded. To view a summary of all menu/submenu load tim
 3. You will see a table of all menu/submenu load times for your session.
 
 This helps you identify slow-loading menus and optimize your workflow.
+
+## Menu Navigation: Robust Pattern Everywhere
+
+All menus and submenus now use a robust, standardized menu loop pattern:
+
+- You select an option; the system looks up the action and calls it if callable.
+- This ensures every menu and submenu works as intended, with no redraw bugs or dead options.
+- Navigation is now consistent and reliable everywhere in the CLI.
+
+For more details, see [docs/features.md](features.md) and [docs/advanced.md](advanced.md).

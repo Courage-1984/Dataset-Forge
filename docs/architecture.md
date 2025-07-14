@@ -26,3 +26,7 @@ The CLI interface now provides audio error feedback: whenever an error is report
 - All menu and submenu actions use the lazy import pattern, and are wrapped with the timing utility for performance analytics.
 - Timing data is available to the user via the System Monitoring menu, and is also available for developer analytics.
 - This system is part of the broader monitoring and analytics utilities in `utils/monitoring.py`.
+
+### Menu System: Robust Loop Pattern
+
+All menus and submenus use a robust, standardized menu loop pattern (choice-based, action lookup, callable check). This is essential for modularity, maintainability, and reliable navigation throughout the CLI.

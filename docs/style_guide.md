@@ -250,3 +250,13 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Do not print raw analytics logs to the console; only user-facing timing prints should be shown.
 - Ensure that "Back" and "Exit" options do not trigger timing prints or errors.
 - Document any new timing/profiling features in the appropriate docs/ files and README_full.md.
+
+## Robust Menu Loop Pattern (Required)
+
+- All menus and submenus must use the robust menu loop pattern:
+  - Get the user's choice (key) from `show_menu`.
+  - Look up the action in the options dictionary.
+  - Call the action if callable.
+- This is required for reliability and maintainability.
+- Always use the Catppuccin Mocha color scheme for menu headers and prompts.
+- Integrate timing/profiling as described in the relevant sections.

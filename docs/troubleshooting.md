@@ -22,3 +22,13 @@
 - Update your menu code to follow the latest menu loop pattern (see `docs/style_guide.md`).
 
 If issues persist, consult the documentation or contact the project maintainer.
+
+## Menu Loop Issues
+
+If you encounter a menu that redraws repeatedly or a submenu that does not appear:
+
+- Ensure the menu loop uses the robust pattern:
+  - Get the user's choice (key) from `show_menu`.
+  - Look up the action in the options dictionary.
+  - Call the action if callable.
+- This resolves most navigation and invocation issues in the CLI.

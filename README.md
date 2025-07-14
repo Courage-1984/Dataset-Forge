@@ -53,6 +53,20 @@ Dataset Forge now uses a lazy import pattern for all main menus and submenus. Th
 
 ---
 
+## 🧭 Robust Menu Loop Pattern (July 2025)
+
+Dataset Forge now uses a robust, standardized menu loop pattern for all menus and submenus:
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+- This pattern is now applied globally, ensuring reliable navigation and submenu invocation everywhere.
+- No more redraw bugs or dead options—every menu and submenu works as intended.
+
+For implementation details and code examples, see the documentation in `docs/features.md`, `docs/usage.md`, and `docs/advanced.md`.
+
+---
+
 ## 🖥️ Supported Platforms & Requirements
 
 - **Python**: 3.8+ (tested on 3.12)

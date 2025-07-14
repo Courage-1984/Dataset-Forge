@@ -90,6 +90,22 @@ For advanced usage and developer notes, see `docs/advanced.md`.
 
 ---
 
+## Robust Menu Loop Pattern (July 2025)
+
+All menus and submenus now use a robust, standardized menu loop pattern:
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+- This pattern is applied globally, ensuring reliable navigation and submenu invocation everywhere.
+- No more redraw bugs or dead options—every menu and submenu works as intended.
+
+This pattern complements the lazy import and timing/profiling systems, maximizing CLI speed, reliability, and user experience.
+
+See [docs/usage.md](usage.md) and [docs/advanced.md](advanced.md) for implementation details and code examples.
+
+---
+
 # Advanced Features
 
 ## AI-Powered Image Analysis

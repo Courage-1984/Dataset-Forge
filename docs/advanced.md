@@ -131,3 +131,26 @@ All menus and submenus in Dataset Forge use a lazy import pattern. This means th
 #### Rationale
 
 - Lazy imports and timing analytics together ensure the CLI remains fast, memory-efficient, and transparent for both users and developers.
+
+## Robust Menu Loop Pattern: Implementation & Rationale
+
+To ensure reliable navigation and submenu invocation, all menus and submenus now use the following pattern:
+
+```python
+while True:
+    choice = show_menu("Menu Title", options, ...)
+    if choice is None or choice == "0":
+        break
+    action = options[choice][1]
+    if callable(action):
+        action()
+```
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+- This pattern is now required for all menus and submenus.
+
+This approach prevents redraw bugs and dead options, and works seamlessly with the lazy import and timing/profiling systems.
+
+**Best Practice:** Always use this pattern for new menus. See [docs/style_guide.md](style_guide.md) for requirements.

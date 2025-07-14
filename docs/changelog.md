@@ -30,5 +30,7 @@
 - Lazy import pattern enforced for all menus and actions for maximum CLI speed.
 - Timing prints use the Catppuccin Mocha color scheme for clarity.
 - Documentation updated across README.md and docs/ to reflect these changes.
+- Global robust menu loop pattern integration for all menus and submenus
+- Improved reliability and navigation throughout the CLI
 
 This file will track major changes and releases in the future.

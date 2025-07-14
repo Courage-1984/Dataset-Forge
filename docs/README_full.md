@@ -462,6 +462,18 @@ Dataset Forge now uses a comprehensive lazy import pattern for all main menus an
 
 This is now the recommended pattern for all new menu and action integrations.
 
+## Robust Menu Loop Pattern (July 2025)
+
+All menus and submenus now use a robust, standardized menu loop pattern:
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+- This pattern is applied globally, ensuring reliable navigation and submenu invocation everywhere.
+- No more redraw bugs or dead options—every menu and submenu works as intended.
+
+This pattern complements the lazy import and timing/profiling systems, maximizing CLI speed, reliability, and user experience.
+
 # Usage Guide
 
 [//]: # "Navigation"
@@ -865,6 +877,7 @@ Dataset Forge now features a fast, responsive CLI menu system with built-in timi
 - The timing system uses lazy imports to maximize CLI speed and minimize memory usage.
 
 See also:
+
 - [Features](features.md#menu-timing--profiling-july-2025)
 - [Usage](usage.md#menu-timing--profiling)
 - [Advanced](advanced.md#advanced-menu-timing-profiling-and-lazy-imports)
