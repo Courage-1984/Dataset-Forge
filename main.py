@@ -9,7 +9,8 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import logging
 
-from dataset_forge.menus.main_menu import main_menu
+# Delay import of main_menu until needed for faster startup
+main_menu = None
 
 import signal
 import sys
@@ -69,6 +70,9 @@ if __name__ == "__main__":
     # os.system("cls" if os.name == "nt" else "clear")
 
     try:
+        # Lazy import of main_menu for faster CLI startup
+        if main_menu is None:
+            from dataset_forge.menus.main_menu import main_menu
         main_menu()
     finally:
         # Cleanup memory on exit

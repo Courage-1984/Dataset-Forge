@@ -73,6 +73,7 @@
 - **Smart Input**: Path history, favorites, and intelligent defaults
 - **Parallel Processing**: Multiprocessing and multithreading for speed improvements
 - **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
+- ⚡ **Fast CLI menus with lazy imports:** All main menus and submenus use a lazy import pattern, so heavy modules are only loaded when needed. This makes the CLI extremely fast and responsive, even for large projects.
 
 ---
 

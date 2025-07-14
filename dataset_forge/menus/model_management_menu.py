@@ -4,6 +4,7 @@ Allows browsing, searching, filtering, and downloading models from OpenModelDB.
 Integrates with project utilities for progress, color, and input.
 """
 
+import importlib
 import os
 import webbrowser
 from dataset_forge.utils.menu import show_menu
@@ -14,36 +15,40 @@ from dataset_forge.utils.printing import (
     print_warning,
     print_error,
 )
-from dataset_forge.actions.openmodeldb_actions import (
-    get_cached_models,
-    update_model_cache,
-    filter_models,
-    download_model,
-    get_model_details,
-    test_model,
-)
 from dataset_forge.utils.input_utils import get_input
 
 CACHE_DIR = os.path.join("OpenModelDB", "cache")
 MODELS_DIR = os.path.join("OpenModelDB", "models")
 
 
+def lazy_action(module_path, func_name):
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_path)
+        return getattr(module, func_name)(*args, **kwargs)
+
+    return _action
+
+
 def openmodeldb_model_browser_menu():
-    """
-    Main entry point for the OpenModelDB Model Browser menu.
-    Auto-updates cache, allows browsing, searching, filtering, and downloading models.
-    """
     print_info("\nUpdating OpenModelDB model cache...")
+    from dataset_forge.actions.openmodeldb_actions import (
+        update_model_cache,
+        get_cached_models,
+    )
+
     update_model_cache(CACHE_DIR)
     models = get_cached_models(CACHE_DIR)
     filtered_models = models
     while True:
         options = {
-            "1": ("🔍 Search/Filter Models", lambda: search_filter_menu(models)),
-            "2": ("📄 List All Models", lambda: list_models_menu(models)),
+            "1": (
+                "🔍 Search/Filter Models",
+                lazy_action(__name__, "search_filter_menu"),
+            ),
+            "2": ("📄 List All Models", lazy_action(__name__, "list_models_menu")),
             "3": (
                 "📥 List Downloaded Models",
-                lambda: list_downloaded_models_menu(models),
+                lazy_action(__name__, "list_downloaded_models_menu"),
             ),
             "0": ("🚪 Back to Previous Menu", None),
         }
@@ -54,7 +59,7 @@ def openmodeldb_model_browser_menu():
         )
         if choice is None or choice == "0":
             break
-        options[choice][1]()
+        options[choice][1](models)
 
 
 def search_filter_menu(models):

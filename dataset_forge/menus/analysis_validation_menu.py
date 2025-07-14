@@ -1,3 +1,4 @@
+import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.printing import (
     print_header,
@@ -10,7 +11,6 @@ from dataset_forge.utils.printing import (
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
-from dataset_forge.menus.bhi_filtering_menu import bhi_filtering_menu
 from dataset_forge.utils.input_utils import get_path_with_history
 
 
@@ -24,6 +24,14 @@ def require_hq_lq(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def lazy_action(module_path, func_name):
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_path)
+        return getattr(module, func_name)(*args, **kwargs)
+
+    return _action
 
 
 def comprehensive_validation_menu():
@@ -319,7 +327,7 @@ def analyze_properties_menu():
         "3": ("🔍 Find & Test HQ/LQ Scale", find_test_scale_workflow),
         "4": ("📏 Report Image Dimensions", report_dimensions_workflow),
         "5": ("🎯 Find Native Resolution", find_native_resolution_workflow),
-        "6": ("⭐ BHI Filtering Analysis", bhi_filtering_menu),
+        "6": ("⭐ BHI Filtering Analysis", lazy_action(__name__, "bhi_filtering_menu")),
         "0": ("⬅️ Back", None),
     }
 
@@ -338,15 +346,21 @@ def analyze_properties_menu():
 def analysis_validation_menu():
     """Main analysis and validation menu with hierarchical structure."""
     options = {
-        "1": ("📊 Dataset Analysis & Reporting", comprehensive_validation_menu),
-        "2": ("🔍 Find & Fix Issues", find_fix_issues_menu),
-        "3": ("📊 Analyze Properties", analyze_properties_menu),
+        "1": (
+            "🔍 Run Comprehensive Validation Suite",
+            lazy_action(__name__, "comprehensive_validation_menu"),
+        ),
+        "2": ("🔧 Find & Fix Issues", lazy_action(__name__, "find_fix_issues_menu")),
+        "3": (
+            "🧪 Analyze Properties",
+            lazy_action(__name__, "analyze_properties_menu"),
+        ),
         "0": ("⬅️ Back to Main Menu", None),
     }
 
     while True:
         action = show_menu(
-            "🔍 Analysis & Validation",
+            "Analysis & Validation Menu",
             options,
             header_color=Mocha.lavender,
             char="=",

@@ -1,3 +1,4 @@
+import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.printing import (
     print_header,
@@ -17,6 +18,14 @@ from dataset_forge.menus.correct_hq_lq_pairing_menu import (
     correct_hq_lq_pairing_menu,
     fuzzy_hq_lq_pairing_menu,
 )
+
+
+def lazy_action(module_path, func_name):
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_path)
+        return getattr(module, func_name)(*args, **kwargs)
+
+    return _action
 
 
 def dataset_creation_menu():
@@ -281,13 +290,18 @@ def clean_organize_menu():
 def dataset_management_menu():
     """Main dataset management menu with hierarchical structure."""
     options = {
-        "1": ("🎯 Create Dataset from Source", dataset_creation_menu),
-        "2": ("🔗 Combine or Split Datasets", combine_split_menu),
-        "3": ("🔗 Manage HQ/LQ Pairs", hq_lq_pairs_menu),
-        "4": ("🧹 Clean & Organize", clean_organize_menu),
+        "1": (
+            "🎯 Create Dataset from Source",
+            lazy_action(__name__, "dataset_creation_menu"),
+        ),
+        "2": (
+            "🔗 Combine or Split Datasets",
+            lazy_action(__name__, "combine_split_menu"),
+        ),
+        "3": ("🔗 Manage HQ/LQ Pairs", lazy_action(__name__, "hq_lq_pairs_menu")),
+        "4": ("🧹 Clean & Organize", lazy_action(__name__, "clean_organize_menu")),
         "0": ("⬅️ Back to Main Menu", None),
     }
-
     while True:
         action = show_menu(
             "📂 Dataset Management",

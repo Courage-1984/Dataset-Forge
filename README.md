@@ -45,6 +45,14 @@ See [Project Architecture](docs/architecture.md) for details.
 
 ---
 
+## 🏎️ Fast CLI Menus with Lazy Imports
+
+Dataset Forge now uses a lazy import pattern for all main menus and submenus. This means the CLI is extremely fast and responsive, even as the project grows. Heavy modules and actions are only imported when needed, keeping startup and navigation snappy.
+
+- See [docs/advanced.md](docs/advanced.md) for details on the lazy import pattern.
+
+---
+
 ## 🚀 Quick Start
 
 1. **Clone the repository:**

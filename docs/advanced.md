@@ -52,3 +52,26 @@ Dataset Forge includes a comprehensive monitoring and analytics system for live 
   - Monitoring and analytics are enabled by default. Advanced users can customize logging, notification, and analytics settings in the configuration files.
 
 See the [Usage Guide](usage.md) for step-by-step instructions.
+
+---
+
+## Fast CLI Menus with Lazy Imports (Updated)
+
+Dataset Forge now uses a comprehensive lazy import pattern for all main menus and submenus. This means:
+
+- **Heavy modules and actions are only imported when the user selects a menu option.**
+- The CLI main menu and all submenus are now extremely fast and responsive, even as the project grows.
+- The `lazy_action()` helper is used throughout menu files to wrap actions and submenu calls, ensuring imports are deferred until needed.
+- This pattern is applied to: main menu, dataset management, analysis & validation, image processing, system monitoring, model management, and more.
+
+**Why?**
+
+- Python imports can be slow, especially with large dependencies (e.g., torch, PIL, OpenCV).
+- Lazy imports keep the CLI snappy and reduce memory usage.
+
+**How to use in new menus:**
+
+- Use the `lazy_action(module_path, func_name)` helper to wrap any action or submenu that imports heavy modules.
+- See `dataset_forge/menus/main_menu.py` and other menu files for examples.
+
+This is now the recommended pattern for all new menu and action integrations.

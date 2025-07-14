@@ -11,12 +11,22 @@ Provides:
 Integrates with utils.monitoring.
 """
 
+import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.printing import print_info
 
 # Import monitoring utilities (stubs for now)
 from dataset_forge.utils import monitoring
+
+
+def lazy_action(module_path, func_name):
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_path)
+        return getattr(module, func_name)(*args, **kwargs)
+
+    return _action
+
 
 monitor_instance = None
 task_registry = None
@@ -125,10 +135,16 @@ def system_monitoring_menu():
             "📊 View Live Resource Usage",
             lambda: monitoring.print_resource_snapshot(monitor_instance.snapshot()),
         ),
-        "2": ("📈 View Performance Analytics", show_performance_analytics),
-        "3": ("🛑 View Error Summary", show_error_summary),
-        "4": ("🩺 Run Health Checks", run_health_checks),
-        "5": ("🧵 Manage Background Tasks", manage_background_tasks),
+        "2": (
+            "📈 View Performance Analytics",
+            lazy_action(__name__, "show_performance_analytics"),
+        ),
+        "3": ("🛑 View Error Summary", lazy_action(__name__, "show_error_summary")),
+        "4": ("🩺 Run Health Checks", lazy_action(__name__, "run_health_checks")),
+        "5": (
+            "🧵 Manage Background Tasks",
+            lazy_action(__name__, "manage_background_tasks"),
+        ),
         "0": ("🚪 Return to Main Menu", None),
     }
     while True:

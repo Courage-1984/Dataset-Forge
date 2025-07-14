@@ -1,3 +1,4 @@
+import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.printing import (
     print_header,
@@ -10,8 +11,6 @@ from dataset_forge.utils.printing import (
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
-from dataset_forge.menus.hue_adjustment_menu import hue_adjustment_menu
-from dataset_forge.menus.augmentation_menu import augmentation_menu
 
 
 def require_hq_lq(func):
@@ -24,6 +23,14 @@ def require_hq_lq(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def lazy_action(module_path, func_name):
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_path)
+        return getattr(module, func_name)(*args, **kwargs)
+
+    return _action
 
 
 def basic_transformations_menu():
@@ -77,7 +84,12 @@ def color_tone_adjustments_menu():
                 )
             ),
         ),
-        "2": ("🌈 Hue/Brightness/Contrast", hue_adjustment_menu),
+        "2": (
+            "🌈 Hue/Brightness/Contrast",
+            lazy_action(
+                "dataset_forge.menus.hue_adjustment_menu", "hue_adjustment_menu"
+            ),
+        ),
         "0": ("⬅️ Back", None),
     }
     while True:
@@ -101,8 +113,14 @@ def metadata_menu():
     )
 
     options = {
-        "1": ("🧹 Scrub EXIF Data", exif_scrubber_menu),
-        "2": ("🎯 Convert ICC Profile to sRGB", icc_to_srgb_menu),
+        "1": (
+            "🧹 Scrub EXIF Data",
+            lazy_action("dataset_forge.actions.metadata_actions", "exif_scrubber_menu"),
+        ),
+        "2": (
+            "🎯 Convert ICC Profile to sRGB",
+            lazy_action("dataset_forge.actions.metadata_actions", "icc_to_srgb_menu"),
+        ),
         "0": ("⬅️ Back", None),
     }
     while True:
@@ -173,11 +191,23 @@ def extract_sketches_menu():
 
 def image_processing_menu():
     options = {
-        "1": ("🔄 Basic Transformations", basic_transformations_menu),
-        "2": ("🎨 Color & Tone Adjustments", color_tone_adjustments_menu),
-        "3": ("📋 Metadata", metadata_menu),
-        "4": ("🚀 Augmentation", augmentation_submenu),
-        "5": ("✏️ FIND & EXTRACT SKETCHES/DRAWINGS/LINE ART", extract_sketches_menu),
+        "1": (
+            "🔄 Basic Transformations",
+            lazy_action(__name__, "basic_transformations_menu"),
+        ),
+        "2": (
+            "🎨 Color & Tone Adjustments",
+            lazy_action(__name__, "color_tone_adjustments_menu"),
+        ),
+        "3": ("📋 Metadata", lazy_action(__name__, "metadata_menu")),
+        "4": (
+            "🚀 Augmentation",
+            lazy_action("dataset_forge.menus.augmentation_menu", "augmentation_menu"),
+        ),
+        "5": (
+            "✏️ FIND & EXTRACT SKETCHES/DRAWINGS/LINE ART",
+            lazy_action(__name__, "extract_sketches_menu"),
+        ),
         "0": ("⬅️ Back to Main Menu", None),
     }
 

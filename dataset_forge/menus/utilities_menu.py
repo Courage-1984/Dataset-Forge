@@ -1,3 +1,4 @@
+import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.printing import (
     print_header,
@@ -9,10 +10,7 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.menus.compress_menu import compress_menu
-from dataset_forge.menus.compress_dir_menu import compress_dir_menu
 from dataset_forge.menus import session_state
-from dataset_forge.menus.sanitize_images_menu import sanitize_images_menu
 
 
 def require_hq_lq(func):
@@ -27,36 +25,60 @@ def require_hq_lq(func):
     return wrapper
 
 
-def utilities_menu():
-    from dataset_forge.actions.comparison_actions import (
-        create_comparison_images,
-        create_gif_comparison,
-        compare_folders_menu,
-    )
+def lazy_action(module_path, func_name):
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_path)
+        return getattr(module, func_name)(*args, **kwargs)
 
+    return _action
+
+
+def utilities_menu():
     options = {
         "1": (
             "🖼️ Create Comparison Images (Side-by-side)",
             require_hq_lq(
-                lambda: create_comparison_images(
-                    session_state.hq_folder, session_state.lq_folder
+                lazy_action(
+                    "dataset_forge.actions.comparison_actions",
+                    "create_comparison_images",
                 )
             ),
         ),
         "2": (
             "🎬 Create GIF Comparison",
             require_hq_lq(
-                lambda: create_gif_comparison(
-                    session_state.hq_folder, session_state.lq_folder
+                lazy_action(
+                    "dataset_forge.actions.comparison_actions", "create_gif_comparison"
                 )
             ),
         ),
-        "3": ("🔍 Compare Folder Contents", compare_folders_menu),
-        "4": ("🗜️ Compress Images", compress_menu),
-        "5": ("📦 Compress Directory", compress_dir_menu),
-        "6": ("🧹 Sanitize Images", sanitize_images_menu),
-        "7": ("🧹 Filter non-Images", filter_non_images_menu),
-        "8": ("🌳 Enhanced Directory Tree", directory_tree_menu),
+        "3": (
+            "🔍 Compare Folder Contents",
+            lazy_action(
+                "dataset_forge.actions.comparison_actions", "compare_folders_menu"
+            ),
+        ),
+        "4": (
+            "🗜️ Compress Images",
+            lazy_action("dataset_forge.menus.compress_menu", "compress_menu"),
+        ),
+        "5": (
+            "📦 Compress Directory",
+            lazy_action("dataset_forge.menus.compress_dir_menu", "compress_dir_menu"),
+        ),
+        "6": (
+            "🧹 Sanitize Images",
+            lazy_action(
+                "dataset_forge.menus.sanitize_images_menu", "sanitize_images_menu"
+            ),
+        ),
+        "7": ("🧹 Filter non-Images", lazy_action(__name__, "filter_non_images_menu")),
+        "8": (
+            "🌳 Enhanced Directory Tree",
+            lazy_action(
+                "dataset_forge.menus.directory_tree_menu", "directory_tree_menu"
+            ),
+        ),
         "0": ("⬅️ Back to Main Menu", None),
     }
     while True:
