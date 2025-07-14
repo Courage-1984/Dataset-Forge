@@ -66,3 +66,5 @@ OpenModelDB
 ./example_uspscale
 example_uspscale
 
+./.pytest_cache
+.pytest_cache

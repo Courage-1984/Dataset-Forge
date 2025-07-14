@@ -1,6 +1,4 @@
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Usage Guide](usage.md) | [Advanced Features](advanced.md)
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
 # Features
 
@@ -77,16 +75,60 @@
 
 ---
 
-## Menu Timing & Profiling (July 2025)
+## Menu Timing & Profiling
 
-Dataset Forge now includes a fast, responsive CLI menu system with built-in timing and profiling:
+Dataset Forge features a fast, responsive CLI menu system with built-in timing and profiling. Every time you load a menu or submenu, a timing print (e.g., `⏱️ Loaded dataset_management_menu in 0.123 seconds.`) is shown in the Catppuccin Mocha color scheme. All menu load times are recorded and can be viewed in the System Monitoring menu under "⏱️ View Menu Load Times". This helps identify slow-loading menus and provides transparency for performance optimization. The timing system uses lazy imports to maximize CLI speed and minimize memory usage.
 
-- **Timing Prints:** Every time you load a menu or submenu, a timing print (e.g., `⏱️ Loaded dataset_management_menu in 0.123 seconds.`) is shown in the Catppuccin Mocha color scheme.
-- **Menu Load Analytics:** All menu load times are recorded and can be viewed in the System Monitoring menu under "⏱️ View Menu Load Times".
-- **Performance Transparency:** This feature helps users and developers identify slow-loading menus and optimize performance.
-- **Lazy Imports:** The timing system leverages lazy imports to maximize CLI speed and minimize memory usage.
+## Robust Menu Loop Pattern
 
-For advanced usage and developer notes, see `docs/advanced.md`.
+All menus and submenus use a robust, standardized menu loop pattern:
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+  This pattern ensures reliable navigation and submenu invocation everywhere. Example:
+
+```python
+from dataset_forge.utils.menu import show_menu
+from dataset_forge.utils.color import Mocha
+
+def my_menu():
+    options = {
+        "1": ("📂 Option 1", function1),
+        "2": ("🔍 Option 2", function2),
+        "0": ("🚪 Exit", None),
+    }
+    while True:
+        try:
+            action = show_menu("Menu Title", options, Mocha.lavender)
+            if action is None:
+                break
+            action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
+            break
+```
+
+## Content-Based Image Retrieval (CBIR) for Duplicates
+
+CBIR uses deep learning embeddings (CLIP, ResNet, VGG) for semantic duplicate detection. It supports feature extraction, similarity search, ANN indexing, grouping, and batch actions (find, remove, move, copy). Access CBIR features from the Duplicates menu. See the usage guide for workflow details.
+
+## Monitoring, Analytics & Error Tracking
+
+Dataset Forge uses centralized monitoring and analytics utilities. All user-facing and long-running functions are decorated for performance and error tracking. Subprocesses/threads are registered for background task management. Health checks for RAM, disk, CUDA, and permissions are available. Persistent logging of analytics and errors is stored in ./logs/. All monitoring and analytics features are accessible from the System Monitoring menu.
+
+## Test Suite
+
+Dataset Forge includes a comprehensive, automated test suite covering CLI entry and menu navigation, menu timing/profiling, error feedback (including audio), memory management and parallel processing, file and image utilities, and robust handling of Unicode, subprocess, and Windows-specific issues. To run all tests:
+
+```sh
+venv312\Scripts\activate
+pytest
+```
+
+## Dependency Management: Grouped Requirements & Install Order
+
+The `requirements.txt` is grouped and commented for clarity. Please install VapourSynth before getnative, and install the correct CUDA-enabled torch/torchvision/torchaudio before running `pip install .`. See the advanced guide for details.
 
 ---
 

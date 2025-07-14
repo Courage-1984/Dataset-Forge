@@ -1,6 +1,4 @@
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
 # Troubleshooting
 
@@ -47,3 +45,15 @@ If you encounter a menu that redraws repeatedly or a submenu that does not appea
 - **Monkeypatching not working**: Patch the function in the namespace where it is used, not just where it is defined.
 - **Multiprocessing pickling errors**: Use top-level functions, not lambdas or closures, for functions passed to process pools.
 - **Manual/script tests not running**: Run them directly with python, not via pytest.
+
+## VapourSynth/getnative and CUDA/torch Install Order
+
+If you encounter issues with getnative, ensure VapourSynth is installed first. For CUDA acceleration, install the correct CUDA-enabled torch/torchvision/torchaudio before running `pip install .`.
+
+## Troubleshooting Menu Timing, Robust Loop, CBIR, Monitoring, and Test Suite
+
+- If menu timing prints do not appear, check your CLI environment and ensure the latest version is installed.
+- If robust menu navigation fails, ensure you are using the latest code and that all dependencies are installed.
+- For CBIR issues, verify that all required deep learning models are installed and that your GPU drivers are up to date.
+- For monitoring/analytics issues, check the logs in the ./logs/ directory.
+- If tests fail, ensure your environment matches the requirements and all dependencies are installed.

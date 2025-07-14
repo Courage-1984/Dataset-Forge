@@ -165,6 +165,13 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 
 ## 🛠️ Documentation Maintenance
 
+**Whenever you update any documentation in the docs/ folder or the main README.md, you MUST also update:**
+
+- `docs/README_full.md` (comprehensive, merged documentation)
+- `docs/toc.md` (Table of Contents for all documentation)
+
+This ensures that all documentation is always up to date and easy to navigate for users and contributors.
+
 **To update documentation:**
 
 - Edit the relevant file in the [docs/](docs/) folder.

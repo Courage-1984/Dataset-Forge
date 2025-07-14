@@ -1,179 +1,29 @@
-<!--
-README_full.md: This file is a comprehensive, auto-generated documentation for Dataset Forge.
-Whenever you update any documentation in README.md or docs/*.md, you MUST update this file as well.
--->
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
-# Dataset Forge — Full Documentation
+
+# Dataset Forge Full Documentation
 
 ---
 
-<!-- Main README.md content -->
-<h3 align="center">
-  Dataset Forge
-</h3>
-<p align="center">
-  <img src="https://pomf2.lain.la/f/2ulflln.png" width="300" alt="Dataset Forge Thumbnail"/>
-</p>
-<div align="center">
-  <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600" alt="Separator"/>
-</div>
+# Table of Contents
 
-<p align="center"><i>The all-in-one, modular image dataset utility for ML, with a focus on HQ/LQ image pairs for SISR and general computer vision. CLI-first, highly extensible, and packed with advanced tools for dataset curation, analysis, transformation, and validation.</i></p>
+- [Features](features.md)
+- [Usage Guide](usage.md)
+- [Advanced Features & Configuration](advanced.md)
+- [Project Architecture](architecture.md)
+- [Troubleshooting](troubleshooting.md)
+- [Style Guide](style_guide.md)
+- [Changelog](changelog.md)
+- [Contributing](contributing.md)
+- [FAQ](faq.md)
+- [License](license.md)
 
----
-
-## What is Dataset Forge?
-
-**Dataset Forge** is a professional-grade Python CLI utility for managing, analyzing, and transforming image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution (SISR) and general computer vision tasks. It is designed for ML researchers and data scientists who need:
-
-- Powerful dataset curation, validation, and cleaning tools
-- Deep analysis and reporting for dataset quality
-- Advanced image processing, augmentation, and transformation
-- A beautiful, user-friendly CLI with progress tracking and memory management
-
-**Key Use Cases:**
-
-- Preparing HQ/LQ datasets for super-resolution training
-- Validating, cleaning, and analyzing large image datasets
-- Running advanced deduplication, tiling, and augmentation pipelines
-- Generating rich reports and statistics for ML workflows
 
 ---
 
-## 🏗️ Modular Architecture (Summary)
-
-Dataset Forge is built with a modular, extensible architecture:
-
-- **menus/**: UI layer (CLI menus, user interaction)
-- **actions/**: Business logic (core dataset/image operations)
-- **utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dpid/**: Multiple DPID (degradation) implementations
-- **configs/**: Example and user configuration files
-- **reports/**: Report templates for HTML/Markdown output
-
-See [Project Architecture](#project-architecture) for details.
-
----
-
-## 🏎️ Fast CLI Menus with Lazy Imports
-
-Dataset Forge now uses a lazy import pattern for all main menus and submenus. This means the CLI is extremely fast and responsive, even as the project grows. Heavy modules and actions are only imported when needed, keeping startup and navigation snappy.
-
-See [Advanced Features & Configuration](#advanced-features--configuration) for details on the lazy import pattern.
-
----
-
-## 🚀 Quick Start
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Courage-1984/Dataset-Forge.git
-   cd Dataset-Forge
-   ```
-2. **Set up the environment:**
-   ```bash
-   py -3.12 -m venv venv312
-   venv312\Scripts\activate
-   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-   pip install -r requirements.txt
-   ```
-3. **Run the application:**
-   ```bash
-   py main.py
-   # or
-   ./run.bat
-   ```
-
----
-
-## 🖥️ Supported Platforms & Requirements
-
-- **Python**: 3.8+ (tested on 3.12)
-- **OS**: Windows (primary), Linux (partial support)
-- **CUDA**: 12.1+ (for GPU acceleration)
-- **RAM**: 8GB+ (16GB+ recommended for large datasets)
-- **Storage**: SSD recommended for faster I/O
-- See [Advanced Features & Configuration](#advanced-features--configuration) for full details.
-
----
-
-## 📖 Table of Contents
-
-- [Features](#features)
-- [Usage Guide](#usage-guide)
-- [Advanced Features & Configuration](#advanced-features--configuration)
-- [Project Architecture](#project-architecture)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [Style Guide](#dataset-forge-style-guide)
-- [FAQ](#frequently-asked-questions-faq)
-- [Changelog](#changelog)
-- [License](#license)
-
----
-
-## ✨ Key Features
-
-- Modular, extensible CLI for image dataset management
-- HQ/LQ pair support for super-resolution and ML
-- 40+ operations: validation, analysis, augmentation, deduplication, reporting
-- Beautiful Catppuccin Mocha-themed interface
-- Smart memory and parallel processing
-- Deep validation and reporting tools
-- **Advanced system monitoring & analytics**: Live resource usage (CPU, GPU, RAM, disk), performance analytics, error tracking, health checks, and background task management, all accessible from a dedicated CLI menu. Includes persistent logging, notifications, and memory/CUDA cleanup integration.
-- **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
-
----
-
-## About
-
-Dataset Forge is a professional-grade tool for ML researchers and data scientists, designed for high-quality dataset curation, analysis, and transformation. For full documentation, see the [docs/](#full-documentation) section or the links above.
-
-**Audio error feedback:** Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback, ensuring you never miss a critical issue.
-
-**For coding standards and best practices, see the [Style Guide](#dataset-forge-style-guide).**
-
----
-
-## 💜 Credits
-
-- Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
-- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) & [Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing)
-- Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
-- Thanks [Phhofm](https://github.com/Phhofm)❤️ for [sisr](https://github.com/Phhofm/sisr)
-
----
-
-## License
-
-This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](LICENSE) for details.
-
----
-
-## 🛠️ Documentation Maintenance
-
-**To update documentation:**
-
-- Edit the relevant file in the [docs/](#full-documentation) section.
-- Keep the main README.md concise and up-to-date with links to detailed docs.
-- Add new sections to docs/ as the project grows.
-- **Whenever you update any documentation in README.md or docs/\*.md, you MUST update this file as well.**
-
----
-
-<!-- Badges (add more as needed) -->
-<p align="center">
-  <a href="https://github.com/Courage-1984/Dataset-Forge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-CC--BY--SA--4.0-blue" alt="License"></a>
-  <!-- Add CI/build/test badges here if available -->
-</p>
-
----
 
 # Features
 
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
 
 # Features
 
@@ -247,6 +97,79 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 - **Parallel Processing**: Multiprocessing and multithreading for speed improvements
 - **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
 - ⚡ **Fast CLI menus with lazy imports:** All main menus and submenus use a lazy import pattern, so heavy modules are only loaded when needed. This makes the CLI extremely fast and responsive, even for large projects.
+
+---
+
+## Menu Timing & Profiling
+
+Dataset Forge features a fast, responsive CLI menu system with built-in timing and profiling. Every time you load a menu or submenu, a timing print (e.g., `⏱️ Loaded dataset_management_menu in 0.123 seconds.`) is shown in the Catppuccin Mocha color scheme. All menu load times are recorded and can be viewed in the System Monitoring menu under "⏱️ View Menu Load Times". This helps identify slow-loading menus and provides transparency for performance optimization. The timing system uses lazy imports to maximize CLI speed and minimize memory usage.
+
+## Robust Menu Loop Pattern
+
+All menus and submenus use a robust, standardized menu loop pattern:
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+  This pattern ensures reliable navigation and submenu invocation everywhere. Example:
+
+```python
+from dataset_forge.utils.menu import show_menu
+from dataset_forge.utils.color import Mocha
+
+def my_menu():
+    options = {
+        "1": ("📂 Option 1", function1),
+        "2": ("🔍 Option 2", function2),
+        "0": ("🚪 Exit", None),
+    }
+    while True:
+        try:
+            action = show_menu("Menu Title", options, Mocha.lavender)
+            if action is None:
+                break
+            action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
+            break
+```
+
+## Content-Based Image Retrieval (CBIR) for Duplicates
+
+CBIR uses deep learning embeddings (CLIP, ResNet, VGG) for semantic duplicate detection. It supports feature extraction, similarity search, ANN indexing, grouping, and batch actions (find, remove, move, copy). Access CBIR features from the Duplicates menu. See the usage guide for workflow details.
+
+## Monitoring, Analytics & Error Tracking
+
+Dataset Forge uses centralized monitoring and analytics utilities. All user-facing and long-running functions are decorated for performance and error tracking. Subprocesses/threads are registered for background task management. Health checks for RAM, disk, CUDA, and permissions are available. Persistent logging of analytics and errors is stored in ./logs/. All monitoring and analytics features are accessible from the System Monitoring menu.
+
+## Test Suite
+
+Dataset Forge includes a comprehensive, automated test suite covering CLI entry and menu navigation, menu timing/profiling, error feedback (including audio), memory management and parallel processing, file and image utilities, and robust handling of Unicode, subprocess, and Windows-specific issues. To run all tests:
+
+```sh
+venv312\Scripts\activate
+pytest
+```
+
+## Dependency Management: Grouped Requirements & Install Order
+
+The `requirements.txt` is grouped and commented for clarity. Please install VapourSynth before getnative, and install the correct CUDA-enabled torch/torchvision/torchaudio before running `pip install .`. See the advanced guide for details.
+
+---
+
+## Robust Menu Loop Pattern (July 2025)
+
+All menus and submenus now use a robust, standardized menu loop pattern:
+
+- The user's choice (key) is obtained from `show_menu`.
+- The action is looked up in the options dictionary.
+- The action is called if it is callable.
+- This pattern is applied globally, ensuring reliable navigation and submenu invocation everywhere.
+- No more redraw bugs or dead options—every menu and submenu works as intended.
+
+This pattern complements the lazy import and timing/profiling systems, maximizing CLI speed, reliability, and user experience.
+
+See [docs/usage.md](usage.md) and [docs/advanced.md](advanced.md) for implementation details and code examples.
 
 ---
 
@@ -380,17 +303,195 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
 - **Dedicated CLI Menu**: Access all monitoring, analytics, and management features from the System Monitoring menu
 
+## Content-Based Image Retrieval (CBIR) for Duplicates
+
+- **Semantic Duplicate Detection**: Uses deep learning embeddings (CLIP, ResNet, VGG) to find images that are conceptually similar, even if visually transformed.
+- **Feature Extraction**: Extracts high-dimensional feature vectors for each image using a pre-trained CNN (CLIP preferred, fallback to ResNet/VGG).
+- **Similarity Search**: Computes cosine similarity or Euclidean distance between embeddings to identify near-duplicates.
+- **ANN Indexing**: Uses approximate nearest neighbor (ANN) indexing for efficient search in large datasets.
+- **Grouping & Actions**: Clusters images by semantic similarity and provides user options to find, remove, move, or copy duplicate groups.
+- **GPU Acceleration**: Leverages GPU for fast embedding extraction and search.
+- **Menu Integration**: Accessible from the Clean & Organize submenu under Dataset Management.
+
+## Automated Test Suite
+
+Dataset Forge now includes a robust, automated test suite:
+
+- Covers CLI entry, menu navigation, timing/profiling, error feedback (audio), memory management, parallel processing, and file/image utilities.
+- Handles Unicode, subprocess, and Windows-specific edge cases.
+- Includes manual/script-style tests for BHI filtering and pepeline (run directly).
+- All tests pass as of this integration.
+
+See [usage.md](usage.md#running-tests) for instructions on running tests.
+
 ---
 
+
+# Usage
+
+
+# Usage Guide
+
+(Include the full "Usage Examples" and "Menu Structure" sections from the original README here, preserving formatting and navigation.)
+
+## Using the System Monitoring Menu
+
+The System Monitoring menu provides live resource usage, analytics, error tracking, health checks, and background task management:
+
+1. Select '🖥️ System Monitoring' from the main menu.
+2. Features available:
+   - **Live Resource Usage**: View CPU, GPU, RAM, and disk usage for all processes/threads.
+   - **Performance Analytics**: See live and session analytics for all major operations.
+   - **Error Summaries**: Review error logs and summaries, with notifications for critical errors.
+   - **Health Checks**: Run automated checks for RAM, disk, CUDA, Python version, and permissions.
+   - **Background Task Management**: List, pause, resume, or kill subprocesses/threads.
+   - **Persistent Logs**: All analytics and errors are saved to ./logs/ for later review.
+   - **Notifications**: Critical errors trigger sound/visual notifications.
+   - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
+
+See the [Advanced Features](advanced.md) for more details on configuration and integration.
+
+## Using the OpenModelDB Model Browser
+
+The OpenModelDB Model Browser is available from the Training & Inference menu:
+
+1. Select '🧠 OpenModelDB Model Browser'.
+2. Choose between:
+   - **Basic Menu (classic):** Hierarchical, emoji-rich menu system
+   - **CLI-interactive (modern):** Arrow keys, live search, and dynamic actions (requires `questionary`)
+
+### Features
+
+- Browse, search, and filter models by tag, architecture, scale, or free text
+- View model details, resources, and sample images
+- Download models (with SHA256 verification, Google Drive/OneDrive/manual fallback)
+- Test models on your images (with Spandrel/ONNX support)
+- List and manage already downloaded models
+- Open model page in your browser
+
+### Downloading from OneDrive
+
+If a model is hosted on OneDrive, you will be prompted to download it manually. The browser will open the link for you, and you should place the file in the indicated models directory.
+
+### CLI-interactive Mode
+
+- Use arrow keys and type to search models
+- After selecting a model, choose actions: View Details, Download, Test, Open in Browser, or go back
+- Requires `questionary` (install with `pip install questionary`)
+
+---
+
+## Using Content-Based Image Retrieval (CBIR) for Duplicates
+
+1. Navigate to the main menu, then Dataset Management > Clean & Organize > CBIR (Semantic Duplicate Detection).
+2. Choose your workflow: single-folder or HQ/LQ pair.
+3. Select the embedding model: CLIP (recommended), ResNet, or VGG.
+4. Set the similarity threshold (default: 0.92 for cosine similarity).
+5. Choose an action:
+   - **Find**: List groups of semantically similar images.
+   - **Remove**: Delete all but one image in each group.
+   - **Move**: Move duplicates to a specified folder.
+   - **Copy**: Copy duplicates to a specified folder.
+6. Review the summary of affected files after each operation.
+
+CBIR supports GPU acceleration and is optimized for large datasets. For advanced options, see the advanced features documentation.
+
+## Menu Timing & Profiling
+
+Whenever you load a menu or submenu in Dataset Forge, you will see a timing print in the CLI, such as:
+
+    ⏱️ Loaded dataset_management_menu in 0.123 seconds.
+
+This print uses the Catppuccin Mocha color scheme for clarity and consistency.
+
+All menu load times are recorded. To view a summary of all menu/submenu load timings:
+
+1. Go to the **System Monitoring** menu from the main menu.
+2. Select **"⏱️ View Menu Load Times"**.
+3. You will see a table of all menu/submenu load times for your session.
+
+This helps you identify slow-loading menus and optimize your workflow.
+
+## Menu Navigation: Robust Pattern Everywhere
+
+All menus and submenus now use a robust, standardized menu loop pattern:
+
+- You select an option; the system looks up the action and calls it if callable.
+- This ensures every menu and submenu works as intended, with no redraw bugs or dead options.
+- Navigation is now consistent and reliable everywhere in the CLI.
+
+For more details, see [docs/features.md](features.md) and [docs/advanced.md](advanced.md).
+
+## Running Tests
+
+Dataset Forge includes a comprehensive automated test suite. To run all tests:
+
+1. Activate your virtual environment:
+   ```sh
+   venv312\Scripts\activate
+   ```
+2. Run all automated tests from the project root:
+   ```sh
+   pytest
+   ```
+
+Manual/script-style tests (for BHI filtering and pepeline) can be run directly:
+
+```sh
+python tests/test_bhi_filtering.py
+python tests/test_pepeline.py
+```
+
+The test suite covers:
+
+- CLI entry and menu navigation
+- Menu timing/profiling
+- Error feedback (including audio)
+- Memory management and parallel processing
+- File and image utilities
+- Robust handling of Unicode, subprocess, and Windows-specific issues
+
+See the [README.md](../README.md) and [features.md](features.md) for more details on test coverage and philosophy.
+
+---
+
+
+# Advanced
+
+
 # Advanced Features & Configuration
 
-[//]: # "Navigation"
+## Requirements & Dependency Matrix
 
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
+Dataset Forge requires the following for full functionality (especially for GPU acceleration):
 
-# Advanced Features & Configuration
+- **Python**: 3.8+ (tested on 3.12)
+- **OS**: Windows (primary), Linux (partial support)
+- **CUDA**: 12.1+ (for GPU acceleration)
+- **cuDNN**: 8.9+ (required for PyTorch CUDA)
+- **PyTorch**: 2.2.0+ (see below)
+- **RAM**: 8GB+ (16GB+ recommended for large datasets)
+- **Storage**: SSD recommended for faster I/O
+- **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
 
-(Include the full "Advanced Features", "Configuration", and "Requirements" sections from the original README here, preserving formatting and navigation.)
+**Dependency Matrix:**
+
+| Python | CUDA Toolkit | cuDNN | PyTorch | OS      |
+| ------ | ------------ | ----- | ------- | ------- |
+| 3.12   | 12.1         | 8.9+  | 2.2.0+  | Windows |
+| 3.8+   | 11.8/12.1    | 8.6+  | 2.0.0+  | Linux   |
+
+- For GPU acceleration, ensure your CUDA and cuDNN versions match your PyTorch install. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
+- If you use a different CUDA/cuDNN version, install the matching PyTorch build.
+
+**Installation via pip (recommended):**
+
+```bash
+py -3.12 -m venv venv312
+venv312\Scripts\activate
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install .
+```
 
 ## Advanced OpenModelDB Integration
 
@@ -462,85 +563,84 @@ Dataset Forge now uses a comprehensive lazy import pattern for all main menus an
 
 This is now the recommended pattern for all new menu and action integrations.
 
-## Robust Menu Loop Pattern (July 2025)
+---
 
-All menus and submenus now use a robust, standardized menu loop pattern:
+## Advanced: Menu Timing, Profiling, and Lazy Imports
+
+### Lazy Import Pattern
+
+All menus and submenus in Dataset Forge use a lazy import pattern. This means that heavy modules and actions are only imported when the user selects a menu option, not at startup. This keeps the CLI fast and responsive, even as the codebase grows.
+
+- Use the `lazy_action()` and `lazy_menu()` helpers to defer imports until needed.
+- See `dataset_forge/menus/main_menu.py` for the canonical pattern.
+
+### Menu Timing & Profiling Integration
+
+- Every menu and submenu load is timed using a centralized utility (`time_and_record_menu_load` in `utils/monitoring.py`).
+- Timing prints are shown to the user after each menu load, and all timings are aggregated for analytics.
+- The System Monitoring menu provides a summary of all menu load times for the session.
+
+### Extending/Customizing Timing Analytics
+
+- Developers can use the timing utility in any new menu or action by wrapping the function call with `time_and_record_menu_load`.
+- The timing system is extensible: you can add custom analytics, logging, or performance alerts as needed.
+
+#### Rationale
+
+- Lazy imports and timing analytics together ensure the CLI remains fast, memory-efficient, and transparent for both users and developers.
+
+## Robust Menu Loop Pattern: Implementation & Rationale
+
+To ensure reliable navigation and submenu invocation, all menus and submenus now use the following pattern:
+
+```python
+while True:
+    choice = show_menu("Menu Title", options, ...)
+    if choice is None or choice == "0":
+        break
+    action = options[choice][1]
+    if callable(action):
+        action()
+```
 
 - The user's choice (key) is obtained from `show_menu`.
 - The action is looked up in the options dictionary.
 - The action is called if it is callable.
-- This pattern is applied globally, ensuring reliable navigation and submenu invocation everywhere.
-- No more redraw bugs or dead options—every menu and submenu works as intended.
+- This pattern is now required for all menus and submenus.
 
-This pattern complements the lazy import and timing/profiling systems, maximizing CLI speed, reliability, and user experience.
+This approach prevents redraw bugs and dead options, and works seamlessly with the lazy import and timing/profiling systems.
 
-# Usage Guide
+**Best Practice:** Always use this pattern for new menus. See [docs/style_guide.md](style_guide.md) for requirements.
 
-[//]: # "Navigation"
+## Content-Based Image Retrieval (CBIR) for Duplicates (Advanced)
 
-[← Back to Main README](../README.md) | [Features](features.md) | [Advanced Features](advanced.md)
+CBIR enables semantic duplicate detection using deep learning embeddings:
 
-# Usage Guide
+- **Embedding Extraction**: Uses CLIP, ResNet, or VGG to generate feature vectors for each image. GPU acceleration is used if available.
+- **Similarity Matrix**: Computes cosine similarity (default) or Euclidean distance between all image embeddings.
+- **ANN Indexing**: For large datasets, uses approximate nearest neighbor (ANN) search for fast duplicate detection.
+- **Grouping**: Clusters images by similarity threshold, forming groups of near-duplicates.
+- **Batch Actions**: Supports batch removal, move, or copy of duplicates, keeping one image per group.
+- **Parallel Processing**: Uses smart_map and batch_map for efficient processing.
+- **Memory Management**: Integrates with memory_context and auto_cleanup for safe operation.
+- **Menu Integration**: Follows the robust menu loop and lazy import patterns for fast, user-friendly CLI navigation.
 
-(Include the full "Usage Examples" and "Menu Structure" sections from the original README here, preserving formatting and navigation.)
+For implementation details, see `cbir_actions.py` and `cbir_menu.py`.
 
-## Using the System Monitoring Menu
+## Test Suite & Best Practices
 
-The System Monitoring menu provides live resource usage, analytics, error tracking, health checks, and background task management:
+- Dataset Forge uses pytest for all automated testing.
+- Tests are organized by utility, CLI, and integration level.
+- Manual/script-style tests are provided for BHI filtering and pepeline.
+- Contributors should add tests for new features and bugfixes.
+- For CI integration, add a GitHub Actions workflow to run pytest on push/PR.
+- See [usage.md](usage.md#running-tests) for how to run tests.
 
-1. Select '🖥️ System Monitoring' from the main menu.
-2. Features available:
-   - **Live Resource Usage**: View CPU, GPU, RAM, and disk usage for all processes/threads.
-   - **Performance Analytics**: See live and session analytics for all major operations.
-   - **Error Summaries**: Review error logs and summaries, with notifications for critical errors.
-   - **Health Checks**: Run automated checks for RAM, disk, CUDA, Python version, and permissions.
-   - **Background Task Management**: List, pause, resume, or kill subprocesses/threads.
-   - **Persistent Logs**: All analytics and errors are saved to ./logs/ for later review.
-   - **Notifications**: Critical errors trigger sound/visual notifications.
-   - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
+---
 
-See the [Advanced Features](advanced.md) for more details on configuration and integration.
 
-## Using the OpenModelDB Model Browser
+# Architecture
 
-The OpenModelDB Model Browser is available from the Training & Inference menu:
-
-1. Select '🧠 OpenModelDB Model Browser'.
-2. Choose between:
-   - **Basic Menu (classic):** Hierarchical, emoji-rich menu system
-   - **CLI-interactive (modern):** Arrow keys, live search, and dynamic actions (requires `questionary`)
-
-### Features
-
-- Browse, search, and filter models by tag, architecture, scale, or free text
-- View model details, resources, and sample images
-- Download models (with SHA256 verification, Google Drive/OneDrive/manual fallback)
-- Test models on your images (with Spandrel/ONNX support)
-- List and manage already downloaded models
-- Open model page in your browser
-
-### Downloading from OneDrive
-
-If a model is hosted on OneDrive, you will be prompted to download it manually. The browser will open the link for you, and you should place the file in the indicated models directory.
-
-### CLI-interactive Mode
-
-- Use arrow keys and type to search models
-- After selecting a model, choose actions: View Details, Download, Test, Open in Browser, or go back
-- Requires `questionary` (install with `pip install questionary`)
-
-## Content-Based Image Retrieval (CBIR) for Duplicates
-
-- Semantic duplicate detection using deep learning embeddings (CLIP, ResNet, VGG)
-- Feature extraction, similarity search, ANN indexing, grouping, and batch actions (find, remove, move, copy)
-- GPU acceleration and robust menu integration
-- See features, usage, and advanced sections for details
-
-# Project Architecture
-
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
 
 # Project Architecture
 
@@ -557,11 +657,93 @@ All major operations in actions/ are instrumented with monitoring/analytics hook
 
 The CLI interface now provides audio error feedback: whenever an error is reported to the user (via print_error), an error sound (error.mp3) is played for immediate feedback. This is handled by the centralized print_error utility in utils/printing.py, which calls play_error_sound from utils/audio_utils.py.
 
-# Dataset Forge Style Guide
+---
 
-[//]: # "Navigation"
+## Menu System, Robust Loop, and Timing
 
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md) | [Contributing](contributing.md)
+The menu system uses a robust loop pattern and integrates timing/profiling for all menu and submenu loads. This ensures reliability and performance.
+
+## Content-Based Image Retrieval (CBIR)
+
+CBIR is integrated as a modular component for semantic duplicate detection.
+
+## Monitoring, Analytics & Error Tracking
+
+Monitoring and analytics are integrated throughout the architecture for performance and error tracking.
+
+## Test Suite
+
+The test suite is integrated to cover all major architectural components.
+
+---
+
+
+# Troubleshooting
+
+
+# Troubleshooting
+
+(Include the full "Troubleshooting" section from the original README here, preserving formatting and navigation.)
+
+---
+
+## Troubleshooting: Menu Timing & Profiling
+
+**Problem:** Timing prints do not appear after loading a menu or submenu.
+
+- Ensure you are running the latest version of Dataset Forge.
+- Check that the menu or submenu uses the `time_and_record_menu_load` utility (see `utils/monitoring.py`).
+- Make sure you are not selecting a "Back" or "Exit" option, which do not trigger timing prints.
+
+**Problem:** Errors occur when navigating menus (e.g., `TypeError: 'str' object is not callable`).
+
+- This usually means a menu action is not callable. All menu loops should check if the action is callable before calling it.
+- Update your menu code to follow the latest menu loop pattern (see `docs/style_guide.md`).
+
+If issues persist, consult the documentation or contact the project maintainer.
+
+## Menu Loop Issues
+
+If you encounter a menu that redraws repeatedly or a submenu that does not appear:
+
+- Ensure the menu loop uses the robust pattern:
+  - Get the user's choice (key) from `show_menu`.
+  - Look up the action in the options dictionary.
+  - Call the action if callable.
+- This resolves most navigation and invocation issues in the CLI.
+
+## CBIR Troubleshooting
+
+- **Model loading errors**: Ensure torch, torchvision, and timm are installed and match your CUDA version. See requirements and install instructions.
+- **GPU out of memory**: Lower the batch size or use CPU fallback. Close other GPU-intensive applications.
+- **Slow performance**: Use GPU if available. For very large datasets, increase system RAM or process in smaller batches.
+- **CLIP/ResNet/VGG not found**: Check requirements.txt and reinstall dependencies.
+
+## Troubleshooting Test Issues
+
+- **UnicodeEncodeError**: Set PYTHONIOENCODING=utf-8 in your environment or subprocess.
+- **PermissionError on file deletion (Windows)**: Ensure files are closed before deleting; move os.unlink outside with blocks.
+- **Monkeypatching not working**: Patch the function in the namespace where it is used, not just where it is defined.
+- **Multiprocessing pickling errors**: Use top-level functions, not lambdas or closures, for functions passed to process pools.
+- **Manual/script tests not running**: Run them directly with python, not via pytest.
+
+## VapourSynth/getnative and CUDA/torch Install Order
+
+If you encounter issues with getnative, ensure VapourSynth is installed first. For CUDA acceleration, install the correct CUDA-enabled torch/torchvision/torchaudio before running `pip install .`.
+
+## Troubleshooting Menu Timing, Robust Loop, CBIR, Monitoring, and Test Suite
+
+- If menu timing prints do not appear, check your CLI environment and ensure the latest version is installed.
+- If robust menu navigation fails, ensure you are using the latest code and that all dependencies are installed.
+- For CBIR issues, verify that all required deep learning models are installed and that your GPU drivers are up to date.
+- For monitoring/analytics issues, check the logs in the ./logs/ directory.
+- If tests fail, ensure your environment matches the requirements and all dependencies are installed.
+
+---
+
+
+# Style Guide
+
 
 # Dataset Forge Style Guide
 
@@ -801,69 +983,49 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 
 For questions, see [Contributing](contributing.md) or ask the project maintainer.
 
-# Contributing
+---
 
-[//]: # "Navigation"
+## Menu Timing & Profiling: Best Practices
 
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md) | [Style Guide](style_guide.md)
+- All new menus and submenus must use the `time_and_record_menu_load` utility from `utils/monitoring.py` to time and record menu loads.
+- Use the `lazy_action()` and `lazy_menu()` helpers to ensure lazy imports and proper timing.
+- Timing prints must use the Catppuccin Mocha color scheme for consistency and clarity.
+- Do not print raw analytics logs to the console; only user-facing timing prints should be shown.
+- Ensure that "Back" and "Exit" options do not trigger timing prints or errors.
+- Document any new timing/profiling features in the appropriate docs/ files and README_full.md.
 
-# Contributing
+## Robust Menu Loop Pattern (Required)
 
-> **All code contributions must follow the [Style Guide](style_guide.md).**
+- All menus and submenus must use the robust menu loop pattern:
+  - Get the user's choice (key) from `show_menu`.
+  - Look up the action in the options dictionary.
+  - Call the action if callable.
+- This is required for reliability and maintainability.
+- Always use the Catppuccin Mocha color scheme for menu headers and prompts.
+- Integrate timing/profiling as described in the relevant sections.
 
-(Include the full "Contributing" and "Development Guidelines" sections from the original README here, preserving formatting and navigation.)
+## CBIR Code Style
 
-## 🧪 Testing
+- Follow modular design: separate menu (cbir_menu.py) and actions (cbir_actions.py)
+- Use robust error handling and logging for all file operations
+- Integrate memory management (memory_context, auto_cleanup)
+- Use parallel processing (smart_map, batch_map) for efficiency
+- Provide clear user feedback and progress tracking
 
-Dataset Forge now includes a comprehensive, automated test suite covering:
+## Test Code Style & Best Practices
 
-- CLI entry and menu navigation
-- Menu timing/profiling
-- Error feedback (including audio)
-- Memory management and parallel processing
-- File and image utilities
-- Robust handling of Unicode, subprocess, and Windows-specific issues
-- Manual/script-style tests for BHI filtering and pepeline (run directly, not via pytest)
+- Use pytest for all automated tests.
+- Use fixtures for temp files, directories, and configs.
+- Use monkeypatching/mocking for audio, error feedback, and subprocesses.
+- Ensure tests are robust on Windows (file locks, Unicode, etc.).
+- Add tests for new features and bugfixes.
+- See [advanced.md](advanced.md#test-suite--best-practices) for more.
 
-**How to run all tests:**
+---
 
-1. Activate your virtual environment:
-   ```sh
-   venv312\Scripts\activate
-   ```
-2. Run all automated tests from the project root:
-   ```sh
-   pytest
-   ```
-3. To run manual/script tests:
-   ```sh
-   python tests/test_bhi_filtering.py
-   python tests/test_pepeline.py
-   ```
-
-All tests pass as of this integration. See [usage.md](usage.md) and [features.md](features.md) for details.
-
-# Frequently Asked Questions (FAQ)
-
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
-
-# Frequently Asked Questions (FAQ)
-
-(If there are not enough FAQs in the original README, leave this as a stub for future expansion.)
-
-# Troubleshooting
-
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
-
-# Troubleshooting
-
-(Include the full "Troubleshooting" section from the original README here, preserving formatting and navigation.)
 
 # Changelog
+
 
 [//]: # "Navigation"
 
@@ -889,35 +1051,71 @@ All tests pass as of this integration. See [usage.md](usage.md) and [features.md
   - Notifications for critical errors (sound/visual).
   - Memory and CUDA cleanup integrated on exit/errors for all tracked processes/threads.
   - Background task management: pause, resume, kill subprocesses/threads from CLI.
+- Added Content-Based Image Retrieval (CBIR) for Duplicates:
+  - Semantic duplicate detection using CLIP, ResNet, and VGG embeddings
+  - Fast similarity search and grouping with ANN indexing
+  - Batch actions: find, remove, move, copy duplicate groups
+  - Integrated into Clean & Organize submenu under Dataset Management
+- Integrated comprehensive automated test suite (pytest-based)
+- Covers CLI, menu timing, error feedback, memory, parallelism, file/image utils
+- Handles Unicode, subprocess, and Windows-specific issues
+- Manual/script tests for BHI filtering and pepeline
+- All tests pass as of this integration
+
+## [July 2025]
+
+- Added menu timing/profiling system: every menu and submenu load is timed and printed to the user.
+- All menu load times are recorded and viewable in the System Monitoring menu ("⏱️ View Menu Load Times").
+- Lazy import pattern enforced for all menus and actions for maximum CLI speed.
+- Timing prints use the Catppuccin Mocha color scheme for clarity.
+- Documentation updated across README.md and docs/ to reflect these changes.
+- Global robust menu loop pattern integration for all menus and submenus
+- Improved reliability and navigation throughout the CLI
+- Added menu timing & profiling integration for all menus and submenus
+- Implemented robust menu loop pattern for reliability
+- Integrated Content-Based Image Retrieval (CBIR) for semantic duplicate detection
+- Centralized monitoring, analytics, and error tracking system
+- Comprehensive test suite covering CLI, memory, parallelism, and error feedback
+- requirements.txt is now grouped and commented by category
+- Added install order warnings for VapourSynth/getnative and CUDA/torch
 
 This file will track major changes and releases in the future.
 
+
+---
+
+
+# Contributing
+
+
+# Contributing
+
+> **All code contributions must follow the [Style Guide](style_guide.md).**
+
+(Include the full "Contributing" and "Development Guidelines" sections from the original README here, preserving formatting and navigation.)
+
+---
+
+
+# Faq
+
+
+# Frequently Asked Questions (FAQ)
+
+(If there are not enough FAQs in the original README, leave this as a stub for future expansion.)
+
+### What is CBIR for Duplicates?
+
+CBIR (Content-Based Image Retrieval) for Duplicates uses deep learning models (CLIP, ResNet, VGG) to find images that are semantically similar, even if they look different at the pixel level. It extracts feature embeddings, computes similarity, and groups duplicates for easy management.
+
+---
+
+
 # License
 
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
 
 ---
-
-## Menu Timing & Profiling (New in July 2025)
-
-Dataset Forge now features a fast, responsive CLI menu system with built-in timing and profiling:
-
-- Every time you load a menu or submenu, you will see a timing print (e.g., `⏱️ Loaded dataset_management_menu in 0.123 seconds.`) in the Catppuccin Mocha color scheme.
-- All menu load times are recorded and can be viewed in the System Monitoring menu under "⏱️ View Menu Load Times".
-- This helps you identify slow-loading menus and provides transparency for performance optimization.
-- The timing system uses lazy imports to maximize CLI speed and minimize memory usage.
-
-See also:
-
-- [Features](features.md#menu-timing--profiling-july-2025)
-- [Usage](usage.md#menu-timing--profiling)
-- [Advanced](advanced.md#advanced-menu-timing-profiling-and-lazy-imports)
-- [Architecture](architecture.md#menu-timing--profiling-in-the-architecture)
-- [Style Guide](style_guide.md#menu-timing--profiling-best-practices)
-- [Troubleshooting](troubleshooting.md#troubleshooting-menu-timing--profiling)

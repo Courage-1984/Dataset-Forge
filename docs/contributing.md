@@ -1,6 +1,4 @@
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md) | [Style Guide](style_guide.md)
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
 # Contributing
 

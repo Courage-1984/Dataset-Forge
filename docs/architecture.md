@@ -1,6 +1,4 @@
-[//]: # "Navigation"
-
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
 # Project Architecture
 
@@ -19,27 +17,18 @@ The CLI interface now provides audio error feedback: whenever an error is report
 
 ---
 
-## Menu Timing & Profiling in the Architecture
+## Menu System, Robust Loop, and Timing
 
-- The menu system now includes a timing/profiling layer that times every menu and submenu load.
-- This is implemented via the `time_and_record_menu_load` utility in `utils/monitoring.py`.
-- All menu and submenu actions use the lazy import pattern, and are wrapped with the timing utility for performance analytics.
-- Timing data is available to the user via the System Monitoring menu, and is also available for developer analytics.
-- This system is part of the broader monitoring and analytics utilities in `utils/monitoring.py`.
+The menu system uses a robust loop pattern and integrates timing/profiling for all menu and submenu loads. This ensures reliability and performance.
 
-### Menu System: Robust Loop Pattern
+## Content-Based Image Retrieval (CBIR)
 
-All menus and submenus use a robust, standardized menu loop pattern (choice-based, action lookup, callable check). This is essential for modularity, maintainability, and reliable navigation throughout the CLI.
+CBIR is integrated as a modular component for semantic duplicate detection.
 
-## CBIR (Content-Based Image Retrieval) for Duplicates
+## Monitoring, Analytics & Error Tracking
 
-Implemented in `actions/cbir_actions.py` and `menus/cbir_menu.py`. Provides semantic duplicate detection using deep learning embeddings (CLIP, ResNet, VGG), similarity search, grouping, and batch actions. Integrated with the modular menu and action system.
+Monitoring and analytics are integrated throughout the architecture for performance and error tracking.
 
-## Test Suite Structure
+## Test Suite
 
-- All tests are in the `tests/` directory.
-- Organized by:
-  - `test_utils/`: utility modules
-  - `test_cli/`: CLI and integration tests
-  - Manual scripts: BHI filtering, pepeline
-- See [usage.md](usage.md#running-tests) for how to run tests.
+The test suite is integrated to cover all major architectural components.
