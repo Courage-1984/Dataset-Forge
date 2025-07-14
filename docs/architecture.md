@@ -16,3 +16,13 @@ All major operations in actions/ are instrumented with monitoring/analytics hook
 ## Audio Error Feedback
 
 The CLI interface now provides audio error feedback: whenever an error is reported to the user (via print_error), an error sound (error.mp3) is played for immediate feedback. This is handled by the centralized print_error utility in utils/printing.py, which calls play_error_sound from utils/audio_utils.py.
+
+---
+
+## Menu Timing & Profiling in the Architecture
+
+- The menu system now includes a timing/profiling layer that times every menu and submenu load.
+- This is implemented via the `time_and_record_menu_load` utility in `utils/monitoring.py`.
+- All menu and submenu actions use the lazy import pattern, and are wrapped with the timing utility for performance analytics.
+- Timing data is available to the user via the System Monitoring menu, and is also available for developer analytics.
+- This system is part of the broader monitoring and analytics utilities in `utils/monitoring.py`.

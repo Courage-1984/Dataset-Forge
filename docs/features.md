@@ -77,6 +77,19 @@
 
 ---
 
+## Menu Timing & Profiling (July 2025)
+
+Dataset Forge now includes a fast, responsive CLI menu system with built-in timing and profiling:
+
+- **Timing Prints:** Every time you load a menu or submenu, a timing print (e.g., `⏱️ Loaded dataset_management_menu in 0.123 seconds.`) is shown in the Catppuccin Mocha color scheme.
+- **Menu Load Analytics:** All menu load times are recorded and can be viewed in the System Monitoring menu under "⏱️ View Menu Load Times".
+- **Performance Transparency:** This feature helps users and developers identify slow-loading menus and optimize performance.
+- **Lazy Imports:** The timing system leverages lazy imports to maximize CLI speed and minimize memory usage.
+
+For advanced usage and developer notes, see `docs/advanced.md`.
+
+---
+
 # Advanced Features
 
 ## AI-Powered Image Analysis

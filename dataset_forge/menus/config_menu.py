@@ -26,15 +26,17 @@ from dataset_forge.actions.config_actions import (
 def config_menu():
     options = config_menu.__menu_options__
     while True:
-        action = show_menu(
+        choice = show_menu(
             "Configuration & Model Management",
             options,
             header_color=Mocha.mauve,
             char="=",
         )
-        if action is None:
-            break
-        action()
+        if choice is None or choice == "0":
+            return
+        action = options[choice][1]
+        if callable(action):
+            action()
         print_prompt("\nPress Enter to return to the menu...")
         input()
 

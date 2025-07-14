@@ -50,3 +50,21 @@ If a model is hosted on OneDrive, you will be prompted to download it manually. 
 - Use arrow keys and type to search models
 - After selecting a model, choose actions: View Details, Download, Test, Open in Browser, or go back
 - Requires `questionary` (install with `pip install questionary`)
+
+---
+
+## Menu Timing & Profiling
+
+Whenever you load a menu or submenu in Dataset Forge, you will see a timing print in the CLI, such as:
+
+    ⏱️ Loaded dataset_management_menu in 0.123 seconds.
+
+This print uses the Catppuccin Mocha color scheme for clarity and consistency.
+
+All menu load times are recorded. To view a summary of all menu/submenu load timings:
+
+1. Go to the **System Monitoring** menu from the main menu.
+2. Select **"⏱️ View Menu Load Times"**.
+3. You will see a table of all menu/submenu load times for your session.
+
+This helps you identify slow-loading menus and optimize your workflow.

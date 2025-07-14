@@ -16,6 +16,7 @@ from dataset_forge.utils.printing import (
     print_error,
 )
 from dataset_forge.utils.input_utils import get_input
+from dataset_forge.utils import monitoring
 
 CACHE_DIR = os.path.join("OpenModelDB", "cache")
 MODELS_DIR = os.path.join("OpenModelDB", "models")
@@ -23,8 +24,12 @@ MODELS_DIR = os.path.join("OpenModelDB", "models")
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
-        module = importlib.import_module(module_path)
-        return getattr(module, func_name)(*args, **kwargs)
+        return monitoring.time_and_record_menu_load(
+            func_name,
+            lambda: getattr(importlib.import_module(module_path), func_name)(
+                *args, **kwargs
+            ),
+        )
 
     return _action
 
@@ -58,8 +63,10 @@ def openmodeldb_model_browser_menu():
             Mocha.lavender,
         )
         if choice is None or choice == "0":
-            break
-        options[choice][1](models)
+            return
+        action = options[choice][1]
+        if callable(action):
+            action(models)
 
 
 def search_filter_menu(models):
@@ -82,7 +89,7 @@ def search_filter_menu(models):
         }
         choice = show_menu("Search/Filter Models", options, Mocha.lavender)
         if choice is None or choice == "0":
-            break
+            return
         options[choice][1]()
 
 
@@ -170,7 +177,7 @@ def list_models_menu(models):
     while True:
         choice = show_menu("Select a Model", options, Mocha.lavender)
         if choice is None or choice == "0":
-            break
+            return
         model_key = options[choice][1]
         model_details_menu(models, model_key)
 
@@ -220,7 +227,7 @@ def list_downloaded_models_menu(models):
     while True:
         choice = show_menu("Select a Downloaded Model File", options, Mocha.lavender)
         if choice is None or choice == "0":
-            break
+            return
         selected_file = options[choice][1]
         model_info = file_to_model[selected_file]
         downloaded_model_menu(selected_file, model_info)
@@ -260,7 +267,7 @@ def downloaded_model_menu(filename, model_info):
     while True:
         choice = show_menu(f"Downloaded Model: {filename}", options, Mocha.lavender)
         if choice is None or choice == "0":
-            break
+            return
         options[choice][1]()
 
 
@@ -346,7 +353,7 @@ def model_details_menu(models, model_key):
     while True:
         choice = show_menu(f"Model: {details['name']}", options, Mocha.lavender)
         if choice is None or choice == "0":
-            break
+            return
         options[choice][1]()
 
 

@@ -18,12 +18,17 @@ from dataset_forge.menus.correct_hq_lq_pairing_menu import (
     correct_hq_lq_pairing_menu,
     fuzzy_hq_lq_pairing_menu,
 )
+from dataset_forge.utils import monitoring
 
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
-        module = importlib.import_module(module_path)
-        return getattr(module, func_name)(*args, **kwargs)
+        return monitoring.time_and_record_menu_load(
+            func_name,
+            lambda: getattr(importlib.import_module(module_path), func_name)(
+                *args, **kwargs
+            ),
+        )
 
     return _action
 
@@ -303,12 +308,14 @@ def dataset_management_menu():
         "0": ("⬅️ Back to Main Menu", None),
     }
     while True:
-        action = show_menu(
+        choice = show_menu(
             "📂 Dataset Management",
             options,
             header_color=Mocha.lavender,
             char="=",
         )
-        if action is None:
-            break
-        action()
+        if choice is None or choice == "0":
+            return
+        action = options[choice][1]
+        if callable(action):
+            action()

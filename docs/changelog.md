@@ -23,4 +23,12 @@
   - Memory and CUDA cleanup integrated on exit/errors for all tracked processes/threads.
   - Background task management: pause, resume, kill subprocesses/threads from CLI.
 
+## [July 2025]
+
+- Added menu timing/profiling system: every menu and submenu load is timed and printed to the user.
+- All menu load times are recorded and viewable in the System Monitoring menu ("⏱️ View Menu Load Times").
+- Lazy import pattern enforced for all menus and actions for maximum CLI speed.
+- Timing prints use the Catppuccin Mocha color scheme for clarity.
+- Documentation updated across README.md and docs/ to reflect these changes.
+
 This file will track major changes and releases in the future.

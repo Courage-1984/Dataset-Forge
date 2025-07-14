@@ -25,17 +25,18 @@ def user_profile_submenu():
     }
 
     while True:
-        action = show_menu(
+        choice = show_menu(
             "👤 User Profile",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
-            break
-        action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
+        if choice is None or choice == "0":
+            return
+        action = options[choice][1]
+        if callable(action):
+            action()
+        # No prompt after Back
 
 
 def memory_management_submenu():
@@ -116,15 +117,17 @@ def system_settings_menu():
         "0": ("⬅️ Back to Main Menu", None),
     }
     while True:
-        action = show_menu(
+        choice = show_menu(
             "⚙️ System & Settings",
             options,
             header_color=Mocha.lavender,
             char="=",
         )
-        if action is None:
-            break
-        action()
+        if choice is None or choice == "0":
+            return
+        action = options[choice][1]
+        if callable(action):
+            action()
 
 
 def set_hq_folder():

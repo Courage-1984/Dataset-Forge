@@ -79,6 +79,19 @@ Dataset Forge now uses a lazy import pattern for all main menus and submenus. Th
 
 ---
 
+## Menu Timing & Profiling (New in July 2025)
+
+Dataset Forge now features a fast, responsive CLI menu system with built-in timing and profiling:
+
+- Every time you load a menu or submenu, you will see a timing print (e.g., `⏱️ Loaded dataset_management_menu in 0.123 seconds.`) in the Catppuccin Mocha color scheme.
+- All menu load times are recorded and can be viewed in the System Monitoring menu under "⏱️ View Menu Load Times".
+- This helps you identify slow-loading menus and provides transparency for performance optimization.
+- The timing system uses lazy imports to maximize CLI speed and minimize memory usage.
+
+For more details, see the documentation in `docs/features.md`, `docs/usage.md`, and `docs/advanced.md`.
+
+---
+
 ## 📖 Table of Contents
 
 - [Features](docs/features.md)

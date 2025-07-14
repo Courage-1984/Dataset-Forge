@@ -239,3 +239,14 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 ---
 
 For questions, see [Contributing](contributing.md) or ask the project maintainer.
+
+---
+
+## Menu Timing & Profiling: Best Practices
+
+- All new menus and submenus must use the `time_and_record_menu_load` utility from `utils/monitoring.py` to time and record menu loads.
+- Use the `lazy_action()` and `lazy_menu()` helpers to ensure lazy imports and proper timing.
+- Timing prints must use the Catppuccin Mocha color scheme for consistency and clarity.
+- Do not print raw analytics logs to the console; only user-facing timing prints should be shown.
+- Ensure that "Back" and "Exit" options do not trigger timing prints or errors.
+- Document any new timing/profiling features in the appropriate docs/ files and README_full.md.

@@ -1,6 +1,7 @@
 import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
+from dataset_forge.utils import monitoring
 
 # Helper for lazy importing submenu modules
 # This returns a function that, when called, imports and calls the submenu
@@ -8,8 +9,10 @@ from dataset_forge.utils.color import Mocha
 
 def lazy_menu(module_name: str, func_name: str):
     def _menu():
-        module = importlib.import_module(module_name)
-        getattr(module, func_name)()
+        monitoring.time_and_record_menu_load(
+            func_name,
+            lambda: getattr(importlib.import_module(module_name), func_name)(),
+        )
 
     return _menu
 
@@ -73,7 +76,7 @@ def main_menu():
             Mocha.lavender,
         )
         if choice is None or choice == "0":
-            break
+            return
         action = options[choice][1]
-        if action:
+        if callable(action):
             action()

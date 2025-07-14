@@ -11,6 +11,7 @@ from dataset_forge.utils.printing import (
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
+from dataset_forge.utils import monitoring
 
 
 def require_hq_lq(func):
@@ -27,8 +28,12 @@ def require_hq_lq(func):
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
-        module = importlib.import_module(module_path)
-        return getattr(module, func_name)(*args, **kwargs)
+        return monitoring.time_and_record_menu_load(
+            func_name,
+            lambda: getattr(importlib.import_module(module_path), func_name)(
+                *args, **kwargs
+            ),
+        )
 
     return _action
 
@@ -82,15 +87,17 @@ def utilities_menu():
         "0": ("⬅️ Back to Main Menu", None),
     }
     while True:
-        action = show_menu(
+        choice = show_menu(
             "🛠️ Utilities",
             options,
             header_color=Mocha.lavender,
             char="=",
         )
-        if action is None:
-            break
-        action()
+        if choice is None or choice == "0":
+            return
+        action = options[choice][1]
+        if callable(action):
+            action()
 
 
 def filter_non_images_menu():

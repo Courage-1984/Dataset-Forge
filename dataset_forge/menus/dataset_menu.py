@@ -177,14 +177,16 @@ def dataset_menu():
         "0": ("Back to Main Menu", None),
     }
     while True:
-        action = show_menu(
+        choice = show_menu(
             "Dataset Creation & Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
-            break
-        action()
+        if choice is None or choice == "0":
+            return
+        action = options[choice][1]
+        if callable(action):
+            action()
         print_prompt("\nPress Enter to return to the menu...")
         input()

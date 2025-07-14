@@ -220,7 +220,7 @@ class PerformanceAnalytics:
             "timestamp": time.time(),
         }
         self.records.append(rec)
-        logger.info(f"Performance: {rec}")
+        # logger.info(f"Performance: {rec}")  # <-- Remove or comment out this line to suppress console output
 
     def summary(self) -> Dict[str, Any]:
         """Return analytics summary."""
@@ -525,3 +525,23 @@ def print_health_check_results(results: Dict[str, Any]):
 perf_analytics = PerformanceAnalytics()
 error_tracker = ErrorTracker()
 task_registry = TaskRegistry()
+
+
+def time_and_record_menu_load(menu_name, func, *args, **kwargs):
+    """
+    Utility to time and record the duration of a menu or submenu load.
+    Records the timing in perf_analytics and prints to the user.
+    Only times if func is callable; otherwise returns func as is.
+    """
+    import time
+    from dataset_forge.utils.printing import print_info, print_warning
+
+    if not callable(func):
+        print_warning(f"[Menu Timing] {menu_name} is not callable; skipping timing.")
+        return func
+    start = time.time()
+    result = func(*args, **kwargs)
+    duration = time.time() - start
+    perf_analytics.record_operation(f"menu:{menu_name}", duration)
+    print_info(f"⏱️ Loaded {menu_name} in {duration:.3f} seconds.")
+    return result

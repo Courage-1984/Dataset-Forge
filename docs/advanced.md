@@ -105,3 +105,29 @@ Dataset Forge now uses a comprehensive lazy import pattern for all main menus an
 - See `dataset_forge/menus/main_menu.py` and other menu files for examples.
 
 This is now the recommended pattern for all new menu and action integrations.
+
+---
+
+## Advanced: Menu Timing, Profiling, and Lazy Imports
+
+### Lazy Import Pattern
+
+All menus and submenus in Dataset Forge use a lazy import pattern. This means that heavy modules and actions are only imported when the user selects a menu option, not at startup. This keeps the CLI fast and responsive, even as the codebase grows.
+
+- Use the `lazy_action()` and `lazy_menu()` helpers to defer imports until needed.
+- See `dataset_forge/menus/main_menu.py` for the canonical pattern.
+
+### Menu Timing & Profiling Integration
+
+- Every menu and submenu load is timed using a centralized utility (`time_and_record_menu_load` in `utils/monitoring.py`).
+- Timing prints are shown to the user after each menu load, and all timings are aggregated for analytics.
+- The System Monitoring menu provides a summary of all menu load times for the session.
+
+### Extending/Customizing Timing Analytics
+
+- Developers can use the timing utility in any new menu or action by wrapping the function call with `time_and_record_menu_load`.
+- The timing system is extensible: you can add custom analytics, logging, or performance alerts as needed.
+
+#### Rationale
+
+- Lazy imports and timing analytics together ensure the CLI remains fast, memory-efficient, and transparent for both users and developers.

@@ -2785,15 +2785,17 @@ def directory_tree_menu():
 
     while True:
         try:
-            action = show_menu(
+            choice = show_menu(
                 "🌳 Enhanced Directory Tree Generator", options, Mocha.lavender
             )
-            if action is None:
-                break
-            action()
+            if choice is None or choice == "0":
+                return
+            action = options[choice][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting...")
-            break
+            return
         except Exception as e:
             print_error(f"❌ Unexpected error: {e}")
             print_info("💡 Please try again or contact support if the issue persists.")

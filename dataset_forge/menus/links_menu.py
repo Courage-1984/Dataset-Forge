@@ -71,10 +71,8 @@ def community_links_menu():
             link_sel = show_menu(
                 f"{cat_name} Links", show_menu_dict, header_color=Mocha.lavender
             )
-            print(f"DEBUG: link_sel={link_sel}")
             if link_sel is None or link_sel == "0":
                 break
-            # Accept both key and value returns from show_menu
             sel_key = None
             if isinstance(link_sel, str) and link_sel in show_menu_dict:
                 sel_key = link_sel
@@ -83,23 +81,18 @@ def community_links_menu():
                     if isinstance(v, tuple) and v[1] == link_sel:
                         sel_key = k
                         break
-            print(f"DEBUG: sel_key={sel_key}")
             if sel_key is None or sel_key == "0":
                 break
             label, val = show_menu_dict[sel_key]
-            print(f"DEBUG: label={label}, val={val}")
             if val is None:
                 break
             if isinstance(val, tuple) and val[0] == "link":
                 url = val[1]
-                print(f"DEBUG: Opening link {url}")
                 open_link(url)
-                # Do not break; stay in submenu after opening link
                 continue
             elif isinstance(val, tuple) and val[0] == "submenu":
                 subcat = label
                 sublinks = val[1]
-                # Build submenu options
                 sublink_options = {
                     str(i + 1): (subitem["name"], subitem["url"])
                     for i, subitem in enumerate(sublinks)
@@ -114,34 +107,28 @@ def community_links_menu():
                         sublink_options,
                         header_color=Mocha.lavender,
                     )
-                    print(f"DEBUG: sub_sel={sub_sel}")
                     if sub_sel is None or sub_sel == "0":
                         break
-                    # Accept both key and value returns for submenus
                     sub_key = None
                     if isinstance(sub_sel, str) and sub_sel in sublink_options:
                         sub_key = sub_sel
                     elif isinstance(sub_sel, str):
-                        # If sub_sel is a URL, open it directly
                         for k, v in sublink_options.items():
                             if v[1] == sub_sel:
                                 open_link(sub_sel)
-                                sub_key = k  # Optionally set sub_key for consistency
+                                sub_key = k
                                 break
                         if sub_key is not None:
-                            continue  # Stay in submenu after opening link
+                            continue
                     elif isinstance(sub_sel, tuple):
                         for k, v in sublink_options.items():
                             if v == sub_sel:
                                 sub_key = k
                                 break
-                    print(f"DEBUG: sub_key={sub_key}")
                     if sub_key is None or sub_key == "0":
                         break
                     url = sublink_options[sub_key][1]
-                    print(f"DEBUG: Opening sublink {url}")
                     open_link(url)
-                    # Do not break; stay in submenu after opening link
                     continue
 
 
@@ -190,7 +177,7 @@ def links_menu():
         if action is None or action == "0":
             break
         func = options[action][1]
-        if func:
+        if callable(func):
             func()
 
 
