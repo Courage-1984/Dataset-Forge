@@ -5,6 +5,10 @@ from PIL import Image, ImageEnhance
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.file_utils import is_image_file
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def adjust_image(img, brightness=None, contrast=None, hue=None):

@@ -15,6 +15,10 @@ from dataset_forge.utils.file_utils import (
     perform_file_operation,
     run_oxipng,
 )
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def compress_single_image(
@@ -93,6 +97,7 @@ def compress_single_image(
         return False
 
 
+@monitor_all("compress_images", critical_on_error=True)
 def compress_images(
     src_hq=None,
     src_lq=None,
@@ -153,6 +158,11 @@ def compress_images(
         chunk_size=parallel_config.get("chunk_size", 1),
     )
 
+    import threading
+
+    thread = threading.Thread(target=lambda: None)
+    task_registry.register_thread(thread)
+
     if paired_mode:
         # Process HQ/LQ pairs
         def compress_pair(pair):
@@ -206,6 +216,10 @@ def compress_images(
             desc="Compressing images",
             max_workers=config.max_workers,
         )
+    clear_memory()
+    clear_cuda_cache()
+    print_success("Compression complete.")
+    play_done_sound()
 
     # Count results
     successful = sum(1 for result in results if result)
@@ -214,6 +228,7 @@ def compress_images(
     print(f"Compression complete: {successful} successful, {failed} failed")
 
 
+@monitor_all("compress_directory", critical_on_error=True)
 def compress_directory(
     input_dir: str,
     output_dir: str,
@@ -276,6 +291,11 @@ def compress_directory(
         use_gpu=False,
     )
 
+    import threading
+
+    thread = threading.Thread(target=lambda: None)
+    task_registry.register_thread(thread)
+
     def compress_with_paths(path_tuple):
         input_path, output_path = path_tuple
         return compress_single_image(
@@ -297,6 +317,10 @@ def compress_directory(
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
     )
+    clear_memory()
+    clear_cuda_cache()
+    print_success("Directory compression complete.")
+    play_done_sound()
 
     successful = sum(1 for result in results if result)
     failed = len(results) - successful

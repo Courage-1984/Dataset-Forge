@@ -8,6 +8,10 @@ from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.image_ops import CorruptionFixer
 from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def detect_corruption(file_path):
@@ -34,6 +38,7 @@ def fix_corruption(file_path):
         return True, f"Corruption fixed: {e}"
 
 
+@monitor_all("fix_corrupted_images", critical_on_error=True)
 def fix_corrupted_images(folder_path, grayscale=False):
     """Re-save images to fix corruption issues using CorruptionFixer class."""
     print("\n" + "=" * 30)
@@ -88,6 +93,10 @@ def fix_corrupted_images(folder_path, grayscale=False):
             print(f"  ... and {len(errors) - 5} more errors")
     print("-" * 30)
     print("=" * 30)
+    clear_memory()
+    clear_cuda_cache()
+    print_success("Corruption fixing complete.")
+    play_done_sound()
 
 
 def fix_corrupted_images_hq_lq(hq_folder, lq_folder, grayscale=False):

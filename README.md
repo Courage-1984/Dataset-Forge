@@ -36,7 +36,7 @@ Dataset Forge is built with a modular, extensible architecture:
 
 - **menus/**: UI layer (CLI menus, user interaction)
 - **actions/**: Business logic (core dataset/image operations)
-- **utils/**: Reusable utilities (file ops, memory, parallelism, color, etc.)
+- **utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dpid/**: Multiple DPID (degradation) implementations
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
@@ -102,13 +102,16 @@ See [Project Architecture](docs/architecture.md) for details.
 - Beautiful Catppuccin Mocha-themed interface
 - Smart memory and parallel processing
 - Deep validation and reporting tools
-- [See all features...](docs/features.md)
+- **Advanced system monitoring & analytics**: Live resource usage (CPU, GPU, RAM, disk), performance analytics, error tracking, health checks, and background task management, all accessible from a dedicated CLI menu. Includes persistent logging, notifications, and memory/CUDA cleanup integration.
+- **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
 
 ---
 
 ## About
 
 Dataset Forge is a professional-grade tool for ML researchers and data scientists, designed for high-quality dataset curation, analysis, and transformation. For full documentation, see the [docs/](docs/) folder or the links above.
+
+**Audio error feedback:** Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback, ensuring you never miss a critical issue.
 
 **For coding standards and best practices, see the [Style Guide](docs/style_guide.md).**
 

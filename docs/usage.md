@@ -6,6 +6,23 @@
 
 (Include the full "Usage Examples" and "Menu Structure" sections from the original README here, preserving formatting and navigation.)
 
+## Using the System Monitoring Menu
+
+The System Monitoring menu provides live resource usage, analytics, error tracking, health checks, and background task management:
+
+1. Select '🖥️ System Monitoring' from the main menu.
+2. Features available:
+   - **Live Resource Usage**: View CPU, GPU, RAM, and disk usage for all processes/threads.
+   - **Performance Analytics**: See live and session analytics for all major operations.
+   - **Error Summaries**: Review error logs and summaries, with notifications for critical errors.
+   - **Health Checks**: Run automated checks for RAM, disk, CUDA, Python version, and permissions.
+   - **Background Task Management**: List, pause, resume, or kill subprocesses/threads.
+   - **Persistent Logs**: All analytics and errors are saved to ./logs/ for later review.
+   - **Notifications**: Critical errors trigger sound/visual notifications.
+   - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
+
+See the [Advanced Features](advanced.md) for more details on configuration and integration.
+
 ## Using the OpenModelDB Model Browser
 
 The OpenModelDB Model Browser is available from the Training & Inference menu:

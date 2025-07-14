@@ -1,6 +1,10 @@
 import os
 from dataset_forge.actions import exif_scrubber_actions
 from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 # If ICCToSRGBConverter is not available, leave a TODO stub
 
@@ -39,7 +43,9 @@ def exif_scrubber_menu():
         print(
             f"Scrubbing EXIF metadata from paired HQ/LQ folders:\n  HQ: {hq_folder}\n  LQ: {lq_folder}"
         )
-        count, failed = exif_scrubber_actions.scrub_exif_hq_lq_folders(hq_folder, lq_folder)
+        count, failed = exif_scrubber_actions.scrub_exif_hq_lq_folders(
+            hq_folder, lq_folder
+        )
         print(f"Processed {count} HQ/LQ image pairs.")
         if failed:
             print(f"Failed to process {len(failed)} pairs:")

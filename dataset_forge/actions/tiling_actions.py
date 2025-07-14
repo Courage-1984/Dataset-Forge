@@ -28,6 +28,10 @@ from dataset_forge.utils.memory_utils import (
     auto_cleanup,
     to_device_safe,
 )
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 # src/enum.py
@@ -608,20 +612,31 @@ class BestTile:
         except Exception as e:
             print(f"Error processing {img_name}: {e}")
 
+    @monitor_all("BestTile.run", critical_on_error=True)
     def run(self):
         """
         Run the processing on all images using the specified processing type.
         """
+        import threading
+        import multiprocessing
+
         if self.process_type == ProcessType.THREAD:
+            thread = threading.Thread(target=lambda: None)
+            task_registry.register_thread(thread)
             thread_map(self.process, self.all_images)
         elif self.process_type == ProcessType.PROCESS:
+            proc = multiprocessing.Process(target=lambda: None)
+            task_registry.register_process(proc)
             process_map(self.process, self.all_images)
         else:
             for img_name in tqdm(self.all_images):
                 self.process(img_name)
+        clear_memory()
+        clear_cuda_cache()
 
 
 # --- API for main.py integration ---
+@monitor_all("tile_single_folder", critical_on_error=True)
 def tile_single_folder(
     in_folder,
     out_folder,
@@ -652,6 +667,10 @@ def tile_single_folder(
         **kwargs,
     )
     processor.run()
+    print_success("Tiling complete.")
+    play_done_sound()
+    clear_memory()
+    clear_cuda_cache()
 
 
 def tile_hq_lq_dataset(

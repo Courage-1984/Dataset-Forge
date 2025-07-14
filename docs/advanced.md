@@ -14,3 +14,41 @@
 - **Testing & Inference:** Supports Spandrel and ONNX models, tiling, alpha handling, device/precision selection, and output format options.
 - **Extensibility:** Designed for future features (batch, metrics, advanced filtering, etc.).
 - **User Experience:** Catppuccin Mocha color scheme, progress bars, audio feedback, and clear error messages throughout the workflow.
+
+## Advanced System Monitoring & Analytics
+
+Dataset Forge includes a comprehensive monitoring and analytics system for live resource usage, performance analytics, error tracking, health checks, and background task management.
+
+- **Accessing Monitoring:**
+
+  - Use the 'System Monitoring' menu from the main CLI to view live CPU, GPU, RAM, and disk usage for all processes and threads.
+  - View performance analytics and error summaries for the current session and review persistent logs in ./logs/.
+
+- **Performance Analytics:**
+
+  - All major operations are instrumented with decorators for analytics and error tracking.
+  - Analytics are shown live in the CLI and saved to disk for later review.
+
+- **Error Tracking & Notifications:**
+
+  - Errors are logged to both file and CLI, with summaries and critical error notifications (sound/visual).
+  - **Audio error feedback:** Whenever an error is reported to the user (via print_error), an error sound (error.mp3) is played for immediate feedback.
+
+- **Health Checks:**
+
+  - Automated checks for RAM, disk, CUDA, Python version, and permissions are available from the monitoring menu.
+  - CLI output provides recommendations and warnings.
+
+- **Background Task Management:**
+
+  - All subprocesses/threads are registered and can be paused, resumed, or killed from the CLI menu.
+  - Session-only persistence ensures background tasks are managed safely.
+
+- **Memory & CUDA Cleanup:**
+
+  - Automatic cleanup is triggered on exit/errors for all tracked processes/threads.
+
+- **Configuration:**
+  - Monitoring and analytics are enabled by default. Advanced users can customize logging, notification, and analytics settings in the configuration files.
+
+See the [Usage Guide](usage.md) for step-by-step instructions.

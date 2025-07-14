@@ -20,6 +20,9 @@ from dataset_forge.utils.printing import (
     print_success,
     print_warning,
 )
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def load_images_from_folder(
@@ -255,6 +258,7 @@ def find_near_duplicates_clip(
     return groups
 
 
+@monitor_all("visual_dedup_workflow", critical_on_error=True)
 def visual_dedup_workflow(
     hq_path: Optional[str] = None,
     lq_path: Optional[str] = None,
@@ -299,6 +303,11 @@ def visual_dedup_workflow(
             use_gpu=parallel_config.get("use_gpu", True),
         )
 
+        import threading
+
+        thread = threading.Thread(target=lambda: None)
+        task_id = task_registry.register_thread(thread)
+        # Actually run the smart_map (not in thread, but for demo)
         folder_results = smart_map(
             process_folder,
             [hq_path, lq_path],
@@ -306,13 +315,17 @@ def visual_dedup_workflow(
             max_workers=2,  # Only 2 folders
             processing_type=ProcessingType.THREAD,
         )
-
         for path, groups in folder_results:
             results[path] = groups
-
+        # Cleanup
+        clear_memory()
+        clear_cuda_cache()
+    print_success("Visual deduplication complete.")
+    play_done_sound()
     return results
 
 
+@monitor_all("move_duplicate_groups", critical_on_error=True)
 def move_duplicate_groups(
     groups: List[List[str]], destination_dir: str, dry_run: bool = True
 ) -> List[str]:
@@ -373,6 +386,7 @@ def move_duplicate_groups(
     return moved_files
 
 
+@monitor_all("copy_duplicate_groups", critical_on_error=True)
 def copy_duplicate_groups(
     groups: List[List[str]], destination_dir: str, dry_run: bool = True
 ) -> List[str]:
@@ -433,6 +447,7 @@ def copy_duplicate_groups(
     return copied_files
 
 
+@monitor_all("remove_duplicate_groups", critical_on_error=True)
 def remove_duplicate_groups(groups: List[List[str]], dry_run: bool = True) -> List[str]:
     """
     Remove duplicate files from groups with parallel processing.

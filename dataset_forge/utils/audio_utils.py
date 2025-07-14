@@ -169,3 +169,18 @@ def play_done_sound(block=False):
     """
     player = get_audio_player()
     player.play_audio(block=block)
+
+
+def play_error_sound(block=False):
+    """
+    Play the error sound asynchronously.
+
+    Args:
+        block: If True, block until audio finishes. If False, play asynchronously.
+    """
+    # Get the path to the error.mp3 file relative to the project root
+    current_dir = Path(__file__).parent  # utils directory
+    project_root = current_dir.parent.parent  # project root
+    error_audio_path = project_root / "assets" / "error.mp3"
+    player = AudioPlayer(audio_file_path=error_audio_path)
+    player.play_audio(block=block)

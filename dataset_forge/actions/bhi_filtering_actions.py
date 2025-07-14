@@ -11,6 +11,11 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from pepeline import read, ImgFormat
 
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
+
 
 # --- ImageDataset and IQANode (from utils/module.py and utils/objects.py) ---
 class ImageDataset(Dataset):
@@ -736,6 +741,7 @@ def run_bhi_filtering_with_defaults(
     )
 
 
+@monitor_all("run_bhi_filtering", critical_on_error=True)
 def run_bhi_filtering(
     input_path: str,
     thresholds: Optional[Dict[str, float]] = None,

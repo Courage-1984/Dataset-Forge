@@ -9,6 +9,15 @@ import torch.nn.functional as F
 import timm
 import torchvision.transforms as T
 import torch.nn as nn
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import (
+    clear_memory,
+    clear_cuda_cache,
+    auto_cleanup,
+)
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
+import threading
 
 
 class LayerNorm(torch.nn.Module):
@@ -37,12 +46,6 @@ class LayerNorm(torch.nn.Module):
 
 # --- Extract Frames Utility ---
 # Import centralized memory management
-from dataset_forge.utils.memory_utils import (
-    clear_memory,
-    clear_cuda_cache,
-    auto_cleanup,
-    to_device_safe,
-)
 
 
 def release_memory():
@@ -50,6 +53,7 @@ def release_memory():
     clear_memory()
 
 
+@monitor_all("extract_frames_menu", critical_on_error=True)
 def extract_frames_menu():
     print("\n--- Extract Frames from Video (Batch/Multi-Model) ---")
     video_path = input("Enter path to video file: ").strip()
@@ -202,6 +206,10 @@ def extract_frames_menu():
             video_to_frame(video_path, out_dir, start_frame=start, end_frame=end)
 
     print("\nAll selected models processed.")
+    clear_memory()
+    clear_cuda_cache()
+    print_success("Frame extraction complete.")
+    play_done_sound()
 
 
 # --- END Extract Frames Utility ---

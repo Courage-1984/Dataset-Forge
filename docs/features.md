@@ -63,6 +63,7 @@
 - **Enhanced Directory Tree**: Advanced directory visualization with emoji categorization, statistics, and multiple output formats
 - **Path History**: Smart path management with history and favorites
 - **Parallel Processing**: High-performance multiprocessing and multithreading
+- **System Monitoring, Analytics & Error Tracking**: Live monitoring of CPU, GPU, RAM, and disk usage for all processes and threads; performance analytics with persistent logging; error tracking with CLI and log summaries; health checks (RAM, disk, CUDA, permissions); background task management (pause/resume/kill); notifications for critical errors; memory and CUDA cleanup integration; all accessible from a dedicated CLI menu.
 
 ## Beautiful CLI Interface
 
@@ -71,6 +72,7 @@
 - **Progress Tracking**: Progress bars, error handling, memory management
 - **Smart Input**: Path history, favorites, and intelligent defaults
 - **Parallel Processing**: Multiprocessing and multithreading for speed improvements
+- **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
 
 ---
 
@@ -191,3 +193,15 @@
 - **Scale Relationship Detection**: Automatic HQ/LQ scale factor detection
 - **Outlier Detection**: Statistical analysis for anomalous images
 - **Corruption Detection**: Comprehensive image integrity checking
+
+## System Monitoring, Analytics & Error Tracking
+
+- **Live Resource Monitoring**: Real-time CPU, GPU (NVIDIA), RAM, and disk usage for all processes/threads
+- **Performance Analytics**: Decorator-based analytics for all major operations, with live and persistent session summaries
+- **Error Tracking**: Logs errors to file and CLI, with summary granularity and critical error notifications (sound/visual)
+- **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
+- **Health Checks**: Automated checks for RAM, disk, CUDA, Python version, and permissions, with CLI output and recommendations
+- **Background Task Management**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
+- **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
+- **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
+- **Dedicated CLI Menu**: Access all monitoring, analytics, and management features from the System Monitoring menu

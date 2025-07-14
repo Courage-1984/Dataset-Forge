@@ -4,6 +4,10 @@ from collections import defaultdict
 import imagehash
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def compute_hashes(folder, hash_func="phash"):

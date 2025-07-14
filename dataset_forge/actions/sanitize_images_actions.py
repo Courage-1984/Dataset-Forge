@@ -28,6 +28,10 @@ import cv2
 from dataset_forge.utils.image_ops import ICCToSRGBConverter
 import concurrent.futures
 import uuid
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp")
 
@@ -170,6 +174,7 @@ def _run_zsteg_check(image_path: str, zsteg_results_file=None):
                 f.write(f"{image_path}: {msg}\n\n")
 
 
+@monitor_all("sanitize_images", critical_on_error=True)
 def sanitize_images(
     input_path: str,
     output_folder: str,
@@ -204,6 +209,10 @@ def sanitize_images(
             if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
         ]
         print_info(f"Fixing image corruption in-place in {folder} (parallel)...")
+        import threading
+
+        thread = threading.Thread(target=lambda: None)
+        task_registry.register_thread(thread)
 
         def fix_one(fpath):
             try:
@@ -223,6 +232,8 @@ def sanitize_images(
                     desc=f"Fix corruption {os.path.basename(folder)}",
                 )
             )
+        clear_memory()
+        clear_cuda_cache()
 
     for in_folder, _ in folders:
         if not dry_run:
@@ -391,6 +402,10 @@ def sanitize_images(
                     for f in os.listdir(tempB)
                     if f.lower().endswith(".png")
                 ]
+                import threading
+
+                thread = threading.Thread(target=lambda: None)
+                task_registry.register_thread(thread)
                 with concurrent.futures.ThreadPoolExecutor(
                     max_workers=max_workers
                 ) as executor:
@@ -401,6 +416,8 @@ def sanitize_images(
                             desc=f"Remove alpha {os.path.basename(tempB)}",
                         )
                     )
+                clear_memory()
+                clear_cuda_cache()
         # 7. Metadata removal: oxipng to output (per-file parallel)
         print_info(
             "Running oxipng for metadata removal and final output (per-file parallel)..."
@@ -451,7 +468,10 @@ def sanitize_images(
                             )
                         else:
                             print_info(f"[Dry run] Would run zsteg on {fpath}")
-    print_success("Sanitization complete. Output written to: " + output_folder)
+    print_success("Sanitization complete.")
+    play_done_sound()
+    clear_memory()
+    clear_cuda_cache()
     if zsteg_results_file:
         return zsteg_results_file
     return None

@@ -2,6 +2,10 @@ import os
 from dataset_forge.utils.progress_utils import tqdm
 from PIL import Image
 import imagehash
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def fuzzy_hq_lq_pairing_logic(

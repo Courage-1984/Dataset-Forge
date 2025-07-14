@@ -33,6 +33,11 @@ from dataset_forge.dpid import (
     run_phhofm_dpid_single_folder,
     run_phhofm_dpid_hq_lq,
 )
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
+import threading
 
 
 def create_multiscale_dataset(*args, **kwargs):
@@ -247,6 +252,7 @@ def remove_small_image_pairs(hq_folder, lq_folder):
     return _remove_small_image_pairs(hq_folder, lq_folder)
 
 
+@monitor_all("de_dupe", critical_on_error=True)
 def de_dupe(
     hq_folder,
     lq_folder=None,
@@ -268,6 +274,10 @@ def de_dupe(
     if not groups:
         print("No duplicates or near-duplicates found.")
         return
+    import threading
+
+    thread = threading.Thread(target=lambda: None)
+    task_registry.register_thread(thread)
     if lq_folder:
         # Progress bar for paired deduplication
         for group in tqdm(groups, desc="Processing duplicate groups"):
@@ -296,7 +306,10 @@ def de_dupe(
 
                             shutil.copy2(hq_path, dest)
                             print(f"Copied {hq_path} -> {dest}")
-    print("Done!")
+    clear_memory()
+    clear_cuda_cache()
+    print_success("Deduplication complete.")
+    play_done_sound()
 
 
 def batch_rename(

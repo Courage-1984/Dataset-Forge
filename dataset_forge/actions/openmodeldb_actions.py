@@ -18,6 +18,9 @@ from dataset_forge.utils.printing import (
 from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.utils.input_utils import get_input
 import webbrowser
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
 
 OPENMODELDB_API_URL = "https://openmodeldb.info/api/v1/models.json"
 
@@ -134,6 +137,7 @@ def get_resource_filename(resource, model_details):
     return f"{model_name}.{ext}"
 
 
+@monitor_all("Download Model", critical_on_error=True)
 def download_model(
     model_details: dict, models_dir: str, verify_sha256: bool = False
 ) -> None:
@@ -237,6 +241,7 @@ def verify_file_sha256(filepath: str, expected_hash: str) -> bool:
     return h.hexdigest().lower() == expected_hash.lower()
 
 
+@monitor_all("Test Model", critical_on_error=True)
 def test_model(model_details: dict, models_dir: str, image_path: str) -> None:
     """
     Runs a test upscaling using the selected model and image.

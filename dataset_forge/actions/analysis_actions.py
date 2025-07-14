@@ -21,8 +21,10 @@ from dataset_forge.actions.analysis_ops_actions import (
     ConsistencyAnalyzer,
 )
 from dataset_forge.utils.image_ops import get_image_size
+from dataset_forge.utils.monitoring import monitor_all
 
 
+@monitor_all("analyze_single_image")
 def analyze_single_image(image_path: str) -> dict:
     """
     Analyze a single image and return its properties.
@@ -48,6 +50,7 @@ def analyze_single_image(image_path: str) -> dict:
         return {"path": image_path, "error": str(e), "success": False}
 
 
+@monitor_all("analyze_image_batch")
 def analyze_image_batch(image_paths: list) -> list:
     """
     Analyze a batch of images in parallel.
@@ -61,6 +64,7 @@ def analyze_image_batch(image_paths: list) -> list:
     return [analyze_single_image(path) for path in image_paths]
 
 
+@monitor_all("generate_hq_lq_dataset_report", critical_on_error=True)
 def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     print("\n" + "=" * 30)
     print("   HQ/LQ DATASET REPORT")
@@ -618,6 +622,7 @@ def analyze_file_sizes(folder_path, folder_name, verbose=True):
 
 
 # Keep existing functions that don't need parallel processing
+@monitor_all("verify_images", critical_on_error=True)
 def verify_images(hq_folder, lq_folder):
     """Verify image integrity with parallel processing."""
     hq_files = [f for f in os.listdir(hq_folder) if is_image_file(f)]
@@ -693,6 +698,7 @@ def verify_images(hq_folder, lq_folder):
             print(f"  ... and {len(lq_errors) - 5} more")
 
 
+@monitor_all("fix_corrupted_images", critical_on_error=True)
 def fix_corrupted_images(*args, **kwargs):
     """Redirect to corruption actions."""
     from dataset_forge.actions.corruption_actions import (
@@ -923,6 +929,7 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
             print(f"  Errors: {len(errors)}")
 
 
+@monitor_all("progressive_dataset_validation", critical_on_error=True)
 def progressive_dataset_validation(hq_folder, lq_folder):
     """Run progressive dataset validation with parallel processing."""
     print("Starting progressive dataset validation...")

@@ -1,4 +1,5 @@
 from .color import Mocha
+from .audio_utils import play_error_sound
 
 
 def print_header(title, char="#", color=Mocha.mauve):
@@ -14,7 +15,7 @@ def print_section(title, char="-", color=Mocha.sapphire):
 
 
 def print_success(msg):
-    print(Mocha.green + Mocha.bold + "✔ " + msg + Mocha.reset)
+    print(Mocha.green + Mocha.bold + "  " + msg + Mocha.reset)
 
 
 def print_warning(msg):
@@ -22,7 +23,8 @@ def print_warning(msg):
 
 
 def print_error(msg):
-    print(Mocha.red + Mocha.bold + "✖ " + msg + Mocha.reset)
+    play_error_sound(block=False)
+    print(Mocha.red + Mocha.bold + "  " + msg + Mocha.reset)
 
 
 def print_info(msg):

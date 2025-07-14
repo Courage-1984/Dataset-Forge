@@ -5,6 +5,7 @@ from dataset_forge.menus.image_processing_menu import image_processing_menu
 from dataset_forge.menus.utilities_menu import utilities_menu
 from dataset_forge.menus.system_settings_menu import system_settings_menu
 from dataset_forge.menus.links_menu import links_menu
+from dataset_forge.menus.system_monitoring_menu import system_monitoring_menu
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
 
@@ -19,6 +20,7 @@ def main_menu():
             "5": ("🛠️ Utilities", utilities_menu),
             "6": ("⚙️ System & Settings", system_settings_menu),
             "7": ("🔗 Links", links_menu),
+            "8": ("🩺 System Monitoring & Health", system_monitoring_menu),
             "0": ("🚪 Exit", None),
         }
         choice = show_menu(

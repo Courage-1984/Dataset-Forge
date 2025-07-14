@@ -144,6 +144,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 - Log all major operations with timestamps.
 - Use try-except with meaningful error messages.
 - Provide graceful degradation for non-critical errors.
+- All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
 
 ## Session State & Configuration
 
@@ -162,6 +163,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 - Use centralized audio utilities: `from dataset_forge.utils.audio_utils import play_done_sound`
 - Play completion sounds for long operations.
 - Respect user audio preferences.
+- All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
 
 ## Testing & Validation
 
@@ -176,6 +178,17 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 - Implement batch processing for large datasets.
 - Use memory-efficient operations.
 - Cache expensive computations.
+
+## Monitoring, Analytics & Error Tracking
+
+- Use centralized monitoring utilities: `from dataset_forge.utils.monitoring import monitor_performance, track_errors, register_background_task, health_check`
+- Decorate all user-facing and long-running functions in actions/ with `@monitor_performance` and `@track_errors` for analytics and error tracking
+- Register all subprocesses/threads with `register_background_task` for background task management
+- Use `health_check()` for RAM, disk, CUDA, and permissions validation
+- Ensure persistent logging of analytics and errors to ./logs/
+- Trigger notifications (sound/visual) for critical errors
+- Integrate memory and CUDA cleanup on exit/errors for all tracked processes/threads
+- All monitoring and analytics features must be accessible from the System Monitoring menu
 
 ## Error Handling & Recovery
 
@@ -221,6 +234,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 8. **Always provide user-friendly feedback and progress tracking**
 9. **Always document your code with Google-style docstrings**
 10. **Always test your changes thoroughly before committing**
+11. **All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.**
 
 ---
 

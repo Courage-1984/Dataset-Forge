@@ -14,5 +14,13 @@
   - CLI-interactive mode with live search, arrow keys, and dynamic actions
   - Batch upscaling, Spandrel/ONNX support, tiling, alpha handling, device/precision selection
   - Improved error handling, user feedback, and Catppuccin Mocha UI
+- **Advanced Monitoring, Analytics & Error Tracking:**
+  - Added monitoring.py utility for live resource usage (CPU, GPU, RAM, disk), performance analytics, error tracking, health checks, and background task registry.
+  - Added system_monitoring_menu.py for CLI access to monitoring, analytics, error summaries, health checks, and background task management.
+  - Decorator-based integration for analytics and error tracking in all action modules.
+  - Persistent logging of analytics and errors to ./logs/.
+  - Notifications for critical errors (sound/visual).
+  - Memory and CUDA cleanup integrated on exit/errors for all tracked processes/threads.
+  - Background task management: pause, resume, kill subprocesses/threads from CLI.
 
 This file will track major changes and releases in the future.

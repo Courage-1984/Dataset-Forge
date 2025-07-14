@@ -12,6 +12,7 @@ from dataset_forge.utils.parallel_utils import (
 )
 from dataset_forge.menus.session_state import parallel_config, user_preferences
 from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.monitoring import monitor_all
 
 
 # Augmentation functions
@@ -143,6 +144,7 @@ AUGMENTATION_RECIPES = {
 }
 
 
+@monitor_all("augment_single_image")
 def augment_single_image(
     image_path: str,
     recipe: List[Tuple[Callable, Dict[str, Any]]],
@@ -186,6 +188,7 @@ def augment_single_image(
         return False
 
 
+@monitor_all("augment_image_pair")
 def augment_image_pair(
     pair_info: tuple,
     recipe: List[Tuple[Callable, Dict[str, Any]]],
@@ -221,6 +224,7 @@ def augment_image_pair(
 
 
 # --- Pipeline Application ---
+@monitor_all("apply_augmentation_pipeline", critical_on_error=True)
 def apply_augmentation_pipeline(
     input_dir: str,
     output_dir: str,
@@ -405,6 +409,7 @@ def apply_augmentation_pipeline(
     )
 
 
+@monitor_all("create_augmentation_variations", critical_on_error=True)
 def create_augmentation_variations(
     input_dir: str,
     output_dir: str,

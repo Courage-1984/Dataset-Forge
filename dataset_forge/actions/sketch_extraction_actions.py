@@ -4,14 +4,30 @@ from typing import Optional, Tuple
 from PIL import Image
 import torch
 from dataset_forge.utils.progress_utils import tqdm
-from dataset_forge.utils.input_utils import get_file_operation_choice, get_destination_path
-from dataset_forge.utils.printing import print_info, print_success, print_warning, print_error
-from dataset_forge.utils.memory_utils import clear_memory, memory_context
+from dataset_forge.utils.input_utils import (
+    get_file_operation_choice,
+    get_destination_path,
+)
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+)
+from dataset_forge.utils.memory_utils import (
+    clear_memory,
+    memory_context,
+    clear_cuda_cache,
+)
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.audio_utils import play_done_sound
 
 try:
     from transformers import AutoImageProcessor, SiglipForImageClassification
 except ImportError:
-    print_error("transformers not installed. Please install it to use sketch extraction.")
+    print_error(
+        "transformers not installed. Please install it to use sketch extraction."
+    )
     raise
 
 MODEL_NAME = "prithivMLmods/Sketch-126-DomainNet"
@@ -21,14 +37,18 @@ SKETCH_CLASS_IDS = list(range(0, 126))  # 0–125 = sketch classes
 _model = None
 _processor = None
 
+
 def get_model_and_processor():
     global _model, _processor
     if _model is None or _processor is None:
-        print_info("Loading Sketch-126-DomainNet model (first time use may take a while)...")
+        print_info(
+            "Loading Sketch-126-DomainNet model (first time use may take a while)..."
+        )
         _processor = AutoImageProcessor.from_pretrained(MODEL_NAME)
         _model = SiglipForImageClassification.from_pretrained(MODEL_NAME)
         _model.eval()
     return _model, _processor
+
 
 def is_sketch(image_path: str, confidence_threshold: float = 0.5) -> bool:
     try:
@@ -44,6 +64,7 @@ def is_sketch(image_path: str, confidence_threshold: float = 0.5) -> bool:
         pred_class = torch.argmax(probs, dim=1).item()
         confidence = probs[0][pred_class].item()
     return (pred_class in SKETCH_CLASS_IDS) and (confidence >= confidence_threshold)
+
 
 def extract_sketches_from_folder(
     input_dir: str,
@@ -74,6 +95,7 @@ def extract_sketches_from_folder(
             errors += 1
     return found, errors
 
+
 def extract_sketches_workflow(
     hq_folder: Optional[str] = None,
     lq_folder: Optional[str] = None,
@@ -89,7 +111,9 @@ def extract_sketches_workflow(
         if not operation:
             operation = get_file_operation_choice()
         if not output_base:
-            output_base = get_destination_path("Enter output folder for extracted sketches:")
+            output_base = get_destination_path(
+                "Enter output folder for extracted sketches:"
+            )
         if not output_base:
             print_error("No output folder specified. Aborting.")
             return
@@ -99,7 +123,9 @@ def extract_sketches_workflow(
             found, errors = extract_sketches_from_folder(
                 single_folder, out_dir, operation, confidence_threshold
             )
-            print_success(f"Extracted {found} sketches from {single_folder} (errors: {errors})")
+            print_success(
+                f"Extracted {found} sketches from {single_folder} (errors: {errors})"
+            )
         elif hq_folder and lq_folder:
             print_info(f"Extracting sketches from HQ: {hq_folder}")
             out_hq = os.path.join(output_base, "hq_sketches")
@@ -112,7 +138,11 @@ def extract_sketches_workflow(
             found_lq, errors_lq = extract_sketches_from_folder(
                 lq_folder, out_lq, operation, confidence_threshold
             )
-            print_success(f"Extracted {found_lq} sketches from LQ (errors: {errors_lq})")
+            print_success(
+                f"Extracted {found_lq} sketches from LQ (errors: {errors_lq})"
+            )
         else:
-            print_error("You must specify either a single folder or both HQ and LQ folders.")
-        clear_memory() 
+            print_error(
+                "You must specify either a single folder or both HQ and LQ folders."
+            )
+        clear_memory()

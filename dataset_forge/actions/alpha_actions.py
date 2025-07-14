@@ -10,6 +10,10 @@ from dataset_forge.utils.input_utils import (
 )
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.image_ops import AlphaRemover
+from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 class AlphaAnalyzer:
@@ -352,6 +356,7 @@ def remove_alpha_channels_menu():
         use_gpu=False,
     )
 
+    @monitor_all("remove_alpha_channel", critical_on_error=True)
     def remove_alpha_channel(image_file):
         """Remove alpha channel from a single image."""
         try:

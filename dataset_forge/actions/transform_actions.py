@@ -17,8 +17,10 @@ from dataset_forge.utils.input_utils import (
 )
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.monitoring import monitor_all, task_registry
 
 
+@monitor_all("apply_transformation_to_image")
 def apply_transformation_to_image(
     input_path: str,
     transform_type: str,
@@ -87,6 +89,7 @@ def apply_transformation_to_image(
         return False
 
 
+@monitor_all("transform_single_pair", critical_on_error=True)
 def transform_single_pair(
     pair_info: tuple,
     transform_type: str,
@@ -134,6 +137,7 @@ def transform_single_pair(
     return hq_success and lq_success
 
 
+@monitor_all("transform_dataset", critical_on_error=True)
 def transform_dataset(hq_folder, lq_folder):
     """Transform dataset with parallel processing."""
     print("\n" + "=" * 30)
@@ -236,6 +240,7 @@ def transform_dataset(hq_folder, lq_folder):
     )
 
 
+@monitor_all("transform_single_folder", critical_on_error=True)
 def transform_single_folder(folder_path: str):
     """Transform images in a single folder with parallel processing."""
     print("\n" + "=" * 30)
@@ -327,6 +332,7 @@ def transform_single_folder(folder_path: str):
     )
 
 
+@monitor_all("batch_transform_with_parameters", critical_on_error=True)
 def batch_transform_with_parameters(
     folder_path: str,
     transform_type: str,
@@ -415,6 +421,7 @@ def batch_transform_with_parameters(
     )
 
 
+@monitor_all("apply_custom_transformation", critical_on_error=True)
 def apply_custom_transformation(
     folder_path: str,
     transform_func,
