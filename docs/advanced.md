@@ -169,3 +169,12 @@ CBIR enables semantic duplicate detection using deep learning embeddings:
 - **Menu Integration**: Follows the robust menu loop and lazy import patterns for fast, user-friendly CLI navigation.
 
 For implementation details, see `cbir_actions.py` and `cbir_menu.py`.
+
+## Test Suite & Best Practices
+
+- Dataset Forge uses pytest for all automated testing.
+- Tests are organized by utility, CLI, and integration level.
+- Manual/script-style tests are provided for BHI filtering and pepeline.
+- Contributors should add tests for new features and bugfixes.
+- For CI integration, add a GitHub Actions workflow to run pytest on push/PR.
+- See [usage.md](usage.md#running-tests) for how to run tests.

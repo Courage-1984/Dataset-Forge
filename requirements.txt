@@ -86,3 +86,6 @@ imagededup
 # ^ first install VapourSynth
 # Directory tree functionality
 
+# Unsorted/Ungrouped:
+
+pytest

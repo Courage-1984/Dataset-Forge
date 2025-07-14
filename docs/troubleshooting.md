@@ -39,3 +39,11 @@ If you encounter a menu that redraws repeatedly or a submenu that does not appea
 - **GPU out of memory**: Lower the batch size or use CPU fallback. Close other GPU-intensive applications.
 - **Slow performance**: Use GPU if available. For very large datasets, increase system RAM or process in smaller batches.
 - **CLIP/ResNet/VGG not found**: Check requirements.txt and reinstall dependencies.
+
+## Troubleshooting Test Issues
+
+- **UnicodeEncodeError**: Set PYTHONIOENCODING=utf-8 in your environment or subprocess.
+- **PermissionError on file deletion (Windows)**: Ensure files are closed before deleting; move os.unlink outside with blocks.
+- **Monkeypatching not working**: Patch the function in the namespace where it is used, not just where it is defined.
+- **Multiprocessing pickling errors**: Use top-level functions, not lambdas or closures, for functions passed to process pools.
+- **Manual/script tests not running**: Run them directly with python, not via pytest.

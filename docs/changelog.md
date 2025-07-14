@@ -27,6 +27,11 @@
   - Fast similarity search and grouping with ANN indexing
   - Batch actions: find, remove, move, copy duplicate groups
   - Integrated into Clean & Organize submenu under Dataset Management
+- Integrated comprehensive automated test suite (pytest-based)
+- Covers CLI, menu timing, error feedback, memory, parallelism, file/image utils
+- Handles Unicode, subprocess, and Windows-specific issues
+- Manual/script tests for BHI filtering and pepeline
+- All tests pass as of this integration
 
 ## [July 2025]
 

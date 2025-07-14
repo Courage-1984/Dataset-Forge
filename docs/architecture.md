@@ -34,3 +34,12 @@ All menus and submenus use a robust, standardized menu loop pattern (choice-base
 ## CBIR (Content-Based Image Retrieval) for Duplicates
 
 Implemented in `actions/cbir_actions.py` and `menus/cbir_menu.py`. Provides semantic duplicate detection using deep learning embeddings (CLIP, ResNet, VGG), similarity search, grouping, and batch actions. Integrated with the modular menu and action system.
+
+## Test Suite Structure
+
+- All tests are in the `tests/` directory.
+- Organized by:
+  - `test_utils/`: utility modules
+  - `test_cli/`: CLI and integration tests
+  - Manual scripts: BHI filtering, pepeline
+- See [usage.md](usage.md#running-tests) for how to run tests.

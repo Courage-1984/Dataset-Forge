@@ -93,3 +93,34 @@ All menus and submenus now use a robust, standardized menu loop pattern:
 - Navigation is now consistent and reliable everywhere in the CLI.
 
 For more details, see [docs/features.md](features.md) and [docs/advanced.md](advanced.md).
+
+## Running Tests
+
+Dataset Forge includes a comprehensive automated test suite. To run all tests:
+
+1. Activate your virtual environment:
+   ```sh
+   venv312\Scripts\activate
+   ```
+2. Run all automated tests from the project root:
+   ```sh
+   pytest
+   ```
+
+Manual/script-style tests (for BHI filtering and pepeline) can be run directly:
+
+```sh
+python tests/test_bhi_filtering.py
+python tests/test_pepeline.py
+```
+
+The test suite covers:
+
+- CLI entry and menu navigation
+- Menu timing/profiling
+- Error feedback (including audio)
+- Memory management and parallel processing
+- File and image utilities
+- Robust handling of Unicode, subprocess, and Windows-specific issues
+
+See the [README.md](../README.md) and [features.md](features.md) for more details on test coverage and philosophy.

@@ -245,3 +245,14 @@ See [docs/usage.md](usage.md) and [docs/advanced.md](advanced.md) for implementa
 - **Grouping & Actions**: Clusters images by semantic similarity and provides user options to find, remove, move, or copy duplicate groups.
 - **GPU Acceleration**: Leverages GPU for fast embedding extraction and search.
 - **Menu Integration**: Accessible from the Clean & Organize submenu under Dataset Management.
+
+## Automated Test Suite
+
+Dataset Forge now includes a robust, automated test suite:
+
+- Covers CLI entry, menu navigation, timing/profiling, error feedback (audio), memory management, parallel processing, and file/image utilities.
+- Handles Unicode, subprocess, and Windows-specific edge cases.
+- Includes manual/script-style tests for BHI filtering and pepeline (run directly).
+- All tests pass as of this integration.
+
+See [usage.md](usage.md#running-tests) for instructions on running tests.

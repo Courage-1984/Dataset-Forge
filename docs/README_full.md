@@ -813,6 +813,36 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 
 (Include the full "Contributing" and "Development Guidelines" sections from the original README here, preserving formatting and navigation.)
 
+## 🧪 Testing
+
+Dataset Forge now includes a comprehensive, automated test suite covering:
+
+- CLI entry and menu navigation
+- Menu timing/profiling
+- Error feedback (including audio)
+- Memory management and parallel processing
+- File and image utilities
+- Robust handling of Unicode, subprocess, and Windows-specific issues
+- Manual/script-style tests for BHI filtering and pepeline (run directly, not via pytest)
+
+**How to run all tests:**
+
+1. Activate your virtual environment:
+   ```sh
+   venv312\Scripts\activate
+   ```
+2. Run all automated tests from the project root:
+   ```sh
+   pytest
+   ```
+3. To run manual/script tests:
+   ```sh
+   python tests/test_bhi_filtering.py
+   python tests/test_pepeline.py
+   ```
+
+All tests pass as of this integration. See [usage.md](usage.md) and [features.md](features.md) for details.
+
 # Frequently Asked Questions (FAQ)
 
 [//]: # "Navigation"

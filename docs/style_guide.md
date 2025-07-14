@@ -268,3 +268,12 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Integrate memory management (memory_context, auto_cleanup)
 - Use parallel processing (smart_map, batch_map) for efficiency
 - Provide clear user feedback and progress tracking
+
+## Test Code Style & Best Practices
+
+- Use pytest for all automated tests.
+- Use fixtures for temp files, directories, and configs.
+- Use monkeypatching/mocking for audio, error feedback, and subprocesses.
+- Ensure tests are robust on Windows (file locks, Unicode, etc.).
+- Add tests for new features and bugfixes.
+- See [advanced.md](advanced.md#test-suite--best-practices) for more.
