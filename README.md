@@ -12,6 +12,39 @@
 
 ---
 
+## What is Dataset Forge?
+
+**Dataset Forge** is a professional-grade Python CLI utility for managing, analyzing, and transforming image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution (SISR) and general computer vision tasks. It is designed for ML researchers and data scientists who need:
+
+- Powerful dataset curation, validation, and cleaning tools
+- Deep analysis and reporting for dataset quality
+- Advanced image processing, augmentation, and transformation
+- A beautiful, user-friendly CLI with progress tracking and memory management
+
+**Key Use Cases:**
+
+- Preparing HQ/LQ datasets for super-resolution training
+- Validating, cleaning, and analyzing large image datasets
+- Running advanced deduplication, tiling, and augmentation pipelines
+- Generating rich reports and statistics for ML workflows
+
+---
+
+## 🏗️ Modular Architecture (Summary)
+
+Dataset Forge is built with a modular, extensible architecture:
+
+- **menus/**: UI layer (CLI menus, user interaction)
+- **actions/**: Business logic (core dataset/image operations)
+- **utils/**: Reusable utilities (file ops, memory, parallelism, color, etc.)
+- **dpid/**: Multiple DPID (degradation) implementations
+- **configs/**: Example and user configuration files
+- **reports/**: Report templates for HTML/Markdown output
+
+See [Project Architecture](docs/architecture.md) for details.
+
+---
+
 ## 🚀 Quick Start
 
 1. **Clone the repository:**
@@ -32,6 +65,17 @@
    # or
    ./run.bat
    ```
+
+---
+
+## 🖥️ Supported Platforms & Requirements
+
+- **Python**: 3.8+ (tested on 3.12)
+- **OS**: Windows (primary), Linux (partial support)
+- **CUDA**: 12.1+ (for GPU acceleration)
+- **RAM**: 8GB+ (16GB+ recommended for large datasets)
+- **Storage**: SSD recommended for faster I/O
+- See [Requirements](docs/advanced.md#requirements) for full details.
 
 ---
 
@@ -64,6 +108,17 @@
 ## About
 
 Dataset Forge is a professional-grade tool for ML researchers and data scientists, designed for high-quality dataset curation, analysis, and transformation. For full documentation, see the [docs/](docs/) folder or the links above.
+
+---
+
+## 💜 Credits
+
+- Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
+- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) & [Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing)
+- Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
+- Thanks [Phhofm](https://github.com/Phhofm)❤️ for [sisr](https://github.com/Phhofm/sisr)
+
+---
 
 ## License
 
