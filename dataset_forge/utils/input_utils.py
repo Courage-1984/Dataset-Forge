@@ -294,3 +294,20 @@ def ask_choice(prompt, choices, default=None, return_index=False):
         if 0 <= idx < len(choices):
             return idx if return_index else choices[idx]
         print(f"Please enter a number between 0 and {len(choices)-1}.")
+
+
+def get_input(prompt: str, default: str = None) -> str:
+    """
+    Prompt the user for input, with optional default value.
+
+    Args:
+        prompt: The prompt to display.
+        default: The default value if the user presses Enter.
+    Returns:
+        The user's input, or the default if provided and input is blank.
+    """
+    suffix = f" [default: {default}]" if default is not None else ""
+    resp = input(f"{prompt}{suffix}: ").strip()
+    if not resp and default is not None:
+        return default
+    return resp

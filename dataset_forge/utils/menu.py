@@ -16,6 +16,6 @@ def show_menu(title, options, header_color, char="#"):
         print_prompt("\nEnter your choice: ")
         choice = input().strip()
         if choice in options:
-            return options[choice][1]
+            return choice
         else:
             print_error("Invalid choice. Please try again.")

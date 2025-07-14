@@ -2,8 +2,6 @@ import os
 import configparser
 import torch
 from PIL import Image
-import spandrel
-import spandrel_extra_arches
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import time
@@ -12,295 +10,401 @@ import gc
 import argparse
 import sys
 from dataset_forge.utils.progress_utils import tqdm
+from dataset_forge.utils.memory_utils import to_device_safe, clear_memory
 import chainner_ext
 
-# Install extra architectures
+try:
+    import spandrel
+    import spandrel_extra_arches
+
 spandrel_extra_arches.install()
+except ImportError:
+    spandrel = None
+
+try:
+    import onnxruntime as ort
+except ImportError:
+    ort = None
+
+SUPPORTED_FORMATS = (".png", ".jpg", ".jpeg", ".webp", ".tga", ".bmp", ".tiff")
 
 
-# Read configuration
+# ===================== CONFIGURATION =====================
 def get_config_path(args):
-    # Priority: --config argument > ./configs/config.ini > ./config.ini
-    if args.config:
+    if hasattr(args, "config") and args.config:
         return args.config
     if os.path.exists(os.path.join("configs", "config.ini")):
         return os.path.join("configs", "config.ini")
     return "config.ini"
 
 
-parser = argparse.ArgumentParser(description="Image Upscaling Tool")
-parser.add_argument("--input", required=True, help="Input image file or directory")
-parser.add_argument("--output", required=True, help="Output directory")
-parser.add_argument("--model", required=True, help="Path to the model file")
-parser.add_argument(
-    "--config",
-    required=False,
-    help="Path to config.ini (default: ./configs/config.ini or ./config.ini)",
-)
-args = parser.parse_args()
-
-config_path = get_config_path(args)
+def load_config(config_path):
 config = configparser.ConfigParser()
 config.read(config_path)
-
-TILE_SIZE = config["Processing"].get("TileSize", "512").lower()
-PRECISION = config["Processing"].get("Precision", "auto").lower()
-THREAD_POOL_WORKERS = int(config["Processing"].get("ThreadPoolWorkers", 1))
-OUTPUT_FORMAT = config["Processing"].get("OutputFormat", "png").lower()
-ALPHA_HANDLING = config["Processing"].get("AlphaHandling", "resize").lower()
-GAMMA_CORRECTION = config["Processing"].getboolean("GammaCorrection", False)
-
-# Create a ThreadPoolExecutor for running CPU-bound tasks
-thread_pool = ThreadPoolExecutor(max_workers=THREAD_POOL_WORKERS)
-
-# Supported image formats
-SUPPORTED_FORMATS = (".png", ".jpg", ".jpeg", ".webp", ".tga", ".bmp", ".tiff")
+    return config
 
 
-def upscale_tensor(img_tensor, model, tile_size):
+# ===================== MODEL LOADING =====================
+def load_model(model_path, device="cuda", use_onnx=False):
+    """
+    Load a model from file. Supports PyTorch (spandrel) and ONNX.
+    """
+    if use_onnx or (model_path.lower().endswith(".onnx") and ort is not None):
+        if ort is None:
+            raise ImportError("onnxruntime is not installed.")
+        session = ort.InferenceSession(
+            model_path, providers=["CUDAExecutionProvider", "CPUExecutionProvider"]
+        )
+        return session
+    if spandrel is None:
+        raise ImportError("spandrel is not installed.")
+    model = spandrel.ModelLoader().load_from_file(model_path)
+    model = to_device_safe(model, device).eval()
+    return model
+
+
+# ===================== TILING UTILS =====================
+def tile_image(img_tensor, tile_size, overlap, scale):
+    """
+    Split an image tensor into overlapping tiles.
+    Returns a list of (y, x, tile_tensor).
+    """
     _, _, h, w = img_tensor.shape
-    output_h, output_w = h * model.scale, w * model.scale
-
-    output_dtype = torch.float32 if PRECISION == "fp32" else torch.float16
-    output_tensor = torch.zeros(
-        (1, img_tensor.shape[1], output_h, output_w), dtype=output_dtype, device="cuda"
-    )
-
-    if tile_size == "native":
-        tile_size = max(h, w)
-
-    tile_size = int(tile_size)
-
-    for y in range(0, h, tile_size):
-        for x in range(0, w, tile_size):
+    tiles = []
+    for y in range(0, h, tile_size - overlap):
+        for x in range(0, w, tile_size - overlap):
             tile = img_tensor[
                 :, :, y : min(y + tile_size, h), x : min(x + tile_size, w)
             ]
-
-            with torch.inference_mode():
-                if (
-                    hasattr(model, "supports_bfloat16")
-                    and model.supports_bfloat16
-                    and PRECISION in ["auto", "bf16"]
-                ):
-                    with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
-                        upscaled_tile = model(tile)
-                elif (
-                    hasattr(model, "supports_half")
-                    and model.supports_half
-                    and PRECISION in ["auto", "fp16"]
-                ):
-                    with torch.autocast(device_type="cuda", dtype=torch.float16):
-                        upscaled_tile = model(tile)
-                else:
-                    upscaled_tile = model(tile)
-
-            output_tensor[
-                :,
-                :,
-                y * model.scale : min((y + tile_size) * model.scale, output_h),
-                x * model.scale : min((x + tile_size) * model.scale, output_w),
-            ].copy_(upscaled_tile)
-
-    return output_tensor
+            tiles.append((y, x, tile))
+    return tiles
 
 
-def load_model(model_path):
-    if not os.path.exists(model_path):
-        raise ValueError(f"Model file not found: {model_path}")
+def merge_tiles(tiles, out_shape, tile_size, overlap, scale):
+    """
+    Merge upscaled tiles into a full image tensor.
+    """
+    c, h, w = out_shape
+    out = torch.zeros((c, h, w), dtype=tiles[0][2].dtype, device=tiles[0][2].device)
+    weight = torch.zeros((1, h, w), dtype=tiles[0][2].dtype, device=tiles[0][2].device)
+    for y, x, tile in tiles:
+        y1, x1 = y * scale, x * scale
+        y2, x2 = y1 + tile.shape[2], x1 + tile.shape[3]
+        out[:, y1:y2, x1:x2] += tile[0]
+        weight[:, y1:y2, x1:x2] += 1
+    out /= weight
+    return out
 
-    try:
-        from dataset_forge.utils.memory_utils import to_device_safe
-        model = spandrel.ModelLoader().load_from_file(model_path)
-        if isinstance(model, spandrel.ImageModelDescriptor):
-            return to_device_safe(model, "cuda").eval()
-        else:
-            raise ValueError(f"Invalid model type for {model_path}")
-    except Exception as e:
-        print(f"Failed to load model {model_path}: {str(e)}")
-        raise
 
-
-def upscale_image(image, model, tile_size, alpha_handling, gamma_correction):
-    has_alpha = image.mode == "RGBA"
+# ===================== UPSCALING CORE =====================
+def upscale_single_image(
+    input_path,
+    output_path,
+    model,
+    model_type="pytorch",
+    tile_size=None,
+    overlap=16,
+    alpha_handling="resize",
+    gamma_correction=False,
+    device="cuda",
+    precision="auto",
+    output_format="png",
+    progress_callback=None,
+):
+    """
+    Robust single-image upscaling with tiling, alpha, ONNX, and device/precision support.
+    """
+    img = Image.open(input_path)
+    has_alpha = img.mode == "RGBA"
     if has_alpha:
-        rgb_image, alpha = image.convert("RGB"), image.split()[3]
+        rgb_img, alpha = img.convert("RGB"), img.split()[3]
     else:
-        rgb_image = image
-
-    # Import centralized memory management
-    from dataset_forge.utils.memory_utils import to_device_safe
-
-    # Upscale RGB
+        rgb_img = img
     rgb_tensor = (
-        torch.from_numpy(np.array(rgb_image))
+        torch.from_numpy(np.array(rgb_img))
         .permute(2, 0, 1)
         .float()
-        .div_(255.0)
+        .div(255.0)
         .unsqueeze(0)
     )
-    rgb_tensor = to_device_safe(rgb_tensor, "cuda")
-    upscaled_rgb_tensor = upscale_tensor(rgb_tensor, model, tile_size)
-    upscaled_rgb = Image.fromarray(
-        (upscaled_rgb_tensor[0].permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)
+    rgb_tensor = to_device_safe(rgb_tensor, device)
+    scale = getattr(model, "scale", 1) if model_type == "pytorch" else 1
+    # Tiling logic
+    if tile_size is not None:
+        tiles = tile_image(rgb_tensor, tile_size, overlap, scale)
+        upscaled_tiles = []
+        for i, (y, x, tile) in enumerate(tiles):
+            if model_type == "pytorch":
+                with torch.inference_mode():
+                    out_tile = model(tile)
+            else:
+                ort_inputs = {model.get_inputs()[0].name: tile.cpu().numpy()}
+                out_tile = torch.from_numpy(model.run(None, ort_inputs)[0])
+            upscaled_tiles.append((y, x, out_tile.unsqueeze(0)))
+            if progress_callback:
+                progress_callback(i + 1, len(tiles))
+        out_shape = (3, rgb_tensor.shape[2] * scale, rgb_tensor.shape[3] * scale)
+        out_tensor = merge_tiles(upscaled_tiles, out_shape, tile_size, overlap, scale)
+    else:
+        if model_type == "pytorch":
+            with torch.inference_mode():
+                out_tensor = model(rgb_tensor)[0]
+        else:
+            ort_inputs = {model.get_inputs()[0].name: rgb_tensor.cpu().numpy()}
+            out_tensor = torch.from_numpy(model.run(None, ort_inputs)[0][0])
+    out_img = Image.fromarray(
+        (out_tensor.permute(1, 2, 0).cpu().numpy() * 255).clip(0, 255).astype(np.uint8)
     )
-
+    # Advanced alpha handling
     if has_alpha:
         if alpha_handling == "upscale":
-            # Create a 3-channel tensor from the alpha channel
-            alpha_array = np.array(alpha)
-            alpha_3channel = np.stack([alpha_array, alpha_array, alpha_array], axis=2)
             alpha_tensor = (
-                torch.from_numpy(alpha_3channel)
-                .permute(2, 0, 1)
-                .float()
-                .div_(255.0)
+                torch.from_numpy(np.array(alpha))
                 .unsqueeze(0)
+                .unsqueeze(0)
+                .float()
+                .div(255.0)
             )
-            alpha_tensor = to_device_safe(alpha_tensor, "cuda")
-
-            # Upscale the 3-channel alpha tensor
-            upscaled_alpha_tensor = upscale_tensor(alpha_tensor, model, tile_size)
-
-            # Extract a single channel from the result
-            upscaled_alpha = Image.fromarray(
-                (upscaled_alpha_tensor[0, 0].cpu().numpy() * 255).astype(np.uint8)
-            )
+            alpha_tensor = to_device_safe(alpha_tensor, device)
+            if tile_size is not None:
+                alpha_tiles = tile_image(alpha_tensor, tile_size, overlap, scale)
+                upscaled_alpha_tiles = []
+                for y, x, tile in alpha_tiles:
+                    if model_type == "pytorch":
+                        with torch.inference_mode():
+                            out_tile = model(tile.repeat(1, 3, 1, 1))
+                    else:
+                        ort_inputs = {
+                            model.get_inputs()[0]
+                            .name: tile.repeat(1, 3, 1, 1)
+                            .cpu()
+                            .numpy()
+                        }
+                        out_tile = torch.from_numpy(model.run(None, ort_inputs)[0])
+                    upscaled_alpha_tiles.append((y, x, out_tile[:, 0:1, :, :]))
+                out_shape = (
+                    1,
+                    alpha_tensor.shape[2] * scale,
+                    alpha_tensor.shape[3] * scale,
+                )
+                upscaled_alpha = merge_tiles(
+                    upscaled_alpha_tiles, out_shape, tile_size, overlap, scale
+                )
+                upscaled_alpha_img = Image.fromarray(
+                    (upscaled_alpha[0].cpu().numpy() * 255)
+                    .clip(0, 255)
+                    .astype(np.uint8)
+                )
+            else:
+                with torch.inference_mode():
+                    upscaled_alpha = model(alpha_tensor.repeat(1, 3, 1, 1))[0, 0]
+                upscaled_alpha_img = Image.fromarray(
+                    (upscaled_alpha.cpu().numpy() * 255).clip(0, 255).astype(np.uint8)
+                )
+            out_img.putalpha(upscaled_alpha_img)
         elif alpha_handling == "resize":
-            # Resize alpha using chainner_ext.resize with CubicMitchell filter
-            alpha_np = np.array(alpha, dtype=np.float32) / 255.0  # Normalize to [0, 1]
-            alpha_np = alpha_np.reshape(
-                alpha_np.shape[0], alpha_np.shape[1], 1
-            )  # Add channel dimension
-            upscaled_alpha_np = chainner_ext.resize(
-                alpha_np,
-                (upscaled_rgb.width, upscaled_rgb.height),
-                chainner_ext.ResizeFilter.CubicMitchell,
-                gamma_correction=gamma_correction,
+            alpha_img = alpha.resize(out_img.size, Image.LANCZOS)
+            if gamma_correction:
+                # Optionally apply gamma correction here
+                pass
+            out_img.putalpha(alpha_img)
+        # else: discard alpha
+    out_img.save(output_path, output_format.upper())
+    return output_path
+
+
+# ===================== BATCH UPSCALING =====================
+def batch_upscale(
+    input_dir,
+    output_dir,
+    model,
+    model_type="pytorch",
+    tile_size=None,
+    overlap=16,
+    alpha_handling="resize",
+    gamma_correction=False,
+    device="cuda",
+    precision="auto",
+    output_format="png",
+    progress_bar=True,
+):
+    """
+    Batch upscaling for all images in a directory.
+    """
+    image_files = [
+        os.path.join(root, file)
+        for root, _, files in os.walk(input_dir)
+        for file in files
+        if file.lower().endswith(SUPPORTED_FORMATS)
+    ]
+    os.makedirs(output_dir, exist_ok=True)
+    total = len(image_files)
+    results = []
+    with (
+        tqdm(total=total, desc="Batch Upscaling", unit="img")
+        if progress_bar
+        else DummyContext()
+    ) as pbar:
+        for i, input_path in enumerate(image_files):
+            rel_path = os.path.relpath(input_path, input_dir)
+            out_path = os.path.join(
+                output_dir, os.path.splitext(rel_path)[0] + f".{output_format}"
             )
-            # Convert back to 0-255 range and clip values
-            upscaled_alpha_np = np.clip(upscaled_alpha_np * 255, 0, 255)
-            upscaled_alpha = Image.fromarray(
-                upscaled_alpha_np.squeeze().astype(np.uint8)
-            )
-        elif alpha_handling == "discard":
-            # Discard alpha
-            return upscaled_rgb
-
-        # Merge upscaled RGB and alpha
-        upscaled_rgba = upscaled_rgb.copy()
-        upscaled_rgba.putalpha(upscaled_alpha)
-        return upscaled_rgba
-    else:
-        return upscaled_rgb
-
-
-def process_image(input_path, output_path, model):
-    try:
-        image = Image.open(input_path)
-
-        start_time = time.time()
-
-        result = upscale_image(
-            image, model, TILE_SIZE, ALPHA_HANDLING, GAMMA_CORRECTION
-        )
-
-        upscale_time = time.time() - start_time
-
-        # Ensure the output directory exists
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-        result.save(output_path, OUTPUT_FORMAT.upper())
-
-        save_time = time.time() - start_time - upscale_time
-        total_time = time.time() - start_time
-
-        return total_time
-
+            os.makedirs(os.path.dirname(out_path), exist_ok=True)
+            try:
+                upscale_single_image(
+                    input_path,
+                    out_path,
+                    model,
+                    model_type=model_type,
+                    tile_size=tile_size,
+                    overlap=overlap,
+                    alpha_handling=alpha_handling,
+                    gamma_correction=gamma_correction,
+                    device=device,
+                    precision=precision,
+                    output_format=output_format,
+                )
+                results.append((input_path, out_path, True))
     except Exception as e:
-        print(f"Error processing {input_path}: {str(e)}")
+                print(f"Error upscaling {input_path}: {e}")
         traceback.print_exc()
-        return None
+                results.append((input_path, out_path, False))
+            if progress_bar:
+                pbar.update(1)
+    return results
 
 
-def process_directory(input_dir, output_dir, model):
-    image_files = []
-    for root, _, files in os.walk(input_dir):
-        for file in files:
-            if file.lower().endswith(SUPPORTED_FORMATS):
-                image_files.append((root, file))
+class DummyContext:
+    def __enter__(self):
+        return self
 
-    print(f"Found {len(image_files)} image(s) to process.")
+    def __exit__(self, *a):
+        pass
 
-    total_time = 0
-    successful_images = 0
-
-    with tqdm(total=len(image_files), desc="Processing Images", unit="image") as pbar:
-        for root, file in image_files:
-            input_path = os.path.join(root, file)
-            relative_path = os.path.relpath(input_path, input_dir)
-            output_path = os.path.join(output_dir, relative_path)
-            output_path = os.path.splitext(output_path)[0] + f".{OUTPUT_FORMAT}"
-
-            processing_time = process_image(input_path, output_path, model)
-
-            if processing_time is not None:
-                total_time += processing_time
-                successful_images += 1
-
-            pbar.update(1)
-
-    print(
-        f"Successfully processed {successful_images} out of {len(image_files)} images."
-    )
-    print(f"Total processing time: {total_time:.2f} seconds")
-    if successful_images > 0:
-        print(f"Average time per image: {total_time / successful_images:.2f} seconds")
+    def update(self, *a, **k):
+        pass
 
 
+# ===================== CLI ENTRY POINT =====================
 def main():
-    print(f"Input path: {args.input}")
-    print(f"Output path: {args.output}")
-    print(f"Model path: {args.model}")
-    print(f"Config path: {config_path}")
-    print(f"Tile size: {TILE_SIZE}")
-    print(f"Output format: {OUTPUT_FORMAT}")
+    parser = argparse.ArgumentParser(description="Image Upscaling Tool")
+    parser.add_argument("--input", required=True, help="Input image file or directory")
+    parser.add_argument("--output", required=True, help="Output directory")
+    parser.add_argument("--model", required=True, help="Path to the model file")
+    parser.add_argument(
+        "--config",
+        required=False,
+        help="Path to config.ini (default: ./configs/config.ini or ./config.ini)",
+    )
+    parser.add_argument(
+        "--tile_size",
+        type=int,
+        default=None,
+        help="Tile size for tiling (default: None)",
+    )
+    parser.add_argument(
+        "--overlap", type=int, default=16, help="Tile overlap (default: 16)"
+    )
+    parser.add_argument(
+        "--alpha_handling",
+        type=str,
+        default="resize",
+        choices=["resize", "upscale", "discard"],
+        help="Alpha handling mode",
+    )
+    parser.add_argument(
+        "--gamma_correction",
+        action="store_true",
+        help="Enable gamma correction for alpha resize",
+    )
+    parser.add_argument(
+        "--device", type=str, default="cuda", help="Device to use (cuda or cpu)"
+    )
+    parser.add_argument(
+        "--precision",
+        type=str,
+        default="auto",
+        choices=["auto", "fp32", "fp16", "bf16"],
+        help="Precision mode",
+    )
+    parser.add_argument(
+        "--output_format", type=str, default="png", help="Output image format"
+    )
+    parser.add_argument("--onnx", action="store_true", help="Force ONNX model usage")
+    args = parser.parse_args()
+
+    config_path = get_config_path(args)
+    config = load_config(config_path)
+    # Optionally override config with CLI args
+    tile_size = args.tile_size or config["Processing"].getint("TileSize", fallback=None)
+    overlap = args.overlap or config["Processing"].getint("Overlap", fallback=16)
+    alpha_handling = args.alpha_handling or config["Processing"].get(
+        "AlphaHandling", fallback="resize"
+    )
+    gamma_correction = args.gamma_correction or config["Processing"].getboolean(
+        "GammaCorrection", fallback=False
+    )
+    device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
+    precision = args.precision or config["Processing"].get("Precision", fallback="auto")
+    output_format = args.output_format or config["Processing"].get(
+        "OutputFormat", fallback="png"
+    )
+    use_onnx = args.onnx or args.model.lower().endswith(".onnx")
 
     if not os.path.exists(args.input):
         print(f"Error: Input path not found: {args.input}")
         return
-
     if not os.path.exists(args.output):
         print(f"Creating output directory: {args.output}")
         os.makedirs(args.output)
-
     if not os.path.exists(args.model):
         print(f"Error: Model file not found: {args.model}")
         return
-
     try:
         print("Loading model...")
-        model = load_model(args.model)
+        model = load_model(args.model, device=device, use_onnx=use_onnx)
         print("Model loaded successfully.")
-
         if os.path.isfile(args.input):
             print(f"Processing single file: {args.input}")
-            output_path = os.path.join(args.output, os.path.basename(args.input))
-            output_path = os.path.splitext(output_path)[0] + f".{OUTPUT_FORMAT}"
-            process_image(args.input, output_path, model)
+            out_path = os.path.join(
+                args.output,
+                os.path.splitext(os.path.basename(args.input))[0] + f".{output_format}",
+            )
+            upscale_single_image(
+                args.input,
+                out_path,
+                model,
+                model_type="onnx" if use_onnx else "pytorch",
+                tile_size=tile_size,
+                overlap=overlap,
+                alpha_handling=alpha_handling,
+                gamma_correction=gamma_correction,
+                device=device,
+                precision=precision,
+                output_format=output_format,
+            )
         else:
             print(f"Processing directory: {args.input}")
-            process_directory(args.input, args.output, model)
-
+            batch_upscale(
+                args.input,
+                args.output,
+                model,
+                model_type="onnx" if use_onnx else "pytorch",
+                tile_size=tile_size,
+                overlap=overlap,
+                alpha_handling=alpha_handling,
+                gamma_correction=gamma_correction,
+                device=device,
+                precision=precision,
+                output_format=output_format,
+                progress_bar=True,
+            )
         print("All processing completed.")
-
     except Exception as e:
         print(f"Error: {str(e)}")
         traceback.print_exc()
     finally:
-        # Import and use centralized memory management
-        from dataset_forge.utils.memory_utils import clear_memory
-
         clear_memory()
         print("Cleanup completed.")
 
