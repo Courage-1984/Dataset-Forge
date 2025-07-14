@@ -30,7 +30,7 @@ def training_inference_menu():
         if choice is None or choice == "0":
             break
         action = options[choice][1]
-        if action:
+        if callable(action):
             action()
 
 

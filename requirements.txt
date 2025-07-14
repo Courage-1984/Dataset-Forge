@@ -81,8 +81,8 @@ imagededup
 # =============================
 # Optional/External Tools
 # =============================
+
 # getnative
 # ^ first install VapourSynth
 # Directory tree functionality
-# (see Kim's_Directory_Tree_Maker/requirements.txt for more)
 

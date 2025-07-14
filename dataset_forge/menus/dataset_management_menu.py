@@ -12,13 +12,12 @@ from dataset_forge.utils.printing import (
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
 from dataset_forge.utils.input_utils import get_folder_path, get_path_with_history
-from dataset_forge.menus.visual_dedup_menu import visual_dedup_menu
-from dataset_forge.menus.imagededup_menu import imagededup_menu
+from dataset_forge.utils import monitoring
+from dataset_forge.utils.menu import lazy_menu
 from dataset_forge.menus.correct_hq_lq_pairing_menu import (
     correct_hq_lq_pairing_menu,
     fuzzy_hq_lq_pairing_menu,
 )
-from dataset_forge.utils import monitoring
 
 
 def lazy_action(module_path, func_name):
@@ -57,9 +56,10 @@ def dataset_creation_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
-        action()
+        if callable(action):
+            action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 
@@ -90,9 +90,10 @@ def combine_split_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
-        action()
+        if callable(action):
+            action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 
@@ -133,9 +134,10 @@ def hq_lq_pairs_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
-        action()
+        if callable(action):
+            action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 
@@ -265,10 +267,13 @@ def clean_organize_menu():
     options = {
         "1": (
             "👁️ Visual De-duplication (Duplicates & Near-Duplicates)",
-            visual_dedup_menu,
+            lazy_menu("dataset_forge.menus.visual_dedup_menu", "visual_dedup_menu"),
         ),
         "2": ("🔐 De-Duplicate (File Hash)", dedupe_menu),
-        "3": ("🔍 ImageDedup - Advanced Duplicate Detection", imagededup_menu),
+        "3": (
+            "🔍 ImageDedup - Advanced Duplicate Detection",
+            lazy_menu("dataset_forge.menus.imagededup_menu", "imagededup_menu"),
+        ),
         "4": ("✏️ Batch Rename", batch_rename_menu),
         "5": ("📏 Remove Image Pairs by Size", remove_small_pairs),
         "6": (
@@ -279,17 +284,17 @@ def clean_organize_menu():
     }
 
     while True:
-        action = show_menu(
+        choice = show_menu(
             "🧹 Clean & Organize",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if choice is None or choice == "0":
             break
-        action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
+        action = options[choice][1]
+        if callable(action):
+            action()
 
 
 def dataset_management_menu():

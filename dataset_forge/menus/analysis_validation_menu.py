@@ -152,7 +152,7 @@ def comprehensive_validation_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
         if callable(action):
             action()
@@ -241,9 +241,10 @@ def find_fix_issues_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
-        action()
+        if callable(action):
+            action()
 
 
 def analyze_properties_menu():
@@ -344,9 +345,10 @@ def analyze_properties_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
-        action()
+        if callable(action):
+            action()
 
 
 def analysis_validation_menu():

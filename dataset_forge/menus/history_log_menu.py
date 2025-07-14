@@ -47,12 +47,14 @@ def select_log_to_view():
 def history_log_menu():
     options = history_log_menu.__menu_options__
     while True:
-        action = show_menu(
+        choice = show_menu(
             "Change/History Log Menu", options, header_color=Mocha.lavender
         )
-        if action is None:
+        if choice is None or choice == "0":
             break
-        action()
+        action = options[choice][1]
+        if callable(action):
+            action()
 
 
 history_log_menu.__menu_options__ = {

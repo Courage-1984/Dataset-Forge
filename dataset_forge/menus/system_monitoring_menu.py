@@ -168,7 +168,7 @@ def system_monitoring_menu():
                 return
             action = options[choice][1]
             if callable(action):
-                action()
+            action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting System Monitoring Menu...")
             return

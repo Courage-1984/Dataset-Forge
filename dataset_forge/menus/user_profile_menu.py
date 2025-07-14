@@ -74,6 +74,7 @@ def get_menu_options(menu_func):
 
 def user_profile_menu():
     from dataset_forge.actions import user_profile_actions
+
     options = user_profile_menu.__menu_options__
     while True:
         action = show_menu(
@@ -84,7 +85,8 @@ def user_profile_menu():
         )
         if action is None:
             break
-        action()
+        if callable(action):
+            action()
 
 
 def profile_management_menu():

@@ -27,12 +27,10 @@ def metadata_menu():
             char="-",
         )
         if choice is None or choice == "0":
-            return
+            break
         action = options[choice][1]
         if callable(action):
             action()
-        print_prompt("\nPress Enter to return to the menu...")
-        input()
 
 
 metadata_menu.__menu_options__ = {

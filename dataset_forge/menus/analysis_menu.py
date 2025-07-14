@@ -140,11 +140,11 @@ def analysis_menu():
         choice = show_menu(
             "Analysis Menu",
             options,
-            header_color=Mocha.lavender,
-            char="=",
+            header_color=Mocha.sapphire,
+            char="-",
         )
         if choice is None or choice == "0":
-            return
+            break
         action = options[choice][1]
         if callable(action):
             action()

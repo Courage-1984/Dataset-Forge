@@ -14,19 +14,27 @@ def quality_scoring_menu():
 
     options = quality_scoring_menu.__menu_options__
     while True:
-        action = show_menu(
+        choice = show_menu(
             "Automated Dataset Quality Scoring",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if choice is None or choice == "0":
             break
-        action()
+        action = options[choice][1]
+        if callable(action):
+            action()
 
 
 # Register a static menu for favorites (customize as needed)
 quality_scoring_menu.__menu_options__ = {
-    "1": ("Run Quality Scoring Workflow", lambda: None),
+    "1": (
+        "Run Quality Scoring Workflow",
+        lazy_action(
+            "dataset_forge.actions.quality_scoring_actions",
+            "run_quality_scoring_workflow",
+        ),
+    ),
     "0": ("Back to Main Menu", None),
 }

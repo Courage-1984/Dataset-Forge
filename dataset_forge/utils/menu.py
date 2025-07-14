@@ -1,3 +1,5 @@
+import importlib
+
 from .printing import print_header, print_error, print_prompt
 
 
@@ -19,3 +21,29 @@ def show_menu(title, options, header_color, char="#"):
             return choice
         else:
             print_error("Invalid choice. Please try again.")
+
+
+def lazy_action(module_name: str, func_name: str):
+    """
+    Returns a callable that lazy-loads and calls the specified function.
+    """
+
+    def _action(*args, **kwargs):
+        module = importlib.import_module(module_name)
+        func = getattr(module, func_name)
+        return func(*args, **kwargs)
+
+    return _action
+
+
+def lazy_menu(module_name: str, func_name: str):
+    """
+    Returns a callable that lazy-loads and calls the specified menu function.
+    """
+
+    def _menu(*args, **kwargs):
+        module = importlib.import_module(module_name)
+        func = getattr(module, func_name)
+        return func(*args, **kwargs)
+
+    return _menu

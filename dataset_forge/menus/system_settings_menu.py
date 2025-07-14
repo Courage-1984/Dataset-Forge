@@ -60,9 +60,10 @@ def memory_management_submenu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if action is None or action == "0":
             break
-        action()
+        if callable(action):
+            action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 

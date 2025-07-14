@@ -29,19 +29,26 @@ def augmentation_menu():
 
     options = augmentation_menu.__menu_options__
     while True:
-        action = show_menu(
-            "Augmentation Recipes",
+        choice = show_menu(
+            "Augmentation Menu",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
+        if choice is None or choice == "0":
             break
-        action()
+        action = options[choice][1]
+        if callable(action):
+            action()
 
 
 # Register a static menu for favorites (customize as needed)
 augmentation_menu.__menu_options__ = {
-    "1": ("Run Augmentation Pipeline", lambda: None),
+    "1": (
+        "Run Augmentation Pipeline",
+        lazy_action(
+            "dataset_forge.actions.augmentation_actions", "run_augmentation_pipeline"
+        ),
+    ),
     "0": ("Back to Main Menu", None),
 }
