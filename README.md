@@ -87,6 +87,7 @@ See [Project Architecture](docs/architecture.md) for details.
 - [Project Architecture](docs/architecture.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Contributing](docs/contributing.md)
+- [Style Guide](docs/style_guide.md)
 - [FAQ](docs/faq.md)
 - [Changelog](docs/changelog.md)
 - [License](docs/license.md)
@@ -108,6 +109,8 @@ See [Project Architecture](docs/architecture.md) for details.
 ## About
 
 Dataset Forge is a professional-grade tool for ML researchers and data scientists, designed for high-quality dataset curation, analysis, and transformation. For full documentation, see the [docs/](docs/) folder or the links above.
+
+**For coding standards and best practices, see the [Style Guide](docs/style_guide.md).**
 
 ---
 

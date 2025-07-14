@@ -14,6 +14,7 @@ Welcome to the **Dataset Forge** documentation hub! Here you'll find detailed gu
 - [Project Architecture](architecture.md)
 - [Troubleshooting](troubleshooting.md)
 - [Contributing](contributing.md)
+- [Style Guide](style_guide.md)
 - [FAQ](faq.md)
 - [Changelog](changelog.md)
 - [License](license.md)
@@ -25,6 +26,7 @@ Welcome to the **Dataset Forge** documentation hub! Here you'll find detailed gu
 - The main [README.md](../README.md) in the project root is a concise landing page with quick start and overview.
 - All detailed documentation is split into separate markdown files in this `docs/` folder for clarity and maintainability.
 - Each file includes navigation links at the top for easy movement between docs and back to the main README.
+- **For coding standards and best practices, see the [Style Guide](style_guide.md).**
 
 ## Contributing to Documentation
 
