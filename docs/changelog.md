@@ -22,6 +22,11 @@
   - Notifications for critical errors (sound/visual).
   - Memory and CUDA cleanup integrated on exit/errors for all tracked processes/threads.
   - Background task management: pause, resume, kill subprocesses/threads from CLI.
+- Added Content-Based Image Retrieval (CBIR) for Duplicates:
+  - Semantic duplicate detection using CLIP, ResNet, and VGG embeddings
+  - Fast similarity search and grouping with ANN indexing
+  - Batch actions: find, remove, move, copy duplicate groups
+  - Integrated into Clean & Organize submenu under Dataset Management
 
 ## [July 2025]
 

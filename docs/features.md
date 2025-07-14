@@ -235,3 +235,13 @@ See [docs/usage.md](usage.md) and [docs/advanced.md](advanced.md) for implementa
 - **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
 - **Dedicated CLI Menu**: Access all monitoring, analytics, and management features from the System Monitoring menu
+
+## Content-Based Image Retrieval (CBIR) for Duplicates
+
+- **Semantic Duplicate Detection**: Uses deep learning embeddings (CLIP, ResNet, VGG) to find images that are conceptually similar, even if visually transformed.
+- **Feature Extraction**: Extracts high-dimensional feature vectors for each image using a pre-trained CNN (CLIP preferred, fallback to ResNet/VGG).
+- **Similarity Search**: Computes cosine similarity or Euclidean distance between embeddings to identify near-duplicates.
+- **ANN Indexing**: Uses approximate nearest neighbor (ANN) indexing for efficient search in large datasets.
+- **Grouping & Actions**: Clusters images by semantic similarity and provides user options to find, remove, move, or copy duplicate groups.
+- **GPU Acceleration**: Leverages GPU for fast embedding extraction and search.
+- **Menu Integration**: Accessible from the Clean & Organize submenu under Dataset Management.

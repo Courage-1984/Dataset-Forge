@@ -32,3 +32,10 @@ If you encounter a menu that redraws repeatedly or a submenu that does not appea
   - Look up the action in the options dictionary.
   - Call the action if callable.
 - This resolves most navigation and invocation issues in the CLI.
+
+## CBIR Troubleshooting
+
+- **Model loading errors**: Ensure torch, torchvision, and timm are installed and match your CUDA version. See requirements and install instructions.
+- **GPU out of memory**: Lower the batch size or use CPU fallback. Close other GPU-intensive applications.
+- **Slow performance**: Use GPU if available. For very large datasets, increase system RAM or process in smaller batches.
+- **CLIP/ResNet/VGG not found**: Check requirements.txt and reinstall dependencies.

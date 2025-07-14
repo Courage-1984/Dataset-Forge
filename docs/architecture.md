@@ -30,3 +30,7 @@ The CLI interface now provides audio error feedback: whenever an error is report
 ### Menu System: Robust Loop Pattern
 
 All menus and submenus use a robust, standardized menu loop pattern (choice-based, action lookup, callable check). This is essential for modularity, maintainability, and reliable navigation throughout the CLI.
+
+## CBIR (Content-Based Image Retrieval) for Duplicates
+
+Implemented in `actions/cbir_actions.py` and `menus/cbir_menu.py`. Provides semantic duplicate detection using deep learning embeddings (CLIP, ResNet, VGG), similarity search, grouping, and batch actions. Integrated with the modular menu and action system.

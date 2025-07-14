@@ -274,9 +274,13 @@ def clean_organize_menu():
             "🔍 ImageDedup - Advanced Duplicate Detection",
             lazy_menu("dataset_forge.menus.imagededup_menu", "imagededup_menu"),
         ),
-        "4": ("✏️ Batch Rename", batch_rename_menu),
-        "5": ("📏 Remove Image Pairs by Size", remove_small_pairs),
-        "6": (
+        "4": (
+            "🧠 CBIR (Semantic Duplicate Detection)",
+            lazy_menu("dataset_forge.menus.cbir_menu", "cbir_menu"),
+        ),
+        "5": ("✏️ Batch Rename", batch_rename_menu),
+        "6": ("📏 Remove Image Pairs by Size", remove_small_pairs),
+        "7": (
             "🔄 Organize by Orientation (Landscape/Portrait/Square)",
             organize_by_orientation,
         ),

@@ -529,6 +529,13 @@ If a model is hosted on OneDrive, you will be prompted to download it manually. 
 - After selecting a model, choose actions: View Details, Download, Test, Open in Browser, or go back
 - Requires `questionary` (install with `pip install questionary`)
 
+## Content-Based Image Retrieval (CBIR) for Duplicates
+
+- Semantic duplicate detection using deep learning embeddings (CLIP, ResNet, VGG)
+- Feature extraction, similarity search, ANN indexing, grouping, and batch actions (find, remove, move, copy)
+- GPU acceleration and robust menu integration
+- See features, usage, and advanced sections for details
+
 # Project Architecture
 
 [//]: # "Navigation"

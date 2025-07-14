@@ -154,3 +154,18 @@ while True:
 This approach prevents redraw bugs and dead options, and works seamlessly with the lazy import and timing/profiling systems.
 
 **Best Practice:** Always use this pattern for new menus. See [docs/style_guide.md](style_guide.md) for requirements.
+
+## Content-Based Image Retrieval (CBIR) for Duplicates (Advanced)
+
+CBIR enables semantic duplicate detection using deep learning embeddings:
+
+- **Embedding Extraction**: Uses CLIP, ResNet, or VGG to generate feature vectors for each image. GPU acceleration is used if available.
+- **Similarity Matrix**: Computes cosine similarity (default) or Euclidean distance between all image embeddings.
+- **ANN Indexing**: For large datasets, uses approximate nearest neighbor (ANN) search for fast duplicate detection.
+- **Grouping**: Clusters images by similarity threshold, forming groups of near-duplicates.
+- **Batch Actions**: Supports batch removal, move, or copy of duplicates, keeping one image per group.
+- **Parallel Processing**: Uses smart_map and batch_map for efficient processing.
+- **Memory Management**: Integrates with memory_context and auto_cleanup for safe operation.
+- **Menu Integration**: Follows the robust menu loop and lazy import patterns for fast, user-friendly CLI navigation.
+
+For implementation details, see `cbir_actions.py` and `cbir_menu.py`.

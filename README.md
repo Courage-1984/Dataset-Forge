@@ -132,12 +132,15 @@ For more details, see the documentation in `docs/features.md`, `docs/usage.md`, 
 - **Advanced system monitoring & analytics**: Live resource usage (CPU, GPU, RAM, disk), performance analytics, error tracking, health checks, and background task management, all accessible from a dedicated CLI menu. Includes persistent logging, notifications, and memory/CUDA cleanup integration.
 - **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
 - **getnative integration**: For native resolution detection (requires VapourSynth, see requirements).
+- **Content-Based Image Retrieval (CBIR) for Duplicates**: Find, remove, move, or copy semantically similar images using deep learning embeddings (CLIP, ResNet, VGG). Detects duplicates and near-duplicates based on semantic content, not just pixel similarity.
 
 ---
 
 ## About
 
 Dataset Forge is a professional-grade tool for ML researchers and data scientists, designed for high-quality dataset curation, analysis, and transformation. For full documentation, see the [docs/](docs/) folder or the links above.
+
+**CBIR for Duplicates:** Use deep learning models (CLIP, ResNet, VGG) to find, group, and manage semantically similar images. Supports fast similarity search, grouping, and batch actions (find, remove, move, copy) with GPU acceleration.
 
 **Audio error feedback:** Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback, ensuring you never miss a critical issue.
 

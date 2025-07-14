@@ -53,6 +53,21 @@ If a model is hosted on OneDrive, you will be prompted to download it manually. 
 
 ---
 
+## Using Content-Based Image Retrieval (CBIR) for Duplicates
+
+1. Navigate to the main menu, then Dataset Management > Clean & Organize > CBIR (Semantic Duplicate Detection).
+2. Choose your workflow: single-folder or HQ/LQ pair.
+3. Select the embedding model: CLIP (recommended), ResNet, or VGG.
+4. Set the similarity threshold (default: 0.92 for cosine similarity).
+5. Choose an action:
+   - **Find**: List groups of semantically similar images.
+   - **Remove**: Delete all but one image in each group.
+   - **Move**: Move duplicates to a specified folder.
+   - **Copy**: Copy duplicates to a specified folder.
+6. Review the summary of affected files after each operation.
+
+CBIR supports GPU acceleration and is optimized for large datasets. For advanced options, see the advanced features documentation.
+
 ## Menu Timing & Profiling
 
 Whenever you load a menu or submenu in Dataset Forge, you will see a timing print in the CLI, such as:

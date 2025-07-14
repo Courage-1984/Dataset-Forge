@@ -260,3 +260,11 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - This is required for reliability and maintainability.
 - Always use the Catppuccin Mocha color scheme for menu headers and prompts.
 - Integrate timing/profiling as described in the relevant sections.
+
+## CBIR Code Style
+
+- Follow modular design: separate menu (cbir_menu.py) and actions (cbir_actions.py)
+- Use robust error handling and logging for all file operations
+- Integrate memory management (memory_context, auto_cleanup)
+- Use parallel processing (smart_map, batch_map) for efficiency
+- Provide clear user feedback and progress tracking
