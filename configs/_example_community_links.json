@@ -61,12 +61,40 @@
     ],
     "General Resources": [
         {
-            "name": "Frequently asked questions",
-            "url": "https://openmodeldb.info/docs/faq"
+            "OpenModelDB Documentation": [
+                {
+                    "name": "Documentation",
+                    "url": "https://openmodeldb.info/docs/contributing/documentation"
+                },
+                {
+                    "name": "Frequently asked questions",
+                    "url": "https://openmodeldb.info/docs/faq"
+                },
+                {
+                    "name": "Licenses",
+                    "url": "https://openmodeldb.info/docs/licenses"
+                },
+                {
+                    "name": "Contributing",
+                    "url": "https://openmodeldb.info/docs/contributing"
+                },
+                {
+                    "name": "Contributing - Models",
+                    "url": "https://openmodeldb.info/docs/contributing/models"
+                },
+                {
+                    "name": "Contributing - Documentation",
+                    "url": "https://openmodeldb.info/docs/contributing/documentation"
+                }
+            ]
         },
         {
             "name": "Upscale Resources",
             "url": "https://github.com/Upscale-Community/upscale-resources"
+        },
+        {
+            "name": "Upscale Discord Community",
+            "url": "https://discord.gg/cpAUpDK"
         }
     ]
 }
