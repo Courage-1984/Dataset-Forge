@@ -337,3 +337,111 @@ def images_orientation_organization(*args, **kwargs):
             kwargs["orientations"],
             kwargs.get("operation", "copy"),
         )
+
+
+def filter_non_images(
+    folder: str = None,
+    hq_folder: str = None,
+    lq_folder: str = None,
+    operation: str = "move",
+    dest_dir: str = None,
+    dry_run: bool = False,
+):
+    """
+    Filter non-image files from a folder or HQ/LQ pair.
+
+    Args:
+        folder: Single folder path (if provided, process all files in this folder)
+        hq_folder: HQ folder path (for paired mode)
+        lq_folder: LQ folder path (for paired mode)
+        operation: 'copy', 'move', or 'delete'
+        dest_dir: Destination directory for copy/move (ignored for delete)
+        dry_run: If True, only print what would be done
+
+    Returns:
+        Dict with counts of processed and skipped files
+
+    Raises:
+        ValueError: If no valid folder(s) provided
+
+    Example:
+        >>> filter_non_images(folder="/path/to/folder", operation="delete")
+        >>> filter_non_images(hq_folder="/hq", lq_folder="/lq", operation="move", dest_dir="/out")
+    """
+    import os
+    from dataset_forge.utils.file_utils import is_image_file, get_unique_filename
+    from dataset_forge.utils.progress_utils import tqdm, image_map
+    from dataset_forge.utils.printing import (
+        print_info,
+        print_success,
+        print_warning,
+        print_error,
+    )
+    import shutil
+
+    def _filter_in_folder(src_folder, op, dest=None):
+        files = [
+            f
+            for f in os.listdir(src_folder)
+            if os.path.isfile(os.path.join(src_folder, f))
+        ]
+        non_images = [f for f in files if not is_image_file(f)]
+        if not non_images:
+            print_info(f"No non-image files found in {src_folder}.")
+            return {"processed": 0, "skipped": 0}
+        print_info(f"Found {len(non_images)} non-image files in {src_folder}.")
+        processed = 0
+        skipped = 0
+        for fname in tqdm(
+            non_images, desc=f"Filtering non-images in {os.path.basename(src_folder)}"
+        ):
+            src_path = os.path.join(src_folder, fname)
+            try:
+                if dry_run:
+                    print_info(
+                        f"[Dry run] Would {op} {src_path}{' to ' + dest if dest else ''}"
+                    )
+                    continue
+                if op == "delete":
+                    os.remove(src_path)
+                elif op in ("move", "copy"):
+                    if not dest:
+                        print_error(
+                            f"Destination directory required for {op} operation."
+                        )
+                        skipped += 1
+                        continue
+                    os.makedirs(dest, exist_ok=True)
+                    dest_path = os.path.join(dest, get_unique_filename(dest, fname))
+                    if op == "move":
+                        shutil.move(src_path, dest_path)
+                    else:
+                        shutil.copy2(src_path, dest_path)
+                processed += 1
+            except Exception as e:
+                print_warning(f"Failed to {op} {src_path}: {e}")
+                skipped += 1
+        print_success(f"{op.title()}d {processed} non-image files from {src_folder}.")
+        return {"processed": processed, "skipped": skipped}
+
+    results = {}
+    if folder:
+        results[folder] = _filter_in_folder(folder, operation, dest_dir)
+    elif hq_folder and lq_folder:
+        dest_hq = (
+            os.path.join(dest_dir, "hq")
+            if dest_dir and operation in ("move", "copy")
+            else None
+        )
+        dest_lq = (
+            os.path.join(dest_dir, "lq")
+            if dest_dir and operation in ("move", "copy")
+            else None
+        )
+        results["hq"] = _filter_in_folder(hq_folder, operation, dest_hq)
+        results["lq"] = _filter_in_folder(lq_folder, operation, dest_lq)
+    else:
+        raise ValueError(
+            "Must provide either a single folder or both hq_folder and lq_folder."
+        )
+    return results
