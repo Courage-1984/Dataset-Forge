@@ -11,8 +11,36 @@ import logging
 
 from dataset_forge.menus.main_menu import main_menu
 
+import signal
+import sys
+
 # All functionality is now organized in the new hierarchical menu structure
 # See MENU_RESTRUCTURE_SUMMARY.md for details on the new organization
+
+
+def _sigint_handler(signum, frame):
+    try:
+        from dataset_forge.utils.memory_utils import clear_memory
+
+        clear_memory()
+    except Exception as e:
+        print(f"[SIGINT] Memory cleanup failed: {e}")
+    # Try to gracefully quit pygame audio if running
+    try:
+        import pygame
+
+        if pygame.mixer.get_init():
+            pygame.mixer.quit()
+            print("[SIGINT] Pygame mixer quit.")
+    except ImportError:
+        pass
+    except Exception as e:
+        print(f"[SIGINT] Pygame mixer quit failed: {e}")
+    print("\n🛑 Caught Ctrl+C (SIGINT). Cleaned up memory and audio. Exiting...")
+    sys.exit(130)
+
+
+signal.signal(signal.SIGINT, _sigint_handler)
 
 if __name__ == "__main__":
     # Suppress pygame warnings and other unnecessary output
