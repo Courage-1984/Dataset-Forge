@@ -53,7 +53,7 @@
 - **Visual Comparison**: Side-by-side comparisons, animated GIF comparisons
 - **Folder Comparison**: Find missing files between folders
 - **Compression Tools**: Image compression, directory archiving
-- **Enhanced Directory Tree**: AI-powered directory visualization with emoji categorization, statistics, and multiple output formats
+- **Enhanced Directory Tree**: Advanced directory visualization with emoji categorization, statistics, and multiple output formats
 - **Path History**: Smart path management with history and favorites
 - **Parallel Processing**: High-performance multiprocessing and multithreading
 
