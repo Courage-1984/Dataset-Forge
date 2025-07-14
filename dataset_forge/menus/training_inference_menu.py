@@ -1,4 +1,7 @@
-from dataset_forge.menus.model_management_menu import openmodeldb_model_browser_menu
+from dataset_forge.menus.model_management_menu import (
+    openmodeldb_model_browser_menu,
+    openmodeldb_model_browser_cli_interactive,
+)
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
 
@@ -16,13 +19,36 @@ def training_inference_menu():
             "8": ("✏️ Edit .hcl Config File", None),
             "9": ("✏️ Edit .yml Config File", None),
             "10": ("📋 List/Upscale with Model", None),
-            "11": ("🧠 OpenModelDB Model Browser", openmodeldb_model_browser_menu),
+            "11": ("🧠 OpenModelDB Model Browser", openmodeldb_model_browser_mode_menu),
             "0": ("⬅️ Back to Main Menu", None),
         }
         choice = show_menu(
             "🚀 Training & Inference",
             options,
             Mocha.lavender,
+        )
+        if choice is None or choice == "0":
+            break
+        action = options[choice][1]
+        if action:
+            action()
+
+
+def openmodeldb_model_browser_mode_menu():
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
+
+    options = {
+        "1": ("🧾 Basic Menu (classic)", openmodeldb_model_browser_menu),
+        "2": (
+            "🖱️ CLI-interactive (modern, live search)",
+            openmodeldb_model_browser_cli_interactive,
+        ),
+        "0": ("⬅️ Back", None),
+    }
+    while True:
+        choice = show_menu(
+            "OpenModelDB Model Browser - Choose Mode", options, Mocha.lavender
         )
         if choice is None or choice == "0":
             break

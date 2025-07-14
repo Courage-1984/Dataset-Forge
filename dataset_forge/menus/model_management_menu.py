@@ -362,3 +362,110 @@ def open_model_page_in_browser(model_key):
     url = f"https://openmodeldb.info/models/{model_key}"
     print_info(f"Opening: {url}")
     webbrowser.open(url)
+
+
+def openmodeldb_model_browser_cli_interactive():
+    """
+    CLI-interactive OpenModelDB Model Browser using questionary.
+    Shows a searchable, scrollable list of models. After selection, allows details, download, test, open in browser.
+    """
+    try:
+        import questionary
+    except ImportError:
+        print(
+            "\n[!] The 'questionary' package is required for CLI-interactive mode.\n    Install it with: pip install questionary\n"
+        )
+        return
+    from dataset_forge.actions.openmodeldb_actions import (
+        get_cached_models,
+        update_model_cache,
+        download_model,
+        test_model,
+    )
+    import os
+    import sys
+    import webbrowser
+
+    CACHE_DIR = os.path.join("OpenModelDB", "cache")
+    MODELS_DIR = os.path.join("OpenModelDB", "models")
+    print("\nUpdating OpenModelDB model cache...")
+    update_model_cache(CACHE_DIR)
+    models = get_cached_models(CACHE_DIR)
+    model_keys = list(models.keys())
+    model_names = [f"{models[k]['name']} ({k})" for k in model_keys]
+    if not model_names:
+        print("No models found in cache.")
+        return
+    while True:
+        answer = questionary.autocomplete(
+            "Select a model (type to search):",
+            choices=model_names,
+            validate=lambda x: x in model_names,
+            style=questionary.Style(
+                [("qmark", "fg:#ff9d00 bold"), ("answer", "fg:#00ff00 bold")]
+            ),
+            qmark="🧠",
+        ).ask()
+        if not answer:
+            print("No selection made. Returning to previous menu.")
+            return
+        idx = model_names.index(answer)
+        key = model_keys[idx]
+        model = models[key]
+        # Model action menu
+        while True:
+            action = questionary.select(
+                f"Model: {model['name']} ({key})",
+                choices=[
+                    "View Details",
+                    "⬇️ Download Model",
+                    "🧪 Test This Model",
+                    "🌐 Open Model Page in Browser",
+                    "Back to Model List",
+                ],
+                style=questionary.Style(
+                    [("qmark", "fg:#ff9d00 bold"), ("answer", "fg:#00ff00 bold")]
+                ),
+                qmark="🧠",
+            ).ask()
+            if action == "View Details":
+                print("\n" + "#" * 50)
+                print(f"Model: {model['name']}")
+                print(f"Key: {key}")
+                print(f"Author: {model.get('author', '-')}")
+                print(f"Tags: {', '.join(model.get('tags', []))}")
+                print(f"Architecture: {model.get('architecture', '-')}")
+                print(f"Scale: {model.get('scale', '-')}")
+                print(f"License: {model.get('license', '-')}")
+                print(f"Date: {model.get('date', '-')}")
+                print(f"Description: {model.get('description', '-')}")
+                print("Resources:")
+                for i, res in enumerate(model.get("resources", []), 1):
+                    print(
+                        f"  [{i}] Platform: {res.get('platform', '-')}, Type: {res.get('type', '-')}, Size: {res.get('size', '-')}, SHA256: {res.get('sha256', '-')}"
+                    )
+                    for url in res.get("urls", []):
+                        print(f"    URL: {url}")
+                if model.get("images"):
+                    print("Sample Images:")
+                    for img in model["images"]:
+                        print(f"  LR: {img.get('LR', '-')}, SR: {img.get('SR', '-')}")
+                print("#" * 50 + "\n")
+            elif action == "⬇️ Download Model":
+                download_model(model, MODELS_DIR)
+            elif action == "🧪 Test This Model":
+                image_path = questionary.path("Enter path to image to test:").ask()
+                if not image_path or not os.path.exists(image_path):
+                    print("[!] Image path does not exist.")
+                else:
+                    test_model(model, MODELS_DIR, image_path)
+            elif action == "🌐 Open Model Page in Browser":
+                url = f"https://openmodeldb.info/models/{key}"
+                print(f"Opening: {url}")
+                webbrowser.open(url)
+            elif action == "Back to Model List":
+                break
+        # After returning from model action menu, ask if user wants to select another model
+        again = questionary.confirm("Select another model?", default=True).ask()
+        if not again:
+            break
