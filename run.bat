@@ -1,6 +1,9 @@
 @echo off
 REM Activate the virtual environment
 call venv312\Scripts\activate.bat
- 
-REM Run run.py (which should run main.py)
-py run.py 
+
+REM Run Dataset Forge via CLI entry point (preferred)
+dataset-forge
+
+REM Fallback: run main.py if CLI entry point is not available
+REM py main.py 

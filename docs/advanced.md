@@ -4,7 +4,37 @@
 
 # Advanced Features & Configuration
 
-(Include the full "Advanced Features", "Configuration", and "Requirements" sections from the original README here, preserving formatting and navigation.)
+## Requirements & Dependency Matrix
+
+Dataset Forge requires the following for full functionality (especially for GPU acceleration):
+
+- **Python**: 3.8+ (tested on 3.12)
+- **OS**: Windows (primary), Linux (partial support)
+- **CUDA**: 12.1+ (for GPU acceleration)
+- **cuDNN**: 8.9+ (required for PyTorch CUDA)
+- **PyTorch**: 2.2.0+ (see below)
+- **RAM**: 8GB+ (16GB+ recommended for large datasets)
+- **Storage**: SSD recommended for faster I/O
+- **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
+
+**Dependency Matrix:**
+
+| Python | CUDA Toolkit | cuDNN | PyTorch | OS      |
+| ------ | ------------ | ----- | ------- | ------- |
+| 3.12   | 12.1         | 8.9+  | 2.2.0+  | Windows |
+| 3.8+   | 11.8/12.1    | 8.6+  | 2.0.0+  | Linux   |
+
+- For GPU acceleration, ensure your CUDA and cuDNN versions match your PyTorch install. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
+- If you use a different CUDA/cuDNN version, install the matching PyTorch build.
+
+**Installation via pip (recommended):**
+
+```bash
+py -3.12 -m venv venv312
+venv312\Scripts\activate
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+pip install .
+```
 
 ## Advanced OpenModelDB Integration
 

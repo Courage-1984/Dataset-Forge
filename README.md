@@ -53,37 +53,29 @@ Dataset Forge now uses a lazy import pattern for all main menus and submenus. Th
 
 ---
 
-## 🚀 Quick Start
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Courage-1984/Dataset-Forge.git
-   cd Dataset-Forge
-   ```
-2. **Set up the environment:**
-   ```bash
-   py -3.12 -m venv venv312
-   venv312\Scripts\activate
-   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-   pip install -r requirements.txt
-   ```
-3. **Run the application:**
-   ```bash
-   py main.py
-   # or
-   ./run.bat
-   ```
-
----
-
 ## 🖥️ Supported Platforms & Requirements
 
 - **Python**: 3.8+ (tested on 3.12)
 - **OS**: Windows (primary), Linux (partial support)
 - **CUDA**: 12.1+ (for GPU acceleration)
+- **cuDNN**: 8.9+ (for GPU acceleration, required for PyTorch CUDA)
 - **RAM**: 8GB+ (16GB+ recommended for large datasets)
 - **Storage**: SSD recommended for faster I/O
+- **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
 - See [Requirements](docs/advanced.md#requirements) for full details.
+
+**Dependency Matrix:**
+
+| Python | CUDA Toolkit | cuDNN | PyTorch | OS      |
+| ------ | ------------ | ----- | ------- | ------- |
+| 3.12   | 12.1         | 8.9+  | 2.2.0+  | Windows |
+| 3.8+   | 11.8/12.1    | 8.6+  | 2.0.0+  | Linux   |
+
+- For GPU acceleration, ensure your CUDA and cuDNN versions match your PyTorch install. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
+- If you use a different CUDA/cuDNN version, install the matching PyTorch build.
+
+> **IMPORTANT:** You must install the correct version of torch/torchvision/torchaudio for your CUDA version **before** running `pip install .`. If you skip this, pip will install the CPU-only version of torch by default. See the Quick Start below for the recommended command.
+> **IMPORTANT:** You must install VapourSynth before installing or using getnative. See the requirements.txt and docs for details.
 
 ---
 
@@ -112,6 +104,7 @@ Dataset Forge now uses a lazy import pattern for all main menus and submenus. Th
 - Deep validation and reporting tools
 - **Advanced system monitoring & analytics**: Live resource usage (CPU, GPU, RAM, disk), performance analytics, error tracking, health checks, and background task management, all accessible from a dedicated CLI menu. Includes persistent logging, notifications, and memory/CUDA cleanup integration.
 - **Audio error feedback**: Whenever an error is reported to the user, an error sound (error.mp3) is played for immediate feedback.
+- **getnative integration**: For native resolution detection (requires VapourSynth, see requirements).
 
 ---
 
@@ -147,6 +140,37 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 - Edit the relevant file in the [docs/](docs/) folder.
 - Keep the main README.md concise and up-to-date with links to detailed docs.
 - Add new sections to docs/ as the project grows.
+
+- The requirements.txt is now grouped and commented for clarity (see file for details).
+- The install.bat and run.bat scripts have been updated for best practices and CUDA/torch install warnings.
+
+---
+
+## 🚀 Quick Start
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Courage-1984/Dataset-Forge.git
+   cd Dataset-Forge
+   ```
+2. **Set up the environment:**
+   ```bash
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+   pip install .
+   ```
+   > **Note:** If you use a different CUDA version, see https://pytorch.org/get-started/locally/ for the right install command.
+   > **Note:** If you plan to use getnative, you must install VapourSynth before installing or using getnative. See requirements.txt and docs for details.
+3. **Run the application:**
+   ```bash
+   dataset-forge
+   # or
+   py main.py
+   # or
+   ./run.bat
+   ```
 
 ---
 

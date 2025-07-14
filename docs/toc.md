@@ -44,6 +44,7 @@
 - [Credits](README_full.md#credits)
 - [License](README_full.md#license)
 - [Documentation Maintenance](README_full.md#documentation-maintenance)
+- [Requirements & Dependency Matrix](README_full.md#requirements--dependency-matrix)
 
 ### Full Documentation Sections
 

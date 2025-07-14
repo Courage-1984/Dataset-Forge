@@ -1,51 +1,88 @@
-# numpy
+# =============================
+# Core Scientific Libraries
+# =============================
 numpy<2
+
+# =============================
+# Image Processing & I/O
+# =============================
 opencv-python
 Pillow
+imageio
+imagehash
+matplotlib
+seaborn
+
+# =============================
+# Machine Learning & Models
+# =============================
+torch
+torchvision
+torchaudio
+lpips
+open-clip-torch
+timm
+transformers
+pyiqa
 spandrel
 spandrel_extra_arches
 chainner-ext
-tqdm
-imageio
-pyyaml
-tqdm
-ffmpeg
-imagehash
-PyExifTool
-pepeline
-pepedpid
-pyiqa
-timm
-matplotlib
-seaborn
-jinja2
-lpips
-open-clip-torch
-imagededup
 
+# =============================
+# CLI, UI, and User Input
+# =============================
+questionary
+
+# =============================
+# Audio Feedback
+# =============================
 pygame
 playsound
 playsound2
 
-transformers
-
-# Parallel processing and system monitoring
+# =============================
+# Parallel Processing & Monitoring
+# =============================
 psutil
 joblib
+GPUtil
 
-# getnative
-# ^ first install VapourSynth
-
-# Directory tree functionality
+# =============================
+# File, Path, and Directory Utilities
+# =============================
 python-magic==0.4.27
 python-magic-bin==0.4.14
 libmagic==1.0
 
+# =============================
+# Data Compression & Archiving
+# =============================
+ffmpeg
+
+# =============================
+# Jinja2 for Report Templates
+# =============================
+jinja2
+
+# =============================
+# Miscellaneous Utilities
+# =============================
+pyyaml
+pepeline
+pepedpid
+importlib
 gdown
 
-questionary
+# =============================
+# Deduplication & Similarity
+# =============================
+imagededup
 
-GPUtil
-
-importlib
+# =============================
+# Optional/External Tools
+# =============================
+# getnative
+# ^ first install VapourSynth
+# Directory tree functionality
+# (see Kim's_Directory_Tree_Maker/requirements.txt for more)
 

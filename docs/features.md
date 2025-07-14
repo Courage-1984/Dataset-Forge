@@ -162,7 +162,7 @@
 
 - **WTP Dataset Destroyer**: Full integration with advanced dataset processing
 - **traiNNer-redux**: Seamless training pipeline integration
-- **VapourSynth**: Required for getnative functionality
+- **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
 - **ExifTool**: Advanced metadata handling and manipulation
 - **FFmpeg**: Video processing and HDR conversion capabilities
 

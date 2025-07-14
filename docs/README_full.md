@@ -173,7 +173,7 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 
 [//]: # "Navigation"
 
-[← Back to Main README](../README.md) | [Usage Guide](usage.md) | [Advanced Features](advanced.md)
+[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
 
 # Features
 
@@ -335,7 +335,7 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 
 - **WTP Dataset Destroyer**: Full integration with advanced dataset processing
 - **traiNNer-redux**: Seamless training pipeline integration
-- **VapourSynth**: Required for getnative functionality
+- **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
 - **ExifTool**: Advanced metadata handling and manipulation
 - **FFmpeg**: Video processing and HDR conversion capabilities
 
