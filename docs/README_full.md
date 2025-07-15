@@ -97,6 +97,8 @@ See [usage.md](usage.md#running-tests) for instructions on running tests.
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
 
+- Dual native resolution detection: Choose between getnative (Python/VapourSynth) and resdet (C binary, fast, WSL integration on Windows). See [special_installation.md](special_installation.md) for install details.
+
 ---
 
 
@@ -148,6 +150,32 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 ---
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
+
+## Native Resolution Detection (getnative & resdet)
+
+The 'Find Native Resolution' feature allows you to estimate the original resolution of an image using two methods:
+
+- **getnative** (Python, VapourSynth): Works natively on Windows and Linux. Requires VapourSynth and Python dependencies.
+- **resdet** (C binary): Fast, supports PNG/JPEG. On Windows, the CLI will use WSL to run resdet if available. On Linux, resdet is run natively.
+
+### How to Use
+1. From the main menu, navigate to:
+   - `Analysis & Validation` → `Analyze Properties` → `Find Native Resolution`
+2. Choose whether to analyze a folder (HQ/LQ) or a single image.
+3. Select your preferred method:
+   - **getnative**: Requires VapourSynth and Python dependencies.
+   - **resdet**: Requires resdet to be installed and available in your PATH (or in WSL PATH on Windows).
+
+### Windows Users
+- If you select resdet, the CLI will automatically use WSL if available.
+- You must install resdet in your WSL environment and ensure it is in the WSL PATH.
+- See [special_installation.md](special_installation.md) for detailed instructions.
+
+### Linux Users
+- Install resdet natively and ensure it is in your PATH.
+
+### Troubleshooting
+- If resdet is not found, you will receive a clear error message with installation instructions.
 
 ---
 
@@ -566,11 +594,61 @@ This file will track major changes and releases in the future.
 # Contributing
 
 
+[ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
+
 # Contributing
 
-> **All code contributions must follow the [Style Guide](style_guide.md).**
+Thank you for your interest in contributing to **Dataset Forge**! We welcome contributions from the community to improve features, fix bugs, and enhance documentation.
 
-(Include the full "Contributing" and "Development Guidelines" sections from the original README here, preserving formatting and navigation.)
+## How to Contribute
+
+1. **Read the [Style Guide](style_guide.md):**
+   - All code must follow the project's coding standards, modular architecture, and documentation requirements.
+2. **Fork the repository** and create a new branch for your feature or fix.
+3. **Write clear, well-documented code:**
+   - Use Google-style docstrings and type hints for all public functions/classes.
+   - Add or update tests in `tests/` for new features or bugfixes.
+   - Update or add documentation in the appropriate `docs/` file(s).
+4. **Test your changes:**
+   - Activate the virtual environment: `venv312\Scripts\activate`
+   - Run the test suite: `pytest`
+   - Ensure all tests pass on your platform (Windows and/or Linux).
+5. **Submit a Pull Request (PR):**
+   - Describe your changes clearly in the PR description.
+   - Reference any related issues or discussions.
+   - If your change affects documentation, mention which files were updated.
+   - Be responsive to code review feedback.
+
+## Development Guidelines
+
+- **Modular Design:**
+  - UI in `menus/`, business logic in `actions/`, helpers in `utils/`.
+  - Use lazy imports for menu actions (see [advanced.md](advanced.md)).
+- **Memory & Performance:**
+  - Use centralized memory and parallel processing utilities.
+  - Always clean up memory after large operations.
+- **Testing:**
+  - Add tests for new features and bugfixes.
+  - Use pytest fixtures and monkeypatching as needed.
+- **Documentation:**
+  - Update relevant docs in `docs/` and regenerate `README_full.md` and `toc.md` using `merge_docs.py` after changes.
+  - Keep navigation links at the top of each doc file.
+- **Commit Messages:**
+  - Use clear, descriptive commit messages (e.g., `feat: add CBIR duplicate detection`, `fix: handle VapourSynth import error`).
+- **Community Standards:**
+  - Be respectful and constructive in all communications.
+  - Report bugs or suggest features via GitHub Issues.
+
+## Doc Maintenance
+
+- After updating any documentation, always regenerate `docs/README_full.md` and `docs/toc.md` using `merge_docs.py`.
+- For major changes, update `docs/changelog.md`.
+- For new documentation sections, create a new markdown file in `docs/` and add it to the Table of Contents in `README.md` and `docs/toc.md`.
+
+---
+
+For questions, open an issue or contact the project maintainer.
+
 
 ---
 
@@ -580,11 +658,66 @@ This file will track major changes and releases in the future.
 
 # Frequently Asked Questions (FAQ)
 
-(If there are not enough FAQs in the original README, leave this as a stub for future expansion.)
+---
+
+### What is Dataset Forge?
+
+Dataset Forge is a modular Python CLI tool for managing, analyzing, and transforming image datasets, with a focus on HQ/LQ pairs for super-resolution and ML workflows.
+
+### What platforms are supported?
+
+- Windows (primary)
+- Linux (tested)
+- macOS is not officially supported but may work with some features disabled.
+
+### What Python version is required?
+
+Python 3.12+ is recommended. The project supports Python 3.8+ but is tested on 3.12.
+
+### How do I install Dataset Forge and its dependencies?
+
+See the [Quick Start](../README.md#quick-start) and [Special Installation Instructions](special_installation.md). Always install the correct CUDA-enabled torch/torchvision/torchaudio **before** running `pip install .`.
+
+### Why do I need to install VapourSynth before getnative?
+
+getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [special_installation.md](special_installation.md#vapoursynth--getnative-for-getnative-functionality).
+
+### How do I fix python-magic errors on Windows?
+
+You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [special_installation.md](special_installation.md#python-magic-for-directory-utilities).
+
+### How do I run the test suite?
+
+Activate the virtual environment and run `pytest`. See [usage.md](usage.md#running-tests).
 
 ### What is CBIR for Duplicates?
 
-CBIR (Content-Based Image Retrieval) for Duplicates uses deep learning models (CLIP, ResNet, VGG) to find images that are semantically similar, even if they look different at the pixel level. It extracts feature embeddings, computes similarity, and groups duplicates for easy management.
+CBIR (Content-Based Image Retrieval) for Duplicates uses deep learning models (CLIP, ResNet, VGG) to find images that are semantically similar, even if visually transformed. It extracts feature embeddings, computes similarity, and groups duplicates for easy management. See [features.md](features.md#cbir-content-based-image-retrieval-for-duplicates).
+
+### How do I use the monitoring and analytics features?
+
+Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md#monitoring-analytics--error-tracking).
+
+### What should I do if I get CUDA or GPU errors?
+
+- Ensure your CUDA and cuDNN versions match your PyTorch install.
+- Close other GPU-intensive applications.
+- Lower batch size or use CPU fallback if you run out of memory.
+- See [troubleshooting.md](troubleshooting.md).
+
+### What if a menu or feature is missing or crashes?
+
+- Make sure you are running the latest version.
+- Check the logs in the `./logs/` directory for error details.
+- See [troubleshooting.md](troubleshooting.md) for solutions to common issues.
+
+### How do I get help or report a bug?
+
+Open an issue on GitHub or contact the project maintainer.
+
+---
+
+If your question is not answered here, check the [usage guide](usage.md), [troubleshooting guide](troubleshooting.md), or open an issue.
 
 ---
 
