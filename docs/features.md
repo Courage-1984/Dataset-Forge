@@ -71,3 +71,5 @@ See [usage.md](usage.md#running-tests) for instructions on running tests.
 ---
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
+
+- Dual native resolution detection: Choose between getnative (Python/VapourSynth) and resdet (C binary, fast, WSL integration on Windows). See [special_installation.md](special_installation.md) for install details.

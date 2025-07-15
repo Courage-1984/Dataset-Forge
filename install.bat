@@ -13,3 +13,4 @@ venv312\Scripts\pip.exe install .
 
 REM Print success message
 echo Installation complete. To run, activate the venv and use: dataset-forge 
+

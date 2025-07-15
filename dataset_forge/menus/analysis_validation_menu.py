@@ -1,3 +1,4 @@
+from dataset_forge.utils.color import Mocha
 import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.printing import (
@@ -9,7 +10,6 @@ from dataset_forge.utils.printing import (
     print_info,
     print_prompt,
 )
-from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
 from dataset_forge.utils.input_utils import get_path_with_history
 from dataset_forge.utils import monitoring
@@ -315,18 +315,99 @@ def analyze_properties_menu():
         input()
 
     def find_native_resolution_workflow():
+        print("DEBUG: Entered find_native_resolution_workflow")
         print_header("🎯 Find Native Resolution", color=Mocha.yellow)
-        hq = get_path_with_history(
-            "📁 Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        from dataset_forge.utils.input_utils import (
+            get_path_with_history,
+            get_folder_path,
         )
-        lq = get_path_with_history(
-            "📁 Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
-        )
-        from dataset_forge.actions.getnative_actions import find_native_resolution
+        from dataset_forge.utils.printing import print_info, print_warning
+        from dataset_forge.utils.menu import show_menu
 
-        find_native_resolution(hq, lq)
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
+        # Prompt for input type
+        input_type_options = {
+            "1": ("📁 Folder (HQ/LQ)", "folder"),
+            "2": ("🖼️ Single Image", "image"),
+            "0": ("🚪 Back", None),
+        }
+        while True:
+            input_type = show_menu(
+                "Select input type", input_type_options, Mocha.lavender
+            )
+            print(f"DEBUG: input_type selected: {input_type}")
+            if input_type is None or input_type == "0":
+                print("DEBUG: input_type is None or 0, returning")
+                return
+            if input_type == "1":
+                hq = get_path_with_history(
+                    "📁 Enter HQ folder path:",
+                    allow_hq_lq=True,
+                    allow_single_folder=True,
+                )
+                lq = get_path_with_history(
+                    "📁 Enter LQ folder path:",
+                    allow_hq_lq=True,
+                    allow_single_folder=True,
+                )
+                break
+            elif input_type == "2":
+                while True:
+                    image_path = get_path_with_history("🖼️ Enter image file path:")
+                    from dataset_forge.utils.file_utils import is_image_file
+                    import os
+
+                    if os.path.isfile(image_path) and is_image_file(image_path):
+                        hq = image_path
+                        lq = None
+                        break
+                    else:
+                        print_warning(
+                            "Selected path is not a valid image file. Please try again."
+                        )
+                break
+            else:
+                print_warning("Invalid selection. Please try again.")
+
+        # Prompt for method
+        method_options = {
+            "1": ("🧪 getnative (VapourSynth, Python)", "getnative"),
+            "2": ("⚡ resdet (C binary, fast)", "resdet"),
+            "0": ("🚪 Back", None),
+        }
+        while True:
+            method = show_menu(
+                "Choose native resolution detection method",
+                method_options,
+                Mocha.lavender,
+            )
+            print(f"DEBUG: method selected: {method}")
+            if method is None or method == "0":
+                print("DEBUG: method is None or 0, returning")
+                return
+            if method == "1":
+                from dataset_forge.actions.getnative_actions import (
+                    find_native_resolution,
+                )
+
+                if lq is not None:
+                    find_native_resolution(hq, lq)
+                else:
+                    find_native_resolution(hq)
+                break
+            elif method == "2":
+                from dataset_forge.actions.getnative_actions import (
+                    find_native_resolution_resdet,
+                )
+
+                if lq is not None:
+                    print_info(
+                        "resdet only supports single image input. Please select a single image."
+                    )
+                else:
+                    find_native_resolution_resdet(hq)
+                break
+            else:
+                print_warning("Invalid selection. Please try again.")
 
     options = {
         "1": ("🔍 Check Dataset Consistency", check_consistency_workflow),
@@ -339,14 +420,15 @@ def analyze_properties_menu():
     }
 
     while True:
-        action = show_menu(
+        choice = show_menu(
             "📊 Analyze Properties",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        if choice is None or choice == "0":
             break
+        action = options[choice][1]
         if callable(action):
             action()
 

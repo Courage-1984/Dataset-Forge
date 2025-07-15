@@ -84,7 +84,6 @@ imagededup
 
 # getnative
 # ^ first install VapourSynth
-# Directory tree functionality
 
 # Unsorted/Ungrouped:
 

@@ -42,14 +42,15 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 
 ## 🖥️ Supported Platforms & Requirements
 
-- **Python**: 3.8+ (tested on 3.12)
-- **OS**: Windows (primary), Linux (partial support)
+- **Python**: 3.12+ (tested on 3.12)
+- **OS**: Windows (primary)
 - **CUDA**: 12.1+ (for GPU acceleration)
-- **cuDNN**: 8.9+ (for GPU acceleration, required for PyTorch CUDA)
+- **cuDNN**: 9.1+ (for GPU acceleration, required for PyTorch CUDA, tested on 9.1)
 - **RAM**: 8GB+ (16GB+ recommended for large datasets)
 - **Storage**: SSD recommended for faster I/O
 - **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
-- See [Requirements](docs/advanced.md#requirements) for full details.
+- **python-magic**: Requires special DLLs on Windows. See [Special Installation Instructions](docs/special_installation.md).
+- See [Requirements](docs/advanced.md#requirements) and [Special Installation Instructions](docs/special_installation.md) for full details.
 
 **Dependency Matrix:**
 
@@ -63,6 +64,7 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 
 > **IMPORTANT:** You must install the correct version of torch/torchvision/torchaudio for your CUDA version **before** running `pip install .`. If you skip this, pip will install the CPU-only version of torch by default. See the Quick Start below for the recommended command.
 > **IMPORTANT:** You must install VapourSynth before installing or using getnative. See the requirements.txt and docs for details.
+> **IMPORTANT:** On Windows, python-magic requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md).
 
 ---
 
@@ -83,6 +85,7 @@ It's designed to streamline the tedious work of preparing image datasets for tra
    ```
    > **Note:** If you use a different CUDA version, see https://pytorch.org/get-started/locally/ for the right install command.
    > **Note:** If you plan to use getnative, you must install VapourSynth before installing or using getnative. See requirements.txt and docs for details.
+   > **Note:** On Windows, python-magic requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md).
 3. **Run the application:**
    ```bash
    dataset-forge

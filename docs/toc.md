@@ -10,3 +10,4 @@
 - [Contributing](contributing.md)
 - [FAQ](faq.md)
 - [License](license.md)
+- [Special Installation Instructions](special_installation.md)

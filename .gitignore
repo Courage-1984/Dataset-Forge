@@ -68,3 +68,7 @@ example_uspscale
 
 ./.pytest_cache
 .pytest_cache
+
+./resdet
+resdet
+
