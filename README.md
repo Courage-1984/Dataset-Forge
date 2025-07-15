@@ -51,19 +51,19 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 - **cuDNN**: 9.1+ (for GPU acceleration, required for PyTorch CUDA, tested on 9.1)
 - **RAM**: 8GB+ (16GB+ recommended for large datasets)
 - **Storage**: SSD recommended for faster I/O
-
 - See [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
-
 - For GPU acceleration, ensure your CUDA and cuDNN versions match your PyTorch install. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
 - If you use a different CUDA/cuDNN version, install the matching PyTorch build.
+
 
 > **IMPORTANT:** You must install the correct version of torch/torchvision/torchaudio for your CUDA version **before** running `pip install .`. If you skip this, pip will install the CPU-only version of torch by default. See the Quick Start below for the recommended command.
 
 > **IMPORTANT:** On Windows, python-magic (required for 'Enhanced Directory Tree') requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md) for full details.
 
-> **IMPORTANT:** You must install VapourSynth before installing or using getnative. See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
+> **IMPORTANT:** You must install VapourSynth before installing or using [getnative](https://github.com/Infiziert90/getnative). See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
 
 > **IMPORTANT:** You must compile/buiild [resdet](https://github.com/0x09/resdet) first before using resdet. See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
+
 
 ---
 
