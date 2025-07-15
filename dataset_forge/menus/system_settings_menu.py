@@ -21,7 +21,7 @@ def user_profile_submenu():
         "1": ("👤 Profile Management", lambda: user_profile_menu()),
         "2": ("⭐ View/Edit Favorites & Presets", lambda: user_profile_menu()),
         "3": ("🚀 Manage Quick Access Paths", lambda: user_profile_menu()),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -50,7 +50,7 @@ def memory_management_submenu():
             "💡 Memory Optimization Recommendations",
             lambda: show_memory_optimization(),
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -115,7 +115,7 @@ def system_settings_menu():
         "5": ("📊 View Current Settings", view_settings),
         "6": ("⚡ Configure Parallel Processing", configure_parallel),
         "7": ("🔄 Reset Settings", reset_settings),
-        "0": ("⬅️ Back to Main Menu", None),
+        "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
         choice = show_menu(

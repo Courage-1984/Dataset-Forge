@@ -48,11 +48,11 @@ def main_menu():
                 ),
             ),
             "5": (
-                "🛠️ Utilities",
+                "🛠️  Utilities",
                 lazy_menu("dataset_forge.menus.utilities_menu", "utilities_menu"),
             ),
             "6": (
-                "⚙️ System & Settings",
+                "⚙️  System & Settings",
                 lazy_menu(
                     "dataset_forge.menus.system_settings_menu", "system_settings_menu"
                 ),

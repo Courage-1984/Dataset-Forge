@@ -11,7 +11,7 @@ from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
-def adjust_image(img, brightness=None, contrast=None, hue=None):
+def adjust_image(img, brightness=None, contrast=None, hue=None, saturation=None):
     # img: numpy array (BGR)
     if brightness is not None:
         pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
@@ -22,6 +22,11 @@ def adjust_image(img, brightness=None, contrast=None, hue=None):
         pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         enhancer = ImageEnhance.Contrast(pil_img)
         pil_img = enhancer.enhance(contrast)
+        img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
+    if saturation is not None:
+        pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        enhancer = ImageEnhance.Color(pil_img)
+        pil_img = enhancer.enhance(saturation)
         img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
     if hue is not None:
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -36,11 +41,15 @@ def process_folder(
     brightness=None,
     contrast=None,
     hue=None,
+    saturation=None,
     duplicates=1,
     real_name=False,
     paired_lq_folder=None,
     paired_output_lq_folder=None,
 ):
+    """
+    Process a folder of images, applying brightness, contrast, hue, and saturation adjustments.
+    """
     os.makedirs(output_folder, exist_ok=True)
     if paired_lq_folder and paired_output_lq_folder:
         os.makedirs(paired_output_lq_folder, exist_ok=True)
@@ -57,7 +66,7 @@ def process_folder(
             for f in os.listdir(input_folder)
             if is_image_file(f) and os.path.isfile(os.path.join(input_folder, f))
         ]
-    for filename in tqdm(files, desc="Hue/Brightness/Contrast Adjustment"):
+    for filename in tqdm(files, desc="Hue/Brightness/Contrast/Saturation Adjustment"):
         img_path = os.path.join(input_folder, filename)
         img = cv2.imread(img_path)
         if img is None:
@@ -74,6 +83,7 @@ def process_folder(
             b = brightness
             c = contrast
             h = hue
+            s = saturation
             if duplicates > 1:
                 if brightness is not None:
                     b = np.random.uniform(max(0.1, brightness - 0.2), brightness + 0.2)
@@ -81,9 +91,13 @@ def process_folder(
                     c = np.random.uniform(max(0.1, contrast - 0.2), contrast + 0.2)
                 if hue is not None:
                     h = np.random.randint(max(0, int(hue - 20)), int(hue + 20) + 1)
-            adj_img = adjust_image(img, brightness=b, contrast=c, hue=h)
+                if saturation is not None:
+                    s = np.random.uniform(max(0.1, saturation - 0.2), saturation + 0.2)
+            adj_img = adjust_image(img, brightness=b, contrast=c, hue=h, saturation=s)
             if paired_lq_folder and paired_output_lq_folder:
-                adj_lq_img = adjust_image(lq_img, brightness=b, contrast=c, hue=h)
+                adj_lq_img = adjust_image(
+                    lq_img, brightness=b, contrast=c, hue=h, saturation=s
+                )
             base, ext = os.path.splitext(filename)
             if real_name:
                 out_name = f"{base}_{i}{ext}" if duplicates > 1 else filename

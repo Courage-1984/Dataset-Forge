@@ -55,7 +55,7 @@ def openmodeldb_model_browser_menu():
                 "📥 List Downloaded Models",
                 lazy_action(__name__, "list_downloaded_models_menu"),
             ),
-            "0": ("🚪 Back to Previous Menu", None),
+            "0": ("⬅️  Back to Previous Menu", None),
         }
         choice = show_menu(
             "OpenModelDB Model Browser",
@@ -85,7 +85,7 @@ def search_filter_menu(models):
             "3": ("🔢 Filter by Scale", lambda: filter_by_scale(models)),
             "4": ("🔎 Free Text Search", lambda: filter_by_text(models)),
             "5": ("🧩 Advanced/Combined Filter", lambda: filter_advanced(models)),
-            "0": ("⬅️ Back", None),
+            "0": ("⬅️  Back", None),
         }
         choice = show_menu("Search/Filter Models", options, Mocha.lavender)
         if choice is None or choice == "0":

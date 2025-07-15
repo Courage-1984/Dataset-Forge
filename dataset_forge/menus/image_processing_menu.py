@@ -40,29 +40,19 @@ def lazy_action(module_path, func_name):
 
 def basic_transformations_menu():
     from dataset_forge.actions.transform_actions import (
-        downsample_images_menu,
-        hdr_to_sdr_menu,
-        dataset_colour_adjustment,
-        grayscale_conversion,
-        transform_dataset,
+        crop_image_menu,
+        flip_image_menu,
+        rotate_image_menu,
     )
-    from dataset_forge.actions.alpha_actions import remove_alpha_channels_menu
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
 
     options = {
-        "1": ("📉 Downsample Images", downsample_images_menu),
-        "2": ("🌅 Convert HDR to SDR", hdr_to_sdr_menu),
-        "3": (
-            "⚫ Convert to Grayscale",
-            require_hq_lq(
-                lambda: grayscale_conversion(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "4": ("🖼️ Remove Alpha Channel", remove_alpha_channels_menu),
-        "0": ("⬅️ Back", None),
+        "1": ("Crop Image", crop_image_menu),
+        "2": ("Flip Image", flip_image_menu),
+        "3": ("Rotate Image", rotate_image_menu),
+        "0": ("⬅️  Back", None),
     }
-
     while True:
         action = show_menu(
             "🔄 Basic Transformations",
@@ -74,33 +64,42 @@ def basic_transformations_menu():
             break
         if callable(action):
             action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
+        input("Press Enter to return to the menu...")
 
 
-def color_tone_adjustments_menu():
-    from dataset_forge.actions.transform_actions import dataset_colour_adjustment
+def not_implemented_menu():
+    from dataset_forge.utils.printing import print_warning
+
+    print_warning("This feature is not implemented yet.")
+    input("Press Enter to return to the menu...")
+
+
+def colour_tone_levels_menu():
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
+    from dataset_forge.actions.image_ops import (
+        convert_hdr_to_sdr_menu,
+        convert_to_grayscale_menu,
+    )
+    from dataset_forge.menus.color_adjustment_menu import (
+        brightness_adjustment_menu,
+        contrast_adjustment_menu,
+        hue_adjustment_menu,
+        saturation_adjustment_menu,
+    )
 
     options = {
-        "1": (
-            "🎨 General Color/Tone Adjustments",
-            require_hq_lq(
-                lambda: dataset_colour_adjustment(
-                    session_state.hq_folder, session_state.lq_folder
-                )
-            ),
-        ),
-        "2": (
-            "🌈 Hue/Brightness/Contrast",
-            lazy_action(
-                "dataset_forge.menus.hue_adjustment_menu", "hue_adjustment_menu"
-            ),
-        ),
-        "0": ("⬅️ Back", None),
+        "1": ("Adjust Brightness", brightness_adjustment_menu),
+        "2": ("Adjust Contrast", contrast_adjustment_menu),
+        "3": ("Adjust Hue", hue_adjustment_menu),
+        "4": ("Adjust Saturation (Not implemented)", saturation_adjustment_menu),
+        "5": ("Convert HDR to SDR", convert_hdr_to_sdr_menu),
+        "6": ("Convert to Grayscale", convert_to_grayscale_menu),
+        "0": ("⬅️  Back", None),
     }
     while True:
         action = show_menu(
-            "🎨 Color & Tone Adjustments",
+            "🎨 Colour, Tone & Levels Adjustments",
             options,
             header_color=Mocha.sapphire,
             char="-",
@@ -109,8 +108,25 @@ def color_tone_adjustments_menu():
             break
         if callable(action):
             action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
+        input("Press Enter to return to the menu...")
+
+
+def degradations_menu():
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
+
+    options = {
+        "0": ("⬅️  Back", None),
+    }
+    while True:
+        action = show_menu(
+            "🧪 Degradations (Coming Soon)",
+            options,
+            header_color=Mocha.sapphire,
+            char="-",
+        )
+        if action is None or action == "0":
+            break
 
 
 def metadata_menu():
@@ -128,7 +144,7 @@ def metadata_menu():
             "🎯 Convert ICC Profile to sRGB",
             lazy_action("dataset_forge.actions.metadata_actions", "icc_to_srgb_menu"),
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
     while True:
         action = show_menu(
@@ -198,30 +214,32 @@ def extract_sketches_menu():
 
 
 def image_processing_menu():
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
+
     options = {
-        "1": (
-            "🔄 Basic Transformations",
-            lazy_action(__name__, "basic_transformations_menu"),
-        ),
-        "2": (
-            "🎨 Color & Tone Adjustments",
-            lazy_action(__name__, "color_tone_adjustments_menu"),
-        ),
-        "3": ("📋 Metadata", lazy_action(__name__, "metadata_menu")),
+        "1": ("🔄 Basic Transformations", basic_transformations_menu),
+        "2": ("🎨 Colour, Tone & Levels Adjustments", colour_tone_levels_menu),
+        "3": ("🧪 Degradations", degradations_menu),
         "4": (
             "🚀 Augmentation",
             lazy_action("dataset_forge.menus.augmentation_menu", "augmentation_menu"),
         ),
         "5": (
-            "✏️ FIND & EXTRACT SKETCHES/DRAWINGS/LINE ART",
-            lazy_action(__name__, "extract_sketches_menu"),
+            "📋 Metadata",
+            lazy_action("dataset_forge.menus.metadata_menu", "metadata_menu"),
         ),
-        "0": ("⬅️ Back to Main Menu", None),
+        "6": (
+            "✏️  FIND & EXTRACT SKETCHES/DRAWINGS/LINE ART",
+            lazy_action(
+                "dataset_forge.menus.sketch_extraction_menu", "sketch_extraction_menu"
+            ),
+        ),
+        "0": ("⬅️  Back to Main Menu", None),
     }
-
     while True:
         choice = show_menu(
-            "Image Processing Menu",
+            "✨ Image Processing & Augmentation",
             options,
             header_color=Mocha.lavender,
             char="=",

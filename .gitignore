@@ -30,6 +30,11 @@ configs/*
 !configs/_example_community_links.json
 !configs/_example_user_profile.json
 
+# Augmentation recipes
+configs/augmentation_recipes/*
+!configs/augmentation_recipes/_example_advanced_recipe_template.json
+!configs/augmentation_recipes/_example_basic_flip_rotate.json
+
 # User-specific config files
 configs/test_config.json
 configs/user_profile_active.txt
@@ -71,4 +76,7 @@ example_uspscale
 
 ./resdet
 resdet
+
+./wtp_dataset_destroyer
+wtp_dataset_destroyer
 

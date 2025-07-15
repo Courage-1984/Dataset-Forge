@@ -1,6 +1,10 @@
 import os
+import sys
 
-DOCS_DIR = "docs"
+# Always resolve docs/ relative to the project root (parent of this script)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir))
+DOCS_DIR = os.path.join(PROJECT_ROOT, "docs")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "README_full.md")
 
 # Order of files to merge (edit as needed)

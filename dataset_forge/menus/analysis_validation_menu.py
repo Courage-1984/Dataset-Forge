@@ -142,7 +142,7 @@ def comprehensive_validation_menu():
         "1": ("🔍 Run Comprehensive Validation Suite", progressive_validation_workflow),
         "2": ("📊 Generate Detailed Report (HTML/Markdown)", rich_reports_workflow),
         "3": ("⭐ Automated Dataset Quality Scoring", quality_scoring_workflow),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -231,7 +231,7 @@ def find_fix_issues_menu():
         "2": ("🔍 Find Misaligned Image Pairs", find_misaligned_workflow),
         "3": ("🎯 Find Outliers & Anomalies", find_outliers_workflow),
         "4": ("🖼️ Find Images with Alpha Channel", find_alpha_channels_menu),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -328,7 +328,7 @@ def analyze_properties_menu():
         input_type_options = {
             "1": ("📁 Folder (HQ/LQ)", "folder"),
             "2": ("🖼️ Single Image", "image"),
-            "0": ("🚪 Back", None),
+            "0": ("⬅️  Back", None),
         }
         while True:
             input_type = show_menu(
@@ -372,7 +372,7 @@ def analyze_properties_menu():
         method_options = {
             "1": ("🧪 getnative (VapourSynth, Python)", "getnative"),
             "2": ("⚡ resdet (C binary, fast)", "resdet"),
-            "0": ("🚪 Back", None),
+            "0": ("⬅️  Back", None),
         }
         while True:
             method = show_menu(
@@ -416,7 +416,7 @@ def analyze_properties_menu():
         "4": ("📏 Report Image Dimensions", report_dimensions_workflow),
         "5": ("🎯 Find Native Resolution", find_native_resolution_workflow),
         "6": ("⭐ BHI Filtering Analysis", lazy_action(__name__, "bhi_filtering_menu")),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -445,12 +445,12 @@ def analysis_validation_menu():
             "🧪 Analyze Properties",
             lazy_action(__name__, "analyze_properties_menu"),
         ),
-        "0": ("⬅️ Back to Main Menu", None),
+        "0": ("⬅️  Back to Main Menu", None),
     }
 
     while True:
         choice = show_menu(
-            "Analysis & Validation Menu",
+            "🔍 Analysis & Validation",
             options,
             header_color=Mocha.lavender,
             char="=",

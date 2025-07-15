@@ -40,3 +40,14 @@ This document covers advanced usage, configuration, and developer patterns for D
 ---
 
 For user workflows and feature summaries, see [features.md](features.md). For code style and requirements, see [style_guide.md](style_guide.md).
+
+
+## CBIR (Content-Based Image Retrieval) for Duplicates
+
+- **Semantic Duplicate Detection**: Uses deep learning embeddings (CLIP, ResNet, VGG) to find images that are conceptually similar, even if visually transformed.
+- **Feature Extraction**: Extracts high-dimensional feature vectors for each image using a pre-trained CNN (CLIP preferred, fallback to ResNet/VGG).
+- **Similarity Search**: Computes cosine similarity or Euclidean distance between embeddings to identify near-duplicates.
+- **ANN Indexing**: Uses approximate nearest neighbor (ANN) indexing for efficient search in large datasets.
+- **Grouping & Actions**: Clusters images by semantic similarity and provides user options to find, remove, move, or copy duplicate groups.
+- **GPU Acceleration**: Leverages GPU for fast embedding extraction and search.
+- **Menu Integration**: Accessible from the Clean & Organize submenu under Dataset Management.

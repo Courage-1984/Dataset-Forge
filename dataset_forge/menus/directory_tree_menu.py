@@ -2780,7 +2780,7 @@ def directory_tree_menu():
         "6": ("📈 Enhanced Statistics Analysis", enhanced_statistics_analysis),
         "7": ("📦 Batch Export Analysis", batch_export_analysis),
         "8": ("🔍 Advanced Insights Analysis", advanced_insights_analysis),
-        "0": ("⬅️ Back to Main Menu", None),
+        "0": ("⬅️  Back to Main Menu", None),
     }
 
     while True:

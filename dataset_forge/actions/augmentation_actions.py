@@ -13,6 +13,7 @@ from dataset_forge.utils.parallel_utils import (
 from dataset_forge.menus.session_state import parallel_config, user_preferences
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all
+import json
 
 
 # Augmentation functions
@@ -142,6 +143,68 @@ AUGMENTATION_RECIPES = {
         # Mixup is handled specially in the pipeline
     ],
 }
+
+AUGMENTATION_FUNCTIONS = {
+    "random_crop": random_crop,
+    "random_flip": random_flip,
+    "random_rotation": random_rotation,
+    "random_brightness": random_brightness,
+    "random_contrast": random_contrast,
+    "random_saturation": random_saturation,
+    "random_noise": random_noise,
+    "random_blur": random_blur,
+    "mixup": mixup,
+}
+
+
+def load_json_augmentation_recipe(recipe_name: str) -> list:
+    """
+    Load a JSON augmentation recipe from ./configs/augmentation_recipes/ and convert it to a list of (function, params) tuples.
+
+    Args:
+        recipe_name: The filename of the recipe (e.g., 'basic_flip_rotate.json')
+
+    Returns:
+        List of (function, params) tuples for the augmentation pipeline.
+
+    Raises:
+        FileNotFoundError: If the recipe file does not exist.
+        ValueError: If the recipe contains unsupported operations.
+
+    Supported operations:
+        - random_crop
+        - random_flip
+        - random_rotation
+        - random_brightness
+        - random_contrast
+        - random_saturation
+        - random_noise
+        - random_blur
+        - mixup
+    """
+    import os
+
+    recipe_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            "../../configs",
+            "augmentation_recipes",
+            recipe_name,
+        )
+    )
+    if not os.path.isfile(recipe_path):
+        raise FileNotFoundError(f"Recipe file not found: {recipe_path}")
+    with open(recipe_path, "r", encoding="utf-8") as f:
+        recipe_json = json.load(f)
+    pipeline = []
+    for step in recipe_json:
+        op_name = step.get("operation")
+        params = step.get("params", {})
+        func = AUGMENTATION_FUNCTIONS.get(op_name)
+        if not func:
+            raise ValueError(f"Unsupported operation in recipe: {op_name}")
+        pipeline.append((func, params))
+    return pipeline
 
 
 @monitor_all("augment_single_image")

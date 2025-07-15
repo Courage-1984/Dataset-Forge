@@ -11,16 +11,16 @@ def training_inference_menu():
         options = {
             "1": ("📝 Add Training/Inference Config", None),
             "2": ("📂 Load Config", None),
-            "3": ("ℹ️ View Config Info", None),
+            "3": ("ℹ️  View Config Info", None),
             "4": ("✅ Validate HQ/LQ Dataset", None),
             "5": ("✅ Validate Val Dataset", None),
-            "6": ("🛠️ Run wtp_dataset_destroyer", None),
+            "6": ("🛠️  Run wtp_dataset_destroyer", None),
             "7": ("🚀 Run traiNNer-redux", None),
-            "8": ("✏️ Edit .hcl Config File", None),
-            "9": ("✏️ Edit .yml Config File", None),
+            "8": ("✏️  Edit .hcl Config File", None),
+            "9": ("✏️  Edit .yml Config File", None),
             "10": ("📋 List/Upscale with Model", None),
             "11": ("🧠 OpenModelDB Model Browser", openmodeldb_model_browser_mode_menu),
-            "0": ("⬅️ Back to Main Menu", None),
+            "0": ("⬅️  Back to Main Menu", None),
         }
         choice = show_menu(
             "🚀 Training & Inference",
@@ -44,7 +44,7 @@ def openmodeldb_model_browser_mode_menu():
             "🖱️ CLI-interactive (modern, live search)",
             openmodeldb_model_browser_cli_interactive,
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
     while True:
         choice = show_menu(

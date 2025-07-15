@@ -24,13 +24,13 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 **Troubleshooting:**
 
 - Mismatched CUDA/cuDNN versions will cause import errors or no GPU support.
-- See [requirements](advanced.md#requirements) and [PyTorch docs](https://pytorch.org/get-started/locally/).
+- See [requirements.txt](../requirements.txt) and [PyTorch docs](https://pytorch.org/get-started/locally/).
 
 ---
 
-## 2. VapourSynth & getnative (for getnative functionality)
+## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality)
 
-**VapourSynth must be installed _before_ getnative.**
+**VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
 **Steps (Windows):**
 
@@ -38,9 +38,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 2. Open a terminal and run:
 
 ```bat
-vsrepo.py install descale
-vsrepo.py install ffms2
-vsrepo.py install lsmas
+py vsrepo.py install descale
+py vsrepo.py install ffms2
+py vsrepo.py install lsmas
 ```
 
 3. Activate your virtual environment:
@@ -59,8 +59,9 @@ pip install getnative
 
 **Troubleshooting:**
 
-- If getnative fails to import, check that VapourSynth is installed and on your PATH.
 - Install VapourSynth _before_ getnative or any requirements that depend on it.
+- If getnative fails to import, check that VapourSynth is installed and on your PATH.
+- Also make sure directory containing `vsrepo.py` and the plugin's folder containing the `.dll`s are also on your PATH.
 
 ---
 
@@ -73,6 +74,7 @@ pip install getnative
 1. Install the packages:
 
 ```bat
+venv312\Scripts\activate
 pip install python-magic python-magic-bin libmagic
 ```
 
@@ -82,7 +84,7 @@ pip install python-magic python-magic-bin libmagic
    - `magic.mgc`
    - `magic1.dll`
 
-   (These are prebuilt for 64-bit Windows. See [libmagicwin64](https://github.com/pidydx/libmagicwin64) for details.)
+   (These are prebuilt for 64-bit Windows. See source: [libmagicwin64](https://github.com/pidydx/libmagicwin64) for details.)
 
 3. When using python-magic, specify the magic file path if needed:
 
@@ -98,9 +100,32 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## Installing and Using resdet for Native Resolution Detection
+## Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
 
-### Windows (MSYS2 MINGW64 Shell)
+### Method 1: Windows (WSL - Recommended for CLI Integration)
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/0x09/resdet.git
+   cd resdet
+   ```
+2. Build resdet:
+   ```sh
+   cd path/to/resdet
+   make clean
+   ./configure
+   make
+   ```
+3. Install resdet to your WSL PATH:
+   ```sh
+   sudo cp resdet /usr/local/bin/
+   sudo chmod +x /usr/local/bin/resdet
+   # Or, to use make install:
+   sudo make install
+   ```
+4. **Note:** The Dataset Forge CLI will automatically use WSL to run resdet on Windows. Ensure resdet is available in your WSL environment's PATH.
+
+### Method 2: Windows (MSYS2 MINGW64 Shell)
 
 1. Clone the repository:
    ```sh
@@ -117,47 +142,12 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 5. Build resdet:
    ```sh
+   cd path/to/resdet
    make clean
    ./configure --prefix=/mingw64
    make
    ```
 6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
-
-### Windows (WSL - Recommended for CLI Integration)
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/0x09/resdet.git
-   cd resdet
-   ```
-2. Build resdet:
-   ```sh
-   ./configure
-   make
-   ```
-3. Install resdet to your WSL PATH:
-   ```sh
-   sudo cp resdet /usr/local/bin/
-   sudo chmod +x /usr/local/bin/resdet
-   # Or, to use make install:
-   sudo make install
-   ```
-4. **Note:** The Dataset Forge CLI will automatically use WSL to run resdet on Windows. Ensure resdet is available in your WSL environment's PATH.
-
-### Linux
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/0x09/resdet.git
-   cd resdet
-   ```
-2. Install dependencies (see resdet README for your distro).
-3. Build and install:
-   ```sh
-   ./configure
-   make
-   sudo make install
-   ```
 
 ### Usage in Dataset Forge
 
@@ -167,15 +157,4 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## Summary Table
-
-| Dependency   | Install Order | Windows Notes                                     | Docs/Links                                            |
-| ------------ | ------------- | ------------------------------------------------- | ----------------------------------------------------- |
-| torch (CUDA) | 1             | Use correct CUDA version, install before all else | [PyTorch](https://pytorch.org/get-started/locally/)   |
-| VapourSynth  | 2             | Install before getnative, add to PATH             | [VapourSynth](http://www.vapoursynth.com/)            |
-| getnative    | 3             | Only after VapourSynth                            | [getnative](https://github.com/Infiziert90/getnative) |
-| python-magic | 4             | Install DLLs to System32                          | [python-magic](https://github.com/ahupp/python-magic) |
-
----
-
-For more details, see the [main README](../README.md) and [troubleshooting guide](troubleshooting.md).
+For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).

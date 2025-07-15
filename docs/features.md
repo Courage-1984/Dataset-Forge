@@ -2,50 +2,46 @@
 
 # Features
 
-## Core & Configuration
+## ⚙️ Core & Configuration
 
-- **Multi-format config support**: JSON, YAML, HCL
-- **External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
-- **Model management**: List, select, and run upscaling with trained models
-- **Validation tools**: Validate HQ/LQ and validation datasets from config
-- **Built-in config editors** for .hcl and .yml files
-- **User profiles**: Save favorites, presets, and quick access paths
+- **🔧 External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux), [getnative](https://github.com/Infiziert90/getnative), [resdet](https://github.com/0x09/resdet)
+- **📦 Model management**: List, select, download and run upscaling with trained models (also [OpenModelDB](https://openmodeldb.info/) integration)
+- **✅ Validation tools**: Validate HQ/LQ pairs and validation datasets from config
+- **👤 User profiles**: Save favorites, presets, links and quick access paths
+- **⚙️ Multi-format config support**: JSON, YAML, HCL
 
-## Dataset Management
+## 📂 Dataset Management
 
-- **Dataset Creation**: Multiscale dataset generation (DPID), video frame extraction, image tiling
-- **Dataset Operations**: Combine, split, extract random pairs, shuffle datasets
-- **HQ/LQ Pair Management**: Manual pairing, fuzzy matching, scale correction
-- **Clean & Organize**: Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, batch renaming
-- **Orientation Organization**: Sort by landscape/portrait/square
-- **Size Filtering**: Remove small/invalid image pairs
+- **🎯 Dataset Creation**: Multiscale dataset generation (DPID), video frame extraction, image tiling
+- **🔗 Dataset Operations**: Combine, split, extract random pairs, shuffle datasets, remove/move
+- **🔍 HQ/LQ Pair Management**: Create/Correct Manual Pairings, fuzzy matching, scale correction, shuffle, extract random pairs
+- **🧹 Clean & Organize**: De-dupe (Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, CBIR (Semantic Duplicate Detection)), batch renaming
+- **🔄 Orientation Organization**: Sort by landscape/portrait/square
+- **📏 Size Filtering**: Remove small/invalid image pairs
 
-## Analysis & Validation
+## 🔍 Analysis & Validation
 
-- **Comprehensive Validation**: Progressive dataset validation suite
-- **Rich Reporting**: HTML/Markdown reports with plots and sample images
-- **Quality Scoring**: Automated dataset quality assessment (NIQE, etc.)
-- **Issue Detection**: Corruption detection, misalignment detection, outlier detection
-- **Property Analysis**: Consistency checks, aspect ratio testing, dimension reporting
-- **BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment
-- **Scale Detection**: Find and test HQ/LQ scale relationships
+- **🔍 Comprehensive Validation**: Progressive dataset validation suite
+- **📊 Rich Reporting**: HTML/Markdown reports with plots and sample images
+- **⭐ Quality Scoring**: Automated dataset quality assessment (NIQE, etc.)
+- **🔧 Issue Detection**: Corruption detection, misalignment detection, outlier detection. alpha channel detection
+- **🧪 Property Analysis**: Consistency checks, aspect ratio testing, dimension reporting
+- **⭐ BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment
+- **🔍 Scale Detection**: Find and test HQ/LQ scale relationships
+- **🎯 Find Native Resolution**: Find image native resolution using [getnative](https://github.com/Infiziert90/getnative) or [resdet](https://github.com/0x09/resdet)
 
-## Image Processing & Augmentation
+## ✨ Image Processing & Augmentation
+
+- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, remove alpha channel
 
 - **Augmentation**: Flip, rotate, crop, color jitter, random erasing, and more
-- **Tiling**: IC9600 and custom tiling for large images
-- **Alpha Channel Handling**: Remove, preserve, or process alpha channels
 - **Batch Processing**: Efficient batch operations for large datasets
 
-## CBIR (Content-Based Image Retrieval) for Duplicates
 
-- **Semantic Duplicate Detection**: Uses deep learning embeddings (CLIP, ResNet, VGG) to find images that are conceptually similar, even if visually transformed.
-- **Feature Extraction**: Extracts high-dimensional feature vectors for each image using a pre-trained CNN (CLIP preferred, fallback to ResNet/VGG).
-- **Similarity Search**: Computes cosine similarity or Euclidean distance between embeddings to identify near-duplicates.
-- **ANN Indexing**: Uses approximate nearest neighbor (ANN) indexing for efficient search in large datasets.
-- **Grouping & Actions**: Clusters images by semantic similarity and provides user options to find, remove, move, or copy duplicate groups.
-- **GPU Acceleration**: Leverages GPU for fast embedding extraction and search.
-- **Menu Integration**: Accessible from the Clean & Organize submenu under Dataset Management.
+
+
+- **Tiling**: IC9600 and custom tiling for large images
+
 
 ## Monitoring, Analytics & Error Tracking
 

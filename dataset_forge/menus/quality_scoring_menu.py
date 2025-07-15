@@ -1,6 +1,6 @@
 from dataset_forge.utils.input_utils import get_path_with_history
 from dataset_forge.utils.printing import print_info, print_success, print_error
-from dataset_forge.utils.menu import show_menu
+from dataset_forge.utils.menu import show_menu, lazy_action
 from dataset_forge.utils.color import Mocha
 
 

@@ -46,7 +46,7 @@ def dataset_creation_menu():
             dataset_actions.extract_frames_from_video,
         ),
         "3": ("🧩 Image Tiling", dataset_actions.image_tiling),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -80,7 +80,7 @@ def combine_split_menu():
     options = {
         "1": ("🔗 Combine Multiple Datasets", dataset_actions.combine_datasets),
         "2": ("✂️ Split and Adjust Dataset", split_adjust_dataset_menu),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -124,7 +124,7 @@ def hq_lq_pairs_menu():
         ),
         "3": ("🎲 Extract Random Pairs", extract_random_pairs),
         "4": ("🔄 Shuffle Image Pairs", shuffle_image_pairs),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -266,7 +266,7 @@ def clean_organize_menu():
 
     options = {
         "1": (
-            "👁️ Visual De-duplication (Duplicates & Near-Duplicates)",
+            "👁️  Visual De-duplication (Duplicates & Near-Duplicates)",
             lazy_menu("dataset_forge.menus.visual_dedup_menu", "visual_dedup_menu"),
         ),
         "2": ("🔐 De-Duplicate (File Hash)", dedupe_menu),
@@ -278,13 +278,13 @@ def clean_organize_menu():
             "🧠 CBIR (Semantic Duplicate Detection)",
             lazy_menu("dataset_forge.menus.cbir_menu", "cbir_menu"),
         ),
-        "5": ("✏️ Batch Rename", batch_rename_menu),
+        "5": ("✏️  Batch Rename", batch_rename_menu),
         "6": ("📏 Remove Image Pairs by Size", remove_small_pairs),
         "7": (
             "🔄 Organize by Orientation (Landscape/Portrait/Square)",
             organize_by_orientation,
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     while True:
@@ -314,7 +314,7 @@ def dataset_management_menu():
         ),
         "3": ("🔗 Manage HQ/LQ Pairs", lazy_action(__name__, "hq_lq_pairs_menu")),
         "4": ("🧹 Clean & Organize", lazy_action(__name__, "clean_organize_menu")),
-        "0": ("⬅️ Back to Main Menu", None),
+        "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
         choice = show_menu(

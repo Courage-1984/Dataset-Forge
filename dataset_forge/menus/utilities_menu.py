@@ -41,7 +41,7 @@ def lazy_action(module_path, func_name):
 def utilities_menu():
     options = {
         "1": (
-            "🖼️ Create Comparison Images (Side-by-side)",
+            "🖼️  Create Comparison Images (Side-by-side)",
             require_hq_lq(
                 lazy_action(
                     "dataset_forge.actions.comparison_actions",
@@ -64,7 +64,7 @@ def utilities_menu():
             ),
         ),
         "4": (
-            "🗜️ Compress Images",
+            "🗜️  Compress Images",
             lazy_action("dataset_forge.menus.compress_menu", "compress_menu"),
         ),
         "5": (
@@ -84,7 +84,7 @@ def utilities_menu():
                 "dataset_forge.menus.directory_tree_menu", "directory_tree_menu"
             ),
         ),
-        "0": ("⬅️ Back to Main Menu", None),
+        "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
         choice = show_menu(
