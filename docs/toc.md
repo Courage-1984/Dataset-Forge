@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Features](features.md)
+- [Special Installation Instructions](special_installation.md)
 - [Usage Guide](usage.md)
 - [Advanced Features & Configuration](advanced.md)
 - [Project Architecture](architecture.md)
@@ -10,4 +11,3 @@
 - [Contributing](contributing.md)
 - [FAQ](faq.md)
 - [License](license.md)
-- [Special Installation Instructions](special_installation.md)

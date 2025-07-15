@@ -3,9 +3,11 @@
 </h3>
 <p align="center">
   <img src="https://pomf2.lain.la/f/2ulflln.png" width="300" alt="Dataset Forge Thumbnail"/>
+    <!-- <img src="https://files.catbox.moe/9jaag6.png" width="300" alt="Dataset Forge Thumbnail Backup"/> -->
 </p>
 <div align="center">
   <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="600" alt="Separator"/>
+    <!-- <img src="https://files.catbox.moe/0fyb8o.png" width="600" alt="Separator Backup"/> -->
 </div>
 
 <p align="center"><i>The all-in-one, modular image dataset utility for ML, with a focus on HQ/LQ image pairs for SISR and general computer vision. CLI-first, highly extensible, and packed with advanced tools for dataset curation, analysis, transformation, and validation.</i></p>
@@ -14,20 +16,21 @@
 
 ## What is Dataset Forge?
 
-**Dataset Forge** is a Python command-line tool for managing image datasets used in machine learning. It helps researchers and data scientists:
+**Dataset Forge** is a Python command-line tool for managing image datasets used in machine learning, espescially for SISR. It helps researchers and data scientists:
 
 - Clean and organize image datasets (especially high/low quality pairs for super-resolution)
 - Analyze dataset quality and generate reports
 - Process, augment, and transform images
 - Remove duplicates and validate data
 
-It's designed to streamline the tedious work of preparing image datasets for training ML models, with an intuitive interface and robust processing capabilities.
+It's designed to streamline the tedious work of preparing image datasets for training ML models, with an intuitive interface and robust processing capabilities. Please see [Features](docs/features.md).
 
 ---
 
 ## 📖 Documentation Links
 
 - [Features](docs/features.md)
+- [Special Installation Instructions](docs/special_installation.md)
 - [Usage Guide](docs/usage.md)
 - [Advanced Features & Configuration](docs/advanced.md)
 - [Project Architecture](docs/architecture.md)
@@ -48,34 +51,33 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 - **cuDNN**: 9.1+ (for GPU acceleration, required for PyTorch CUDA, tested on 9.1)
 - **RAM**: 8GB+ (16GB+ recommended for large datasets)
 - **Storage**: SSD recommended for faster I/O
-- **VapourSynth**: Required for getnative functionality. **You must install VapourSynth before installing or using getnative.**
-- **python-magic**: Requires special DLLs on Windows. See [Special Installation Instructions](docs/special_installation.md).
-- See [Requirements](docs/advanced.md#requirements) and [Special Installation Instructions](docs/special_installation.md) for full details.
 
-**Dependency Matrix:**
-
-| Python | CUDA Toolkit | cuDNN | PyTorch | OS      |
-| ------ | ------------ | ----- | ------- | ------- |
-| 3.12   | 12.1         | 8.9+  | 2.2.0+  | Windows |
-| 3.8+   | 11.8/12.1    | 8.6+  | 2.0.0+  | Linux   |
+- See [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
 
 - For GPU acceleration, ensure your CUDA and cuDNN versions match your PyTorch install. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
 - If you use a different CUDA/cuDNN version, install the matching PyTorch build.
 
 > **IMPORTANT:** You must install the correct version of torch/torchvision/torchaudio for your CUDA version **before** running `pip install .`. If you skip this, pip will install the CPU-only version of torch by default. See the Quick Start below for the recommended command.
-> **IMPORTANT:** You must install VapourSynth before installing or using getnative. See the requirements.txt and docs for details.
-> **IMPORTANT:** On Windows, python-magic requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md).
+
+> **IMPORTANT:** On Windows, python-magic (required for 'Enhanced Directory Tree') requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md) for full details.
+
+> **IMPORTANT:** You must install VapourSynth before installing or using getnative. See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
+
+> **IMPORTANT:** You must compile/buiild [resdet](https://github.com/0x09/resdet) first before using resdet. See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
 
 ---
 
 ## 🚀 Quick Start
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/Courage-1984/Dataset-Forge.git
    cd Dataset-Forge
    ```
+
 2. **Set up the environment:**
+
    ```bash
    py -3.12 -m venv venv312
    venv312\Scripts\activate
@@ -83,9 +85,9 @@ It's designed to streamline the tedious work of preparing image datasets for tra
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
    pip install .
    ```
+
    > **Note:** If you use a different CUDA version, see https://pytorch.org/get-started/locally/ for the right install command.
-   > **Note:** If you plan to use getnative, you must install VapourSynth before installing or using getnative. See requirements.txt and docs for details.
-   > **Note:** On Windows, python-magic requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md).
+
 3. **Run the application:**
    ```bash
    dataset-forge

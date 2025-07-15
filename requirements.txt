@@ -79,12 +79,18 @@ gdown
 imagededup
 
 # =============================
+# Testing
+# =============================
+
+pytest
+
+# =============================
 # Optional/External Tools
 # =============================
 
 # getnative
-# ^ first install VapourSynth
+# ^ first install VapourSynth. See [Special Installation Instructions](docs/special_installation.md) for details.
 
-# Unsorted/Ungrouped:
+# resdet
+# ^ See [Special Installation Instructions](docs/special_installation.md) for details.
 
-pytest
