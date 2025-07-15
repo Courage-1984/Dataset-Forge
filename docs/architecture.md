@@ -2,33 +2,28 @@
 
 # Project Architecture
 
-(Include the full "Modular Architecture" and "Project Structure" sections from the original README here, preserving formatting and navigation.)
+Dataset Forge is built with a modular, extensible architecture for maintainability and performance.
 
-## Monitoring & Analytics Architecture
+## Directory Structure
 
-- **dataset_forge/utils/monitoring.py**: Centralized resource monitoring, analytics, error tracking, health checks, and background task registry. Provides decorators and context managers for integration with all action modules. Handles persistent logging and notifications.
-- **dataset_forge/menus/system_monitoring_menu.py**: CLI menu for live resource usage, analytics, error summaries, health checks, and background task management. Integrates with monitoring.py and is accessible from the main menu.
+- **menus/**: UI layer (CLI menus, user interaction)
+- **actions/**: Business logic (core dataset/image operations)
+- **utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
+- **dpid/**: Multiple DPID (degradation) implementations
+- **configs/**: Example and user configuration files
+- **reports/**: Report templates for HTML/Markdown output
 
-All major operations in actions/ are instrumented with monitoring/analytics hooks, and memory/CUDA cleanup is integrated throughout the app lifecycle.
+## Monitoring & Analytics
 
-## Audio Error Feedback
+- Centralized resource monitoring, analytics, error tracking, health checks, and background task registry (see utils/monitoring.py).
+- CLI menu for live resource usage, analytics, error summaries, health checks, and background task management (see menus/system_monitoring_menu.py).
+- Persistent logging and notifications for all major operations.
 
-The CLI interface now provides audio error feedback: whenever an error is reported to the user (via print_error), an error sound (error.mp3) is played for immediate feedback. This is handled by the centralized print_error utility in utils/printing.py, which calls play_error_sound from utils/audio_utils.py.
+## Test Suite Integration
+
+- Comprehensive automated test suite using pytest.
+- Covers CLI, menu timing, error feedback, memory, parallelism, and file/image utilities.
 
 ---
 
-## Menu System, Robust Loop, and Timing
-
-The menu system uses a robust loop pattern and integrates timing/profiling for all menu and submenu loads. This ensures reliability and performance.
-
-## Content-Based Image Retrieval (CBIR)
-
-CBIR is integrated as a modular component for semantic duplicate detection.
-
-## Monitoring, Analytics & Error Tracking
-
-Monitoring and analytics are integrated throughout the architecture for performance and error tracking.
-
-## Test Suite
-
-The test suite is integrated to cover all major architectural components.
+For coding standards and best practices, see [style_guide.md](style_guide.md).

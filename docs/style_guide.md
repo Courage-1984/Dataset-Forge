@@ -2,36 +2,7 @@
 
 # Dataset Forge Style Guide
 
-Welcome to the official style and coding standards guide for Dataset Forge. All contributors **must** follow these guidelines to ensure code quality, maintainability, and a consistent user experience.
-
----
-
-## Table of Contents
-
-- [General Principles](#general-principles)
-- [Project Architecture](#project-architecture)
-- [Coding Standards](#coding-standards)
-- [Import Organization](#import-organization)
-- [Memory Management](#memory-management)
-- [Parallel Processing](#parallel-processing)
-- [Progress Tracking & User Feedback](#progress-tracking--user-feedback)
-- [Color Scheme & UI](#color-scheme--ui)
-- [Menu System](#menu-system)
-- [Input Handling](#input-handling)
-- [File Operations](#file-operations)
-- [Image Processing](#image-processing)
-- [Logging & Error Handling](#logging--error-handling)
-- [Session State & Configuration](#session-state--configuration)
-- [DPID (Degradation) Patterns](#dpid-degradation-patterns)
-- [Audio & User Feedback](#audio--user-feedback)
-- [Testing & Validation](#testing--validation)
-- [Performance Optimization](#performance-optimization)
-- [Error Handling & Recovery](#error-handling--recovery)
-- [Documentation Requirements](#documentation-requirements)
-- [Security Considerations](#security-considerations)
-- [Dependency Management](#dependency-management)
-- [Git Ignore Patterns](#git-ignore-patterns)
-- [Final Reminders](#final-reminders)
+This guide defines the coding standards, architecture, and best practices for Dataset Forge contributors. For user-facing features and workflows, see [features.md](features.md) and [usage.md](usage.md).
 
 ---
 
@@ -46,33 +17,27 @@ Welcome to the official style and coding standards guide for Dataset Forge. All 
 
 ## Project Architecture
 
-- See [Project Architecture](architecture.md) for directory structure and modularity.
 - Keep UI, logic, and utilities separate.
 - Use thin UI layers (menus), business logic in actions, helpers in utils.
 
 ## Coding Standards
 
-- PEP 8, 4-space indent, 88-char lines.
 - Use type hints everywhere.
-- Google-style docstrings (see below).
+- Google-style docstrings for all public functions/classes.
 - Example:
 
 ```python
 def process_images(image_paths: List[str], output_dir: str) -> List[str]:
     """
     Process a list of images and save results to output directory.
-
     Args:
         image_paths: List of input image file paths
         output_dir: Directory to save processed images
-
     Returns:
         List of output image file paths
-
     Raises:
         FileNotFoundError: If input files don't exist
         PermissionError: If output directory is not writable
-
     Example:
         >>> paths = process_images(['img1.jpg', 'img2.png'], 'output/')
         >>> print(f"Processed {len(paths)} images")
@@ -118,6 +83,17 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 - Use `show_menu()` from `dataset_forge.utils.menu`.
 - Include emojis in menu options.
 - Handle `KeyboardInterrupt` and `EOFError` gracefully.
+- Use the robust menu loop pattern (see code example below):
+
+```python
+while True:
+    choice = show_menu("Menu Title", options, ...)
+    if choice is None or choice == "0":
+        break
+    action = options[choice][1]
+    if callable(action):
+        action()
+```
 
 ## Input Handling
 
@@ -237,41 +213,3 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 ---
 
 For questions, see [Contributing](contributing.md) or ask the project maintainer.
-
----
-
-## Menu Timing & Profiling: Best Practices
-
-- All new menus and submenus must use the `time_and_record_menu_load` utility from `utils/monitoring.py` to time and record menu loads.
-- Use the `lazy_action()` and `lazy_menu()` helpers to ensure lazy imports and proper timing.
-- Timing prints must use the Catppuccin Mocha color scheme for consistency and clarity.
-- Do not print raw analytics logs to the console; only user-facing timing prints should be shown.
-- Ensure that "Back" and "Exit" options do not trigger timing prints or errors.
-- Document any new timing/profiling features in the appropriate docs/ files and README_full.md.
-
-## Robust Menu Loop Pattern (Required)
-
-- All menus and submenus must use the robust menu loop pattern:
-  - Get the user's choice (key) from `show_menu`.
-  - Look up the action in the options dictionary.
-  - Call the action if callable.
-- This is required for reliability and maintainability.
-- Always use the Catppuccin Mocha color scheme for menu headers and prompts.
-- Integrate timing/profiling as described in the relevant sections.
-
-## CBIR Code Style
-
-- Follow modular design: separate menu (cbir_menu.py) and actions (cbir_actions.py)
-- Use robust error handling and logging for all file operations
-- Integrate memory management (memory_context, auto_cleanup)
-- Use parallel processing (smart_map, batch_map) for efficiency
-- Provide clear user feedback and progress tracking
-
-## Test Code Style & Best Practices
-
-- Use pytest for all automated tests.
-- Use fixtures for temp files, directories, and configs.
-- Use monkeypatching/mocking for audio, error feedback, and subprocesses.
-- Ensure tests are robust on Windows (file locks, Unicode, etc.).
-- Add tests for new features and bugfixes.
-- See [advanced.md](advanced.md#test-suite--best-practices) for more.

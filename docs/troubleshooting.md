@@ -2,58 +2,43 @@
 
 # Troubleshooting
 
-(Include the full "Troubleshooting" section from the original README here, preserving formatting and navigation.)
+This guide provides solutions to common issues in Dataset Forge. For advanced usage and developer troubleshooting, see [advanced.md](advanced.md).
 
 ---
 
-## Troubleshooting: Menu Timing & Profiling
+## Menu Timing & Profiling Issues
 
 **Problem:** Timing prints do not appear after loading a menu or submenu.
 
 - Ensure you are running the latest version of Dataset Forge.
-- Check that the menu or submenu uses the `time_and_record_menu_load` utility (see `utils/monitoring.py`).
-- Make sure you are not selecting a "Back" or "Exit" option, which do not trigger timing prints.
-
-**Problem:** Errors occur when navigating menus (e.g., `TypeError: 'str' object is not callable`).
-
-- This usually means a menu action is not callable. All menu loops should check if the action is callable before calling it.
-- Update your menu code to follow the latest menu loop pattern (see `docs/style_guide.md`).
-
-If issues persist, consult the documentation or contact the project maintainer.
+- Check that the menu or submenu uses the `time_and_record_menu_load` utility.
+- "Back" and "Exit" options do not trigger timing prints.
 
 ## Menu Loop Issues
 
-If you encounter a menu that redraws repeatedly or a submenu that does not appear:
+**Problem:** Errors occur when navigating menus (e.g., `TypeError: 'str' object is not callable`).
+
+- All menu loops should check if the action is callable before calling it.
+- Update your menu code to follow the robust menu loop pattern (see [style_guide.md](style_guide.md)).
+
+**Problem:** Menu redraws repeatedly or submenus do not appear.
 
 - Ensure the menu loop uses the robust pattern:
   - Get the user's choice (key) from `show_menu`.
   - Look up the action in the options dictionary.
   - Call the action if callable.
-- This resolves most navigation and invocation issues in the CLI.
 
 ## CBIR Troubleshooting
 
-- **Model loading errors**: Ensure torch, torchvision, and timm are installed and match your CUDA version. See requirements and install instructions.
+- **Model loading errors**: Ensure torch, torchvision, and timm are installed and match your CUDA version.
 - **GPU out of memory**: Lower the batch size or use CPU fallback. Close other GPU-intensive applications.
 - **Slow performance**: Use GPU if available. For very large datasets, increase system RAM or process in smaller batches.
-- **CLIP/ResNet/VGG not found**: Check requirements.txt and reinstall dependencies.
 
-## Troubleshooting Test Issues
+## Other Issues
 
-- **UnicodeEncodeError**: Set PYTHONIOENCODING=utf-8 in your environment or subprocess.
-- **PermissionError on file deletion (Windows)**: Ensure files are closed before deleting; move os.unlink outside with blocks.
-- **Monkeypatching not working**: Patch the function in the namespace where it is used, not just where it is defined.
-- **Multiprocessing pickling errors**: Use top-level functions, not lambdas or closures, for functions passed to process pools.
-- **Manual/script tests not running**: Run them directly with python, not via pytest.
-
-## VapourSynth/getnative and CUDA/torch Install Order
-
-If you encounter issues with getnative, ensure VapourSynth is installed first. For CUDA acceleration, install the correct CUDA-enabled torch/torchvision/torchaudio before running `pip install .`.
-
-## Troubleshooting Menu Timing, Robust Loop, CBIR, Monitoring, and Test Suite
-
-- If menu timing prints do not appear, check your CLI environment and ensure the latest version is installed.
-- If robust menu navigation fails, ensure you are using the latest code and that all dependencies are installed.
-- For CBIR issues, verify that all required deep learning models are installed and that your GPU drivers are up to date.
 - For monitoring/analytics issues, check the logs in the ./logs/ directory.
 - If tests fail, ensure your environment matches the requirements and all dependencies are installed.
+
+---
+
+For further help, see [usage.md](usage.md) or contact the project maintainer.
