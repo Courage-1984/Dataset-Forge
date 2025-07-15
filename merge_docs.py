@@ -6,6 +6,7 @@ OUTPUT_FILE = os.path.join(DOCS_DIR, "README_full.md")
 # Order of files to merge (edit as needed)
 DOC_ORDER = [
     "features.md",
+    "special_installation.md",
     "usage.md",
     "advanced.md",
     "architecture.md",
@@ -26,6 +27,7 @@ NAV_LINKS = (
 TOC = (
     "# Table of Contents\n\n"
     "- [Features](features.md)\n"
+    "- [Special Installation Instructions](special_installation.md)\n"
     "- [Usage Guide](usage.md)\n"
     "- [Advanced Features & Configuration](advanced.md)\n"
     "- [Project Architecture](architecture.md)\n"
