@@ -94,3 +94,11 @@ pytest
 # resdet
 # ^ See [Special Installation Instructions](docs/special_installation.md) for details.
 
+# =============================
+# Unsorted
+# =============================
+
+dataset-support
+tqdm
+python-hcl2
+colour-science

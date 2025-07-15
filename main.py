@@ -18,8 +18,19 @@ import sys
 # All functionality is now organized in the new hierarchical menu structure
 # See MENU_RESTRUCTURE_SUMMARY.md for details on the new organization
 
+shutdown_sound_played = False
+
 
 def _sigint_handler(signum, frame):
+    global shutdown_sound_played
+    # Play shutdown sound on Ctrl+C (blocking)
+    try:
+        from dataset_forge.utils.audio_utils import play_shutdown_sound
+
+        play_shutdown_sound(block=True)
+        shutdown_sound_played = True
+    except Exception:
+        pass
     try:
         from dataset_forge.utils.memory_utils import clear_memory
 
@@ -75,6 +86,15 @@ if __name__ == "__main__":
             from dataset_forge.menus.main_menu import main_menu
         main_menu()
     finally:
+        # Play shutdown sound on normal exit (blocking), unless already played
+        if not shutdown_sound_played:
+            try:
+                from dataset_forge.utils.audio_utils import play_shutdown_sound
+
+                play_shutdown_sound(block=True)
+                shutdown_sound_played = True
+            except Exception:
+                pass
         # Cleanup memory on exit
         try:
             from dataset_forge.utils.memory_utils import clear_memory

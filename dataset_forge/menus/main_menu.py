@@ -2,6 +2,7 @@ import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils import monitoring
+from dataset_forge.utils.audio_utils import play_startup_sound
 
 # Helper for lazy importing submenu modules
 # This returns a function that, when called, imports and calls the submenu
@@ -18,6 +19,8 @@ def lazy_menu(module_name: str, func_name: str):
 
 
 def main_menu():
+    # Play startup sound once per session
+    play_startup_sound(block=False)
     while True:
         options = {
             "1": (

@@ -3,6 +3,7 @@ import platform
 import subprocess
 import threading
 from pathlib import Path
+from dataset_forge.menus.session_state import user_preferences
 
 # Try to import audio libraries, with fallbacks
 try:
@@ -184,3 +185,45 @@ def play_error_sound(block=False):
     error_audio_path = project_root / "assets" / "error.mp3"
     player = AudioPlayer(audio_file_path=error_audio_path)
     player.play_audio(block=block)
+
+
+def play_startup_sound(block=False):
+    """
+    Play the startup sound asynchronously if audio is enabled in user preferences.
+
+    Args:
+        block: If True, block until audio finishes. If False, play asynchronously.
+    """
+    if not user_preferences.get("play_audio", True):
+        return
+    try:
+        current_dir = Path(__file__).parent  # utils directory
+        project_root = current_dir.parent.parent  # project root
+        startup_audio_path = project_root / "assets" / "startup.mp3"
+        if not startup_audio_path.exists():
+            return
+        player = AudioPlayer(audio_file_path=startup_audio_path)
+        player.play_audio(block=block)
+    except Exception:
+        pass
+
+
+def play_shutdown_sound(block=False):
+    """
+    Play the shutdown sound asynchronously if audio is enabled in user preferences.
+
+    Args:
+        block: If True, block until audio finishes. If False, play asynchronously.
+    """
+    if not user_preferences.get("play_audio", True):
+        return
+    try:
+        current_dir = Path(__file__).parent  # utils directory
+        project_root = current_dir.parent.parent  # project root
+        shutdown_audio_path = project_root / "assets" / "shutdown.mp3"
+        if not shutdown_audio_path.exists():
+            return
+        player = AudioPlayer(audio_file_path=shutdown_audio_path)
+        player.play_audio(block=block)
+    except Exception:
+        pass
