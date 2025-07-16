@@ -1,5 +1,5 @@
 {
-    "Models": [
+    "Model Hubs": [
         {
             "name": "OpenModelDB",
             "url": "https://openmodeldb.info/"
@@ -23,41 +23,129 @@
         {
             "name": "umzi's Models",
             "url": "https://drive.google.com/drive/folders/17RtFq-yojENWReibAvOmcaBxTZ_iDvuL?usp=sharing"
+        },
+        {
+            "name": "Hugging Face Model Hub",
+            "url": "https://huggingface.co/models"
+        },
+        {
+            "name": "TensorFlow Hub",
+            "url": "https://tfhub.dev/"
+        },
+        {
+            "name": "ONNX Model Zoo",
+            "url": "https://github.com/onnx/models"
         }
     ],
-    "Datasets": [
-        {
-            "name": "Phhofm's Datasets List",
-            "url": "https://github.com/Phhofm/sisr/tree/main/datasets/dataset_list"
-        },
-        {
-            "name": "OpenModelDB's Datasets",
-            "url": "https://openmodeldb.info/docs/training/datasets"
-        }
-    ],
-    "Dataset Manipulation": [
-        {
-            "name": "Dietz's Dataset Forge",
-            "url": "https://github.com/Courage-1984/Dataset-Forge"
-        },
-        {
-            "name": "umzi2's Dataset_Preprocessing",
-            "url": "https://github.com/umzi2/Dataset_Preprocessing"
-        },
-        {
-            "name": "umzi2's WTP Dataset Destroyer",
-            "url": "https://github.com/umzi2/wtp_dataset_destroyer"
-        },
-        {
-            "name": "Kim2091's helpful-scripts",
-            "url": "https://github.com/Kim2091/helpful-scripts"
-        },
-        {
-            "name": "Phhofm's sisr",
-            "url": "https://github.com/Phhofm/sisr"
-        }
-    ],
-    "Software": [
+    "Datasets": {
+        "Curated Lists": [
+            {
+                "name": "Phhofm's Datasets List",
+                "url": "https://github.com/Phhofm/sisr/tree/main/datasets/dataset_list"
+            },
+            {
+                "name": "OpenModelDB's Datasets",
+                "url": "https://openmodeldb.info/docs/training/datasets"
+            },
+            {
+                "name": "Awesome Public Datasets",
+                "url": "https://github.com/awesomedata/awesome-public-datasets"
+            }
+        ],
+        "Dataset Repositories": [
+            {
+                "name": "ImageNet",
+                "url": "https://www.image-net.org/"
+            },
+            {
+                "name": "DIV2K",
+                "url": "https://data.vision.ee.ethz.ch/cvl/DIV2K/"
+            },
+            {
+                "name": "COCO Dataset",
+                "url": "https://cocodataset.org/"
+            },
+            {
+                "name": "Open Images Dataset",
+                "url": "https://storage.googleapis.com/openimages/web/index.html"
+            }
+        ],
+        "Dataset Search Engines": [
+            {
+                "name": "Papers with Code Datasets",
+                "url": "https://paperswithcode.com/datasets"
+            },
+            {
+                "name": "Kaggle Datasets",
+                "url": "https://www.kaggle.com/datasets"
+            },
+            {
+                "name": "VisualData (Dataset Finder)",
+                "url": "https://visualdata.io/discovery"
+            },
+            {
+                "name": "Google Dataset Search",
+                "url": "https://datasetsearch.research.google.com/"
+            }
+        ]
+    },
+    "Dataset Tools": {
+        "Forge & Preprocessing": [
+            {
+                "name": "Dietz's Dataset Forge",
+                "url": "https://github.com/Courage-1984/Dataset-Forge"
+            },
+            {
+                "name": "umzi2's Dataset_Preprocessing",
+                "url": "https://github.com/umzi2/Dataset_Preprocessing"
+            },
+            {
+                "name": "umzi2's WTP Dataset Destroyer",
+                "url": "https://github.com/umzi2/wtp_dataset_destroyer"
+            },
+            {
+                "name": "Kim2091's helpful-scripts",
+                "url": "https://github.com/Kim2091/helpful-scripts"
+            },
+            {
+                "name": "Phhofm's sisr",
+                "url": "https://github.com/Phhofm/sisr"
+            }
+        ],
+        "Annotation & Labeling": [
+            {
+                "name": "Label Studio",
+                "url": "https://labelstud.io/"
+            },
+            {
+                "name": "MakeSense.ai (Free annotation tool)",
+                "url": "https://www.makesense.ai/"
+            },
+            {
+                "name": "SuperAnnotate",
+                "url": "https://www.superannotate.com/"
+            },
+            {
+                "name": "VIA (VGG Image Annotator)",
+                "url": "https://www.robots.ox.ac.uk/~vgg/software/via/"
+            },
+            {
+                "name": "CVAT (Computer Vision Annotation Tool)",
+                "url": "https://www.cvat.ai/"
+            },
+            {
+                "name": "LabelImg",
+                "url": "https://github.com/tzutalin/labelImg"
+            }
+        ],
+        "Visualization & Management": [
+            {
+                "name": "FiftyOne",
+                "url": "https://voxel51.com/fiftyone"
+            }
+        ]
+    },
+    "Software & Frameworks": [
         {
             "name": "traiNNer-redux",
             "url": "https://github.com/the-database/traiNNer-redux"
@@ -69,44 +157,112 @@
         {
             "name": "the-database's img-ab",
             "url": "https://github.com/the-database/img-ab"
+        },
+        {
+            "name": "Roboflow",
+            "url": "https://roboflow.com/"
+        }
+    ],
+    "Learning & Tutorials": [
+        {
+            "name": "Practical Deep Learning",
+            "url": "https://course.fast.ai/"
+        },
+        {
+            "name": "PyImageSearch",
+            "url": "https://pyimagesearch.com/"
+        },
+        {
+            "name": "Machine Learning Mastery",
+            "url": "https://machinelearningmastery.com/"
+        },
+        {
+            "name": "Deep Learning Weekly (Newsletter)",
+            "url": "https://www.deeplearningweekly.com/"
+        },
+        {
+            "name": "Kaggle Learn",
+            "url": "https://www.kaggle.com/learn"
+        },
+        {
+            "name": "Coursera Computer Vision",
+            "url": "https://www.coursera.org/specializations/computer-vision"
+        },
+        {
+            "name": "Stanford CS231n: Convolutional Neural Networks for Visual Recognition",
+            "url": "http://cs231n.stanford.edu/"
+        }
+    ],
+    "Benchmarks & Leaderboards": [
+        {
+            "name": "Super-Resolution Benchmarks",
+            "url": "https://paperswithcode.com/task/image-super-resolution"
+        }
+    ],
+    "Communities & Forums": [
+        {
+            "name": "Upscale Discord Community",
+            "url": "https://discord.gg/cpAUpDK"
+        },
+        {
+            "name": "Open Data Science Community",
+            "url": "https://ods.ai/"
+        }
+    ],
+    "Conferences & Journals": [
+        {
+            "name": "ECCV (European Conference on Computer Vision)",
+            "url": "https://eccv2024.ecva.net/"
+        },
+        {
+            "name": "ICCV (International Conference on Computer Vision)",
+            "url": "https://iccv2023.thecvf.com/"
         }
     ],
     "General Resources": [
-        {
-            "OpenModelDB Documentation": [
-                {
-                    "name": "Documentation",
-                    "url": "https://openmodeldb.info/docs/contributing/documentation"
-                },
-                {
-                    "name": "Frequently asked questions",
-                    "url": "https://openmodeldb.info/docs/faq"
-                },
-                {
-                    "name": "Licenses",
-                    "url": "https://openmodeldb.info/docs/licenses"
-                },
-                {
-                    "name": "Contributing",
-                    "url": "https://openmodeldb.info/docs/contributing"
-                },
-                {
-                    "name": "Contributing - Models",
-                    "url": "https://openmodeldb.info/docs/contributing/models"
-                },
-                {
-                    "name": "Contributing - Documentation",
-                    "url": "https://openmodeldb.info/docs/contributing/documentation"
-                }
-            ]
-        },
         {
             "name": "Upscale Resources",
             "url": "https://github.com/Upscale-Community/upscale-resources"
         },
         {
-            "name": "Upscale Discord Community",
-            "url": "https://discord.gg/cpAUpDK"
+            "name": "Awesome-Super-Resolution",
+            "url": "https://github.com/ChaofWang/Awesome-Super-Resolution"
+        },
+        {
+            "name": "Awesome Deep learning papers and other resources",
+            "url": "https://github.com/endymecy/awesome-deeplearning-resources"
+        },
+        {
+            "name": "AI Image Colorization Results",
+            "url": "https://github.com/Courage-1984/ai-image-colorization-results"
+        },
+        {
+            "name": "AI Background Removal Results",
+            "url": "https://github.com/Courage-1984/AI-Background-Removal-Results"
+        },
+        {
+            "name": "OpenModelDB Documentation",
+            "url": "https://openmodeldb.info/docs/contributing/documentation"
+        },
+        {
+            "name": "OpenModelDB FAQ",
+            "url": "https://openmodeldb.info/docs/faq"
+        },
+        {
+            "name": "OpenModelDB Licenses",
+            "url": "https://openmodeldb.info/docs/licenses"
+        },
+        {
+            "name": "OpenModelDB Contributing",
+            "url": "https://openmodeldb.info/docs/contributing"
+        },
+        {
+            "name": "OpenModelDB Contributing - Models",
+            "url": "https://openmodeldb.info/docs/contributing/models"
+        },
+        {
+            "name": "OpenModelDB Contributing - Documentation",
+            "url": "https://openmodeldb.info/docs/contributing/documentation"
         }
     ]
 }
