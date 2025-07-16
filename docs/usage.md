@@ -176,3 +176,88 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
 > **Badges:** Standard badges (build, license, Python version, etc.) are included in the README. See the README for their meaning.
+
+# 🛠️ Utility Scripts (tools/)
+
+This section documents the user-facing utility scripts in the `tools/` directory. These scripts assist with code quality, documentation, environment setup, and troubleshooting.
+
+## find_code_issues.py: Static Analysis Tool
+
+A comprehensive static analysis tool for maintainers and contributors.
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Purpose:** Checks for dead code, untested code, missing docstrings, test/code mapping, and more.
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Options:**
+  - `--vulture` Run vulture for dead code
+  - `--coverage` Run pytest-cov for coverage
+  - `--callgraph` Run pyan3 for call graph analysis
+  - `--pyflakes` Run pyflakes for unused imports/variables
+  - `--test-mapping` Check test/code correspondence
+  - `--ast` AST: Find defined but never called functions/classes
+  - `--all` Run all analyses (default)
+  - `--view` View detailed results for each analysis after run
+  - `-h, --help` Show help
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+- **Troubleshooting:**
+  - Ensure all dependencies are installed.
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure.
+  - Review the log file for detailed error messages.
+
+## merge_docs.py: Documentation Merging Tool
+
+- **Location:** `tools/merge_docs.py`
+- **Purpose:** Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`).
+- **How to run:**
+  ```sh
+  python tools/merge_docs.py
+  ```
+- **Output:**
+  - `docs/README_full.md` (merged documentation)
+  - `docs/toc.md` (hierarchical Table of Contents)
+- **Troubleshooting:**
+  - Ensure all documentation files exist and are readable.
+  - If you see missing file warnings, check the `DOC_ORDER` list in the script.
+
+## install.py: Environment Setup Tool
+
+- **Location:** `tools/install.py`
+- **Purpose:** Automated environment setup. Creates a virtual environment, installs CUDA-enabled torch, and all project requirements.
+- **How to run:**
+  ```sh
+  python tools/install.py
+  ```
+- **What it does:**
+  - Checks Python version (requires 3.12+)
+  - Creates `venv312` if not present
+  - Installs torch/torchvision/torchaudio with CUDA 12.1 support
+  - Installs all project requirements
+- **Troubleshooting:**
+  - If Python version is too low, upgrade Python.
+  - If CUDA-enabled torch fails, check your CUDA version and use the correct index URL.
+  - If pip install fails, check your internet connection and permissions.
+
+## print_zsteg_env.py: zsteg Environment Check
+
+- **Location:** `tools/print_zsteg_env.py`
+- **Purpose:** Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration.
+- **How to run:**
+  ```sh
+  python tools/print_zsteg_env.py
+  ```
+- **Output:**
+  - Prints the current PATH and the path to `zsteg` (if found) to the console.
+- **Troubleshooting:**
+  - If `zsteg` is not found, ensure it is installed and in your PATH.
+  - On Windows, you may need to restart your terminal after adding to PATH.

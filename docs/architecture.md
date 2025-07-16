@@ -18,8 +18,11 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **assets/**: Any asset files required
 - **docs/**: Project documentation
 - **tests/**: Unit & integration tests
-- **tools/**: Project tools and developer utilities (e.g., static analysis, documentation merging)
+- **tools/**: Project tools and developer/user utilities (e.g., static analysis, documentation merging, environment setup, troubleshooting)
   - **find_code_issues/find_code_issues.py**: Static analysis and code quality tool for maintainers. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. Outputs actionable reports to the same directory.
+  - **merge_docs.py**: Merges all documentation files in docs/ into a single README_full.md and generates a hierarchical Table of Contents (toc.md).
+  - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements.
+  - **print_zsteg_env.py**: Prints the current PATH and the location of the zsteg binary for troubleshooting steganography tool integration.
 
 ## Mermaid Architecture Diagram (Detailed)
 

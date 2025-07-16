@@ -32,6 +32,7 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 ## 📖 Documentation Links
 
 - [Features](docs/features.md)
+- [Utility Scripts (tools/)](docs/features.md#️-utility-scripts-tools)
 - [Special Installation Instructions](docs/special_installation.md)
 - [Usage Guide](docs/usage.md)
 - [Advanced Features & Configuration](docs/advanced.md)
@@ -42,35 +43,6 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 - [FAQ](docs/faq.md)
 - [Changelog](docs/changelog.md)
 - [License](docs/license.md)
-
----
-
-## 🧑‍💻 Static Analysis & Code Quality
-
-Dataset Forge includes a comprehensive static analysis tool for maintainers and contributors:
-
-- **Location:** `tools/find_code_issues/find_code_issues.py`
-- **Checks:**
-  - Unused (dead) code, functions, classes, and methods
-  - Untested code (missing test coverage)
-  - Functions/classes defined but never called
-  - Test/code mapping (tests without code, code without tests)
-  - Missing docstrings in public functions/classes/methods
-  - Unused imports/variables, and more
-- **How to run:**
-  ```sh
-  python tools/find_code_issues/find_code_issues.py [options]
-  # Run with no options to perform all checks
-  ```
-- **Output:**
-  - Overwrites files in `tools/find_code_issues/` on each run:
-    - `find_code_issues.log` (raw output)
-    - `find_code_issues_report.txt` (actionable summary)
-    - `find_code_issues_view.txt` (detailed results)
-- **Requirements:**
-  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-
-See [docs/usage.md](docs/usage.md) and [docs/features.md](docs/features.md) for details.
 
 ---
 
@@ -128,6 +100,23 @@ See [docs/usage.md](docs/usage.md) and [docs/features.md](docs/features.md) for 
 
 ---
 
+## 📝 TODO / Planned Features
+
+This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place.
+
+- [ ] Debug Mode: I want to add a *Debug Mode* to my project, which when used, activates the showing of more verbose output and debug output/print
+- [ ] tl;dr: Create a '# Features (tl;dr)' section in ./docs/features.md
+- [ ] *Packaging*: "Compile Dataset-Forge" AND/OR "Create docker file/container"
+- [ ] Augmentation: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
+- [ ] Dataset Health Scoring: Add a "Dataset Health Scoring" workflow and menu option
+- [ ] Batch Scripts: Save and replay complex multi-step operations/workflows
+
+- [ ] Example: Improve error reporting for Example workflows
+
+<!-- Add your TODOs and feature ideas below -->
+
+---
+
 ## 💜 Credits
 
 - Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
@@ -152,6 +141,8 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
   <a href="https://img.shields.io/github/stars/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/stars/Courage-1984/Dataset-Forge" alt="Stars"></a>
   <a href="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge" alt="Last Commit"></a>
 </p>
+
+# VERBOSE:
 
 ## 🧪 Comprehensive Test Suite
 
@@ -200,3 +191,31 @@ flowchart TD
     J --> D
     J --> L
 ```
+---
+
+## 🧑‍💻 Static Analysis & Code Quality
+
+Dataset Forge includes a comprehensive static analysis tool for maintainers and contributors:
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+See [docs/usage.md](docs/usage.md) and [docs/features.md](docs/features.md) for details.

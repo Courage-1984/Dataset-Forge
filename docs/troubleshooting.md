@@ -90,4 +90,42 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 
 ---
 
+## Utility Scripts (tools/) Troubleshooting
+
+### find_code_issues.py
+
+- **Problem:** Script fails to run, or you get unexpected results.
+  - Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure and that the codebase is present.
+  - The script overwrites its output files in `tools/find_code_issues/` on each run.
+  - Review the log file (`find_code_issues.log`) for detailed error messages.
+
+### merge_docs.py
+
+- **Problem:** Documentation files are missing or not merged.
+  - Ensure all documentation files exist and are readable.
+  - If you see missing file warnings, check the `DOC_ORDER` list in the script.
+  - If output files are not updated, check file permissions in the docs/ directory.
+
+### install.py
+
+- **Problem:** Python version is too low.
+  - Upgrade to Python 3.12+.
+- **Problem:** CUDA-enabled torch fails to install.
+  - Check your CUDA version and use the correct index URL for torch.
+- **Problem:** pip install fails.
+  - Check your internet connection and permissions.
+  - Try running the command as administrator or with sudo (Linux/Mac).
+
+### print_zsteg_env.py
+
+- **Problem:** `zsteg` is not found.
+  - Ensure `zsteg` is installed and in your PATH.
+  - On Windows, you may need to restart your terminal after adding to PATH.
+- **Problem:** PATH is not updated.
+  - Double-check your environment variable settings and restart your terminal.
+
+---
+
 For further help, see [usage.md](usage.md) or contact the project maintainer.

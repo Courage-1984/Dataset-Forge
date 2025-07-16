@@ -100,6 +100,26 @@ Dataset Forge includes a comprehensive static analysis tool for code quality and
 
 Review the actionable report and detailed results before submitting code or documentation changes.
 
+## 🛠️ Advanced: Utility Scripts (tools/)
+
+### Extending find_code_issues.py
+
+- The static analysis tool is modular and can be extended to add new checks or output formats.
+- To add a new analysis, define a new function and add it to the main() dispatcher.
+- Output files are overwritten on each run; see the script for extension points.
+- Review the actionable report and detailed results before submitting code or documentation changes.
+
+### Extending merge_docs.py
+
+- The documentation merging tool uses a configurable DOC_ORDER list to determine which files to merge and in what order.
+- To add a new documentation file, update DOC_ORDER and ensure navigation links are consistent.
+- The script parses headings to build a hierarchical Table of Contents.
+
+### Adding New Utility Scripts
+
+- All new user-facing scripts in tools/ must be documented in features.md and usage.md, and kept up to date.
+- Add troubleshooting entries for new scripts in troubleshooting.md as needed.
+
 ## ⚡ Caching System: Technical Details (NEW July 2025)
 
 Dataset Forge uses a hybrid caching system for performance:
