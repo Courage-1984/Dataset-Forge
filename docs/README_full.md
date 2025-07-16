@@ -1,5 +1,6 @@
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
+
 # Dataset Forge Full Documentation
 
 ---
@@ -23,6 +24,8 @@
   - [Testing & Validation](features.md#testing--validation)
   - [🧑‍💻 Developer Tools: Static Analysis & Code Quality](features.md#-developer-tools-static-analysis--code-quality)
   - [🛠️ Utility Scripts (tools/)](features.md#-utility-scripts-tools)
+- [🩺 Dataset Health Scoring (NEW July 2025)](features.md#-dataset-health-scoring-new-july-2025)
+- [🔊 Project Sounds & Audio Feedback](features.md#-project-sounds--audio-feedback)
 - [Special Installation Instructions](special_installation.md)
   - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
   - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
@@ -37,6 +40,7 @@
     - [Method 2: Windows (Chocolatey)](special_installation.md#method-2-windows-chocolatey)
 - [Usage Guide](usage.md)
   - [🚀 Quick Start](usage.md#-quick-start)
+  - [🔊 Project Sounds & Audio Feedback](usage.md#-project-sounds--audio-feedback)
   - [👣 Main Workflows](usage.md#-main-workflows)
     - [Dataset Management](usage.md#dataset-management)
     - [Align Images (Batch Projective Alignment)](usage.md#align-images-batch-projective-alignment)
@@ -51,11 +55,12 @@
     - [🧹 Sanitize Images (NEW July 2025)](usage.md#-sanitize-images-new-july-2025)
     - [🗂️ Enhanced Metadata Management (NEW July 2025)](usage.md#-enhanced-metadata-management-new-july-2025)
 - [🛠️ Utility Scripts (tools/)](usage.md#-utility-scripts-tools)
+  - [run_tests.py: Flexible Test Runner (NEW July 2025)](usage.md#runtestspy-flexible-test-runner-new-july-2025)
   - [find_code_issues.py: Static Analysis Tool](usage.md#findcodeissuespy-static-analysis-tool)
   - [merge_docs.py: Documentation Merging Tool](usage.md#mergedocspy-documentation-merging-tool)
   - [install.py: Environment Setup Tool](usage.md#installpy-environment-setup-tool)
   - [print_zsteg_env.py: zsteg Environment Check](usage.md#printzstegenvpy-zsteg-environment-check)
-  - [run_tests.py: Flexible Test Runner (NEW July 2025)](usage.md#run_tests.py-flexible-test-runner-new-july-2025)
+  - [🩺 Using Dataset Health Scoring](usage.md#-using-dataset-health-scoring)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
@@ -79,6 +84,7 @@
   - [Test Suite Integration](architecture.md#test-suite-integration)
     - [Testing & Quality Assurance (Updated July 2025)](architecture.md#testing--quality-assurance-updated-july-2025)
     - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
+    - [Dataset Health Scoring Workflow](architecture.md#dataset-health-scoring-workflow)
   - [Menu Integration](architecture.md#menu-integration)
 - [Troubleshooting](troubleshooting.md)
   - [Dependancy & Library Issues](troubleshooting.md#dependancy--library-issues)
@@ -94,7 +100,6 @@
     - [merge_docs.py](troubleshooting.md#mergedocspy)
     - [install.py](troubleshooting.md#installpy)
     - [print_zsteg_env.py](troubleshooting.md#printzstegenvpy)
-    - [run_tests.py](troubleshooting.md#run_tests.py)
 - [Dataset Forge Style Guide](style_guide.md)
   - [General Principles](style_guide.md#general-principles)
   - [Project Architecture](style_guide.md#project-architecture)
@@ -140,22 +145,25 @@
   - [Doc Maintenance](contributing.md#doc-maintenance)
   - [Static Analysis & Code Quality (NEW)](contributing.md#static-analysis--code-quality-new)
 - [Frequently Asked Questions (FAQ)](faq.md)
-  - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
-  - [What platforms are supported?](faq.md#what-platforms-are-supported)
-  - [What Python version is required?](faq.md#what-python-version-is-required)
-  - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
-  - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
-  - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
-  - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
-  - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
-  - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
-  - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
-  - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
+    - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
+    - [What platforms are supported?](faq.md#what-platforms-are-supported)
+    - [What Python version is required?](faq.md#what-python-version-is-required)
+    - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
+    - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
+    - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
+    - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
+    - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
+    - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
+    - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
+    - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
 - [License](license.md)
+
 
 ---
 
+
 # Features
+
 
 # Features (tl;dr)
 
@@ -280,6 +288,16 @@ Dataset Forge now includes a robust, cross-platform test suite covering all majo
 - Audio feedback, memory, parallel, and progress utilities
 - Session state, config, and error handling
 
+**Run all tests:**
+
+You can now use the flexible test runner script for convenience:
+
+```sh
+python tools/run_tests.py
+```
+
+This script provides a menu to select the test mode, or you can pass an option (see below). See [usage.md](usage.md#🦾-running-the-test-suite) for details.
+
 **Test suite highlights:**
 
 - All features have public, non-interactive APIs for programmatic access and testing.
@@ -328,17 +346,80 @@ See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-pat
 
 Dataset Forge includes several utility scripts in the `tools/` directory to assist with development, documentation, and environment setup. These scripts are user-facing and documented in detail in [usage.md](usage.md#utility-scripts-tools).
 
+- **run_tests.py**: Flexible test runner for the test suite. Lets you choose between basic, recommended, and verbose pytest runs via menu or CLI argument. See [usage.md](usage.md#run_testspy-flexible-test-runner-new-july-2025) for usage and options.
 - **find_code_issues.py**: Comprehensive static analysis tool for code quality and maintainability. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. See [usage.md](usage.md#find_code_issuespy-static-analysis-tool) for full usage and options.
 - **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
 - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
 - **print_zsteg_env.py**: Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration. See [usage.md](usage.md#print_zsteg_envpy-zsteg-environment-check).
-- **run_tests.py**: Flexible test runner for running the test suite with multiple options and interactive menu. See [usage.md](usage.md#run_tests.py-flexible-test-runner-new-july-2025) for full usage and options.
 
 For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
 
+# 🩺 Dataset Health Scoring (NEW July 2025)
+
+**Location:** Dataset Management menu → 🩺 Dataset Health Scoring
+
+**Purpose:**
+
+- Assess the overall health and readiness of an image dataset for ML workflows.
+- Supports both single-folder datasets and HQ/LQ parent folder structures (for super-resolution and paired tasks).
+
+**Workflow:**
+
+- User selects either a single folder or an HQ/LQ parent folder (auto-detects or prompts for HQ/LQ subfolders).
+- Runs a series of modular checks:
+  - Basic validation (file existence, supported formats, min count)
+  - Unreadable/corrupt files
+  - Image format consistency
+  - Quality metrics (resolution, blur, etc.)
+  - Aspect ratio consistency
+  - File size outliers
+  - Consistency checks (duplicates, naming, alignment)
+  - Compliance scan (metadata, forbidden content)
+- Each check is weighted; partial credit is possible.
+- Shows a detailed breakdown of results, a final health score (0–100), and a status (✅ Production Ready, ⚠️ Needs Improvement, ❌ Unusable).
+- Provides actionable suggestions for improvement if any step fails.
+
+**Extensibility:**
+
+- Checks are modular; new steps can be added easily.
+- Scoring weights and logic are configurable in the business logic module.
+
+**Testing:**
+
+- Fully covered by unit and integration tests (see `tests/test_utils/test_dataset_health_scoring.py` and `tests/test_cli/test_dataset_health_scoring_menu.py`).
+- Tests simulate both single-folder and HQ/LQ menu flows, including edge cases and input handling.
+
+**Robustness:**
+
+- Uses centralized input, printing, memory, and error handling utilities.
+- Follows the robust menu loop and lazy import patterns.
+- CLI integration is non-blocking and fully automated for testing.
+
+[Back to Table of Contents](#table-of-contents)
+
+# 🔊 Project Sounds & Audio Feedback
+
+Dataset Forge uses four distinct sounds to provide immediate feedback for key events:
+
+| Sound    | File         | When it Plays                                 | Meaning for User                 |
+| -------- | ------------ | --------------------------------------------- | -------------------------------- |
+| Startup  | startup.mp3  | When the application starts                   | App is ready to use              |
+| Success  | done.wav     | After long or successful operations           | Operation completed successfully |
+| Error    | error.mp3    | On any user-facing error or failed operation  | Attention: an error occurred     |
+| Shutdown | shutdown.mp3 | When the application exits (normal or Ctrl+C) | App is shutting down             |
+
+- All user-facing errors always trigger the error sound for immediate notification.
+- Success and error sounds are also used in progress bars and batch operations.
+- Sounds are played using the centralized audio utilities (see [Style Guide](style_guide.md#audio--user-feedback)).
+- (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
+
+These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
+
 ---
 
+
 # Special Installation
+
 
 # Special Installation Instructions
 
@@ -505,6 +586,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
+
 ---
 
 ## 1. Advanced Metadata Operations (for exiftool integration)
@@ -526,18 +608,17 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 ### Method 2: Windows (Chocolatey)
 
 1. Download ExifTool.exe:
-
    ```sh
    choco install exiftool -y
    ```
 
 2. This will install `exiftool.exe` to:
-
    ```sh
    C:\ProgramData\chocolatey\lib\exiftool\tools\
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
 
 ---
 
@@ -545,7 +626,9 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ---
 
+
 # Usage
+
 
 # Usage Guide
 
@@ -582,6 +665,17 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
    # or
    ./run.bat
    ```
+
+## 🔊 Project Sounds & Audio Feedback
+
+Dataset Forge provides instant audio feedback for key events:
+
+- **Startup (startup.mp3):** When the app starts (ready to use)
+- **Success (done.wav):** After long or successful operations (operation completed)
+- **Error (error.mp3):** On any user-facing error (attention required)
+- **Shutdown (shutdown.mp3):** When the app exits (normal or Ctrl+C)
+
+See [Features](features.md#🔊-project-sounds--audio-feedback) for a full table and more details.
 
 ## 👣 Main Workflows
 
@@ -626,7 +720,25 @@ For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting
 
 ## 🧪 Running the Test Suite
 
-To run all tests:
+To run all tests, you can now use the flexible test runner script:
+
+```sh
+python tools/run_tests.py
+```
+
+This script provides a menu to select between different test run modes, or you can pass an option directly:
+
+- **Option 1:** Basic: venv312\Scripts\activate + pytest
+- **Option 2:** Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+- **Option 3:** Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
+
+Example:
+
+```sh
+python tools/run_tests.py 2  # Recommended
+```
+
+You can still run pytest directly if you prefer:
 
 ```sh
 venv312\Scripts\activate
@@ -728,6 +840,29 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 
 This section documents the user-facing utility scripts in the `tools/` directory. These scripts assist with code quality, documentation, environment setup, and troubleshooting.
 
+## run_tests.py: Flexible Test Runner (NEW July 2025)
+
+A flexible script for running the test suite with multiple options and interactive menu.
+
+- **Location:** `tools/run_tests.py`
+- **Purpose:** Lets you run the test suite in different modes (basic, recommended, verbose) with or without output capture.
+- **How to run:**
+  ```sh
+  python tools/run_tests.py
+  # or, to skip the menu:
+  python tools/run_tests.py 2  # Recommended
+  python tools/run_tests.py 3  # Verbose (no output capture)
+  ```
+- **Options:**
+  - `1` Basic: venv312\Scripts\activate + pytest
+  - `2` Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+  - `3` Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
+- **Menu:** If no option is given, a menu will be shown to select the mode interactively.
+- **Troubleshooting:**
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure.
+  - Review the console output for error messages.
+
 ## find_code_issues.py: Static Analysis Tool
 
 A comprehensive static analysis tool for maintainers and contributors.
@@ -809,32 +944,32 @@ A comprehensive static analysis tool for maintainers and contributors.
   - If `zsteg` is not found, ensure it is installed and in your PATH.
   - On Windows, you may need to restart your terminal after adding to PATH.
 
-## run_tests.py: Flexible Test Runner (NEW July 2025)
+## 🩺 Using Dataset Health Scoring
 
-A flexible script for running the test suite with multiple options and interactive menu.
+1. From the main menu, select 'Dataset Management'.
+2. Choose '🩺 Dataset Health Scoring'.
+3. Select whether to score a single folder or an HQ/LQ parent folder (for paired datasets).
+   - If HQ/LQ, the tool will auto-detect or prompt for HQ and LQ subfolders.
+4. The workflow will run a series of checks (validation, quality, consistency, compliance, etc.).
+5. At the end, you'll see:
+   - A step-by-step breakdown (pass/fail, points per step)
+   - The overall health score (0–100)
+   - Status (✅ Production Ready, ⚠️ Needs Improvement, ❌ Unusable)
+   - Actionable suggestions for improvement if needed
 
-- **Location:** `tools/run_tests.py`
-- **Purpose:** Lets you run the test suite in different modes (basic, recommended, verbose) with or without output capture.
-- **How to run:**
-  ```sh
-  python tools/run_tests.py
-  # or, to skip the menu:
-  python tools/run_tests.py 2  # Recommended
-  python tools/run_tests.py 3  # Verbose (no output capture)
-  ```
-- **Options:**
-  - `1` Basic: venv312\Scripts\activate + pytest
-  - `2` Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
-  - `3` Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
-- **Menu:** If no option is given, a menu will be shown to select the mode interactively.
-- **Troubleshooting:**
-  - If you get import errors, check your virtual environment and Python version.
-  - If the script reports no files found, check your directory structure.
-  - Review the console output for error messages.
+**Tips:**
+
+- Use the suggestions to address any issues before using the dataset for ML training.
+- The workflow is fully automated and robust to input errors.
+- All steps are covered by automated tests for reliability.
+
+[Back to Table of Contents](#table-of-contents)
 
 ---
 
+
 # Advanced
+
 
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
@@ -1059,7 +1194,9 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 
 ---
 
+
 # Architecture
+
 
 # Project Architecture
 
@@ -1163,6 +1300,28 @@ The Umzi Dataset_Preprocessing workflows are now fully modularized within Datase
   - Modular menu and actions for batch metadata extraction, editing, filtering, and anonymization.
   - Uses exiftool, pandas, SQLite, Pillow, and centralized utilities.
 
+### Dataset Health Scoring Workflow
+
+- **UI Layer:** `dataset_forge/menus/dataset_health_scoring_menu.py` (prompts user, runs workflow, displays results)
+- **Business Logic:** `dataset_forge/actions/dataset_health_scoring_actions.py` (modular checks, scoring, suggestions)
+- **Integration:** Added to Dataset Management menu using lazy import and robust menu loop patterns.
+- **Extensibility:** New checks can be added by extending the actions module and updating the step list/weights.
+- **Testing:** Fully covered by unit and CLI integration tests.
+
+**Mermaid Diagram Addition:**
+
+```mermaid
+graph LR
+A[Input Dataset] --> B[Basic Validation]
+B --> C[Quality Metrics]
+C --> D[Consistency Checks]
+D --> E[Compliance Scan]
+E --> F{Health Score}
+F -->|>90| G[✅ Production Ready]
+F -->|70-90| H[⚠️ Needs Improvement]
+F -->|<70| I[❌ Unusable]
+```
+
 ## Menu Integration
 
 - The Dataset Management menu now includes an '🧭 Align Images' option, which calls the align_images_workflow in actions/align_images_actions.py using the lazy import pattern.
@@ -1173,7 +1332,9 @@ For coding standards and best practices, see [style_guide.md](style_guide.md).
 
 ---
 
+
 # Troubleshooting
+
 
 # Troubleshooting
 
@@ -1301,22 +1462,15 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 - **Problem:** PATH is not updated.
   - Double-check your environment variable settings and restart your terminal.
 
-### run_tests.py
-
-- **Problem:** Script fails to run, or you get unexpected results.
-  - Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-  - If you get import errors, check your virtual environment and Python version.
-  - If the script reports no files found, check your directory structure and that the codebase is present.
-  - The script overwrites its output files in `tools/run_tests.py` on each run.
-  - Review the console output for error messages.
-
 ---
 
 For further help, see [usage.md](usage.md) or contact the project maintainer.
 
 ---
 
+
 # Style Guide
+
 
 # Dataset Forge Style Guide
 
@@ -1609,7 +1763,9 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 ---
 
+
 # Changelog
+
 
 [//]: # "Navigation"
 
@@ -1675,6 +1831,12 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 ## [July 2025]
 
+- Added '🩺 Dataset Health Scoring' workflow and menu option under Dataset Management.
+- Supports both single-folder and HQ/LQ parent folder modes.
+- Modular, weighted checks: validation, quality, consistency, compliance, and more.
+- Actionable suggestions and detailed scoring breakdown.
+- Fully covered by unit and integration tests.
+- Robust CLI integration and extensible design.
 - Added menu timing/profiling system: every menu and submenu load is timed and printed to the user.
 - All menu load times are recorded and viewable in the System Monitoring menu ("⏱️ View Menu Load Times").
 - Lazy import pattern enforced for all menus and actions for maximum CLI speed.
@@ -1696,9 +1858,12 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 This file will track major changes and releases in the future.
 
+
 ---
 
+
 # Contributing
+
 
 [ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
@@ -1762,9 +1927,12 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 For questions, open an issue or contact the project maintainer.
 
+
 ---
 
+
 # Faq
+
 
 # Frequently Asked Questions (FAQ)
 
@@ -1827,58 +1995,12 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 ---
 
+
 # License
+
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
-
----
-
-# 🩺 Dataset Health Scoring (NEW July 2025)
-
-**Location:** Dataset Management menu → 🩺 Dataset Health Scoring
-
-**Purpose:**
-
-- Assess dataset health and readiness for ML workflows.
-- Supports both single-folder and HQ/LQ parent folder structures.
-
-**Workflow:**
-
-- User selects dataset type (single folder or HQ/LQ parent).
-- Runs modular checks: validation, unreadable files, format consistency, quality, aspect ratio, file size, consistency, compliance.
-- Weighted scoring and detailed breakdown.
-- Actionable suggestions for improvement.
-
-**Integration:**
-
-- Menu option under Dataset Management, robust menu loop, lazy import.
-- Extensible: add new checks easily.
-- Fully tested (unit and integration).
-
-[Back to Table of Contents](#table-of-contents)
-
----
-
-# 🔊 Project Sounds & Audio Feedback
-
-Dataset Forge uses four distinct sounds to provide immediate feedback for key events:
-
-| Sound    | File         | When it Plays                                 | Meaning for User                 |
-| -------- | ------------ | --------------------------------------------- | -------------------------------- |
-| Startup  | startup.mp3  | When the application starts                   | App is ready to use              |
-| Success  | done.wav     | After long or successful operations           | Operation completed successfully |
-| Error    | error.mp3    | On any user-facing error or failed operation  | Attention: an error occurred     |
-| Shutdown | shutdown.mp3 | When the application exits (normal or Ctrl+C) | App is shutting down             |
-
-- All user-facing errors always trigger the error sound for immediate notification.
-- Success and error sounds are also used in progress bars and batch operations.
-- Sounds are played using the centralized audio utilities (see [Style Guide](style_guide.md#audio--user-feedback)).
-- (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
-
-These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
-
-See also: [Usage Guide](usage.md#🔊-project-sounds--audio-feedback)
 
 ---
