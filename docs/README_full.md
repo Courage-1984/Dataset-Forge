@@ -23,6 +23,7 @@
   - [🧪 Comprehensive Test Suite (Updated July 2025)](features.md#-comprehensive-test-suite-updated-july-2025)
   - [Testing & Validation](features.md#testing--validation)
   - [🧑‍💻 Developer Tools: Static Analysis & Code Quality](features.md#-developer-tools-static-analysis--code-quality)
+  - [🛠️ Utility Scripts (tools/)](features.md#-utility-scripts-tools)
 - [Special Installation Instructions](special_installation.md)
   - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
   - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
@@ -50,12 +51,21 @@
   - [Using Umzi's Dataset_Preprocessing](usage.md#using-umzis-datasetpreprocessing)
     - [🧹 Sanitize Images (NEW July 2025)](usage.md#-sanitize-images-new-july-2025)
     - [🗂️ Enhanced Metadata Management (NEW July 2025)](usage.md#-enhanced-metadata-management-new-july-2025)
+- [🛠️ Utility Scripts (tools/)](usage.md#-utility-scripts-tools)
+  - [find_code_issues.py: Static Analysis Tool](usage.md#findcodeissuespy-static-analysis-tool)
+  - [merge_docs.py: Documentation Merging Tool](usage.md#mergedocspy-documentation-merging-tool)
+  - [install.py: Environment Setup Tool](usage.md#installpy-environment-setup-tool)
+  - [print_zsteg_env.py: zsteg Environment Check](usage.md#printzstegenvpy-zsteg-environment-check)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
   - [Robust Menu Loop Pattern (July 2025)](advanced.md#robust-menu-loop-pattern-july-2025)
   - [Advanced Testing Patterns](advanced.md#advanced-testing-patterns)
   - [🧑‍💻 Advanced Developer Tools: Static Analysis](advanced.md#-advanced-developer-tools-static-analysis)
+  - [🛠️ Advanced: Utility Scripts (tools/)](advanced.md#-advanced-utility-scripts-tools)
+    - [Extending find_code_issues.py](advanced.md#extending-findcodeissuespy)
+    - [Extending merge_docs.py](advanced.md#extending-mergedocspy)
+    - [Adding New Utility Scripts](advanced.md#adding-new-utility-scripts)
   - [⚡ Caching System: Technical Details (NEW July 2025)](advanced.md#-caching-system-technical-details-new-july-2025)
   - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
@@ -79,6 +89,11 @@
   - [🧪 Test Suite Troubleshooting (July 2025)](troubleshooting.md#-test-suite-troubleshooting-july-2025)
   - [Static Analysis Tool Issues](troubleshooting.md#static-analysis-tool-issues)
   - [Metadata Management Issues (NEW July 2025)](troubleshooting.md#metadata-management-issues-new-july-2025)
+  - [Utility Scripts (tools/) Troubleshooting](troubleshooting.md#utility-scripts-tools-troubleshooting)
+    - [find_code_issues.py](troubleshooting.md#findcodeissuespy)
+    - [merge_docs.py](troubleshooting.md#mergedocspy)
+    - [install.py](troubleshooting.md#installpy)
+    - [print_zsteg_env.py](troubleshooting.md#printzstegenvpy)
 - [Dataset Forge Style Guide](style_guide.md)
   - [General Principles](style_guide.md#general-principles)
   - [Project Architecture](style_guide.md#project-architecture)
@@ -310,6 +325,18 @@ See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-pat
     - `find_code_issues_view.txt` (detailed results)
 - **Requirements:**
   - `
+
+## 🛠️ Utility Scripts (tools/)
+
+Dataset Forge includes several utility scripts in the `tools/` directory to assist with development, documentation, and environment setup. These scripts are user-facing and documented in detail in [usage.md](usage.md#utility-scripts-tools).
+
+- **find_code_issues.py**: Comprehensive static analysis tool for code quality and maintainability. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. See [usage.md](usage.md#find_code_issuespy-static-analysis-tool) for full usage and options.
+- **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
+- **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
+- **print_zsteg_env.py**: Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration. See [usage.md](usage.md#print_zsteg_envpy-zsteg-environment-check).
+
+For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
+
 
 ---
 
@@ -703,6 +730,91 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 >
 > **Badges:** Standard badges (build, license, Python version, etc.) are included in the README. See the README for their meaning.
 
+# 🛠️ Utility Scripts (tools/)
+
+This section documents the user-facing utility scripts in the `tools/` directory. These scripts assist with code quality, documentation, environment setup, and troubleshooting.
+
+## find_code_issues.py: Static Analysis Tool
+
+A comprehensive static analysis tool for maintainers and contributors.
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Purpose:** Checks for dead code, untested code, missing docstrings, test/code mapping, and more.
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Options:**
+  - `--vulture` Run vulture for dead code
+  - `--coverage` Run pytest-cov for coverage
+  - `--callgraph` Run pyan3 for call graph analysis
+  - `--pyflakes` Run pyflakes for unused imports/variables
+  - `--test-mapping` Check test/code correspondence
+  - `--ast` AST: Find defined but never called functions/classes
+  - `--all` Run all analyses (default)
+  - `--view` View detailed results for each analysis after run
+  - `-h, --help` Show help
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+- **Troubleshooting:**
+  - Ensure all dependencies are installed.
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure.
+  - Review the log file for detailed error messages.
+
+## merge_docs.py: Documentation Merging Tool
+
+- **Location:** `tools/merge_docs.py`
+- **Purpose:** Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`).
+- **How to run:**
+  ```sh
+  python tools/merge_docs.py
+  ```
+- **Output:**
+  - `docs/README_full.md` (merged documentation)
+  - `docs/toc.md` (hierarchical Table of Contents)
+- **Troubleshooting:**
+  - Ensure all documentation files exist and are readable.
+  - If you see missing file warnings, check the `DOC_ORDER` list in the script.
+
+## install.py: Environment Setup Tool
+
+- **Location:** `tools/install.py`
+- **Purpose:** Automated environment setup. Creates a virtual environment, installs CUDA-enabled torch, and all project requirements.
+- **How to run:**
+  ```sh
+  python tools/install.py
+  ```
+- **What it does:**
+  - Checks Python version (requires 3.12+)
+  - Creates `venv312` if not present
+  - Installs torch/torchvision/torchaudio with CUDA 12.1 support
+  - Installs all project requirements
+- **Troubleshooting:**
+  - If Python version is too low, upgrade Python.
+  - If CUDA-enabled torch fails, check your CUDA version and use the correct index URL.
+  - If pip install fails, check your internet connection and permissions.
+
+## print_zsteg_env.py: zsteg Environment Check
+
+- **Location:** `tools/print_zsteg_env.py`
+- **Purpose:** Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration.
+- **How to run:**
+  ```sh
+  python tools/print_zsteg_env.py
+  ```
+- **Output:**
+  - Prints the current PATH and the path to `zsteg` (if found) to the console.
+- **Troubleshooting:**
+  - If `zsteg` is not found, ensure it is installed and in your PATH.
+  - On Windows, you may need to restart your terminal after adding to PATH.
+
 ---
 
 
@@ -808,6 +920,26 @@ Dataset Forge includes a comprehensive static analysis tool for code quality and
   - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
 
 Review the actionable report and detailed results before submitting code or documentation changes.
+
+## 🛠️ Advanced: Utility Scripts (tools/)
+
+### Extending find_code_issues.py
+
+- The static analysis tool is modular and can be extended to add new checks or output formats.
+- To add a new analysis, define a new function and add it to the main() dispatcher.
+- Output files are overwritten on each run; see the script for extension points.
+- Review the actionable report and detailed results before submitting code or documentation changes.
+
+### Extending merge_docs.py
+
+- The documentation merging tool uses a configurable DOC_ORDER list to determine which files to merge and in what order.
+- To add a new documentation file, update DOC_ORDER and ensure navigation links are consistent.
+- The script parses headings to build a hierarchical Table of Contents.
+
+### Adding New Utility Scripts
+
+- All new user-facing scripts in tools/ must be documented in features.md and usage.md, and kept up to date.
+- Add troubleshooting entries for new scripts in troubleshooting.md as needed.
 
 ## ⚡ Caching System: Technical Details (NEW July 2025)
 
@@ -934,8 +1066,11 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **assets/**: Any asset files required
 - **docs/**: Project documentation
 - **tests/**: Unit & integration tests
-- **tools/**: Project tools and developer utilities (e.g., static analysis, documentation merging)
+- **tools/**: Project tools and developer/user utilities (e.g., static analysis, documentation merging, environment setup, troubleshooting)
   - **find_code_issues/find_code_issues.py**: Static analysis and code quality tool for maintainers. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. Outputs actionable reports to the same directory.
+  - **merge_docs.py**: Merges all documentation files in docs/ into a single README_full.md and generates a hierarchical Table of Contents (toc.md).
+  - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements.
+  - **print_zsteg_env.py**: Prints the current PATH and the location of the zsteg binary for troubleshooting steganography tool integration.
 
 ## Mermaid Architecture Diagram (Detailed)
 
@@ -1116,6 +1251,44 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 - Some image formats may not contain metadata, or may be corrupted.
 - Try running exiftool manually on a sample file to debug.
 - Check file permissions and ensure files are not locked by another process.
+
+---
+
+## Utility Scripts (tools/) Troubleshooting
+
+### find_code_issues.py
+
+- **Problem:** Script fails to run, or you get unexpected results.
+  - Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure and that the codebase is present.
+  - The script overwrites its output files in `tools/find_code_issues/` on each run.
+  - Review the log file (`find_code_issues.log`) for detailed error messages.
+
+### merge_docs.py
+
+- **Problem:** Documentation files are missing or not merged.
+  - Ensure all documentation files exist and are readable.
+  - If you see missing file warnings, check the `DOC_ORDER` list in the script.
+  - If output files are not updated, check file permissions in the docs/ directory.
+
+### install.py
+
+- **Problem:** Python version is too low.
+  - Upgrade to Python 3.12+.
+- **Problem:** CUDA-enabled torch fails to install.
+  - Check your CUDA version and use the correct index URL for torch.
+- **Problem:** pip install fails.
+  - Check your internet connection and permissions.
+  - Try running the command as administrator or with sudo (Linux/Mac).
+
+### print_zsteg_env.py
+
+- **Problem:** `zsteg` is not found.
+  - Ensure `zsteg` is installed and in your PATH.
+  - On Windows, you may need to restart your terminal after adding to PATH.
+- **Problem:** PATH is not updated.
+  - Double-check your environment variable settings and restart your terminal.
 
 ---
 
