@@ -170,7 +170,17 @@ class ICCToSRGBConverter:
             print(f"Invalid input: {input_path} is neither a file nor a directory.")
 
 
+from dataset_forge.utils.cache_utils import in_memory_cache
+
+
+@in_memory_cache(maxsize=256, ttl_seconds=3600)  # Cache for 1 hour
 def get_image_size(image_path):
-    """Returns (width, height) of the image at image_path."""
+    """
+    Returns (width, height) of the image at image_path.
+
+    Note:
+        This function is cached in-memory for fast repeated access to the same image.
+        Cache expires after 1 hour to handle potential file modifications.
+    """
     with Image.open(image_path) as img:
         return img.width, img.height

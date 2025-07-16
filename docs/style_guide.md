@@ -156,6 +156,22 @@ while True:
 - Use memory-efficient operations.
 - Cache expensive computations.
 
+## Enhanced Caching System (UPDATED July 2025)
+
+- **Use centralized caching utilities:** `from dataset_forge.utils.cache_utils import in_memory_cache, disk_cache, model_cache, smart_cache`
+- **Choose appropriate cache type:**
+  - `@in_memory_cache`: Lightweight, frequently-called, session-only results with TTL and compression
+  - `@disk_cache`: Expensive, large, or cross-session results with integrity checks
+  - `@model_cache`: AI model loading operations with CUDA memory management
+  - `@smart_cache`: Automatic selection based on function characteristics
+- **Always document cache usage** in function docstrings with TTL, compression, and strategy rationale
+- **Set appropriate TTL values** based on data volatility and memory constraints
+- **Use compression** for large objects to reduce memory/disk footprint
+- **Monitor cache statistics** for optimization opportunities
+- **Implement cache warmup** for critical, frequently-accessed data
+- **Handle cache misses gracefully** with fallback mechanisms
+- **Test caching behavior** with unit tests covering cache hits, misses, and expiration
+
 ## Monitoring, Analytics & Error Tracking
 
 - Use centralized monitoring utilities: `from dataset_forge.utils.monitoring import monitor_performance, track_errors, register_background_task, health_check`

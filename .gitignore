@@ -105,3 +105,8 @@ Icon?
 tools/find_code_issues.log
 tools/find_code_issues/
 
+.cursorignore
+.cursorrules
+.mdc
+.cursor/
+

@@ -128,4 +128,57 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 
 ---
 
+---
+
+## Enhanced Caching System Issues (NEW July 2025)
+
+**Problem:** Cache misses or unexpected cache behavior.
+
+- Check TTL settings: cached data may have expired
+- Verify cache size limits: in-memory cache may have evicted entries
+- Use cache statistics to analyze hit rates and performance
+- Clear and rebuild cache if corruption is suspected
+
+**Problem:** High memory usage from caching.
+
+- Monitor cache statistics for memory usage
+- Reduce maxsize limits for in-memory caches
+- Use TTL to prevent memory leaks
+- Clear caches when memory pressure is high
+- Enable compression for large objects
+
+**Problem:** Disk cache corruption or missing files.
+
+- Use cache validation tools to detect corruption
+- Run cache repair to fix corrupted entries
+- Check disk space availability
+- Verify file permissions in cache directory
+
+**Problem:** Cache management menu not accessible.
+
+- Ensure you're accessing from System Settings → Cache Management
+- Check that cache_management_menu.py is properly integrated
+- Verify lazy import pattern is working correctly
+
+**Problem:** Model cache issues with CUDA memory.
+
+- Model cache includes automatic CUDA memory management
+- Clear model cache if GPU memory issues occur
+- Monitor CUDA memory usage during model operations
+- Use appropriate TTL for model caching
+
+**Problem:** Smart cache auto-detection not working.
+
+- Check function names for keywords: "model", "load", "embedding" for model cache
+- Check function names for keywords: "extract", "compute", "process" for disk cache
+- Verify cache_dir parameter is passed correctly for disk cache
+- Use explicit cache type if auto-detection fails
+
+**Debug Tools:**
+
+- Use cache statistics to analyze performance
+- Export cache data for offline analysis
+- Run cache validation and repair tools
+- Monitor cache hit rates and memory usage
+
 For further help, see [usage.md](usage.md) or contact the project maintainer.

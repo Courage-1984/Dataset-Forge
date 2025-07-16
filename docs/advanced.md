@@ -120,54 +120,238 @@ Review the actionable report and detailed results before submitting code or docu
 - All new user-facing scripts in tools/ must be documented in features.md and usage.md, and kept up to date.
 - Add troubleshooting entries for new scripts in troubleshooting.md as needed.
 
-## ⚡ Caching System: Technical Details (NEW July 2025)
+## ⚡ Enhanced Caching System: Technical Details (UPDATED July 2025)
 
-Dataset Forge uses a hybrid caching system for performance:
+Dataset Forge implements a comprehensive, production-ready caching system with advanced features, monitoring, and management capabilities.
 
-- **In-Memory Caching:**
+### **Core Architecture**
 
-  - Uses `functools.lru_cache` via the `@in_memory_cache` decorator (see `utils/cache_utils.py`).
-  - Applied to lightweight, frequently-called functions (e.g., image property analysis, directory scans).
-  - Cache is per-session and cleared on process exit or via function-specific calls.
+The caching system is built around four main components:
 
-- **Disk Caching:**
+1. **AdvancedLRUCache Class:** Thread-safe, feature-rich in-memory cache with TTL, compression, and statistics
+2. **Disk Cache:** Persistent storage using joblib.Memory with enhanced file management
+3. **Model Cache:** Specialized cache for expensive model loading operations
+4. **Smart Cache:** Auto-detection system that chooses optimal caching strategy
 
-  - Uses `joblib.Memory` via the `@disk_cache` decorator (see `utils/cache_utils.py`).
-  - Applied to expensive, large-result functions (e.g., CBIR feature extraction).
-  - Cache is persistent across sessions and stored in `store/cache/`.
-  - Disk cache can be cleared from the System Monitoring menu or by deleting the folder.
+### **In-Memory Caching (AdvancedLRUCache)**
 
-- **Cache Management:**
+**Features:**
 
-  - Use the System Monitoring menu to clear all caches.
-  - Disk cache is auto-ignored by git (see `.gitignore`).
+- Thread-safe LRU eviction with configurable max size
+- Time-to-live (TTL) support with automatic expiration
+- Data compression for memory efficiency
+- Comprehensive statistics tracking (hits, misses, memory usage)
+- Sentinel-based cache miss detection (handles None values correctly)
 
-- **How to Use in Your Code:**
+**Implementation:**
 
-  - Import decorators from `dataset_forge.utils.cache_utils`:
-    ```python
-    from dataset_forge.utils.cache_utils import in_memory_cache, disk_cache
-    ```
-  - Decorate your function:
+```python
+from dataset_forge.utils.cache_utils import in_memory_cache
 
-    ```python
-    @in_memory_cache(maxsize=128)
-    def my_func(...):
-        ...
+@in_memory_cache(maxsize=1000, ttl_seconds=3600, compression=True)
+def expensive_calculation(data):
+    return complex_processing(data)
+```
 
-    @disk_cache
-    def expensive_func(...):
-        ...
-    ```
+**Key Features:**
 
-  - Use `clear_disk_cache()` and `clear_in_memory_cache(func)` to clear caches programmatically.
+- **Thread Safety:** Uses threading.Lock for concurrent access
+- **Memory Monitoring:** Tracks cache size and memory usage
+- **Compression:** Optional gzip compression for large objects
+- **Statistics:** Hit/miss rates, memory usage, eviction counts
 
-- **Best Practices:**
-  - Use in-memory cache for small, fast, frequently-repeated operations.
-  - Use disk cache for large, expensive, or cross-session results.
-  - Always document cache usage in your function docstrings.
+### **Disk Caching**
 
-See `docs/features.md` for user-facing info and `README_full.md` for a merged overview.
+**Features:**
+
+- Persistent storage across sessions
+- TTL-based expiration
+- Automatic compression
+- File integrity validation
+- Manual file management capabilities
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.cache_utils import disk_cache
+
+@disk_cache(ttl_seconds=86400, compression=True, cache_dir="custom/path")
+def expensive_feature_extraction(image_path):
+    return extract_deep_features(image_path)
+```
+
+**Key Features:**
+
+- **Persistent Storage:** Survives application restarts
+- **File Management:** Automatic cleanup of expired files
+- **Compression:** Reduces disk space usage
+- **Integrity Checks:** Validates cached files on access
+
+### **Model Caching**
+
+**Features:**
+
+- Specialized for expensive model loading operations
+- Automatic CUDA memory management
+- Statistics tracking for model operations
+- Optimized for large, memory-intensive objects
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.cache_utils import model_cache
+
+@model_cache(maxsize=5, ttl_seconds=7200)
+def load_ai_model(model_name):
+    return load_pretrained_model(model_name)
+```
+
+### **Smart Caching**
+
+**Auto-Detection Logic:**
+
+- **Model Cache:** Functions with "model", "load", "embedding" in name
+- **Disk Cache:** Functions with "extract", "compute", "process" in name
+- **In-Memory Cache:** All other functions
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.cache_utils import smart_cache
+
+@smart_cache(ttl_seconds=3600, maxsize=500, compression=True)
+def process_image_data(image_path):
+    # Automatically selects optimal caching strategy
+    return process_image(image_path)
+```
+
+### **Cache Management System**
+
+**Comprehensive Management Menu:**
+
+- **Statistics Viewing:** Real-time performance metrics
+- **Cache Clearing:** Selective or complete cache clearing
+- **Performance Analysis:** Efficiency metrics and optimization suggestions
+- **Data Export:** Cache statistics and backup functionality
+- **Maintenance Tools:** Validation, repair, cleanup, optimization
+- **Warmup Operations:** Pre-load frequently accessed data
+
+**Programmatic Management:**
+
+```python
+from dataset_forge.utils.cache_utils import (
+    clear_all_caches, get_cache_stats, validate_cache,
+    repair_cache, warmup_cache, export_cache_stats
+)
+
+# Clear all caches
+clear_all_caches()
+
+# Get comprehensive statistics
+stats = get_cache_stats()
+
+# Validate and repair cache integrity
+validate_cache()
+repair_cache()
+
+# Warmup frequently used data
+warmup_cache(['frequently_used_function'])
+
+# Export statistics
+export_cache_stats('cache_report.json')
+```
+
+### **Advanced Features**
+
+**TTL Management:**
+
+- Configurable time-to-live for all cache types
+- Automatic cleanup of expired entries
+- Different TTL strategies for different data types
+
+**Compression:**
+
+- Automatic gzip compression for disk cache
+- Memory-efficient compression for in-memory cache
+- Configurable compression levels
+
+**Statistics & Analytics:**
+
+- Real-time hit/miss rates
+- Memory usage tracking
+- Disk space monitoring
+- Performance metrics
+
+**Integrity & Maintenance:**
+
+- Automatic validation of cached files
+- Repair of corrupted cache entries
+- Cleanup of orphaned cache files
+- Optimization of cache performance
+
+### **Integration with Existing Functions**
+
+The enhanced caching system is automatically applied to key functions:
+
+```python
+# Image operations with TTL-based caching
+@in_memory_cache(ttl_seconds=300, maxsize=1000)
+def get_image_size(image_path):
+    # Cached for 5 minutes with max 1000 entries
+    pass
+
+# Model loading with specialized caching
+@model_cache(ttl_seconds=3600, maxsize=10)
+def enum_to_model(model_enum):
+    # Cached for 1 hour with max 10 models
+    pass
+
+# File operations with in-memory caching
+@in_memory_cache(maxsize=5000)
+def is_image_file(filename):
+    # Frequently called, cached in memory
+    pass
+```
+
+### **Best Practices**
+
+**When to Use Each Cache Type:**
+
+- **In-Memory Cache:** Small, frequently accessed data, session-only results
+- **Disk Cache:** Large, expensive computations, cross-session persistence
+- **Model Cache:** AI model loading, GPU memory management
+- **Smart Cache:** Let the system choose based on function characteristics
+
+**Performance Optimization:**
+
+- Set appropriate TTL values based on data volatility
+- Use compression for large objects
+- Monitor cache statistics for optimization opportunities
+- Implement cache warmup for critical data
+
+**Memory Management:**
+
+- Set reasonable maxsize limits for in-memory caches
+- Use TTL to prevent memory leaks
+- Monitor memory usage with cache statistics
+- Clear caches when memory pressure is high
+
+### **Troubleshooting**
+
+**Common Issues:**
+
+- **Cache Misses:** Check TTL settings and cache size limits
+- **Memory Issues:** Monitor cache statistics and adjust maxsize
+- **Disk Space:** Use compression and regular cleanup
+- **Performance:** Analyze hit rates and optimize cache strategy
+
+**Debug Tools:**
+
+- Cache statistics provide detailed performance metrics
+- Validation tools detect and repair cache corruption
+- Export functionality for offline analysis
+
+See `docs/features.md` for user-facing information and `README_full.md` for a comprehensive overview.
 
 ## Advanced: Modular Integration of Umzi's Dataset_Preprocessing
 

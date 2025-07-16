@@ -77,6 +77,13 @@ See [Features](features.md#🔊-project-sounds--audio-feedback) for a full table
 - Access live resource usage, error tracking, and analytics from the System Monitoring menu.
 - View menu load times and health checks.
 
+### Cache Management
+
+- Access comprehensive cache management from System Settings → Cache Management.
+- View cache statistics, clear caches, perform maintenance, and optimize performance.
+- Monitor hit rates, memory usage, and disk space for all cache types.
+- Export cache data and perform warmup operations for frequently used data.
+
 ---
 
 ## July 2025 Update

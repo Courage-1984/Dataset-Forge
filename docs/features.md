@@ -82,26 +82,74 @@
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
 - **⏱️ View Menu Load Times**: View the menu load times
 
-## ⚡ Caching System (NEW July 2025)
+## ⚡ Enhanced Caching System (UPDATED July 2025)
 
-Dataset Forge now features a robust caching system to accelerate repeated operations:
+Dataset Forge features a comprehensive, production-ready caching system with advanced features, monitoring, and management capabilities:
 
-- **In-Memory Caching:** Frequently-used, lightweight results (e.g., image property analysis, directory scans) are cached in RAM for the current session.
-- **Disk Caching:** Expensive, large results (e.g., deep feature embeddings for CBIR) are cached persistently in `store/cache/` for reuse across sessions.
-- **Automatic Integration:** Caching is transparently applied to key functions:
-  - CBIR feature extraction (CLIP, ResNet, VGG embeddings)
-  - Directory image scans
-  - Image property analysis
-- **Cache Management:**
-  - A new menu option in System Monitoring allows you to clear all caches (disk and in-memory) with one click.
-  - Disk cache is stored in `store/cache/` (auto-ignored by git).
+### **Core Caching Strategies**
 
-**Benefits:**
+- **🔄 In-Memory Caching:** Advanced LRU cache with TTL, compression, and statistics for lightweight, frequently-called, session-only results
+- **💾 Disk Caching:** Persistent storage with TTL, compression, manual file management, and integrity checks for expensive, large, or cross-session results
+- **🧠 Model Caching:** Specialized cache for expensive model loading operations with automatic cleanup
+- **🤖 Smart Caching:** Auto-selects optimal caching strategy based on function characteristics
 
-- Dramatically faster repeated analysis, deduplication, and reporting on large datasets.
-- Reduces redundant computation and I/O.
+### **Advanced Features**
 
-See `docs/advanced.md` for technical details and customization.
+- **⏱️ TTL Management:** Automatic expiration of cached data with configurable time-to-live
+- **🗜️ Compression:** Automatic data compression for disk cache to reduce storage footprint
+- **📊 Statistics & Analytics:** Real-time cache performance, hit rates, memory usage, and disk space monitoring
+- **🔧 Cache Management:** Comprehensive utilities for clearing, validation, repair, warmup, and export
+- **🛡️ Integrity Checks:** Automatic validation and repair of corrupted cache files
+- **🔥 Warmup System:** Pre-load frequently used data into cache for optimal performance
+
+### **Cache Management Menu**
+
+Accessible from System Settings → Cache Management, providing:
+
+- **📈 View Cache Statistics:** Performance metrics, hit rates, and usage analytics
+- **🧹 Clear Caches:** Selective or complete cache clearing
+- **🔍 Performance Analysis:** Cache efficiency metrics and optimization suggestions
+- **📤 Export Data:** Cache statistics and data backup functionality
+- **🔧 Maintenance Tools:** Validation, repair, cleanup, and optimization
+- **🔥 Warmup Operations:** Pre-load frequently accessed data
+
+### **Automatic Integration**
+
+Caching is transparently applied to key functions:
+
+- **🖼️ Image Operations:** `get_image_size()` with TTL-based caching
+- **🧠 Model Loading:** `enum_to_model()` and `get_clip_model()` with model-specific caching
+- **📁 File Operations:** `is_image_file()` with in-memory caching
+- **🔍 CBIR Features:** Feature extraction and similarity search with disk caching
+
+### **Benefits**
+
+- **⚡ Dramatically Faster Operations:** Frequently accessed data served from cache
+- **💾 Memory Efficiency:** LRU eviction and compression reduce memory footprint
+- **🔄 Reduced I/O:** Disk cache reduces file system access
+- **🧠 Model Loading:** Instant access to cached AI models
+- **📊 Transparent Management:** Self-maintaining cache with comprehensive monitoring
+
+### **Usage Examples**
+
+```python
+# Simple in-memory caching with TTL
+@in_memory_cache(ttl=300, maxsize=1000)
+def quick_lookup(key):
+    return expensive_calculation(key)
+
+# Model caching for expensive operations
+@model_cache(ttl=3600)
+def load_expensive_model(name):
+    return load_model_from_disk(name)
+
+# Smart auto-selection
+@smart_cache(ttl=3600, maxsize=500)
+def process_data(data):
+    return complex_processing(data)
+```
+
+See `docs/advanced.md` for technical details, customization, and best practices.
 
 # Features (expanded/misc)
 

@@ -252,7 +252,18 @@ def cosine_dist(emb1, emb2):
     return 1 - F.cosine_similarity(emb1_norm, emb2_norm).item()
 
 
+from dataset_forge.utils.cache_utils import model_cache
+
+
+@model_cache(maxsize=10, ttl_seconds=86400)  # Cache models for 24 hours
 def enum_to_model(enum):
+    """
+    Convert enum to model and preprocess function.
+
+    Note:
+        This function is cached to avoid reloading models repeatedly.
+        Models are cached for 24 hours to handle potential updates.
+    """
     if enum == EmbeddedModel.ConvNextS:
         model = timm.create_model("convnext_small_384_in22ft1k", pretrained=True)
         model.eval()

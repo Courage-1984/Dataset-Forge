@@ -105,6 +105,33 @@ def show_memory_optimization():
             print_info(f"  {key}: {value}")
 
 
+def cache_management_submenu():
+    """Sub-menu for cache management."""
+    from dataset_forge.menus.cache_management_menu import cache_management_menu
+
+    options = {
+        "1": ("📊 View Cache Statistics", lambda: cache_management_menu()),
+        "2": ("🧹 Clear Caches", lambda: cache_management_menu()),
+        "3": ("📈 Performance Analysis", lambda: cache_management_menu()),
+        "4": ("🔧 Cache Maintenance", lambda: cache_management_menu()),
+        "0": ("⬅️  Back", None),
+    }
+
+    while True:
+        action = show_menu(
+            "⚡ Cache Management",
+            options,
+            header_color=Mocha.sapphire,
+            char="-",
+        )
+        if action is None or action == "0":
+            break
+        if callable(action):
+            action()
+        print_prompt("\n⏸️ Press Enter to return to the menu...")
+        input()
+
+
 def system_settings_menu():
     """Main system and settings menu with hierarchical structure."""
     options = {
@@ -112,9 +139,10 @@ def system_settings_menu():
         "2": ("📁 Set LQ Folder", set_lq_folder),
         "3": ("👤 User Profile Management", user_profile_submenu),
         "4": ("🧠 Memory Management", memory_management_submenu),
-        "5": ("📊 View Current Settings", view_settings),
-        "6": ("⚡ Configure Parallel Processing", configure_parallel),
-        "7": ("🔄 Reset Settings", reset_settings),
+        "5": ("⚡ Cache Management", cache_management_submenu),
+        "6": ("📊 View Current Settings", view_settings),
+        "7": ("⚡ Configure Parallel Processing", configure_parallel),
+        "8": ("🔄 Reset Settings", reset_settings),
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:

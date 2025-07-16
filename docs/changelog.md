@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+- **Enhanced Caching System (July 2025):**
+  - Completely rewrote and enhanced the caching system from basic implementation to production-ready solution
+  - Added AdvancedLRUCache class with TTL, compression, statistics, and thread safety
+  - Implemented comprehensive disk caching with integrity checks and file management
+  - Added specialized model caching for expensive AI model loading operations
+  - Created smart cache decorator with auto-detection of optimal caching strategy
+  - Built comprehensive cache management menu with statistics, maintenance, and optimization tools
+  - Added cache warmup, validation, repair, and export functionality
+  - Integrated caching into key functions: get_image_size, enum_to_model, get_clip_model, is_image_file
+  - Created robust test suite covering all caching functionality with 107 passing tests
+  - Fixed critical issues: UnboundLocalError in smart_cache, disk cache filename validation, None value handling
+  - Updated all documentation to reflect enhanced caching capabilities and best practices
 - Added comprehensive [Style Guide](style_guide.md) to docs/ for coding standards, architecture, and best practices (July 2025).
 - **OpenModelDB Integration:**
   - Added OpenModelDB Model Browser with classic and CLI-interactive modes

@@ -77,6 +77,32 @@ flowchart TD
 - CLI menu for live resource usage, analytics, error summaries, health checks, and background task management (see menus/system_monitoring_menu.py).
 - Persistent logging and notifications for all major operations.
 
+## Enhanced Caching System
+
+- **AdvancedLRUCache Class:** Thread-safe in-memory cache with TTL, compression, and statistics (see utils/cache_utils.py).
+- **Disk Caching:** Persistent storage with integrity checks and file management using joblib.Memory.
+- **Model Caching:** Specialized cache for expensive AI model loading operations with CUDA memory management.
+- **Smart Caching:** Auto-detection system that chooses optimal caching strategy based on function characteristics.
+- **Cache Management Menu:** Comprehensive management interface accessible from System Settings → Cache Management.
+- **Integration:** Automatically applied to key functions including image operations, model loading, and file operations.
+
+**Caching Architecture:**
+
+```mermaid
+flowchart TD
+    A[Function Call] --> B{Smart Cache Detection}
+    B -->|Model Functions| C[Model Cache]
+    B -->|Extract/Compute| D[Disk Cache]
+    B -->|Other Functions| E[In-Memory Cache]
+    C --> F[TTL + CUDA Management]
+    D --> G[Persistent Storage + Compression]
+    E --> H[LRU + Statistics]
+    F --> I[Cache Management Menu]
+    G --> I
+    H --> I
+    I --> J[Statistics, Validation, Repair, Warmup]
+```
+
 ## Test Suite Integration
 
 - Comprehensive automated test suite using pytest.

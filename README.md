@@ -104,16 +104,17 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 
 This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place.
 
-- [ ] **Debug Mode**: I want to add a *Debug Mode* to my project, which when used, activates the showing of more verbose output and debug output/print
+- [ ] **Debug Mode**: I want to add a _Debug Mode_ to my project, which when used, activates the showing of more verbose output and debug output/print
 - [ ] **tl;dr**: Create a '# Features (tl;dr)' section in ./docs/features.md
-- [ ] ***Packaging***: "Compile Dataset-Forge" AND/OR "Create docker file/container"
+- [ ] **_Packaging_**: "Compile Dataset-Forge" AND/OR "Create docker file/container"
 - [ ] **Augmentation**: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
 - [x] **Dataset Health Scoring**: Add a "Dataset Health Scoring" workflow and menu option
 - [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
 - [ ] **Phhofm's sisr**: Investigate Phhofm's [sisr](https://github.com/Phhofm/sisr) for stuff i can add to DF
 - [ ] **the-database's img-ab**: Fork and improve.
 - [ ] **Links .json's**: Further customize, add metadata, description, etc/
-- [ ] **Advanced Filtering / AI-Powered Features**: 
+- [ ] **Advanced Filtering / AI-Powered Features**:
+
 ```
 Semantic Filtering: Filter by image content/semantics
 Style-Based Filtering: Filter by artistic style
@@ -124,7 +125,9 @@ Style Transfer: Apply artistic styles to datasets
 Content-Aware Cropping: Intelligent image cropping
 
 ```
-- [ ] **Advanced Data Augmentation**: 
+
+- [ ] **Advanced Data Augmentation**:
+
 ```
 What: Expand the augmentation capabilities to include more complex, model-aware techniques.
 
@@ -174,6 +177,7 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 
 Dataset Forge now includes a robust, cross-platform test suite covering all major features:
 
+- Enhanced caching system (in-memory, disk, model, smart caching)
 - DPID implementations (BasicSR, OpenMMLab, Phhofm)
 - CBIR and deduplication workflows
 - Report generation
@@ -217,6 +221,7 @@ flowchart TD
     J --> D
     J --> L
 ```
+
 ---
 
 ## 🧑‍💻 Static Analysis & Code Quality

@@ -1,6 +1,7 @@
 import os
 import shutil
 import logging
+from dataset_forge.utils.cache_utils import in_memory_cache
 
 IMAGE_TYPES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".ico", ".tiff", ".webp"]
 
@@ -33,8 +34,14 @@ def perform_file_operation(src_path, dest_dir, operation, filename):
         return None
 
 
+@in_memory_cache(maxsize=512)  # Cache file type checks
 def is_image_file(filename):
-    """Checks if a file is an image based on its extension."""
+    """
+    Checks if a file is an image based on its extension.
+
+    Note:
+        This function is cached for fast repeated checks of the same filename.
+    """
     return any(filename.lower().endswith(image_type) for image_type in IMAGE_TYPES)
 
 

@@ -137,7 +137,18 @@ def compute_lpips_matrix(
     return matrix
 
 
+from dataset_forge.utils.cache_utils import model_cache
+
+
+@model_cache(maxsize=5, ttl_seconds=86400)  # Cache CLIP model for 24 hours
 def get_clip_model(device: str = "cuda" if torch.cuda.is_available() else "cpu"):
+    """
+    Get CLIP model and preprocess function.
+
+    Note:
+        This function is cached to avoid reloading the CLIP model repeatedly.
+        Model is cached for 24 hours to handle potential updates.
+    """
     if open_clip is None:
         raise ImportError(
             "open-clip-torch is not installed. Please install it via pip."
