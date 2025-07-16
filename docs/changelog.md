@@ -53,6 +53,10 @@
   - All output uses centralized, Mocha-styled printing utilities.
   - No duplicate prompts, debug prints, or raw print statements remain.
   - Documentation and .cursorrules updated accordingly.
+- **Enhanced Metadata Management:**
+  - Added new menu for batch extract, view/edit, filter, and anonymize image metadata (EXIF, IPTC, XMP) using exiftool, Pillow, pandas, and SQLite.
+  - Fully integrated with centralized printing, memory, progress, and logging utilities.
+  - Documented in all relevant docs and .cursorrules.
 
 ## [July 2025]
 

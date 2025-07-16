@@ -22,8 +22,6 @@
 - [Features (expanded/misc)](features.md#features-expandedmisc)
   - [Testing & Validation](features.md#testing--validation)
   - [🧑‍💻 Developer Tools: Static Analysis & Code Quality](features.md#-developer-tools-static-analysis--code-quality)
-  - [July 2025 Improvements](features.md#july-2025-improvements)
-  - [Umzi's Dataset_Preprocessing Integration](features.md#umzis-datasetpreprocessing-integration)
 - [Special Installation Instructions](special_installation.md)
   - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
   - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
@@ -33,6 +31,9 @@
     - [Method 2: Windows (MSYS2 MINGW64 Shell)](special_installation.md#method-2-windows-msys2-mingw64-shell)
     - [Method 3: Windows (Windows pre-build binary)](special_installation.md#method-3-windows-windows-pre-build-binary)
     - [Usage in Dataset Forge](special_installation.md#usage-in-dataset-forge)
+  - [1. Advanced Metadata Operations (for exiftool integration)](special_installation.md#1-advanced-metadata-operations-for-exiftool-integration)
+    - [Method 1: Windows](special_installation.md#method-1-windows)
+    - [Method 2: Windows (Chocolatey)](special_installation.md#method-2-windows-chocolatey)
 - [Usage Guide](usage.md)
   - [🚀 Quick Start](usage.md#-quick-start)
   - [👣 Main Workflows](usage.md#-main-workflows)
@@ -45,6 +46,7 @@
   - [🧑‍💻 Static Analysis & Code Quality](usage.md#-static-analysis--code-quality)
   - [Using Umzi's Dataset_Preprocessing](usage.md#using-umzis-datasetpreprocessing)
     - [🧹 Sanitize Images (NEW July 2025)](usage.md#-sanitize-images-new-july-2025)
+    - [🗂️ Enhanced Metadata Management (NEW July 2025)](usage.md#-enhanced-metadata-management-new-july-2025)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
@@ -54,6 +56,7 @@
   - [⚡ Caching System: Technical Details (NEW July 2025)](advanced.md#-caching-system-technical-details-new-july-2025)
   - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
+  - [🗂️ Enhanced Metadata Management (NEW July 2025)](advanced.md#-enhanced-metadata-management-new-july-2025)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
@@ -67,6 +70,7 @@
   - [Other Issues](troubleshooting.md#other-issues)
   - [Test Failures](troubleshooting.md#test-failures)
   - [Static Analysis Tool Issues](troubleshooting.md#static-analysis-tool-issues)
+  - [Metadata Management Issues (NEW July 2025)](troubleshooting.md#metadata-management-issues-new-july-2025)
 - [Dataset Forge Style Guide](style_guide.md)
   - [General Principles](style_guide.md#general-principles)
   - [Project Architecture](style_guide.md#project-architecture)
@@ -101,6 +105,7 @@
   - [Testing Requirements](style_guide.md#testing-requirements)
   - [Static Analysis & Code Quality (NEW)](style_guide.md#static-analysis--code-quality-new)
   - [Interactive Workflow Prompt Pattern (July 2025)](style_guide.md#interactive-workflow-prompt-pattern-july-2025)
+  - [New Menu Integration (NEW)](style_guide.md#new-menu-integration-new)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
   - [[July 2025]](changelog.md#july-2025)
@@ -186,6 +191,9 @@
 - **🧹 Sanitize Images**: Comprehensive, interactive image file sanitization. Each major step (corruption fix, copy, batch rename, ICC to sRGB, PNG conversion, remove alpha, metadata removal, steganography) is prompted interactively with emoji and Mocha color. Steganography checks prompt for steghide and zsteg individually, and the summary reports both. A visually distinct summary box is always shown at the end, including zsteg results file path if produced. All output uses the Catppuccin Mocha color scheme and emoji-rich prompts. Menu header is reprinted after returning to the workflow menu.
 - **🌳 Enhanced Directory Tree**: Directory tree visualization using emojis
 - **🧹 Filter non-Images**: Filter all non image type files
+- **🗂️ Enhanced Metadata Management**: Batch Extract Metadata: Extract EXIF/IPTC/XMP from all images in a folder to CSV or SQLite using exiftool and pandas/SQLite. View/Edit Metadata: View and edit metadata for a single image (EXIF, IPTC, XMP) using Pillow and exiftool. Filter by Metadata: Query and filter images by metadata fields (e.g., ISO, camera, date) using pandas/SQLite. Batch Anonymize Metadata: Strip all identifying metadata from images using exiftool, with robust error handling and progress.
+
+> **Dependencies:** Requires [exiftool](https://exiftool.org/) (external), pandas, and SQLite (Python stdlib).
 
 ## ⚙️ System & Settings
 
@@ -268,29 +276,7 @@ See `docs/advanced.md` for technical details and customization.
     - `find_code_issues_report.txt` (actionable summary)
     - `find_code_issues_view.txt` (detailed results)
 - **Requirements:**
-  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-
-## July 2025 Improvements
-
-- All menus now use a robust, error-resistant loop pattern for reliability.
-- All DPID logic is modular and uses the new `dataset_forge.dpid.*` structure.
-- All user-facing workflows provide clear, styled feedback and prompts.
-- CLI output is visually consistent and uses the Catppuccin Mocha color scheme throughout.
-- Exception handling and debug prints ensure errors are caught and shown to the user.
-
-For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
-
-## Umzi's Dataset_Preprocessing Integration
-
-Dataset Forge now includes a full integration of Umzi's Dataset_Preprocessing workflows, accessible from the main menu as "🧩 Umzi's Dataset_Preprocessing". This feature mirrors the original consolidated script and provides the following capabilities:
-
-- **Best Tile Extraction**: Extracts the most informative tile(s) from each image in a folder, with support for Laplacian and IC9600 complexity, batch processing, and advanced filtering.
-- **Video Frame Extraction**: Extracts frames from videos based on deep embedding distance, supporting multiple models and distance metrics.
-- **Image Deduplication**: Computes and saves embeddings for all images in a folder, and finds clusters of duplicate/similar images using configurable thresholds and metrics.
-- **IQA Filtering**: Filters or sorts images by Image Quality Assessment (IQA) score using multiple algorithms (HyperIQA, AnIQA, TopIQ, Blockiness, IC9600).
-- **Embedding Extraction**: Extracts and prints the embedding for a single image, useful for debugging or manual analysis.
-
-All workflows are fully interactive, use Dataset Forge's centralized input, printing, memory, and progress management, and are covered by robust unit and CLI integration tests. This integration is modular, testable, and follows all project coding and UI standards.
+  - `
 
 ---
 
@@ -463,6 +449,40 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
+
+---
+
+## 1. Advanced Metadata Operations (for exiftool integration)
+
+### Method 1: Windows
+
+1. Download ExifTool.exe:
+
+   https://exiftool.org/
+
+2. Download the Windows Executable (e.g., `exiftool-12.70.zip`).
+
+3. Extract it and rename `exiftool(-k).exe` to `exiftool.exe` for command-line use.
+
+4. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+> **IMPORTANT:** Note that if you move the .exe to another folder, you must also move the "exiftool_files" folder to the same location.
+
+### Method 2: Windows (Chocolatey)
+
+1. Download ExifTool.exe:
+   ```sh
+   choco install exiftool -y
+   ```
+
+2. This will install `exiftool.exe` to:
+   ```sh
+   C:\ProgramData\chocolatey\lib\exiftool\tools\
+   ```
+
+3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+
 ---
 
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
@@ -600,6 +620,36 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 - At the end, a visually distinct summary box shows all steps (run/skipped), both steganography sub-choices, and the zsteg results file path if produced.
 - The menu header is reprinted after returning to the workflow menu.
 - All output is Mocha-styled and visually consistent.
+
+### 🗂️ Enhanced Metadata Management (NEW July 2025)
+
+- **Batch Extract Metadata:**
+
+  1. Open the Enhanced Metadata Management menu from the main menu.
+  2. Select 'Batch Extract Metadata'.
+  3. Choose a folder, output format (CSV/SQLite), and output path.
+  4. Requires exiftool to be installed and in PATH.
+
+- **View/Edit Metadata:**
+
+  1. Select 'View/Edit Metadata' from the menu.
+  2. Enter the image file path.
+  3. View EXIF (Pillow) and full metadata (exiftool).
+  4. Optionally set or remove fields using exiftool.
+
+- **Filter by Metadata:**
+
+  1. Select 'Filter by Metadata'.
+  2. Choose metadata source (CSV/SQLite from batch extract).
+  3. Enter a pandas query string (e.g., 'ISO > 800 and Model == "Canon"').
+  4. View and/or export filtered results.
+
+- **Batch Anonymize Metadata:**
+  1. Select 'Batch Anonymize Metadata'.
+  2. Choose a folder and confirm operation.
+  3. All metadata will be stripped using exiftool.
+
+> **Note:** If exiftool is not found, you will be prompted to install it. See [Troubleshooting](troubleshooting.md) for help.
 
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
@@ -780,6 +830,23 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - No duplicate prompts or debug prints remain.
 - This pattern is now the standard for all interactive workflows in Dataset Forge.
 
+## 🗂️ Enhanced Metadata Management (NEW July 2025)
+
+- **Technical Details:**
+  - Uses exiftool for robust, cross-format metadata extraction, editing, and anonymization (supports EXIF, IPTC, XMP, and more).
+  - Batch extract uses exiftool's -csv or -j (JSON) output, loaded into pandas for CSV/SQLite export and filtering.
+  - View/Edit uses Pillow for simple EXIF and exiftool for advanced/other tags.
+  - Filtering leverages pandas' query syntax for flexible, powerful queries.
+  - Batch anonymization uses exiftool with -all= and -overwrite_original, with progress and error handling.
+- **Rationale:**
+  - exiftool is the industry standard for metadata, supporting more tags and formats than any Python library alone.
+  - pandas/SQLite provide scalable, scriptable analysis and filtering.
+- **Extensibility:**
+  - Future support for batch editing, IPTC/XMP-specific workflows, and advanced search/export is planned.
+- **Integration:**
+  - All actions use centralized printing, memory, progress, and logging utilities.
+  - Robust error handling and user feedback throughout.
+
 ---
 
 
@@ -793,7 +860,9 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 ## Directory Structure
 
 - **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
+  - **enhanced_metadata_menu.py**: Enhanced Metadata Management menu (batch extract, view/edit, filter, anonymize)
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
+  - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
 - **configs/**: Example and user configuration files
@@ -816,6 +885,7 @@ flowchart TD
     B --> B5["System Monitoring Menu"]
     B --> B6["Umzi's Dataset_Preprocessing Menu"]
     B --> B7["Settings, User Profile, Utilities"]
+    B --> B8["Enhanced Metadata Menu"]
     B1 --> C1["dataset_forge/actions/dataset_actions.py"]
     B2 --> C2["analysis_actions.py, analysis_ops_actions.py"]
     B3 --> C3["augmentation_actions.py, tiling_actions.py"]
@@ -823,6 +893,7 @@ flowchart TD
     B5 --> C5["monitoring.py, session_state.py"]
     B6 --> C6["umzi_dataset_preprocessing_actions.py"]
     B7 --> C7["settings_actions.py, user_profile_actions.py, ..."]
+    B8 --> C8["enhanced_metadata_actions.py"]
     C1 --> D["Utils (file_utils, image_ops, memory_utils, ...)"]
     C2 --> D
     C3 --> D
@@ -868,6 +939,10 @@ The Umzi Dataset_Preprocessing workflows are now fully modularized within Datase
 - UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`.
 - Uses lazy imports, robust menu loop, and centralized utilities.
 - See `docs/advanced.md` for a detailed discussion of the porting and modularization process.
+
+- **Enhanced Metadata Management:**
+  - Modular menu and actions for batch metadata extraction, editing, filtering, and anonymization.
+  - Uses exiftool, pandas, SQLite, Pillow, and centralized utilities.
 
 ---
 
@@ -934,6 +1009,28 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 - If the script reports no files found, check your directory structure and that the codebase is present.
 - The script overwrites its output files in `tools/find_code_issues/` on each run.
 - Review the log file (`find_code_issues.log`) for detailed error messages.
+
+---
+
+## Metadata Management Issues (NEW July 2025)
+
+**Problem:** exiftool not found or not working.
+
+- Ensure exiftool is installed and in your system PATH. Download from https://exiftool.org/.
+- On Windows, you may need to rename exiftool(-k).exe to exiftool.exe and add its folder to PATH.
+- Restart your terminal after installation.
+
+**Problem:** pandas or SQLite errors when extracting/filtering metadata.
+
+- Ensure pandas is installed: `pip install pandas`
+- SQLite is included with Python, but ensure your Python is not missing standard libraries.
+- Check your CSV/SQLite file for corruption or incomplete extraction.
+
+**Problem:** Metadata extraction returns empty or incomplete results.
+
+- Some image formats may not contain metadata, or may be corrupted.
+- Try running exiftool manually on a sample file to debug.
+- Check file permissions and ensure files are not locked by another process.
 
 ---
 
@@ -1216,6 +1313,14 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - No duplicate prompts, debug prints, or raw print statements are allowed.
 - This is now the standard for all interactive workflows in Dataset Forge.
 
+## New Menu Integration (NEW)
+
+- All new menu items and features (including Enhanced Metadata Management) must be documented in all relevant docs and README_full.md.
+- Enhanced Metadata Management menu and features must be maintained, tested, and documented.
+- exiftool, pandas, and SQLite are required for full metadata support; document their usage and troubleshooting.
+- All user-facing errors must trigger error sound and be logged.
+- All new features must include robust error handling, memory management, and user feedback.
+
 ---
 
 
@@ -1277,6 +1382,10 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
   - All output uses centralized, Mocha-styled printing utilities.
   - No duplicate prompts, debug prints, or raw print statements remain.
   - Documentation and .cursorrules updated accordingly.
+- **Enhanced Metadata Management:**
+  - Added new menu for batch extract, view/edit, filter, and anonymize image metadata (EXIF, IPTC, XMP) using exiftool, Pillow, pandas, and SQLite.
+  - Fully integrated with centralized printing, memory, progress, and logging utilities.
+  - Documented in all relevant docs and .cursorrules.
 
 ## [July 2025]
 

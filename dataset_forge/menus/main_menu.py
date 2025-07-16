@@ -78,6 +78,13 @@ def main_menu():
                     "umzi_dataset_preprocessing_menu",
                 ),
             ),
+            "10": (
+                "🗂️  Enhanced Metadata Management",
+                lazy_menu(
+                    "dataset_forge.menus.enhanced_metadata_menu",
+                    "enhanced_metadata_menu",
+                ),
+            ),
             "0": ("🚪 Exit", None),
         }
         choice = show_menu(

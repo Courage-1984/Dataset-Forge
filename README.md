@@ -22,6 +22,7 @@
 - Analyze dataset quality and generate reports
 - Process, augment, and transform images
 - Remove duplicates and validate data
+- Extract, view, edit, filter, and anonymize image metadata (EXIF, IPTC, XMP) with the Enhanced Metadata Management menu ([see docs](docs/features.md#🗂️-enhanced-metadata-management-new-july-2025)).
 
 It's designed to streamline the tedious work of preparing image datasets for training ML models, with an intuitive interface and robust processing capabilities. Please see [Features](docs/features.md).
 

@@ -128,6 +128,36 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 - The menu header is reprinted after returning to the workflow menu.
 - All output is Mocha-styled and visually consistent.
 
+### 🗂️ Enhanced Metadata Management (NEW July 2025)
+
+- **Batch Extract Metadata:**
+
+  1. Open the Enhanced Metadata Management menu from the main menu.
+  2. Select 'Batch Extract Metadata'.
+  3. Choose a folder, output format (CSV/SQLite), and output path.
+  4. Requires exiftool to be installed and in PATH.
+
+- **View/Edit Metadata:**
+
+  1. Select 'View/Edit Metadata' from the menu.
+  2. Enter the image file path.
+  3. View EXIF (Pillow) and full metadata (exiftool).
+  4. Optionally set or remove fields using exiftool.
+
+- **Filter by Metadata:**
+
+  1. Select 'Filter by Metadata'.
+  2. Choose metadata source (CSV/SQLite from batch extract).
+  3. Enter a pandas query string (e.g., 'ISO > 800 and Model == "Canon"').
+  4. View and/or export filtered results.
+
+- **Batch Anonymize Metadata:**
+  1. Select 'Batch Anonymize Metadata'.
+  2. Choose a folder and confirm operation.
+  3. All metadata will be stripped using exiftool.
+
+> **Note:** If exiftool is not found, you will be prompted to install it. See [Troubleshooting](troubleshooting.md) for help.
+
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
 > **Badges:** Standard badges (build, license, Python version, etc.) are included in the README. See the README for their meaning.

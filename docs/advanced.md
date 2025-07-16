@@ -168,3 +168,20 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - All output uses centralized, Mocha-styled printing utilities and emoji-rich prompts.
 - No duplicate prompts or debug prints remain.
 - This pattern is now the standard for all interactive workflows in Dataset Forge.
+
+## 🗂️ Enhanced Metadata Management (NEW July 2025)
+
+- **Technical Details:**
+  - Uses exiftool for robust, cross-format metadata extraction, editing, and anonymization (supports EXIF, IPTC, XMP, and more).
+  - Batch extract uses exiftool's -csv or -j (JSON) output, loaded into pandas for CSV/SQLite export and filtering.
+  - View/Edit uses Pillow for simple EXIF and exiftool for advanced/other tags.
+  - Filtering leverages pandas' query syntax for flexible, powerful queries.
+  - Batch anonymization uses exiftool with -all= and -overwrite_original, with progress and error handling.
+- **Rationale:**
+  - exiftool is the industry standard for metadata, supporting more tags and formats than any Python library alone.
+  - pandas/SQLite provide scalable, scriptable analysis and filtering.
+- **Extensibility:**
+  - Future support for batch editing, IPTC/XMP-specific workflows, and advanced search/export is planned.
+- **Integration:**
+  - All actions use centralized printing, memory, progress, and logging utilities.
+  - Robust error handling and user feedback throughout.

@@ -61,6 +61,7 @@ OpenModelDB/
 example_uspscale/
 resdet/
 wtp_dataset_destroyer/
+example_Align_Images/
 
 # =============================
 # Configs and Path History

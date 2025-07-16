@@ -58,4 +58,26 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 
 ---
 
+## Metadata Management Issues (NEW July 2025)
+
+**Problem:** exiftool not found or not working.
+
+- Ensure exiftool is installed and in your system PATH. Download from https://exiftool.org/.
+- On Windows, you may need to rename exiftool(-k).exe to exiftool.exe and add its folder to PATH.
+- Restart your terminal after installation.
+
+**Problem:** pandas or SQLite errors when extracting/filtering metadata.
+
+- Ensure pandas is installed: `pip install pandas`
+- SQLite is included with Python, but ensure your Python is not missing standard libraries.
+- Check your CSV/SQLite file for corruption or incomplete extraction.
+
+**Problem:** Metadata extraction returns empty or incomplete results.
+
+- Some image formats may not contain metadata, or may be corrupted.
+- Try running exiftool manually on a sample file to debug.
+- Check file permissions and ensure files are not locked by another process.
+
+---
+
 For further help, see [usage.md](usage.md) or contact the project maintainer.

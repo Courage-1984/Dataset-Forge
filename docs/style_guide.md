@@ -270,3 +270,11 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - All output must use centralized, Mocha-styled printing utilities and emoji-rich prompts.
 - No duplicate prompts, debug prints, or raw print statements are allowed.
 - This is now the standard for all interactive workflows in Dataset Forge.
+
+## New Menu Integration (NEW)
+
+- All new menu items and features (including Enhanced Metadata Management) must be documented in all relevant docs and README_full.md.
+- Enhanced Metadata Management menu and features must be maintained, tested, and documented.
+- exiftool, pandas, and SQLite are required for full metadata support; document their usage and troubleshooting.
+- All user-facing errors must trigger error sound and be logged.
+- All new features must include robust error handling, memory management, and user feedback.

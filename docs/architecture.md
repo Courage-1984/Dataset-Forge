@@ -7,7 +7,9 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 ## Directory Structure
 
 - **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
+  - **enhanced_metadata_menu.py**: Enhanced Metadata Management menu (batch extract, view/edit, filter, anonymize)
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
+  - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
 - **configs/**: Example and user configuration files
@@ -30,6 +32,7 @@ flowchart TD
     B --> B5["System Monitoring Menu"]
     B --> B6["Umzi's Dataset_Preprocessing Menu"]
     B --> B7["Settings, User Profile, Utilities"]
+    B --> B8["Enhanced Metadata Menu"]
     B1 --> C1["dataset_forge/actions/dataset_actions.py"]
     B2 --> C2["analysis_actions.py, analysis_ops_actions.py"]
     B3 --> C3["augmentation_actions.py, tiling_actions.py"]
@@ -37,6 +40,7 @@ flowchart TD
     B5 --> C5["monitoring.py, session_state.py"]
     B6 --> C6["umzi_dataset_preprocessing_actions.py"]
     B7 --> C7["settings_actions.py, user_profile_actions.py, ..."]
+    B8 --> C8["enhanced_metadata_actions.py"]
     C1 --> D["Utils (file_utils, image_ops, memory_utils, ...)"]
     C2 --> D
     C3 --> D
@@ -82,6 +86,10 @@ The Umzi Dataset_Preprocessing workflows are now fully modularized within Datase
 - UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`.
 - Uses lazy imports, robust menu loop, and centralized utilities.
 - See `docs/advanced.md` for a detailed discussion of the porting and modularization process.
+
+- **Enhanced Metadata Management:**
+  - Modular menu and actions for batch metadata extraction, editing, filtering, and anonymization.
+  - Uses exiftool, pandas, SQLite, Pillow, and centralized utilities.
 
 ---
 
