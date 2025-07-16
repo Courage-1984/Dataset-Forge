@@ -43,6 +43,7 @@ site/
 *.swp
 *.swo
 *.orig
+!reports/images/
 reports/images/
 reports/*.html
 reports/*.md
