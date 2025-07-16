@@ -1,0 +1,62 @@
+[
+    {
+        "operation": "random_flip",
+        "params": {
+            "p": 0.5
+        }
+    },
+    {
+        "operation": "random_rotation",
+        "params": {
+            "max_angle": 30
+        }
+    },
+    {
+        "operation": "random_crop",
+        "params": {
+            "crop_size": [
+                256,
+                256
+            ]
+        }
+    },
+    {
+        "operation": "random_brightness",
+        "params": {
+            "factor_range": [
+                0.8,
+                1.2
+            ]
+        }
+    },
+    {
+        "operation": "random_contrast",
+        "params": {
+            "factor_range": [
+                0.8,
+                1.2
+            ]
+        }
+    },
+    {
+        "operation": "random_saturation",
+        "params": {
+            "factor_range": [
+                0.8,
+                1.2
+            ]
+        }
+    },
+    {
+        "operation": "random_noise",
+        "params": {
+            "noise_factor": 0.05
+        }
+    },
+    {
+        "operation": "random_blur",
+        "params": {
+            "max_radius": 2.0
+        }
+    }
+]

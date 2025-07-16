@@ -31,15 +31,10 @@ configs/*
 !configs/_example_user_profile.json
 
 # Augmentation recipes
+!configs/augmentation_recipes/
 configs/augmentation_recipes/*
 !configs/augmentation_recipes/_example_advanced_recipe_template.json
 !configs/augmentation_recipes/_example_basic_flip_rotate.json
-
-# User-specific config files
-configs/test_config.json
-configs/user_profile_active.txt
-configs/user_profile_test.json
-configs/user_profile.json
 
 # Path history
 ./.path_history
@@ -57,8 +52,6 @@ results
 ./Kim's_Directory_Tree_Maker
 Kim's_Directory_Tree_Maker
 
-./charts_20250712_063926
-charts_20250712_063926
 /charts_*/
 ./charts_*/
 

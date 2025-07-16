@@ -1,0 +1,14 @@
+[
+    {
+        "operation": "random_flip",
+        "params": {
+            "p": 0.5
+        }
+    },
+    {
+        "operation": "random_rotation",
+        "params": {
+            "max_angle": 90
+        }
+    }
+]
