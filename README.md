@@ -124,6 +124,18 @@ Style Transfer: Apply artistic styles to datasets
 Content-Aware Cropping: Intelligent image cropping
 
 ```
+- [ ] **Advanced Data Augmentation**: 
+```
+What: Expand the augmentation capabilities to include more complex, model-aware techniques.
+
+Why: Your current augmentations are great for general image processing. Adding advanced techniques can significantly improve model generalization during training.
+
+Suggestions:
+- Compositional Augmentations: Integrate a library like Albumentations to create complex augmentation pipelines.
+- Mixing Augmentations: Implement Mixup (linearly interpolating images and their labels) and CutMix (pasting a patch from one image onto another).
+- GAN-based Augmentations: For advanced users, integrate with a pre-trained StyleGAN to generate synthetic data variations.
+
+```
 
 - [ ] **Example**: Improve error reporting for Example workflows
 
