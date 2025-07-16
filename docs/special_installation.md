@@ -165,6 +165,40 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
+
+---
+
+## 1. Advanced Metadata Operations (for exiftool integration)
+
+### Method 1: Windows
+
+1. Download ExifTool.exe:
+
+   https://exiftool.org/
+
+2. Download the Windows Executable (e.g., `exiftool-12.70.zip`).
+
+3. Extract it and rename `exiftool(-k).exe` to `exiftool.exe` for command-line use.
+
+4. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+> **IMPORTANT:** Note that if you move the .exe to another folder, you must also move the "exiftool_files" folder to the same location.
+
+### Method 2: Windows (Chocolatey)
+
+1. Download ExifTool.exe:
+   ```sh
+   choco install exiftool -y
+   ```
+
+2. This will install `exiftool.exe` to:
+   ```sh
+   C:\ProgramData\chocolatey\lib\exiftool\tools\
+   ```
+
+3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+
 ---
 
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
