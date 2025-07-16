@@ -31,6 +31,7 @@
   - [Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection](special_installation.md#installing-and-using-resdethttpsgithubcom0x09resdet-for-native-resolution-detection)
     - [Method 1: Windows (WSL - Recommended for CLI Integration)](special_installation.md#method-1-windows-wsl---recommended-for-cli-integration)
     - [Method 2: Windows (MSYS2 MINGW64 Shell)](special_installation.md#method-2-windows-msys2-mingw64-shell)
+    - [Method 3: Windows (Windows pre-build binary)](special_installation.md#method-3-windows-windows-pre-build-binary)
     - [Usage in Dataset Forge](special_installation.md#usage-in-dataset-forge)
 - [Usage Guide](usage.md)
   - [🚀 Quick Start](usage.md#-quick-start)
@@ -43,6 +44,7 @@
   - [Running the Test Suite](usage.md#running-the-test-suite)
   - [🧑‍💻 Static Analysis & Code Quality](usage.md#-static-analysis--code-quality)
   - [Using Umzi's Dataset_Preprocessing](usage.md#using-umzis-datasetpreprocessing)
+    - [🧹 Sanitize Images (NEW July 2025)](usage.md#-sanitize-images-new-july-2025)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
@@ -51,6 +53,7 @@
   - [🧑‍💻 Advanced Developer Tools: Static Analysis](advanced.md#-advanced-developer-tools-static-analysis)
   - [⚡ Caching System: Technical Details (NEW July 2025)](advanced.md#-caching-system-technical-details-new-july-2025)
   - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
+  - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Monitoring & Analytics](architecture.md#monitoring--analytics)
@@ -96,6 +99,7 @@
   - [Exception Handling & Debug Prints (NEW)](style_guide.md#exception-handling--debug-prints-new)
   - [Testing Requirements](style_guide.md#testing-requirements)
   - [Static Analysis & Code Quality (NEW)](style_guide.md#static-analysis--code-quality-new)
+  - [Interactive Workflow Prompt Pattern (July 2025)](style_guide.md#interactive-workflow-prompt-pattern-july-2025)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
   - [[July 2025]](changelog.md#july-2025)
@@ -131,7 +135,7 @@
 
 ## ⚙️ Core & Configuration
 
-- **🔧 External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux), [getnative](https://github.com/Infiziert90/getnative), [resdet](https://github.com/0x09/resdet)
+- **🔧 External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux), [getnative](https://github.com/Infiziert90/getnative), [resdet](https://github.com/0x09/resdet), [Oxipng](https://github.com/oxipng/oxipng), [Steghide](https://steghide.sourceforge.net/), [zsteg](https://github.com/zed-0xff/zsteg), [umzi's Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing), []()
 - **📦 Model management**: List, select, download and run upscaling with trained models (also [OpenModelDB](https://openmodeldb.info/) integration)
 - **✅ Validation tools**: Validate HQ/LQ pairs and validation datasets from config
 - **👤 User profiles**: Save favorites, presets, links and quick access paths
@@ -178,7 +182,7 @@
 
 - **🖼️ Create Comparisons**: Create striking image / gif comparisons
 - **📦 Compression**: Compress images or directories
-- **🧹 Sanitize Images**: Comprehensive image file sanitization (alpha channel, colour profile, steganography, metadata)
+- **🧹 Sanitize Images**: Comprehensive, interactive image file sanitization. Each major step (corruption fix, copy, batch rename, ICC to sRGB, PNG conversion, remove alpha, metadata removal, steganography) is prompted interactively with emoji and Mocha color. Steganography checks prompt for steghide and zsteg individually, and the summary reports both. A visually distinct summary box is always shown at the end, including zsteg results file path if produced. All output uses the Catppuccin Mocha color scheme and emoji-rich prompts. Menu header is reprinted after returning to the workflow menu.
 - **🌳 Enhanced Directory Tree**: Directory tree visualization using emojis
 - **🧹 Filter non-Images**: Filter all non image type files
 
@@ -440,6 +444,16 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
 
+### Method 3: Windows (Windows pre-build binary)
+
+1. Extract the following files from `assets/resdet_windows.zip`:
+
+   - `resdet.exe`
+
+   (This is a prebuilt for 64-bit Windows that I compiled.)
+
+2. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
+
 ### Usage in Dataset Forge
 
 - The CLI will detect your platform and use the appropriate resdet binary.
@@ -575,6 +589,14 @@ You can access Umzi's Dataset_Preprocessing from the main menu (option 9: 🧩 U
 - **Embedding Extraction**: Extract and print the embedding for a single image.
 
 All options are fully interactive, use Dataset Forge's input and printing utilities, and are covered by robust unit and CLI tests. See the main menu for access.
+
+### 🧹 Sanitize Images (NEW July 2025)
+
+- The workflow now prompts you interactively for each major step (corruption fix, copy, batch rename, ICC to sRGB, PNG, remove alpha, metadata, steganography), with emoji and Mocha-styled prompts.
+- Steganography checks prompt for steghide and zsteg individually, and only the selected tools are run.
+- At the end, a visually distinct summary box shows all steps (run/skipped), both steganography sub-choices, and the zsteg results file path if produced.
+- The menu header is reprinted after returning to the workflow menu.
+- All output is Mocha-styled and visually consistent.
 
 ---
 
@@ -736,6 +758,16 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - All workflows are testable, with comprehensive unit and CLI integration tests.
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
 - This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.
+
+## Interactive Workflow Prompt Handling (July 2025)
+
+- The sanitize images workflow now handles all step prompts interactively within the workflow function, not in the menu.
+- Steganography checks prompt for steghide and zsteg individually, and the summary reports both sub-choices.
+- The summary box is always shown at the end, listing all steps (run/skipped) and the zsteg results file path if produced.
+- The menu header is reprinted after returning to the workflow menu.
+- All output uses centralized, Mocha-styled printing utilities and emoji-rich prompts.
+- No duplicate prompts or debug prints remain.
+- This pattern is now the standard for all interactive workflows in Dataset Forge.
 
 ---
 
@@ -1118,6 +1150,16 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - The script overwrites its output files in `tools/find_code_issues/` on each run.
 - See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
 
+## Interactive Workflow Prompt Pattern (July 2025)
+
+- All interactive workflows must prompt for each major step within the workflow, not the menu.
+- Steganography checks must prompt for steghide and zsteg individually, and the summary must report both.
+- A visually distinct summary box must always be shown at the end, including zsteg results file path if produced.
+- Menu header must be reprinted after returning to the workflow menu.
+- All output must use centralized, Mocha-styled printing utilities and emoji-rich prompts.
+- No duplicate prompts, debug prints, or raw print statements are allowed.
+- This is now the standard for all interactive workflows in Dataset Forge.
+
 ---
 
 
@@ -1171,6 +1213,14 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - All features are fully interactive, testable, and documented.
 - Added robust unit and CLI integration tests for all workflows.
 - Updated documentation in features.md, usage.md, advanced.md, architecture.md, changelog.md, and .cursorrules.
+- Major refactor of the Sanitize Images workflow (July 2025):
+  - All step prompts are now interactive, Mocha-styled, and emoji-rich.
+  - Steganography checks prompt for steghide and zsteg individually, and the summary reports both.
+  - A visually distinct summary box is always shown at the end, including zsteg results file path if produced.
+  - Menu header is reprinted after returning to the workflow menu.
+  - All output uses centralized, Mocha-styled printing utilities.
+  - No duplicate prompts, debug prints, or raw print statements remain.
+  - Documentation and .cursorrules updated accordingly.
 
 ## [July 2025]
 

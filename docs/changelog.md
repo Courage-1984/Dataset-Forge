@@ -45,6 +45,14 @@
 - All features are fully interactive, testable, and documented.
 - Added robust unit and CLI integration tests for all workflows.
 - Updated documentation in features.md, usage.md, advanced.md, architecture.md, changelog.md, and .cursorrules.
+- Major refactor of the Sanitize Images workflow (July 2025):
+  - All step prompts are now interactive, Mocha-styled, and emoji-rich.
+  - Steganography checks prompt for steghide and zsteg individually, and the summary reports both.
+  - A visually distinct summary box is always shown at the end, including zsteg results file path if produced.
+  - Menu header is reprinted after returning to the workflow menu.
+  - All output uses centralized, Mocha-styled printing utilities.
+  - No duplicate prompts, debug prints, or raw print statements remain.
+  - Documentation and .cursorrules updated accordingly.
 
 ## [July 2025]
 

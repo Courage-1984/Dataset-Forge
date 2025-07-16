@@ -154,3 +154,13 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - All workflows are testable, with comprehensive unit and CLI integration tests.
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
 - This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.
+
+## Interactive Workflow Prompt Handling (July 2025)
+
+- The sanitize images workflow now handles all step prompts interactively within the workflow function, not in the menu.
+- Steganography checks prompt for steghide and zsteg individually, and the summary reports both sub-choices.
+- The summary box is always shown at the end, listing all steps (run/skipped) and the zsteg results file path if produced.
+- The menu header is reprinted after returning to the workflow menu.
+- All output uses centralized, Mocha-styled printing utilities and emoji-rich prompts.
+- No duplicate prompts or debug prints remain.
+- This pattern is now the standard for all interactive workflows in Dataset Forge.

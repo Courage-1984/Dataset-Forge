@@ -260,3 +260,13 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Before submitting a PR, contributors **must** run the static analysis tool and address all actionable issues (dead code, untested code, missing docstrings, etc.).
 - The script overwrites its output files in `tools/find_code_issues/` on each run.
 - See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
+
+## Interactive Workflow Prompt Pattern (July 2025)
+
+- All interactive workflows must prompt for each major step within the workflow, not the menu.
+- Steganography checks must prompt for steghide and zsteg individually, and the summary must report both.
+- A visually distinct summary box must always be shown at the end, including zsteg results file path if produced.
+- Menu header must be reprinted after returning to the workflow menu.
+- All output must use centralized, Mocha-styled printing utilities and emoji-rich prompts.
+- No duplicate prompts, debug prints, or raw print statements are allowed.
+- This is now the standard for all interactive workflows in Dataset Forge.

@@ -119,3 +119,11 @@ You can access Umzi's Dataset_Preprocessing from the main menu (option 9: 🧩 U
 - **Embedding Extraction**: Extract and print the embedding for a single image.
 
 All options are fully interactive, use Dataset Forge's input and printing utilities, and are covered by robust unit and CLI tests. See the main menu for access.
+
+### 🧹 Sanitize Images (NEW July 2025)
+
+- The workflow now prompts you interactively for each major step (corruption fix, copy, batch rename, ICC to sRGB, PNG, remove alpha, metadata, steganography), with emoji and Mocha-styled prompts.
+- Steganography checks prompt for steghide and zsteg individually, and only the selected tools are run.
+- At the end, a visually distinct summary box shows all steps (run/skipped), both steganography sub-choices, and the zsteg results file path if produced.
+- The menu header is reprinted after returning to the workflow menu.
+- All output is Mocha-styled and visually consistent.
