@@ -18,6 +18,51 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **tools/**: Project tools and developer utilities (e.g., static analysis, documentation merging)
   - **find_code_issues/find_code_issues.py**: Static analysis and code quality tool for maintainers. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. Outputs actionable reports to the same directory.
 
+## Mermaid Architecture Diagram (Detailed)
+
+```mermaid
+flowchart TD
+    A["CLI Entrypoint (main.py)"] --> B["Main Menu (menus/main_menu.py)"]
+    B --> B1["Dataset Management Menu"]
+    B --> B2["Analysis & Validation Menu"]
+    B --> B3["Augmentation Menu"]
+    B --> B4["CBIR Menu"]
+    B --> B5["System Monitoring Menu"]
+    B --> B6["Umzi's Dataset_Preprocessing Menu"]
+    B --> B7["Settings, User Profile, Utilities"]
+    B1 --> C1["dataset_forge/actions/dataset_actions.py"]
+    B2 --> C2["analysis_actions.py, analysis_ops_actions.py"]
+    B3 --> C3["augmentation_actions.py, tiling_actions.py"]
+    B4 --> C4["cbir_actions.py, visual_dedup_actions.py"]
+    B5 --> C5["monitoring.py, session_state.py"]
+    B6 --> C6["umzi_dataset_preprocessing_actions.py"]
+    B7 --> C7["settings_actions.py, user_profile_actions.py, ..."]
+    C1 --> D["Utils (file_utils, image_ops, memory_utils, ...)"]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
+    C6 --> D
+    C7 --> D
+    D --> E["DPID Implementations (dpid/)"]
+    D --> F["External Libraries"]
+    E --> F
+    subgraph "Data & Config"
+      G1["configs/"]
+      G2["reports/"]
+      G3["assets/"]
+    end
+    D --> G1
+    D --> G2
+    D --> G3
+    E --> G1
+    E --> G2
+    E --> G3
+    F --> G1
+    F --> G2
+    F --> G3
+```
+
 ## Monitoring & Analytics
 
 - Centralized resource monitoring, analytics, error tracking, health checks, and background task registry (see utils/monitoring.py).

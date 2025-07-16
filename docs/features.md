@@ -117,6 +117,8 @@ See `docs/advanced.md` for technical details and customization.
 
 ## 🧑‍💻 Developer Tools: Static Analysis & Code Quality
 
+> **Documentation Convention:** When adding new features or modules, update the architecture diagrams (Mermaid) in README.md and docs/architecture.md as needed. Use standard badges in the README and document their meaning in the docs.
+
 - **Static Analysis Tool:** Located at `tools/find_code_issues/find_code_issues.py`.
 - **Checks:**
   - Unused (dead) code, functions, classes, and methods

@@ -127,3 +127,7 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 - At the end, a visually distinct summary box shows all steps (run/skipped), both steganography sub-choices, and the zsteg results file path if produced.
 - The menu header is reprinted after returning to the workflow menu.
 - All output is Mocha-styled and visually consistent.
+
+> **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
+>
+> **Badges:** Standard badges (build, license, Python version, etc.) are included in the README. See the README for their meaning.

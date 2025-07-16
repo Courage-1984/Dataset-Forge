@@ -141,10 +141,14 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 
 ---
 
-<!-- Badges (add more as needed) -->
+<!-- Badges -->
 <p align="center">
+  <a href="https://github.com/Courage-1984/Dataset-Forge/actions"><img src="https://img.shields.io/github/workflow/status/Courage-1984/Dataset-Forge/CI?label=build" alt="Build Status"></a>
   <a href="https://github.com/Courage-1984/Dataset-Forge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-CC--BY--SA--4.0-blue" alt="License"></a>
-  <!-- Add CI/build/test badges here if available -->
+  <a href="https://img.shields.io/badge/python-3.12%2B-blue.svg"><img src="https://img.shields.io/badge/python-3.12%2B-blue.svg" alt="Python Version"></a>
+  <a href="https://img.shields.io/github/issues/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/issues/Courage-1984/Dataset-Forge" alt="Issues"></a>
+  <a href="https://img.shields.io/github/stars/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/stars/Courage-1984/Dataset-Forge" alt="Stars"></a>
+  <a href="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge" alt="Last Commit"></a>
 </p>
 
 ## 🧪 Comprehensive Test Suite
@@ -165,3 +169,32 @@ venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
 ```
 
 All new features and bugfixes must include appropriate tests. See [docs/features.md](docs/features.md) and [docs/usage.md](docs/usage.md) for details.
+
+## Project Architecture
+
+A high-level overview of Dataset Forge's modular architecture:
+
+```mermaid
+flowchart TD
+    A["CLI Entrypoint (main.py)"] --> B["Menus (dataset_forge/menus)"]
+    B --> C["Actions (dataset_forge/actions)"]
+    C --> D["Utils (dataset_forge/utils)"]
+    C --> E["DPID Implementations (dataset_forge/dpid)"]
+    B --> F["Session State (menus/session_state.py)"]
+    B --> G["System Monitoring, Settings, User Profile Menus"]
+    C --> H["CBIR, Deduplication, Preprocessing, etc."]
+    D --> I["Memory, Parallel, Progress, Color, Audio, File Ops"]
+    B --> J["Reports, Configs, Assets"]
+    subgraph "External"
+      K["User Input/Output"]
+      L["Third-party Libraries"]
+    end
+    A --> K
+    D --> L
+    E --> L
+    F --> D
+    G --> D
+    H --> D
+    J --> D
+    J --> L
+```

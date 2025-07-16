@@ -56,6 +56,7 @@
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
+  - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
   - [Monitoring & Analytics](architecture.md#monitoring--analytics)
   - [Test Suite Integration](architecture.md#test-suite-integration)
     - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
@@ -245,6 +246,8 @@ See `docs/advanced.md` for technical details and customization.
 ---
 
 ## 🧑‍💻 Developer Tools: Static Analysis & Code Quality
+
+> **Documentation Convention:** When adding new features or modules, update the architecture diagrams (Mermaid) in README.md and docs/architecture.md as needed. Use standard badges in the README and document their meaning in the docs.
 
 - **Static Analysis Tool:** Located at `tools/find_code_issues/find_code_issues.py`.
 - **Checks:**
@@ -598,11 +601,19 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 - The menu header is reprinted after returning to the workflow menu.
 - All output is Mocha-styled and visually consistent.
 
+> **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
+>
+> **Badges:** Standard badges (build, license, Python version, etc.) are included in the README. See the README for their meaning.
+
 ---
 
 
 # Advanced
 
+
+> **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
+>
+> **Badges:** Standard badges (build, license, Python version, etc.) are included in the README. See the README for their meaning.
 
 # Advanced Features & Configuration
 
@@ -792,6 +803,51 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **tests/**: Unit & integration tests
 - **tools/**: Project tools and developer utilities (e.g., static analysis, documentation merging)
   - **find_code_issues/find_code_issues.py**: Static analysis and code quality tool for maintainers. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. Outputs actionable reports to the same directory.
+
+## Mermaid Architecture Diagram (Detailed)
+
+```mermaid
+flowchart TD
+    A["CLI Entrypoint (main.py)"] --> B["Main Menu (menus/main_menu.py)"]
+    B --> B1["Dataset Management Menu"]
+    B --> B2["Analysis & Validation Menu"]
+    B --> B3["Augmentation Menu"]
+    B --> B4["CBIR Menu"]
+    B --> B5["System Monitoring Menu"]
+    B --> B6["Umzi's Dataset_Preprocessing Menu"]
+    B --> B7["Settings, User Profile, Utilities"]
+    B1 --> C1["dataset_forge/actions/dataset_actions.py"]
+    B2 --> C2["analysis_actions.py, analysis_ops_actions.py"]
+    B3 --> C3["augmentation_actions.py, tiling_actions.py"]
+    B4 --> C4["cbir_actions.py, visual_dedup_actions.py"]
+    B5 --> C5["monitoring.py, session_state.py"]
+    B6 --> C6["umzi_dataset_preprocessing_actions.py"]
+    B7 --> C7["settings_actions.py, user_profile_actions.py, ..."]
+    C1 --> D["Utils (file_utils, image_ops, memory_utils, ...)"]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    C5 --> D
+    C6 --> D
+    C7 --> D
+    D --> E["DPID Implementations (dpid/)"]
+    D --> F["External Libraries"]
+    E --> F
+    subgraph "Data & Config"
+      G1["configs/"]
+      G2["reports/"]
+      G3["assets/"]
+    end
+    D --> G1
+    D --> G2
+    D --> G3
+    E --> G1
+    E --> G2
+    E --> G3
+    F --> G1
+    F --> G2
+    F --> G3
+```
 
 ## Monitoring & Analytics
 

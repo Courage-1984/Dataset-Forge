@@ -49,6 +49,7 @@
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
+  - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
   - [Monitoring & Analytics](architecture.md#monitoring--analytics)
   - [Test Suite Integration](architecture.md#test-suite-integration)
     - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
