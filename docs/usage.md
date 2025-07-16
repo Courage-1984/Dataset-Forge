@@ -261,3 +261,24 @@ A comprehensive static analysis tool for maintainers and contributors.
 - **Troubleshooting:**
   - If `zsteg` is not found, ensure it is installed and in your PATH.
   - On Windows, you may need to restart your terminal after adding to PATH.
+
+## 🩺 Using Dataset Health Scoring
+
+1. From the main menu, select 'Dataset Management'.
+2. Choose '🩺 Dataset Health Scoring'.
+3. Select whether to score a single folder or an HQ/LQ parent folder (for paired datasets).
+   - If HQ/LQ, the tool will auto-detect or prompt for HQ and LQ subfolders.
+4. The workflow will run a series of checks (validation, quality, consistency, compliance, etc.).
+5. At the end, you'll see:
+   - A step-by-step breakdown (pass/fail, points per step)
+   - The overall health score (0–100)
+   - Status (✅ Production Ready, ⚠️ Needs Improvement, ❌ Unusable)
+   - Actionable suggestions for improvement if needed
+
+**Tips:**
+
+- Use the suggestions to address any issues before using the dataset for ML training.
+- The workflow is fully automated and robust to input errors.
+- All steps are covered by automated tests for reliability.
+
+[Back to Table of Contents](#table-of-contents)

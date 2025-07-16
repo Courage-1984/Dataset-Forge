@@ -62,6 +62,12 @@
 
 ## [July 2025]
 
+- Added '🩺 Dataset Health Scoring' workflow and menu option under Dataset Management.
+- Supports both single-folder and HQ/LQ parent folder modes.
+- Modular, weighted checks: validation, quality, consistency, compliance, and more.
+- Actionable suggestions and detailed scoring breakdown.
+- Fully covered by unit and integration tests.
+- Robust CLI integration and extensible design.
 - Added menu timing/profiling system: every menu and submenu load is timed and printed to the user.
 - All menu load times are recorded and viewable in the System Monitoring menu ("⏱️ View Menu Load Times").
 - Lazy import pattern enforced for all menus and actions for maximum CLI speed.

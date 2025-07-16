@@ -324,6 +324,13 @@ def dataset_management_menu():
                 "dataset_forge.actions.align_images_actions", "align_images_workflow"
             ),
         ),
+        "6": (
+            "🩺 Dataset Health Scoring",
+            lazy_action(
+                "dataset_forge.menus.dataset_health_scoring_menu",
+                "dataset_health_scoring_menu",
+            ),
+        ),
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:

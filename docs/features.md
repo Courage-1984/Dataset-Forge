@@ -178,3 +178,45 @@ Dataset Forge includes several utility scripts in the `tools/` directory to assi
 
 For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
 
+# 🩺 Dataset Health Scoring (NEW July 2025)
+
+**Location:** Dataset Management menu → 🩺 Dataset Health Scoring
+
+**Purpose:**
+
+- Assess the overall health and readiness of an image dataset for ML workflows.
+- Supports both single-folder datasets and HQ/LQ parent folder structures (for super-resolution and paired tasks).
+
+**Workflow:**
+
+- User selects either a single folder or an HQ/LQ parent folder (auto-detects or prompts for HQ/LQ subfolders).
+- Runs a series of modular checks:
+  - Basic validation (file existence, supported formats, min count)
+  - Unreadable/corrupt files
+  - Image format consistency
+  - Quality metrics (resolution, blur, etc.)
+  - Aspect ratio consistency
+  - File size outliers
+  - Consistency checks (duplicates, naming, alignment)
+  - Compliance scan (metadata, forbidden content)
+- Each check is weighted; partial credit is possible.
+- Shows a detailed breakdown of results, a final health score (0–100), and a status (✅ Production Ready, ⚠️ Needs Improvement, ❌ Unusable).
+- Provides actionable suggestions for improvement if any step fails.
+
+**Extensibility:**
+
+- Checks are modular; new steps can be added easily.
+- Scoring weights and logic are configurable in the business logic module.
+
+**Testing:**
+
+- Fully covered by unit and integration tests (see `tests/test_utils/test_dataset_health_scoring.py` and `tests/test_cli/test_dataset_health_scoring_menu.py`).
+- Tests simulate both single-folder and HQ/LQ menu flows, including edge cases and input handling.
+
+**Robustness:**
+
+- Uses centralized input, printing, memory, and error handling utilities.
+- Follows the robust menu loop and lazy import patterns.
+- CLI integration is non-blocking and fully automated for testing.
+
+[Back to Table of Contents](#table-of-contents)

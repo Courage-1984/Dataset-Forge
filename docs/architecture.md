@@ -102,6 +102,28 @@ The Umzi Dataset_Preprocessing workflows are now fully modularized within Datase
   - Modular menu and actions for batch metadata extraction, editing, filtering, and anonymization.
   - Uses exiftool, pandas, SQLite, Pillow, and centralized utilities.
 
+### Dataset Health Scoring Workflow
+
+- **UI Layer:** `dataset_forge/menus/dataset_health_scoring_menu.py` (prompts user, runs workflow, displays results)
+- **Business Logic:** `dataset_forge/actions/dataset_health_scoring_actions.py` (modular checks, scoring, suggestions)
+- **Integration:** Added to Dataset Management menu using lazy import and robust menu loop patterns.
+- **Extensibility:** New checks can be added by extending the actions module and updating the step list/weights.
+- **Testing:** Fully covered by unit and CLI integration tests.
+
+**Mermaid Diagram Addition:**
+
+```mermaid
+graph LR
+A[Input Dataset] --> B[Basic Validation]
+B --> C[Quality Metrics]
+C --> D[Consistency Checks]
+D --> E[Compliance Scan]
+E --> F{Health Score}
+F -->|>90| G[✅ Production Ready]
+F -->|70-90| H[⚠️ Needs Improvement]
+F -->|<70| I[❌ Unusable]
+```
+
 ## Menu Integration
 
 - The Dataset Management menu now includes an '🧭 Align Images' option, which calls the align_images_workflow in actions/align_images_actions.py using the lazy import pattern.

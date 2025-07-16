@@ -1,6 +1,5 @@
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
-
 # Dataset Forge Full Documentation
 
 ---
@@ -139,25 +138,22 @@
   - [Doc Maintenance](contributing.md#doc-maintenance)
   - [Static Analysis & Code Quality (NEW)](contributing.md#static-analysis--code-quality-new)
 - [Frequently Asked Questions (FAQ)](faq.md)
-    - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
-    - [What platforms are supported?](faq.md#what-platforms-are-supported)
-    - [What Python version is required?](faq.md#what-python-version-is-required)
-    - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
-    - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
-    - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
-    - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
-    - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
-    - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
-    - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
-    - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
+  - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
+  - [What platforms are supported?](faq.md#what-platforms-are-supported)
+  - [What Python version is required?](faq.md#what-python-version-is-required)
+  - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
+  - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
+  - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
+  - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
+  - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
+  - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
+  - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
+  - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
 - [License](license.md)
-
 
 ---
 
-
 # Features
-
 
 # Features (tl;dr)
 
@@ -337,12 +333,9 @@ Dataset Forge includes several utility scripts in the `tools/` directory to assi
 
 For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
 
-
 ---
 
-
 # Special Installation
-
 
 # Special Installation Instructions
 
@@ -509,7 +502,6 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
-
 ---
 
 ## 1. Advanced Metadata Operations (for exiftool integration)
@@ -531,17 +523,18 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 ### Method 2: Windows (Chocolatey)
 
 1. Download ExifTool.exe:
+
    ```sh
    choco install exiftool -y
    ```
 
 2. This will install `exiftool.exe` to:
+
    ```sh
    C:\ProgramData\chocolatey\lib\exiftool\tools\
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
-
 
 ---
 
@@ -549,9 +542,7 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ---
 
-
 # Usage
-
 
 # Usage Guide
 
@@ -817,9 +808,7 @@ A comprehensive static analysis tool for maintainers and contributors.
 
 ---
 
-
 # Advanced
-
 
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
@@ -1044,9 +1033,7 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 
 ---
 
-
 # Architecture
-
 
 # Project Architecture
 
@@ -1160,9 +1147,7 @@ For coding standards and best practices, see [style_guide.md](style_guide.md).
 
 ---
 
-
 # Troubleshooting
-
 
 # Troubleshooting
 
@@ -1296,9 +1281,7 @@ For further help, see [usage.md](usage.md) or contact the project maintainer.
 
 ---
 
-
 # Style Guide
-
 
 # Dataset Forge Style Guide
 
@@ -1591,9 +1574,7 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 ---
 
-
 # Changelog
-
 
 [//]: # "Navigation"
 
@@ -1680,12 +1661,9 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 This file will track major changes and releases in the future.
 
-
 ---
 
-
 # Contributing
-
 
 [ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
@@ -1749,12 +1727,9 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 For questions, open an issue or contact the project maintainer.
 
-
 ---
 
-
 # Faq
-
 
 # Frequently Asked Questions (FAQ)
 
@@ -1817,12 +1792,36 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 ---
 
-
 # License
-
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
+
+---
+
+# 🩺 Dataset Health Scoring (NEW July 2025)
+
+**Location:** Dataset Management menu → 🩺 Dataset Health Scoring
+
+**Purpose:**
+
+- Assess dataset health and readiness for ML workflows.
+- Supports both single-folder and HQ/LQ parent folder structures.
+
+**Workflow:**
+
+- User selects dataset type (single folder or HQ/LQ parent).
+- Runs modular checks: validation, unreadable files, format consistency, quality, aspect ratio, file size, consistency, compliance.
+- Weighted scoring and detailed breakdown.
+- Actionable suggestions for improvement.
+
+**Integration:**
+
+- Menu option under Dataset Management, robust menu loop, lazy import.
+- Extensible: add new checks easily.
+- Fully tested (unit and integration).
+
+[Back to Table of Contents](#table-of-contents)
 
 ---

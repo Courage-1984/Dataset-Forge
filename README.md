@@ -104,14 +104,16 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 
 This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place.
 
-- [ ] Debug Mode: I want to add a *Debug Mode* to my project, which when used, activates the showing of more verbose output and debug output/print
-- [ ] tl;dr: Create a '# Features (tl;dr)' section in ./docs/features.md
-- [ ] *Packaging*: "Compile Dataset-Forge" AND/OR "Create docker file/container"
-- [ ] Augmentation: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
-- [ ] Dataset Health Scoring: Add a "Dataset Health Scoring" workflow and menu option
-- [ ] Batch Scripts: Save and replay complex multi-step operations/workflows
+- [ ] **Debug Mode**: I want to add a *Debug Mode* to my project, which when used, activates the showing of more verbose output and debug output/print
+- [ ] **tl;dr**: Create a '# Features (tl;dr)' section in ./docs/features.md
+- [ ] ***Packaging***: "Compile Dataset-Forge" AND/OR "Create docker file/container"
+- [ ] **Augmentation**: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
+- [x] **Dataset Health Scoring**: Add a "Dataset Health Scoring" workflow and menu option
+- [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
+- [ ] **Phhofm's sisr**: Investigate Phhofm's [sisr](https://github.com/Phhofm/sisr) for stuff i can add to DF
+- [ ] **the-database's img-ab**: Fork and improve.
 
-- [ ] Example: Improve error reporting for Example workflows
+- [ ] **Example**: Improve error reporting for Example workflows
 
 <!-- Add your TODOs and feature ideas below -->
 
