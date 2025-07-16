@@ -112,6 +112,18 @@ This section collects all future feature/functionality ideas, goals, and impleme
 - [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
 - [ ] **Phhofm's sisr**: Investigate Phhofm's [sisr](https://github.com/Phhofm/sisr) for stuff i can add to DF
 - [ ] **the-database's img-ab**: Fork and improve.
+- [ ] **Links .json's**: Further customize, add metadata, description, etc/
+- [ ] **Advanced Filtering / AI-Powered Features**: 
+```
+Semantic Filtering: Filter by image content/semantics
+Style-Based Filtering: Filter by artistic style
+Quality-Based Filtering: Advanced quality assessment filters
+Custom Filter Plugins: User-defined filtering logic
+Auto-Labeling: Automatic image labeling and classification
+Style Transfer: Apply artistic styles to datasets
+Content-Aware Cropping: Intelligent image cropping
+
+```
 
 - [ ] **Example**: Improve error reporting for Example workflows
 
