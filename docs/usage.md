@@ -107,3 +107,15 @@ Dataset Forge includes a static analysis tool for maintainers and contributors:
   - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
 
 Review the actionable report and detailed results before submitting code or documentation changes.
+
+## Using Umzi's Dataset_Preprocessing
+
+You can access Umzi's Dataset_Preprocessing from the main menu (option 9: 🧩 Umzi's Dataset_Preprocessing). This menu provides the following workflows:
+
+- **Best Tile Extraction**: Extracts the most informative tile(s) from images in a folder. Prompts for input/output folders, tile size, complexity function, and other options.
+- **Video Frame Extraction**: Extracts frames from a video based on embedding distance. Prompts for video path, output folder, model, and threshold.
+- **Image Deduplication**: Create embeddings for all images in a folder, or find duplicate clusters from embeddings. Prompts for folders, model, and thresholds.
+- **IQA Filtering**: Filter or sort images by IQA score using various algorithms. Prompts for input folder, algorithm, and thresholds.
+- **Embedding Extraction**: Extract and print the embedding for a single image.
+
+All options are fully interactive, use Dataset Forge's input and printing utilities, and are covered by robust unit and CLI tests. See the main menu for access.

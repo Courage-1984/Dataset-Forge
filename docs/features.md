@@ -147,3 +147,15 @@ See `docs/advanced.md` for technical details and customization.
 - Exception handling and debug prints ensure errors are caught and shown to the user.
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
+
+## Umzi's Dataset_Preprocessing Integration
+
+Dataset Forge now includes a full integration of Umzi's Dataset_Preprocessing workflows, accessible from the main menu as "🧩 Umzi's Dataset_Preprocessing". This feature mirrors the original consolidated script and provides the following capabilities:
+
+- **Best Tile Extraction**: Extracts the most informative tile(s) from each image in a folder, with support for Laplacian and IC9600 complexity, batch processing, and advanced filtering.
+- **Video Frame Extraction**: Extracts frames from videos based on deep embedding distance, supporting multiple models and distance metrics.
+- **Image Deduplication**: Computes and saves embeddings for all images in a folder, and finds clusters of duplicate/similar images using configurable thresholds and metrics.
+- **IQA Filtering**: Filters or sorts images by Image Quality Assessment (IQA) score using multiple algorithms (HyperIQA, AnIQA, TopIQ, Blockiness, IC9600).
+- **Embedding Extraction**: Extracts and prints the embedding for a single image, useful for debugging or manual analysis.
+
+All workflows are fully interactive, use Dataset Forge's centralized input, printing, memory, and progress management, and are covered by robust unit and CLI integration tests. This integration is modular, testable, and follows all project coding and UI standards.

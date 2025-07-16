@@ -40,6 +40,11 @@
 - Major test suite improvements: added and improved unit/integration tests for DPID, CBIR, deduplication, reporting, utilities, session state, and more.
 - All core business logic and utilities now covered by tests.
 - Fixed test import errors, function signatures, and monkeypatches for reliability.
+- Integrated Umzi's Dataset_Preprocessing as a modular menu and actions set.
+- Added Best Tile Extraction, Video Frame Extraction, Image Deduplication, IQA Filtering, and Embedding Extraction workflows.
+- All features are fully interactive, testable, and documented.
+- Added robust unit and CLI integration tests for all workflows.
+- Updated documentation in features.md, usage.md, advanced.md, architecture.md, changelog.md, and .cursorrules.
 
 ## [July 2025]
 

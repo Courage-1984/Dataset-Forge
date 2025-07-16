@@ -23,6 +23,7 @@
   - [Testing & Validation](features.md#testing--validation)
   - [🧑‍💻 Developer Tools: Static Analysis & Code Quality](features.md#-developer-tools-static-analysis--code-quality)
   - [July 2025 Improvements](features.md#july-2025-improvements)
+  - [Umzi's Dataset_Preprocessing Integration](features.md#umzis-datasetpreprocessing-integration)
 - [Special Installation Instructions](special_installation.md)
   - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
   - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
@@ -41,6 +42,7 @@
   - [July 2025 Update](usage.md#july-2025-update)
   - [Running the Test Suite](usage.md#running-the-test-suite)
   - [🧑‍💻 Static Analysis & Code Quality](usage.md#-static-analysis--code-quality)
+  - [Using Umzi's Dataset_Preprocessing](usage.md#using-umzis-datasetpreprocessing)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
@@ -48,10 +50,12 @@
   - [Advanced Testing Patterns](advanced.md#advanced-testing-patterns)
   - [🧑‍💻 Advanced Developer Tools: Static Analysis](advanced.md#-advanced-developer-tools-static-analysis)
   - [⚡ Caching System: Technical Details (NEW July 2025)](advanced.md#-caching-system-technical-details-new-july-2025)
+  - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Monitoring & Analytics](architecture.md#monitoring--analytics)
   - [Test Suite Integration](architecture.md#test-suite-integration)
+    - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
 - [Troubleshooting](troubleshooting.md)
   - [Dependancy & Library Issues](troubleshooting.md#dependancy--library-issues)
   - [Menu Timing & Profiling Issues](troubleshooting.md#menu-timing--profiling-issues)
@@ -268,6 +272,18 @@ See `docs/advanced.md` for technical details and customization.
 - Exception handling and debug prints ensure errors are caught and shown to the user.
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
+
+## Umzi's Dataset_Preprocessing Integration
+
+Dataset Forge now includes a full integration of Umzi's Dataset_Preprocessing workflows, accessible from the main menu as "🧩 Umzi's Dataset_Preprocessing". This feature mirrors the original consolidated script and provides the following capabilities:
+
+- **Best Tile Extraction**: Extracts the most informative tile(s) from each image in a folder, with support for Laplacian and IC9600 complexity, batch processing, and advanced filtering.
+- **Video Frame Extraction**: Extracts frames from videos based on deep embedding distance, supporting multiple models and distance metrics.
+- **Image Deduplication**: Computes and saves embeddings for all images in a folder, and finds clusters of duplicate/similar images using configurable thresholds and metrics.
+- **IQA Filtering**: Filters or sorts images by Image Quality Assessment (IQA) score using multiple algorithms (HyperIQA, AnIQA, TopIQ, Blockiness, IC9600).
+- **Embedding Extraction**: Extracts and prints the embedding for a single image, useful for debugging or manual analysis.
+
+All workflows are fully interactive, use Dataset Forge's centralized input, printing, memory, and progress management, and are covered by robust unit and CLI integration tests. This integration is modular, testable, and follows all project coding and UI standards.
 
 ---
 
@@ -548,6 +564,18 @@ Dataset Forge includes a static analysis tool for maintainers and contributors:
 
 Review the actionable report and detailed results before submitting code or documentation changes.
 
+## Using Umzi's Dataset_Preprocessing
+
+You can access Umzi's Dataset_Preprocessing from the main menu (option 9: 🧩 Umzi's Dataset_Preprocessing). This menu provides the following workflows:
+
+- **Best Tile Extraction**: Extracts the most informative tile(s) from images in a folder. Prompts for input/output folders, tile size, complexity function, and other options.
+- **Video Frame Extraction**: Extracts frames from a video based on embedding distance. Prompts for video path, output folder, model, and threshold.
+- **Image Deduplication**: Create embeddings for all images in a folder, or find duplicate clusters from embeddings. Prompts for folders, model, and thresholds.
+- **IQA Filtering**: Filter or sort images by IQA score using various algorithms. Prompts for input folder, algorithm, and thresholds.
+- **Embedding Extraction**: Extract and print the embedding for a single image.
+
+All options are fully interactive, use Dataset Forge's input and printing utilities, and are covered by robust unit and CLI tests. See the main menu for access.
+
 ---
 
 
@@ -699,6 +727,16 @@ Dataset Forge uses a hybrid caching system for performance:
 
 See `docs/features.md` for user-facing info and `README_full.md` for a merged overview.
 
+## Advanced: Modular Integration of Umzi's Dataset_Preprocessing
+
+The original Dataset_Preprocessing_consolidated_script.py has been fully ported into Dataset Forge as a modular, maintainable set of actions and menu files:
+
+- All business logic is in `dataset_forge/actions/umzi_dataset_preprocessing_actions.py`, following project conventions for memory management, progress tracking, and error handling.
+- The menu interface is in `dataset_forge/menus/umzi_dataset_preprocessing_menu.py`, using lazy imports and the robust menu loop pattern.
+- All workflows are testable, with comprehensive unit and CLI integration tests.
+- The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
+- This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.
+
 ---
 
 
@@ -733,6 +771,15 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 
 - Comprehensive automated test suite using pytest.
 - Covers CLI, menu timing, error feedback, memory, parallelism, and file/image utilities.
+
+### Umzi's Dataset_Preprocessing Integration
+
+The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge:
+
+- Business logic is in `actions/umzi_dataset_preprocessing_actions.py`.
+- UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`.
+- Uses lazy imports, robust menu loop, and centralized utilities.
+- See `docs/advanced.md` for a detailed discussion of the porting and modularization process.
 
 ---
 
@@ -1119,6 +1166,11 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Major test suite improvements: added and improved unit/integration tests for DPID, CBIR, deduplication, reporting, utilities, session state, and more.
 - All core business logic and utilities now covered by tests.
 - Fixed test import errors, function signatures, and monkeypatches for reliability.
+- Integrated Umzi's Dataset_Preprocessing as a modular menu and actions set.
+- Added Best Tile Extraction, Video Frame Extraction, Image Deduplication, IQA Filtering, and Embedding Extraction workflows.
+- All features are fully interactive, testable, and documented.
+- Added robust unit and CLI integration tests for all workflows.
+- Updated documentation in features.md, usage.md, advanced.md, architecture.md, changelog.md, and .cursorrules.
 
 ## [July 2025]
 

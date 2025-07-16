@@ -144,3 +144,13 @@ Dataset Forge uses a hybrid caching system for performance:
   - Always document cache usage in your function docstrings.
 
 See `docs/features.md` for user-facing info and `README_full.md` for a merged overview.
+
+## Advanced: Modular Integration of Umzi's Dataset_Preprocessing
+
+The original Dataset_Preprocessing_consolidated_script.py has been fully ported into Dataset Forge as a modular, maintainable set of actions and menu files:
+
+- All business logic is in `dataset_forge/actions/umzi_dataset_preprocessing_actions.py`, following project conventions for memory management, progress tracking, and error handling.
+- The menu interface is in `dataset_forge/menus/umzi_dataset_preprocessing_menu.py`, using lazy imports and the robust menu loop pattern.
+- All workflows are testable, with comprehensive unit and CLI integration tests.
+- The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
+- This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.

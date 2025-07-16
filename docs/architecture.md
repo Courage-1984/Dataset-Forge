@@ -29,6 +29,15 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - Comprehensive automated test suite using pytest.
 - Covers CLI, menu timing, error feedback, memory, parallelism, and file/image utilities.
 
+### Umzi's Dataset_Preprocessing Integration
+
+The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge:
+
+- Business logic is in `actions/umzi_dataset_preprocessing_actions.py`.
+- UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`.
+- Uses lazy imports, robust menu loop, and centralized utilities.
+- See `docs/advanced.md` for a detailed discussion of the porting and modularization process.
+
 ---
 
 For coding standards and best practices, see [style_guide.md](style_guide.md).

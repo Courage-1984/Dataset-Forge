@@ -71,6 +71,13 @@ def main_menu():
                     "system_monitoring_menu",
                 ),
             ),
+            "9": (
+                "🧩 Umzi's Dataset_Preprocessing",
+                lazy_menu(
+                    "dataset_forge.menus.umzi_dataset_preprocessing_menu",
+                    "umzi_dataset_preprocessing_menu",
+                ),
+            ),
             "0": ("🚪 Exit", None),
         }
         choice = show_menu(
