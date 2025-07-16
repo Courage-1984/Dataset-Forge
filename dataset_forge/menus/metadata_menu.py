@@ -18,23 +18,26 @@ from dataset_forge.actions.metadata_actions import (
 
 
 def metadata_menu():
-    options = metadata_menu.__menu_options__
+    from dataset_forge.actions.metadata_actions import (
+        exif_scrubber_menu,
+        icc_to_srgb_menu,
+    )
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
+
+    options = {
+        "1": ("🧹 Scrub EXIF Metadata", exif_scrubber_menu),
+        "2": ("🎯 Convert ICC Profile to sRGB", icc_to_srgb_menu),
+        "0": ("⬅️  Back", None),
+    }
     while True:
-        choice = show_menu(
+        action = show_menu(
             "EXIF & ICC Profile Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        if action is None or action == "0":
             break
-        action = options[choice][1]
         if callable(action):
             action()
-
-
-metadata_menu.__menu_options__ = {
-    "1": ("Scrub EXIF Metadata", exif_scrubber_menu),
-    "2": ("Convert ICC Profile to sRGB", icc_to_srgb_menu),
-    "0": ("Back to Main Menu", None),
-}

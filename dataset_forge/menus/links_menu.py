@@ -170,7 +170,7 @@ def personal_links_menu():
 def links_menu():
     options = links_menu.__menu_options__
     while True:
-        action = show_menu("Links Menu", options, header_color=Mocha.lavender)
+        action = show_menu("🔗 Links", options, header_color=Mocha.lavender)
         if callable(action):
             action()
             continue
@@ -182,7 +182,7 @@ def links_menu():
 
 
 links_menu.__menu_options__ = {
-    "1": ("Community Links", community_links_menu),
-    "2": ("Personal Links", personal_links_menu),
-    "0": ("Back", None),
+    "1": ("🌐 Community Links", community_links_menu),
+    "2": ("🔗 Personal Links", personal_links_menu),
+    "0": ("⬅️  Back", None),
 }

@@ -6,13 +6,37 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
-1. Clone the repository and set up your environment (see [README.md](../README.md)).
-2. Activate your virtual environment and install requirements.
-3. Run the application using `dataset-forge`, `py main.py`, or `./run.bat`.
+1. **Clone the repository:**
 
-## Main Workflows
+   ```bash
+   git clone https://github.com/Courage-1984/Dataset-Forge.git
+   cd Dataset-Forge
+   ```
+
+2. **Set up the environment:**
+
+   ```bash
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+   pip install .
+   ```
+
+   > **Note:** If you use a different CUDA version, see https://pytorch.org/get-started/locally/ for the right install command.
+
+3. **Run the application:**
+   ```bash
+   dataset-forge
+   # or
+   py main.py
+   # or
+   ./run.bat
+   ```
+
+## 👣 Main Workflows
 
 ### Dataset Management
 
@@ -28,15 +52,6 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 - Apply augmentations, tiling, and batch processing from the Augmentation and Image Processing menus.
 
-### CBIR (Semantic Duplicate Detection)
-
-1. Go to Dataset Management > Clean & Organize > CBIR.
-2. Select your workflow: single-folder or HQ/LQ pair.
-3. Choose the embedding model (CLIP recommended).
-4. Set the similarity threshold (default: 0.92 for cosine similarity).
-5. Choose an action: Find, Remove, Move, or Copy duplicates.
-6. Review the summary of affected files after each operation.
-
 ### Monitoring & Analytics
 
 - Access live resource usage, error tracking, and analytics from the System Monitoring menu.
@@ -45,29 +60,3 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 ---
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
-
-## Native Resolution Detection (getnative & resdet)
-
-The 'Find Native Resolution' feature allows you to estimate the original resolution of an image using two methods:
-
-- **getnative** (Python, VapourSynth): Works natively on Windows and Linux. Requires VapourSynth and Python dependencies.
-- **resdet** (C binary): Fast, supports PNG/JPEG. On Windows, the CLI will use WSL to run resdet if available. On Linux, resdet is run natively.
-
-### How to Use
-1. From the main menu, navigate to:
-   - `Analysis & Validation` → `Analyze Properties` → `Find Native Resolution`
-2. Choose whether to analyze a folder (HQ/LQ) or a single image.
-3. Select your preferred method:
-   - **getnative**: Requires VapourSynth and Python dependencies.
-   - **resdet**: Requires resdet to be installed and available in your PATH (or in WSL PATH on Windows).
-
-### Windows Users
-- If you select resdet, the CLI will automatically use WSL if available.
-- You must install resdet in your WSL environment and ensure it is in the WSL PATH.
-- See [special_installation.md](special_installation.md) for detailed instructions.
-
-### Linux Users
-- Install resdet natively and ensure it is in your PATH.
-
-### Troubleshooting
-- If resdet is not found, you will receive a clear error message with installation instructions.

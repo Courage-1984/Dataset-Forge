@@ -158,17 +158,17 @@ def system_monitoring_menu():
             "🧵 Manage Background Tasks",
             lazy_action(__name__, "manage_background_tasks"),
         ),
-        "6": ("⏱️ View Menu Load Times", show_menu_load_times),
-        "0": ("🚪 Return to Main Menu", None),
+        "6": ("⏱️  View Menu Load Times", show_menu_load_times),
+        "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
         try:
-            choice = show_menu("System Monitoring & Health", options, Mocha.lavender)
+            choice = show_menu("🩺 System Monitoring & Health", options, Mocha.lavender)
             if choice is None or choice == "0":
                 return
             action = options[choice][1]
             if callable(action):
-            action()
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting System Monitoring Menu...")
             return

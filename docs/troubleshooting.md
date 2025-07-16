@@ -6,6 +6,12 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 
 ---
 
+## Dependancy & Library Issues
+
+**Problem:** Import errors or menu options not working.
+
+- Please see: [Special Installation Instructions](troubleshooting.md)
+
 ## Menu Timing & Profiling Issues
 
 **Problem:** Timing prints do not appear after loading a menu or submenu.
@@ -27,12 +33,6 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
   - Get the user's choice (key) from `show_menu`.
   - Look up the action in the options dictionary.
   - Call the action if callable.
-
-## CBIR Troubleshooting
-
-- **Model loading errors**: Ensure torch, torchvision, and timm are installed and match your CUDA version.
-- **GPU out of memory**: Lower the batch size or use CPU fallback. Close other GPU-intensive applications.
-- **Slow performance**: Use GPU if available. For very large datasets, increase system RAM or process in smaller batches.
 
 ## Other Issues
 

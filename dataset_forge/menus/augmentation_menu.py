@@ -37,7 +37,7 @@ def augmentation_menu():
     options = augmentation_menu.__menu_options__
     while True:
         choice = show_menu(
-            "Augmentation Menu",
+            "🚀 Augmentation",
             options,
             header_color=Mocha.sapphire,
             char="-",
@@ -390,10 +390,10 @@ def delete_augmentation_recipe():
 
 # Register a static menu for favorites (customize as needed)
 augmentation_menu.__menu_options__ = {
-    "1": ("List All Recipes", list_augmentation_recipes),
-    "2": ("Create Recipe", create_augmentation_recipe),
-    "3": ("Edit Recipe", edit_augmentation_recipe),
-    "4": ("Delete Recipe", delete_augmentation_recipe),
-    "5": ("Run Augmentation Pipeline", run_augmentation_pipeline_menu),
-    "0": ("Back to Main Menu", None),
+    "1": ("📜 List All Recipes", list_augmentation_recipes),
+    "2": ("➕ Create Recipe", create_augmentation_recipe),
+    "3": ("✏️  Edit Recipe", edit_augmentation_recipe),
+    "4": ("🗑️  Delete Recipe", delete_augmentation_recipe),
+    "5": ("🚀 Run Augmentation Pipeline", run_augmentation_pipeline_menu),
+    "0": ("⬅️  Back", None),
 }

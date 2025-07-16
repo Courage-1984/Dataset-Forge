@@ -12,6 +12,7 @@ from dataset_forge.utils.printing import (
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
 from dataset_forge.utils import monitoring
+from dataset_forge.menus.degradations_menu import degradations_menu
 
 
 def require_hq_lq(func):
@@ -28,12 +29,9 @@ def require_hq_lq(func):
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
-        return monitoring.time_and_record_menu_load(
-            func_name,
-            lambda: getattr(importlib.import_module(module_path), func_name)(
-                *args, **kwargs
-            ),
-        )
+        import importlib
+
+        return getattr(importlib.import_module(module_path), func_name)(*args, **kwargs)
 
     return _action
 
@@ -48,9 +46,21 @@ def basic_transformations_menu():
     from dataset_forge.utils.color import Mocha
 
     options = {
-        "1": ("Crop Image", crop_image_menu),
-        "2": ("Flip Image", flip_image_menu),
-        "3": ("Rotate Image", rotate_image_menu),
+        "1": ("✂️  Crop Image", crop_image_menu),
+        "2": ("↔️  Flip Image", flip_image_menu),
+        "3": ("🔄 Rotate Image", rotate_image_menu),
+        "4": (
+            "⬇️  Downsample Images",
+            lazy_action(
+                "dataset_forge.actions.transform_actions", "downsample_images_menu"
+            ),
+        ),
+        "5": (
+            "🧹 Remove Alpha Channel",
+            lazy_action(
+                "dataset_forge.actions.transform_actions", "remove_alpha_channels_menu"
+            ),
+        ),
         "0": ("⬅️  Back", None),
     }
     while True:
@@ -77,10 +87,25 @@ def not_implemented_menu():
 def colour_tone_levels_menu():
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
-    from dataset_forge.actions.image_ops import (
-        convert_hdr_to_sdr_menu,
-        convert_to_grayscale_menu,
+    from dataset_forge.actions.transform_actions import (
+        hdr_to_sdr_menu,
+        grayscale_conversion,
     )
+
+    def grayscale_conversion_menu():
+        from dataset_forge.utils.input_utils import get_path_with_history
+        from dataset_forge.utils.printing import print_info
+
+        print_info(
+            "This tool converts all images in both HQ and LQ folders to grayscale."
+        )
+        hq_folder = get_path_with_history("Enter HQ folder path:")
+        lq_folder = get_path_with_history("Enter LQ folder path:")
+        if not hq_folder or not lq_folder:
+            print_info("Both HQ and LQ folder paths are required.")
+            return
+        grayscale_conversion(hq_folder, lq_folder)
+
     from dataset_forge.menus.color_adjustment_menu import (
         brightness_adjustment_menu,
         contrast_adjustment_menu,
@@ -89,12 +114,12 @@ def colour_tone_levels_menu():
     )
 
     options = {
-        "1": ("Adjust Brightness", brightness_adjustment_menu),
-        "2": ("Adjust Contrast", contrast_adjustment_menu),
-        "3": ("Adjust Hue", hue_adjustment_menu),
-        "4": ("Adjust Saturation (Not implemented)", saturation_adjustment_menu),
-        "5": ("Convert HDR to SDR", convert_hdr_to_sdr_menu),
-        "6": ("Convert to Grayscale", convert_to_grayscale_menu),
+        "1": ("☀️  Adjust Brightness", brightness_adjustment_menu),
+        "2": ("🌓 Adjust Contrast", contrast_adjustment_menu),
+        "3": ("🌈 Adjust Hue", hue_adjustment_menu),
+        "4": ("🎨 Adjust Saturation (Not implemented)", saturation_adjustment_menu),
+        "5": ("🌅 Convert HDR to SDR", hdr_to_sdr_menu),
+        "6": ("⚫️ Convert to Grayscale", grayscale_conversion_menu),
         "0": ("⬅️  Back", None),
     }
     while True:
@@ -109,24 +134,6 @@ def colour_tone_levels_menu():
         if callable(action):
             action()
         input("Press Enter to return to the menu...")
-
-
-def degradations_menu():
-    from dataset_forge.utils.menu import show_menu
-    from dataset_forge.utils.color import Mocha
-
-    options = {
-        "0": ("⬅️  Back", None),
-    }
-    while True:
-        action = show_menu(
-            "🧪 Degradations (Coming Soon)",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-        )
-        if action is None or action == "0":
-            break
 
 
 def metadata_menu():
@@ -172,7 +179,7 @@ def extract_sketches_menu():
     from dataset_forge.utils.input_utils import get_path_with_history
     from dataset_forge.utils.printing import print_info, print_error
 
-    print_header("✏️ FIND & EXTRACT SKETCHES/DRAWINGS/LINE ART", color=Mocha.mauve)
+    print_header("✏️  Find & extract sketches/drawings/line art", color=Mocha.mauve)
     print_info("Choose input mode:")
     print_info("  1. 📂 HQ/LQ paired folders")
     print_info("  2. 📁 Single folder")
@@ -230,10 +237,8 @@ def image_processing_menu():
             lazy_action("dataset_forge.menus.metadata_menu", "metadata_menu"),
         ),
         "6": (
-            "✏️  FIND & EXTRACT SKETCHES/DRAWINGS/LINE ART",
-            lazy_action(
-                "dataset_forge.menus.sketch_extraction_menu", "sketch_extraction_menu"
-            ),
+            "✏️  Find & extract sketches/drawings/line art",
+            extract_sketches_menu,
         ),
         "0": ("⬅️  Back to Main Menu", None),
     }
@@ -241,7 +246,7 @@ def image_processing_menu():
         choice = show_menu(
             "✨ Image Processing & Augmentation",
             options,
-            header_color=Mocha.lavender,
+            header_color=Mocha.sapphire,
             char="=",
         )
         if choice is None or choice == "0":

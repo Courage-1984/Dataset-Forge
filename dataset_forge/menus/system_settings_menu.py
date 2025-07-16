@@ -119,7 +119,7 @@ def system_settings_menu():
     }
     while True:
         choice = show_menu(
-            "⚙️ System & Settings",
+            "⚙️  System & Settings",
             options,
             header_color=Mocha.lavender,
             char="=",

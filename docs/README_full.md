@@ -26,79 +26,96 @@
 # Features
 
 
-# Features
+# Features (tl;dr)
 
-## Core & Configuration
 
-- **Multi-format config support**: JSON, YAML, HCL
-- **External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
-- **Model management**: List, select, and run upscaling with trained models
-- **Validation tools**: Validate HQ/LQ and validation datasets from config
-- **Built-in config editors** for .hcl and .yml files
-- **User profiles**: Save favorites, presets, and quick access paths
 
-## Dataset Management
+# Features (main menus)
 
-- **Dataset Creation**: Multiscale dataset generation (DPID), video frame extraction, image tiling
-- **Dataset Operations**: Combine, split, extract random pairs, shuffle datasets
-- **HQ/LQ Pair Management**: Manual pairing, fuzzy matching, scale correction
-- **Clean & Organize**: Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, batch renaming
-- **Orientation Organization**: Sort by landscape/portrait/square
-- **Size Filtering**: Remove small/invalid image pairs
+## ⚙️ Core & Configuration
 
-## Analysis & Validation
+- **🔧 External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux), [getnative](https://github.com/Infiziert90/getnative), [resdet](https://github.com/0x09/resdet)
+- **📦 Model management**: List, select, download and run upscaling with trained models (also [OpenModelDB](https://openmodeldb.info/) integration)
+- **✅ Validation tools**: Validate HQ/LQ pairs and validation datasets from config
+- **👤 User profiles**: Save favorites, presets, links and quick access paths
+- **⚙️ Multi-format config support**: JSON, YAML, HCL
 
-- **Comprehensive Validation**: Progressive dataset validation suite
-- **Rich Reporting**: HTML/Markdown reports with plots and sample images
-- **Quality Scoring**: Automated dataset quality assessment (NIQE, etc.)
-- **Issue Detection**: Corruption detection, misalignment detection, outlier detection
-- **Property Analysis**: Consistency checks, aspect ratio testing, dimension reporting
-- **BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment
-- **Scale Detection**: Find and test HQ/LQ scale relationships
+## 📂 Dataset Management
 
-## Image Processing & Augmentation
+- **🎯 Dataset Creation**: Multiscale dataset generation (DPID), video frame extraction, image tiling (using IC9600)
+- **🔗 Dataset Operations**: Combine, split, extract random pairs, shuffle datasets, remove/move
+- **🔍 HQ/LQ Pair Management**: Create/Correct Manual Pairings, fuzzy matching, scale correction, shuffle, extract random pairs
+- **🧹 Clean & Organize**: De-dupe (Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, CBIR (Semantic Duplicate Detection)), batch renaming
+- **🔄 Orientation Organization**: Sort by landscape/portrait/square
+- **📏 Size Filtering**: Remove small/invalid image pairs
 
-- **Augmentation**: Flip, rotate, crop, color jitter, random erasing, and more
-- **Tiling**: IC9600 and custom tiling for large images
-- **Alpha Channel Handling**: Remove, preserve, or process alpha channels
-- **Batch Processing**: Efficient batch operations for large datasets
+## 🔍 Analysis & Validation
 
-## CBIR (Content-Based Image Retrieval) for Duplicates
+- **🔍 Comprehensive Validation**: Progressive dataset validation suite
+- **📊 Rich Reporting**: HTML/Markdown reports with plots and sample images
+- **⭐ Quality Scoring**: Automated dataset quality assessment (NIQE, etc.)
+- **🔧 Issue Detection**: Corruption detection, misalignment detection, outlier detection. alpha channel detection
+- **🧪 Property Analysis**: Consistency checks, aspect ratio testing, dimension reporting
+- **⭐ BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment
+- **🔍 Scale Detection**: Find and test HQ/LQ scale relationships
+- **🎯 Find Native Resolution**: Find image native resolution using [getnative](https://github.com/Infiziert90/getnative) or [resdet](https://github.com/0x09/resdet)
 
-- **Semantic Duplicate Detection**: Uses deep learning embeddings (CLIP, ResNet, VGG) to find images that are conceptually similar, even if visually transformed.
-- **Feature Extraction**: Extracts high-dimensional feature vectors for each image using a pre-trained CNN (CLIP preferred, fallback to ResNet/VGG).
-- **Similarity Search**: Computes cosine similarity or Euclidean distance between embeddings to identify near-duplicates.
-- **ANN Indexing**: Uses approximate nearest neighbor (ANN) indexing for efficient search in large datasets.
-- **Grouping & Actions**: Clusters images by semantic similarity and provides user options to find, remove, move, or copy duplicate groups.
-- **GPU Acceleration**: Leverages GPU for fast embedding extraction and search.
-- **Menu Integration**: Accessible from the Clean & Organize submenu under Dataset Management.
+## ✨ Image Processing & Augmentation
 
-## Monitoring, Analytics & Error Tracking
+- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, remove alpha channel
+- **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
+- **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
+- **🚀 Augmentation**: List, create, edit or delete *recipes* or run advanced augmentation pipelines (using recipes)
+- **📋 Metadata**: Scrub EXIF Metadata, Convert ICC Profile to sRGB
+- **✏️ Find & extract sketches/drawings/line art**: Find & extract sketches/drawings/line art using pre-trained model
+- **🗳️ Batch Processing**: Efficient batch operations for large datasets
 
-- **Live Resource Monitoring**: Real-time CPU, GPU (NVIDIA), RAM, and disk usage for all processes/threads
-- **Performance Analytics**: Decorator-based analytics for all major operations, with live and persistent session summaries
-- **Error Tracking**: Logs errors to file and CLI, with summary granularity and critical error notifications (sound/visual)
+## 🚀 Training & Inference
+
+- **🛠️  Run wtp_dataset_destroyer**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) integration, create HQ/LQ pairs with custom degradations
+- **🚀 Run traiNNer-redux**: [traiNNer-redux](https://github.com/the-database/traiNNer-redux) integration, train your own SISR models
+- **🧠 OpenModelDB Model Browser**: Robust integration with [OpenModelDB](https://openmodeldb.info/)
+- **⚙️ Config files**: Add, load, view & edit configs
+
+## 🛠️  Utilities
+
+- **🖼️  Create Comparisons**: Create striking image / gif comparisons
+- **📦 Compression**: Compress images or directories
+- **🧹 Sanitize Images**: Comprehensive image file sanitization (alpha channel, colour profile, steganography, metadata)
+- **🌳 Enhanced Directory Tree**: Directory tree visualization using emojis
+- **🧹 Filter non-Images**: Filter all non image type files
+
+## ⚙️  System & Settings
+
+- **📁 Set HQ/LQ Folder**: set HQ/LQ image pair folders to use throughout Dataset Forge
+- **👤 User Profile Management**: Create and manage custom profiles for Dataset Forge
+- **🧠 Memory Management**: View, clear & optimize memory management
+- **⚙️ Settings**: View & configure project settings
+
+## 🔗 Links
+
+- **🌐 Community Links**: Browse/List important and usefull links curated by me and the community
+- **🔗 Personal Links**: Browse/List & add your own links
+
+## 🩺 System Monitoring & Health
+
+- **📊 View Live Resource Usage**: Real-time CPU, GPU (NVIDIA), RAM, and disk usage for all processes/threads
+- **📈 View Performance Analytics**: Decorator-based analytics for all major operations, with live and persistent session summaries
+- **🛑 View Error Summary**: Logs errors to file and CLI, with summary granularity and critical error notifications (sound/visual)
+- **🩺 Run Health Checks**: Automated checks for RAM, disk, CUDA, Python version, and permissions, with CLI output and recommendations
+- **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
+- **⏱️  View Menu Load Times**: View the menu load times
+
+
+# Features (expanded/misc)
+
 - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
-- **Health Checks**: Automated checks for RAM, disk, CUDA, Python version, and permissions, with CLI output and recommendations
-- **Background Task Management**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
 - **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
-- **Dedicated CLI Menu**: Access all monitoring, analytics, and management features from the System Monitoring menu
-
-## Automated Test Suite
-
-- Covers CLI entry, menu navigation, timing/profiling, error feedback (audio), memory management, parallel processing, and file/image utilities.
-- Handles Unicode, subprocess, and Windows-specific edge cases.
-- Includes manual/script-style tests for BHI filtering and pepeline (run directly).
-- All tests pass as of this integration.
-
-See [usage.md](usage.md#running-tests) for instructions on running tests.
 
 ---
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
-
-- Dual native resolution detection: Choose between getnative (Python/VapourSynth) and resdet (C binary, fast, WSL integration on Windows). See [special_installation.md](special_installation.md) for install details.
 
 ---
 
@@ -130,13 +147,13 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 **Troubleshooting:**
 
 - Mismatched CUDA/cuDNN versions will cause import errors or no GPU support.
-- See [requirements](advanced.md#requirements) and [PyTorch docs](https://pytorch.org/get-started/locally/).
+- See [requirements.txt](../requirements.txt) and [PyTorch docs](https://pytorch.org/get-started/locally/).
 
 ---
 
-## 2. VapourSynth & getnative (for getnative functionality)
+## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)
 
-**VapourSynth must be installed _before_ getnative.**
+**VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
 **Steps (Windows):**
 
@@ -144,9 +161,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 2. Open a terminal and run:
 
 ```bat
-vsrepo.py install descale
-vsrepo.py install ffms2
-vsrepo.py install lsmas
+py vsrepo.py install descale
+py vsrepo.py install ffms2
+py vsrepo.py install lsmas
 ```
 
 3. Activate your virtual environment:
@@ -165,12 +182,13 @@ pip install getnative
 
 **Troubleshooting:**
 
-- If getnative fails to import, check that VapourSynth is installed and on your PATH.
 - Install VapourSynth _before_ getnative or any requirements that depend on it.
+- If getnative fails to import, check that VapourSynth is installed and on your PATH.
+- Also make sure directory containing `vsrepo.py` and the plugin's folder containing the `.dll`s are also on your PATH.
 
 ---
 
-## 3. python-magic (for directory utilities)
+## 3. python-magic (for `Enhanced Directory Tree`)
 
 **Windows users:** You must install both the Python packages and the required DLLs.
 
@@ -179,6 +197,7 @@ pip install getnative
 1. Install the packages:
 
 ```bat
+venv312\Scripts\activate
 pip install python-magic python-magic-bin libmagic
 ```
 
@@ -188,7 +207,7 @@ pip install python-magic python-magic-bin libmagic
    - `magic.mgc`
    - `magic1.dll`
 
-   (These are prebuilt for 64-bit Windows. See [libmagicwin64](https://github.com/pidydx/libmagicwin64) for details.)
+   (These are prebuilt for 64-bit Windows. See source: [libmagicwin64](https://github.com/pidydx/libmagicwin64) for details.)
 
 3. When using python-magic, specify the magic file path if needed:
 
@@ -204,9 +223,32 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## Installing and Using resdet for Native Resolution Detection
+## Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
 
-### Windows (MSYS2 MINGW64 Shell)
+### Method 1: Windows (WSL - Recommended for CLI Integration)
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/0x09/resdet.git
+   cd resdet
+   ```
+2. Build resdet:
+   ```sh
+   cd path/to/resdet
+   make clean
+   ./configure
+   make
+   ```
+3. Install resdet to your WSL PATH:
+   ```sh
+   sudo cp resdet /usr/local/bin/
+   sudo chmod +x /usr/local/bin/resdet
+   # Or, to use make install:
+   sudo make install
+   ```
+4. **Note:** The Dataset Forge CLI will automatically use WSL to run resdet on Windows. Ensure resdet is available in your WSL environment's PATH.
+
+### Method 2: Windows (MSYS2 MINGW64 Shell)
 
 1. Clone the repository:
    ```sh
@@ -223,47 +265,12 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 5. Build resdet:
    ```sh
+   cd path/to/resdet
    make clean
    ./configure --prefix=/mingw64
    make
    ```
 6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
-
-### Windows (WSL - Recommended for CLI Integration)
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/0x09/resdet.git
-   cd resdet
-   ```
-2. Build resdet:
-   ```sh
-   ./configure
-   make
-   ```
-3. Install resdet to your WSL PATH:
-   ```sh
-   sudo cp resdet /usr/local/bin/
-   sudo chmod +x /usr/local/bin/resdet
-   # Or, to use make install:
-   sudo make install
-   ```
-4. **Note:** The Dataset Forge CLI will automatically use WSL to run resdet on Windows. Ensure resdet is available in your WSL environment's PATH.
-
-### Linux
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/0x09/resdet.git
-   cd resdet
-   ```
-2. Install dependencies (see resdet README for your distro).
-3. Build and install:
-   ```sh
-   ./configure
-   make
-   sudo make install
-   ```
 
 ### Usage in Dataset Forge
 
@@ -273,18 +280,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## Summary Table
-
-| Dependency   | Install Order | Windows Notes                                     | Docs/Links                                            |
-| ------------ | ------------- | ------------------------------------------------- | ----------------------------------------------------- |
-| torch (CUDA) | 1             | Use correct CUDA version, install before all else | [PyTorch](https://pytorch.org/get-started/locally/)   |
-| VapourSynth  | 2             | Install before getnative, add to PATH             | [VapourSynth](http://www.vapoursynth.com/)            |
-| getnative    | 3             | Only after VapourSynth                            | [getnative](https://github.com/Infiziert90/getnative) |
-| python-magic | 4             | Install DLLs to System32                          | [python-magic](https://github.com/ahupp/python-magic) |
-
----
-
-For more details, see the [main README](../README.md) and [troubleshooting guide](troubleshooting.md).
+For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
 
 ---
 
@@ -298,13 +294,37 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
-1. Clone the repository and set up your environment (see [README.md](../README.md)).
-2. Activate your virtual environment and install requirements.
-3. Run the application using `dataset-forge`, `py main.py`, or `./run.bat`.
+1. **Clone the repository:**
 
-## Main Workflows
+   ```bash
+   git clone https://github.com/Courage-1984/Dataset-Forge.git
+   cd Dataset-Forge
+   ```
+
+2. **Set up the environment:**
+
+   ```bash
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+   pip install .
+   ```
+
+   > **Note:** If you use a different CUDA version, see https://pytorch.org/get-started/locally/ for the right install command.
+
+3. **Run the application:**
+   ```bash
+   dataset-forge
+   # or
+   py main.py
+   # or
+   ./run.bat
+   ```
+
+## 👣 Main Workflows
 
 ### Dataset Management
 
@@ -320,15 +340,6 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 - Apply augmentations, tiling, and batch processing from the Augmentation and Image Processing menus.
 
-### CBIR (Semantic Duplicate Detection)
-
-1. Go to Dataset Management > Clean & Organize > CBIR.
-2. Select your workflow: single-folder or HQ/LQ pair.
-3. Choose the embedding model (CLIP recommended).
-4. Set the similarity threshold (default: 0.92 for cosine similarity).
-5. Choose an action: Find, Remove, Move, or Copy duplicates.
-6. Review the summary of affected files after each operation.
-
 ### Monitoring & Analytics
 
 - Access live resource usage, error tracking, and analytics from the System Monitoring menu.
@@ -337,32 +348,6 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 ---
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
-
-## Native Resolution Detection (getnative & resdet)
-
-The 'Find Native Resolution' feature allows you to estimate the original resolution of an image using two methods:
-
-- **getnative** (Python, VapourSynth): Works natively on Windows and Linux. Requires VapourSynth and Python dependencies.
-- **resdet** (C binary): Fast, supports PNG/JPEG. On Windows, the CLI will use WSL to run resdet if available. On Linux, resdet is run natively.
-
-### How to Use
-1. From the main menu, navigate to:
-   - `Analysis & Validation` → `Analyze Properties` → `Find Native Resolution`
-2. Choose whether to analyze a folder (HQ/LQ) or a single image.
-3. Select your preferred method:
-   - **getnative**: Requires VapourSynth and Python dependencies.
-   - **resdet**: Requires resdet to be installed and available in your PATH (or in WSL PATH on Windows).
-
-### Windows Users
-- If you select resdet, the CLI will automatically use WSL if available.
-- You must install resdet in your WSL environment and ensure it is in the WSL PATH.
-- See [special_installation.md](special_installation.md) for detailed instructions.
-
-### Linux Users
-- Install resdet natively and ensure it is in your PATH.
-
-### Troubleshooting
-- If resdet is not found, you will receive a clear error message with installation instructions.
 
 ---
 
@@ -379,27 +364,9 @@ This document covers advanced usage, configuration, and developer patterns for D
 ## Advanced Configuration
 
 - **Custom config files**: Use JSON, YAML, or HCL for advanced workflows.
-- **Integration with external tools**: See [features.md](features.md#core--configuration).
+- **Integration with external tools**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux), [getnative](https://github.com/Infiziert90/getnative), [resdet](https://github.com/0x09/resdet)
 - **Batch processing and memory optimization**: Tune batch sizes and memory settings in the config files for large datasets.
 - **OpenModelDB integration**: Advanced model management and upscaling workflows.
-
-## Extending Dataset Forge
-
-- **Add new menu actions**: Use the lazy import pattern (see [style_guide.md](style_guide.md)).
-- **Add new analytics or monitoring hooks**: Decorate long-running or user-facing functions with the provided decorators.
-- **Add new CBIR models**: Extend the CBIR system by adding new embedding models in the actions layer.
-
-## Implementation Patterns (for Developers)
-
-- **Robust Menu Loop**: All menus and submenus must use the robust menu loop pattern. See [style_guide.md](style_guide.md) for the required code snippet and rationale.
-- **Timing & Profiling**: Use the centralized timing utility (`time_and_record_menu_load` in `utils/monitoring.py`) to wrap menu and submenu loads. Timing prints are shown to the user and aggregated for analytics. See [style_guide.md](style_guide.md) for best practices.
-- **Lazy Imports**: Use `lazy_action()` and `lazy_menu()` helpers to defer heavy imports until needed. This keeps the CLI fast and memory-efficient.
-
-## Advanced CBIR (Content-Based Image Retrieval)
-
-- **Add new embedding models**: Extend `cbir_actions.py` with new model support.
-- **Optimize similarity search**: Use ANN indexing for large datasets.
-- **Batch actions**: Implement new batch actions (remove, move, copy) in the CBIR workflow.
 
 ## Advanced Monitoring & Analytics
 
@@ -423,12 +390,16 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 
 ## Directory Structure
 
-- **menus/**: UI layer (CLI menus, user interaction)
-- **actions/**: Business logic (core dataset/image operations)
-- **utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dpid/**: Multiple DPID (degradation) implementations
+- **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
+- **dataset_forge/actions/**: Business logic (core dataset/image operations)
+- **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
+- **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
+- **assets/**: Any asset files required
+- **docs/**: Project documentation
+- **tests/**: Unit & integration tests
+- **tools/**: *Tools* used in the project outside of the main CLI
 
 ## Monitoring & Analytics
 
@@ -457,6 +428,12 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 
 ---
 
+## Dependancy & Library Issues
+
+**Problem:** Import errors or menu options not working.
+
+- Please see: [Special Installation Instructions](troubleshooting.md)
+
 ## Menu Timing & Profiling Issues
 
 **Problem:** Timing prints do not appear after loading a menu or submenu.
@@ -478,12 +455,6 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
   - Get the user's choice (key) from `show_menu`.
   - Look up the action in the options dictionary.
   - Call the action if callable.
-
-## CBIR Troubleshooting
-
-- **Model loading errors**: Ensure torch, torchvision, and timm are installed and match your CUDA version.
-- **GPU out of memory**: Lower the batch size or use CPU fallback. Close other GPU-intensive applications.
-- **Slow performance**: Use GPU if available. For very large datasets, increase system RAM or process in smaller batches.
 
 ## Other Issues
 
@@ -508,7 +479,7 @@ This guide defines the coding standards, architecture, and best practices for Da
 
 ## General Principles
 
-- **Python 3.8+**. Use modern Python features.
+- **Python 3.12+**. Use modern Python features.
 - **PEP 8** style, 4-space indentation, 88-char line length (Black standard).
 - **Google-style docstrings** for all public functions/classes.
 - **Type hints** for all function parameters and return values.
@@ -519,6 +490,7 @@ This guide defines the coding standards, architecture, and best practices for Da
 
 - Keep UI, logic, and utilities separate.
 - Use thin UI layers (menus), business logic in actions, helpers in utils.
+- Use lazy imports to keep CLI menu responsive and fast.
 
 ## Coding Standards
 
@@ -552,6 +524,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 4. Relative imports (only within same module)
 
 - Always use absolute imports for `dataset_forge` modules.
+- Always use lazy imports for all menus.
 
 ## Memory Management
 
@@ -568,7 +541,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 ## Progress Tracking & User Feedback
 
 - Use `from dataset_forge.utils.progress_utils import tqdm`
-- Use AudioTqdm for audio notifications.
+- Use AudioTqdm for audio notifications (startup, success, error & shutdown).
 - Always show progress for long operations.
 
 ## Color Scheme & UI
@@ -579,7 +552,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 
 ## Menu System
 
-- Use hierarchical menu structure (7 main categories).
+- Use hierarchical menu structure.
 - Use `show_menu()` from `dataset_forge.utils.menu`.
 - Include emojis in menu options.
 - Handle `KeyboardInterrupt` and `EOFError` gracefully.
@@ -636,6 +609,7 @@ while True:
 
 - Use centralized audio utilities: `from dataset_forge.utils.audio_utils import play_done_sound`
 - Play completion sounds for long operations.
+- Play startup and shutdown sounds appropriately.
 - Respect user audio preferences.
 - All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
 
@@ -708,7 +682,7 @@ while True:
 8. **Always provide user-friendly feedback and progress tracking**
 9. **Always document your code with Google-style docstrings**
 10. **Always test your changes thoroughly before committing**
-11. **All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.**
+11. **Always update documentation appropriately after having added and tested new functionality or new menu items.**
 
 ---
 
@@ -854,8 +828,8 @@ Dataset Forge is a modular Python CLI tool for managing, analyzing, and transfor
 ### What platforms are supported?
 
 - Windows (primary)
-- Linux (tested)
-- macOS is not officially supported but may work with some features disabled.
+- Linux (not yet tested)
+- macOS (not yet tested)
 
 ### What Python version is required?
 
@@ -863,27 +837,23 @@ Python 3.12+ is recommended. The project supports Python 3.8+ but is tested on 3
 
 ### How do I install Dataset Forge and its dependencies?
 
-See the [Quick Start](../README.md#quick-start) and [Special Installation Instructions](special_installation.md). Always install the correct CUDA-enabled torch/torchvision/torchaudio **before** running `pip install .`.
+See the [Quick Start](../README.md#-quick-start) and [Special Installation Instructions](special_installation.md).
 
 ### Why do I need to install VapourSynth before getnative?
 
-getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [special_installation.md](special_installation.md#vapoursynth--getnative-for-getnative-functionality).
+getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [Special Installation Instructions](special_installation.md).
 
 ### How do I fix python-magic errors on Windows?
 
-You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [special_installation.md](special_installation.md#python-magic-for-directory-utilities).
+You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [Special Installation Instructions](special_installation.md).
 
 ### How do I run the test suite?
 
-Activate the virtual environment and run `pytest`. See [usage.md](usage.md#running-tests).
-
-### What is CBIR for Duplicates?
-
-CBIR (Content-Based Image Retrieval) for Duplicates uses deep learning models (CLIP, ResNet, VGG) to find images that are semantically similar, even if visually transformed. It extracts feature embeddings, computes similarity, and groups duplicates for easy management. See [features.md](features.md#cbir-content-based-image-retrieval-for-duplicates).
+Activate the virtual environment and run `pytest`. See [usage.md](usage.md).
 
 ### How do I use the monitoring and analytics features?
 
-Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md#monitoring-analytics--error-tracking).
+Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md).
 
 ### What should I do if I get CUDA or GPU errors?
 

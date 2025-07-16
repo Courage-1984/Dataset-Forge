@@ -1240,3 +1240,253 @@ def remove_alpha_channels_menu():
         "remove_alpha_channels",
         f"{operation}, {successful}/{len(image_files)} images",
     )
+
+
+def crop_image_menu():
+    """
+    Menu for cropping images in a folder.
+    Prompts user for crop box and processes all images in the folder.
+    """
+    from dataset_forge.utils.input_utils import (
+        get_path_with_history,
+        get_file_operation_choice,
+        get_destination_path,
+    )
+    from dataset_forge.utils.printing import (
+        print_header,
+        print_info,
+        print_error,
+        print_success,
+    )
+    from dataset_forge.utils.color import Mocha
+
+    print_header("Crop Images", color=Mocha.lavender)
+    input_folder = get_path_with_history("Enter path to input folder:")
+    if not input_folder or not os.path.isdir(input_folder):
+        print_error("Input path must be a valid directory.")
+        return
+    try:
+        left = int(input("Enter left coordinate (pixels): ").strip())
+        upper = int(input("Enter upper coordinate (pixels): ").strip())
+        right = int(input("Enter right coordinate (pixels): ").strip())
+        lower = int(input("Enter lower coordinate (pixels): ").strip())
+    except Exception:
+        print_error("Invalid crop coordinates.")
+        return
+    crop_box = (left, upper, right, lower)
+    operation = get_file_operation_choice()
+    dest_dir = ""
+    if operation != "inplace":
+        dest_dir = get_destination_path("Enter destination folder: ")
+        if not dest_dir:
+            print_error("Operation aborted as destination path was not provided.")
+            return
+        os.makedirs(dest_dir, exist_ok=True)
+    image_files = [f for f in os.listdir(input_folder) if is_image_file(f)]
+    if not image_files:
+        print_error("No image files found in the input folder.")
+        return
+    print_info(f"\nFound {len(image_files)} images to crop.")
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    def crop_single_image(image_file):
+        try:
+            input_path = os.path.join(input_folder, image_file)
+            if operation == "inplace":
+                output_path = input_path
+            else:
+                output_path = os.path.join(dest_dir, image_file)
+            with Image.open(input_path) as img:
+                cropped = img.crop(crop_box)
+                cropped.save(output_path)
+            return True
+        except Exception as e:
+            print_error(f"Failed to crop {image_file}: {e}")
+            return False
+
+    results = image_map(
+        crop_single_image,
+        image_files,
+        desc="Cropping images",
+        max_workers=config.max_workers,
+    )
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+    print_success(f"\nCropping complete:")
+    print_info(f"  Successful images: {successful}")
+    print_info(f"  Failed images: {failed}")
+    log_operation(
+        "crop_images",
+        f"crop_box={crop_box}, {operation}, {successful}/{len(image_files)} images",
+    )
+
+
+def flip_image_menu():
+    """
+    Menu for flipping images in a folder.
+    Prompts user for flip direction and processes all images in the folder.
+    """
+    from dataset_forge.utils.input_utils import (
+        get_path_with_history,
+        get_file_operation_choice,
+        get_destination_path,
+    )
+    from dataset_forge.utils.printing import (
+        print_header,
+        print_info,
+        print_error,
+        print_success,
+    )
+    from dataset_forge.utils.color import Mocha
+
+    print_header("Flip Images", color=Mocha.lavender)
+    input_folder = get_path_with_history("Enter path to input folder:")
+    if not input_folder or not os.path.isdir(input_folder):
+        print_error("Input path must be a valid directory.")
+        return
+    print_info("Select flip direction:")
+    print_info("1. Horizontal (left-right)")
+    print_info("2. Vertical (top-bottom)")
+    direction = input("Enter 1 or 2: ").strip()
+    if direction == "1":
+        flip_type = "horizontal"
+    elif direction == "2":
+        flip_type = "vertical"
+    else:
+        print_error("Invalid flip direction.")
+        return
+    operation = get_file_operation_choice()
+    dest_dir = ""
+    if operation != "inplace":
+        dest_dir = get_destination_path("Enter destination folder: ")
+        if not dest_dir:
+            print_error("Operation aborted as destination path was not provided.")
+            return
+        os.makedirs(dest_dir, exist_ok=True)
+    image_files = [f for f in os.listdir(input_folder) if is_image_file(f)]
+    if not image_files:
+        print_error("No image files found in the input folder.")
+        return
+    print_info(f"\nFound {len(image_files)} images to flip.")
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    def flip_single_image(image_file):
+        try:
+            input_path = os.path.join(input_folder, image_file)
+            if operation == "inplace":
+                output_path = input_path
+            else:
+                output_path = os.path.join(dest_dir, image_file)
+            with Image.open(input_path) as img:
+                if flip_type == "horizontal":
+                    flipped = img.transpose(Image.FLIP_LEFT_RIGHT)
+                else:
+                    flipped = img.transpose(Image.FLIP_TOP_BOTTOM)
+                flipped.save(output_path)
+            return True
+        except Exception as e:
+            print_error(f"Failed to flip {image_file}: {e}")
+            return False
+
+    results = image_map(
+        flip_single_image,
+        image_files,
+        desc="Flipping images",
+        max_workers=config.max_workers,
+    )
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+    print_success(f"\nFlipping complete:")
+    print_info(f"  Successful images: {successful}")
+    print_info(f"  Failed images: {failed}")
+    log_operation(
+        "flip_images",
+        f"flip_type={flip_type}, {operation}, {successful}/{len(image_files)} images",
+    )
+
+
+def rotate_image_menu():
+    """
+    Menu for rotating images in a folder.
+    Prompts user for rotation angle and processes all images in the folder.
+    """
+    from dataset_forge.utils.input_utils import (
+        get_path_with_history,
+        get_file_operation_choice,
+        get_destination_path,
+    )
+    from dataset_forge.utils.printing import (
+        print_header,
+        print_info,
+        print_error,
+        print_success,
+    )
+    from dataset_forge.utils.color import Mocha
+
+    print_header("Rotate Images", color=Mocha.lavender)
+    input_folder = get_path_with_history("Enter path to input folder:")
+    if not input_folder or not os.path.isdir(input_folder):
+        print_error("Input path must be a valid directory.")
+        return
+    try:
+        angle = float(input("Enter rotation angle (degrees, positive=CCW): ").strip())
+    except Exception:
+        print_error("Invalid angle.")
+        return
+    operation = get_file_operation_choice()
+    dest_dir = ""
+    if operation != "inplace":
+        dest_dir = get_destination_path("Enter destination folder: ")
+        if not dest_dir:
+            print_error("Operation aborted as destination path was not provided.")
+            return
+        os.makedirs(dest_dir, exist_ok=True)
+    image_files = [f for f in os.listdir(input_folder) if is_image_file(f)]
+    if not image_files:
+        print_error("No image files found in the input folder.")
+        return
+    print_info(f"\nFound {len(image_files)} images to rotate.")
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    def rotate_single_image(image_file):
+        try:
+            input_path = os.path.join(input_folder, image_file)
+            if operation == "inplace":
+                output_path = input_path
+            else:
+                output_path = os.path.join(dest_dir, image_file)
+            with Image.open(input_path) as img:
+                rotated = img.rotate(angle, expand=True)
+                rotated.save(output_path)
+            return True
+        except Exception as e:
+            print_error(f"Failed to rotate {image_file}: {e}")
+            return False
+
+    results = image_map(
+        rotate_single_image,
+        image_files,
+        desc="Rotating images",
+        max_workers=config.max_workers,
+    )
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+    print_success(f"\nRotation complete:")
+    print_info(f"  Successful images: {successful}")
+    print_info(f"  Failed images: {failed}")
+    log_operation(
+        "rotate_images",
+        f"angle={angle}, {operation}, {successful}/{len(image_files)} images",
+    )

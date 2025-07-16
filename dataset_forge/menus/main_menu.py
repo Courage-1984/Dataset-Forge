@@ -74,7 +74,7 @@ def main_menu():
             "0": ("🚪 Exit", None),
         }
         choice = show_menu(
-            "🎨 Image Dataset Utility - Main Menu 🎨",
+            "🎨 Dataset Forge - Main Menu 🎨",
             options,
             Mocha.lavender,
         )

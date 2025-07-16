@@ -6,12 +6,16 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 
 ## Directory Structure
 
-- **menus/**: UI layer (CLI menus, user interaction)
-- **actions/**: Business logic (core dataset/image operations)
-- **utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dpid/**: Multiple DPID (degradation) implementations
+- **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
+- **dataset_forge/actions/**: Business logic (core dataset/image operations)
+- **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
+- **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
+- **assets/**: Any asset files required
+- **docs/**: Project documentation
+- **tests/**: Unit & integration tests
+- **tools/**: *Tools* used in the project outside of the main CLI
 
 ## Monitoring & Analytics
 

@@ -8,7 +8,7 @@ This guide defines the coding standards, architecture, and best practices for Da
 
 ## General Principles
 
-- **Python 3.8+**. Use modern Python features.
+- **Python 3.12+**. Use modern Python features.
 - **PEP 8** style, 4-space indentation, 88-char line length (Black standard).
 - **Google-style docstrings** for all public functions/classes.
 - **Type hints** for all function parameters and return values.
@@ -19,6 +19,7 @@ This guide defines the coding standards, architecture, and best practices for Da
 
 - Keep UI, logic, and utilities separate.
 - Use thin UI layers (menus), business logic in actions, helpers in utils.
+- Use lazy imports to keep CLI menu responsive and fast.
 
 ## Coding Standards
 
@@ -52,6 +53,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 4. Relative imports (only within same module)
 
 - Always use absolute imports for `dataset_forge` modules.
+- Always use lazy imports for all menus.
 
 ## Memory Management
 
@@ -68,7 +70,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 ## Progress Tracking & User Feedback
 
 - Use `from dataset_forge.utils.progress_utils import tqdm`
-- Use AudioTqdm for audio notifications.
+- Use AudioTqdm for audio notifications (startup, success, error & shutdown).
 - Always show progress for long operations.
 
 ## Color Scheme & UI
@@ -79,7 +81,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 
 ## Menu System
 
-- Use hierarchical menu structure (7 main categories).
+- Use hierarchical menu structure.
 - Use `show_menu()` from `dataset_forge.utils.menu`.
 - Include emojis in menu options.
 - Handle `KeyboardInterrupt` and `EOFError` gracefully.
@@ -136,6 +138,7 @@ while True:
 
 - Use centralized audio utilities: `from dataset_forge.utils.audio_utils import play_done_sound`
 - Play completion sounds for long operations.
+- Play startup and shutdown sounds appropriately.
 - Respect user audio preferences.
 - All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
 
@@ -208,7 +211,7 @@ while True:
 8. **Always provide user-friendly feedback and progress tracking**
 9. **Always document your code with Google-style docstrings**
 10. **Always test your changes thoroughly before committing**
-11. **All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.**
+11. **Always update documentation appropriately after having added and tested new functionality or new menu items.**
 
 ---
 

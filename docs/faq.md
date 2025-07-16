@@ -11,8 +11,8 @@ Dataset Forge is a modular Python CLI tool for managing, analyzing, and transfor
 ### What platforms are supported?
 
 - Windows (primary)
-- Linux (tested)
-- macOS is not officially supported but may work with some features disabled.
+- Linux (not yet tested)
+- macOS (not yet tested)
 
 ### What Python version is required?
 
@@ -20,27 +20,23 @@ Python 3.12+ is recommended. The project supports Python 3.8+ but is tested on 3
 
 ### How do I install Dataset Forge and its dependencies?
 
-See the [Quick Start](../README.md#quick-start) and [Special Installation Instructions](special_installation.md). Always install the correct CUDA-enabled torch/torchvision/torchaudio **before** running `pip install .`.
+See the [Quick Start](../README.md#-quick-start) and [Special Installation Instructions](special_installation.md).
 
 ### Why do I need to install VapourSynth before getnative?
 
-getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [special_installation.md](special_installation.md#vapoursynth--getnative-for-getnative-functionality).
+getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [Special Installation Instructions](special_installation.md).
 
 ### How do I fix python-magic errors on Windows?
 
-You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [special_installation.md](special_installation.md#python-magic-for-directory-utilities).
+You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [Special Installation Instructions](special_installation.md).
 
 ### How do I run the test suite?
 
-Activate the virtual environment and run `pytest`. See [usage.md](usage.md#running-tests).
-
-### What is CBIR for Duplicates?
-
-CBIR (Content-Based Image Retrieval) for Duplicates uses deep learning models (CLIP, ResNet, VGG) to find images that are semantically similar, even if visually transformed. It extracts feature embeddings, computes similarity, and groups duplicates for easy management. See [features.md](features.md#cbir-content-based-image-retrieval-for-duplicates).
+Activate the virtual environment and run `pytest`. See [usage.md](usage.md).
 
 ### How do I use the monitoring and analytics features?
 
-Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md#monitoring-analytics--error-tracking).
+Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md).
 
 ### What should I do if I get CUDA or GPU errors?
 

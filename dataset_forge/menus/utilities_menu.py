@@ -88,7 +88,7 @@ def utilities_menu():
     }
     while True:
         choice = show_menu(
-            "Utilities Menu",
+            "🛠️  Utilities",
             options,
             header_color=Mocha.sapphire,
             char="-",

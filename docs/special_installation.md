@@ -28,7 +28,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ---
 
-## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality)
+## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)
 
 **VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
@@ -65,7 +65,7 @@ pip install getnative
 
 ---
 
-## 3. python-magic (for directory utilities)
+## 3. python-magic (for `Enhanced Directory Tree`)
 
 **Windows users:** You must install both the Python packages and the required DLLs.
 
