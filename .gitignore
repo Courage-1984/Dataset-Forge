@@ -1,96 +1,106 @@
-# Python virtual environments
-./venv
-venv
-./venv312
-venv312
+# =============================
+# Python Virtual Environments
+# =============================
+venv/
+venv312/
+.venv/
+env/
+ENV/
 
-# Python cache files
-./__pycache__
-__pycache__
-./dataset_forge/__pycache__
-dataset_forge/__pycache__
+# =============================
+# Python Bytecode and Caches
+# =============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.mypy_cache/
+.pylint.d/
+.pytest_cache/
+.cache/
+*.cover
+coverage.*
+*.coverage
+.hypothesis/
 
-# Project-specific directories
-# ./dpid
-# dpid
-./Dataset_Preprocessing
-Dataset_Preprocessing
-./store
-store
-./dpid_implementation_examples
-dpid_implementation_examples
+# =============================
+# Build, Distribution, and Packaging
+# =============================
+build/
+dist/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+htmlcov/
+site/
 
-# Specific files to ignore
-./run_best_tile_ic9600.py
-run_best_tile_ic9600.py
+# =============================
+# Logs and Reports
+# =============================
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+reports/images/
+reports/*.html
+reports/*.md
 
-# Config files (ignore all except examples)
+# =============================
+# Data, Results, and Store
+# =============================
+store/
+results/
+logs/
+test_datasets/
+Dataset_Preprocessing/
+dpid_implementation_examples/
+Kim's_Directory_Tree_Maker/
+OpenModelDB/
+example_uspscale/
+resdet/
+wtp_dataset_destroyer/
+
+# =============================
+# Configs and Path History
+# =============================
 configs/*
+!.gitkeep
 !configs/_example_config.json
 !configs/_example_community_links.json
 !configs/_example_user_profile.json
-
-# Augmentation recipes
 !configs/augmentation_recipes/
 configs/augmentation_recipes/*
 !configs/augmentation_recipes/_example_advanced_recipe_template.json
 !configs/augmentation_recipes/_example_basic_flip_rotate.json
-
-# Path history
-./.path_history
 .path_history
 
-# Logs and results
-./logs
-logs
-./results
-results
+# =============================
+# IDE/Editor Files
+# =============================
+.idea/
+.vscode/
+*.code-workspace
 
-# Cursor rules file (untracked)
+# =============================
+# OS/Platform Files
+# =============================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# =============================
+# Jupyter Notebooks
+# =============================
+*.ipynb
+*.ipynb_checkpoints/
+
+# =============================
+# Miscellaneous
+# =============================
 .cursorrules
-
-./Kim's_Directory_Tree_Maker
-Kim's_Directory_Tree_Maker
-
-/charts_*/
-./charts_*/
-
-# ./tests
-# tests
-
-./OpenModelDB
-OpenModelDB
-
-./example_uspscale
-example_uspscale
-
-./.pytest_cache
-.pytest_cache
-
-./resdet
-resdet
-
-./wtp_dataset_destroyer
-wtp_dataset_destroyer
-
-./test_datasets
-test_datasets
-
-./.coverage
-.coverage
-
-./tools/find_code_issues.log
 tools/find_code_issues.log
-
-./reports/images/
-reports/images/
-
-./tools/find_code_issues/
 tools/find_code_issues/
-
-./Dataset_Preprocessing
-Dataset_Preprocessing
-
-./store/cache/
-store/cache/
 
