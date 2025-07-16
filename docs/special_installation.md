@@ -149,6 +149,16 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
 
+### Method 3: Windows (Windows pre-build binary)
+
+1. Extract the following files from `assets/resdet_windows.zip`:
+
+   - `resdet.exe`
+
+   (This is a prebuilt for 64-bit Windows that I compiled.)
+
+2. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
+
 ### Usage in Dataset Forge
 
 - The CLI will detect your platform and use the appropriate resdet binary.

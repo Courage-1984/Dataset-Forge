@@ -32,6 +32,8 @@ from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.input_utils import ask_yes_no
+from dataset_forge.utils.color import Mocha
 
 SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp")
 
@@ -178,15 +180,35 @@ def _run_zsteg_check(image_path: str, zsteg_results_file=None):
 def sanitize_images(
     input_path: str,
     output_folder: str,
-    remove_alpha: bool = False,
-    icc_to_srgb: bool = True,
-    run_steg: bool = False,
-    steg_tools: Optional[Tuple[bool, bool]] = None,  # (steghide, zsteg)
     dry_run: bool = False,
 ):
     """
-    New sanitize workflow as specified by user, with parallelization for slow steps.
+    Interactive sanitize workflow: prompts for each step, tracks run/skipped, returns summary dict.
     """
+    from dataset_forge.utils.printing import (
+        print_section,
+        print_info,
+        print_success,
+        print_warning,
+        print_error,
+    )
+    from dataset_forge.utils.input_utils import ask_yes_no
+    import tempfile, os, shutil, concurrent.futures, uuid
+    from PIL import Image
+    from dataset_forge.utils.image_ops import ICCToSRGBConverter, AlphaRemover
+    from dataset_forge.utils.progress_utils import tqdm
+    from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+    from dataset_forge.utils.audio_utils import play_done_sound
+    from dataset_forge.actions import exif_scrubber_actions
+    from dataset_forge.utils.history_log import log_operation
+    from dataset_forge.actions.sanitize_images_actions import (
+        run_oxipng_on_file,
+        parallel_oxipng,
+        _run_steghide_check,
+        _run_zsteg_check,
+    )
+
+    summary = {}
     max_workers = os.cpu_count() or 4
     hq_path = os.path.join(input_path, "hq")
     lq_path = os.path.join(input_path, "lq")
@@ -201,46 +223,64 @@ def sanitize_images(
         print_info(f"Detected single folder: {input_path}")
         folders = [(input_path, output_folder)]
 
-    # 1. Fix Image Corruption in-place in input folder(s) (parallel)
-    def fix_corruption_inplace(folder):
-        files = [
-            f
-            for f in os.listdir(folder)
-            if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
-        ]
-        print_info(f"Fixing image corruption in-place in {folder} (parallel)...")
-        import threading
+    # 1. Fix Image Corruption
+    print_section("🩹 Fix Image Corruption", char="-", color=Mocha.yellow)
+    fix_corruption = ask_yes_no(
+        "Fix image corruption in-place in input folder(s)?", default=False
+    )
+    summary["🩹 Fix Corruption"] = "Run" if fix_corruption else "Skipped"
+    if fix_corruption:
 
-        thread = threading.Thread(target=lambda: None)
-        task_registry.register_thread(thread)
+        def fix_corruption_inplace(folder):
+            files = [
+                f
+                for f in os.listdir(folder)
+                if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
+            ]
+            print_info(f"Fixing image corruption in-place in {folder} (parallel)...")
+            import threading
 
-        def fix_one(fpath):
-            try:
-                img = cv2.imread(fpath)
-                if img is not None:
-                    cv2.imwrite(fpath, img)
-                else:
-                    print_warning(f"Could not read {fpath} with OpenCV.")
-            except Exception as e:
-                print_warning(f"Error fixing {fpath}: {e}")
+            thread = threading.Thread(target=lambda: None)
+            task_registry.register_thread(thread)
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            list(
-                tqdm(
-                    executor.map(fix_one, [os.path.join(folder, f) for f in files]),
-                    total=len(files),
-                    desc=f"Fix corruption {os.path.basename(folder)}",
+            def fix_one(fpath):
+                try:
+                    img = cv2.imread(fpath)
+                    if img is not None:
+                        cv2.imwrite(fpath, img)
+                    else:
+                        print_warning(f"Could not read {fpath} with OpenCV.")
+                except Exception as e:
+                    print_warning(f"Error fixing {fpath}: {e}")
+
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=max_workers
+            ) as executor:
+                list(
+                    tqdm(
+                        executor.map(fix_one, [os.path.join(folder, f) for f in files]),
+                        total=len(files),
+                        desc=f"Fix corruption {os.path.basename(folder)}",
+                    )
                 )
-            )
-        clear_memory()
-        clear_cuda_cache()
+            clear_memory()
+            clear_cuda_cache()
 
-    for in_folder, _ in folders:
-        if not dry_run:
-            fix_corruption_inplace(in_folder)
-        else:
-            print_info(f"[Dry run] Would fix corruption in {in_folder}")
-    # 2. Copy all image files to temp_folder_A
+        for in_folder, _ in folders:
+            if not dry_run:
+                fix_corruption_inplace(in_folder)
+            else:
+                print_info(f"[Dry run] Would fix corruption in {in_folder}")
+    else:
+        print_info("Skipping image corruption fix.")
+
+    # 2. Copy to Temp
+    print_section("📂 Copy Images to Temp Folder", char="-", color=Mocha.lavender)
+    copy_to_temp = ask_yes_no("Copy all image files to temp folder?", default=False)
+    summary["📂 Copy to Temp"] = "Run" if copy_to_temp else "Skipped"
+    if not copy_to_temp:
+        print_info("Skipping copy to temp folder and all subsequent steps.")
+        return summary
     with tempfile.TemporaryDirectory() as temp_root:
         tempA_folders = []
         for in_folder, _ in folders:
@@ -260,63 +300,77 @@ def sanitize_images(
                     shutil.copy2(src, dst)
                 else:
                     print_info(f"[Dry run] Would copy {src} -> {dst}")
-
         # 3. Batch rename in tempA (strictly sequential, zero-padded, HQ/LQ aligned)
-        def batch_rename_sequential(folder):
-            files = sorted(
-                [
-                    f
-                    for f in os.listdir(folder)
-                    if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
-                ]
-            )
-            n = len(files)
-            padding = len(str(n))
-            temp_names = []
-            for idx, fname in enumerate(files, 1):
-                ext = os.path.splitext(fname)[1].lower()
-                new_name = f"{str(idx).zfill(padding)}{ext}"
-                temp_names.append((fname, new_name))
-            print_info(f"Batch renaming in {folder}...")
-            for old, new in tqdm(temp_names, desc=f"Rename {os.path.basename(folder)}"):
-                src = os.path.join(folder, old)
-                dst = os.path.join(folder, new)
-                if not dry_run:
-                    os.rename(src, dst)
-                else:
-                    print_info(f"[Dry run] Would rename {src} -> {dst}")
+        print_section("🔢 Batch Rename Images", char="-", color=Mocha.sapphire)
+        batch_rename = ask_yes_no("Batch rename images in tempA?", default=False)
+        summary["🔢 Batch Rename"] = "Run" if batch_rename else "Skipped"
+        if batch_rename:
 
-        if is_pair:
-            hq_files = sorted(
-                [
-                    f
-                    for f in os.listdir(tempA_folders[0])
-                    if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
-                ]
-            )
-            lq_files = sorted(
-                [
-                    f
-                    for f in os.listdir(tempA_folders[1])
-                    if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
-                ]
-            )
-            n = min(len(hq_files), len(lq_files))
-            padding = len(str(n))
-            for idx in range(n):
-                for folder, files in zip(tempA_folders, [hq_files, lq_files]):
-                    old = files[idx]
-                    ext = os.path.splitext(old)[1].lower()
-                    new = f"{str(idx+1).zfill(padding)}{ext}"
+            def batch_rename_sequential(folder):
+                if not os.path.exists(folder):
+                    print_warning(f"Folder does not exist: {folder}")
+                    return
+                files = sorted(
+                    [
+                        f
+                        for f in os.listdir(folder)
+                        if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
+                    ]
+                )
+                n = len(files)
+                padding = len(str(n))
+                temp_names = []
+                for idx, fname in enumerate(files, 1):
+                    ext = os.path.splitext(fname)[1].lower()
+                    new_name = f"{str(idx).zfill(padding)}{ext}"
+                    temp_names.append((fname, new_name))
+                print_info(f"Batch renaming in {folder}...")
+                for old, new in tqdm(
+                    temp_names, desc=f"Rename {os.path.basename(folder)}"
+                ):
                     src = os.path.join(folder, old)
                     dst = os.path.join(folder, new)
                     if not dry_run:
                         os.rename(src, dst)
                     else:
                         print_info(f"[Dry run] Would rename {src} -> {dst}")
+
+            if is_pair:
+                hq_files = sorted(
+                    [
+                        f
+                        for f in os.listdir(tempA_folders[0])
+                        if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
+                    ]
+                )
+                lq_files = sorted(
+                    [
+                        f
+                        for f in os.listdir(tempA_folders[1])
+                        if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
+                    ]
+                )
+                n = min(len(hq_files), len(lq_files))
+                padding = len(str(n))
+                for idx in range(n):
+                    for folder, files in zip(tempA_folders, [hq_files, lq_files]):
+                        old = files[idx]
+                        ext = os.path.splitext(old)[1].lower()
+                        new = f"{str(idx+1).zfill(padding)}{ext}"
+                        src = os.path.join(folder, old)
+                        dst = os.path.join(folder, new)
+                        if not dry_run:
+                            os.rename(src, dst)
+                        else:
+                            print_info(f"[Dry run] Would rename {src} -> {dst}")
+            else:
+                batch_rename_sequential(tempA_folders[0])
         else:
-            batch_rename_sequential(tempA_folders[0])
-        # 4. ICC to sRGB (optional, in-place in tempA, parallel)
+            print_info("Skipping batch rename.")
+        # 4. ICC to sRGB
+        print_section("🎨 ICC to sRGB Conversion", char="-", color=Mocha.green)
+        icc_to_srgb = ask_yes_no("Run ICC to sRGB conversion?", default=False)
+        summary["🎨 ICC to sRGB"] = "Run" if icc_to_srgb else "Skipped"
         if icc_to_srgb:
             print_info("Running ICC to sRGB conversion in tempA (parallel)...")
 
@@ -327,6 +381,9 @@ def sanitize_images(
                     print_info(f"[Dry run] Would convert ICC to sRGB: {fpath}")
 
             for tempA in tempA_folders:
+                if not os.path.exists(tempA):
+                    print_warning(f"Folder does not exist: {tempA}")
+                    continue
                 files = [
                     os.path.join(tempA, f)
                     for f in os.listdir(tempA)
@@ -342,48 +399,62 @@ def sanitize_images(
                             desc=f"ICC to sRGB {os.path.basename(tempA)}",
                         )
                     )
+        else:
+            print_info("Skipping ICC to sRGB conversion.")
         # 5. Format normalization: convert to PNG, save to tempB (parallel)
-        tempB_folders = []
+        print_section("🖼️  Convert to PNG", char="-", color=Mocha.blue)
+        to_png = ask_yes_no("Convert images to PNG format?", default=False)
+        summary["🖼️  Convert to PNG"] = "Run" if to_png else "Skipped"
+        if to_png:
+            tempB_folders = []
 
-        def to_png_one(args):
-            src, dst = args
-            if not dry_run:
-                try:
-                    with Image.open(src) as img:
-                        img.save(dst, format="PNG")
-                except Exception as e:
-                    print_warning(f"Failed to convert {src} to PNG: {e}")
-            else:
-                print_info(f"[Dry run] Would convert {src} -> {dst}")
+            def to_png_one(args):
+                src, dst = args
+                if not dry_run:
+                    try:
+                        with Image.open(src) as img:
+                            img.save(dst, format="PNG")
+                    except Exception as e:
+                        print_warning(f"Failed to convert {src} to PNG: {e}")
+                else:
+                    print_info(f"[Dry run] Would convert {src} -> {dst}")
 
-        for tempA in tempA_folders:
-            tempB = tempA + "_B"
-            tempB_folders.append(tempB)
-            if not dry_run:
-                os.makedirs(tempB, exist_ok=True)
-            files = [
-                f
-                for f in os.listdir(tempA)
-                if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
-            ]
-            args_list = [
-                (
-                    os.path.join(tempA, fname),
-                    os.path.join(tempB, os.path.splitext(fname)[0] + ".png"),
-                )
-                for fname in files
-            ]
-            with concurrent.futures.ThreadPoolExecutor(
-                max_workers=max_workers
-            ) as executor:
-                list(
-                    tqdm(
-                        executor.map(to_png_one, args_list),
-                        total=len(args_list),
-                        desc=f"To PNG {os.path.basename(tempB)}",
+            for tempA in tempA_folders:
+                tempB = tempA + "_B"
+                tempB_folders.append(tempB)
+                if not dry_run:
+                    os.makedirs(tempB, exist_ok=True)
+                if not os.path.exists(tempA):
+                    print_warning(f"Folder does not exist: {tempA}")
+                    continue
+                files = [
+                    f
+                    for f in os.listdir(tempA)
+                    if f.lower().endswith(SUPPORTED_IMAGE_EXTENSIONS)
+                ]
+                args_list = [
+                    (
+                        os.path.join(tempA, fname),
+                        os.path.join(tempB, os.path.splitext(fname)[0] + ".png"),
                     )
-                )
+                    for fname in files
+                ]
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=max_workers
+                ) as executor:
+                    list(
+                        tqdm(
+                            executor.map(to_png_one, args_list),
+                            total=len(args_list),
+                            desc=f"To PNG {os.path.basename(tempB)}",
+                        )
+                    )
+        else:
+            print_info("Skipping PNG conversion.")
         # 6. Remove transparency (optional, in-place in tempB, parallel)
+        print_section("🧊 Remove Transparency (Alpha)", char="-", color=Mocha.teal)
+        remove_alpha = ask_yes_no("Remove transparency (alpha channel)?", default=False)
+        summary["🧊 Remove Alpha"] = "Run" if remove_alpha else "Skipped"
         if remove_alpha:
             print_info("Removing transparency in tempB (parallel)...")
 
@@ -397,6 +468,9 @@ def sanitize_images(
                     print_info(f"[Dry run] Would remove alpha: {fpath}")
 
             for tempB in tempB_folders:
+                if not os.path.exists(tempB):
+                    print_warning(f"Folder does not exist: {tempB}")
+                    continue
                 files = [
                     os.path.join(tempB, f)
                     for f in os.listdir(tempB)
@@ -418,63 +492,100 @@ def sanitize_images(
                     )
                 clear_memory()
                 clear_cuda_cache()
+        else:
+            print_info("Skipping alpha removal.")
         # 7. Metadata removal: oxipng to output (per-file parallel)
-        print_info(
-            "Running oxipng for metadata removal and final output (per-file parallel)..."
-        )
-        for idx, (_, out_folder) in enumerate(folders):
-            tempB = tempB_folders[idx]
-            if not dry_run:
-                os.makedirs(out_folder, exist_ok=True)
-                parallel_oxipng(tempB, out_folder, dry_run, max_workers)
-            else:
-                print_info(
-                    f"[Dry run] Would run oxipng on all PNGs in {tempB} to {out_folder}"
-                )
-        # 8. Steganography checks (not parallelized, but could be if needed)
-        zsteg_results_file = None
-        if run_steg and steg_tools and steg_tools[1]:
-            # Create a temp file for zsteg results
-            zsteg_results_file = os.path.join(
-                tempfile.gettempdir(), f"zsteg_results_{uuid.uuid4().hex[:8]}.txt"
+        print_section("🗑️  Remove Metadata (oxipng)", char="-", color=Mocha.peach)
+        remove_metadata = ask_yes_no("Remove metadata (oxipng)?", default=False)
+        summary["🗑️  Remove Metadata"] = "Run" if remove_metadata else "Skipped"
+        if remove_metadata:
+            print_info(
+                "Running oxipng for metadata removal and final output (per-file parallel)..."
             )
-            with open(zsteg_results_file, "w", encoding="utf-8") as f:
-                f.write("ZSTEG RESULTS LEGEND:\n")
-                f.write("- text: Possible hidden text found in a channel.\n")
-                f.write("- file: Possible embedded file signature detected.\n")
-                f.write("- No hidden data: No suspicious output.\n")
-                f.write("- Stack overflow: zsteg Ruby bug, not a workflow error.\n\n")
+            for idx, (_, out_folder) in enumerate(folders):
+                tempB = tempB_folders[idx]
+                if not dry_run:
+                    os.makedirs(out_folder, exist_ok=True)
+                    parallel_oxipng(tempB, out_folder, dry_run, max_workers)
+                else:
+                    if not os.path.exists(tempB):
+                        print_warning(f"Folder does not exist: {tempB}")
+                        continue
+                    print_info(
+                        f"[Dry run] Would run oxipng on all PNGs in {tempB} to {out_folder}"
+                    )
+        else:
+            print_info("Skipping metadata removal.")
+        # 8. Steganography checks (not parallelized, but could be if needed)
+        print_section("🕵️  Steganography Checks", char="-", color=Mocha.mauve)
+        run_steg = ask_yes_no(
+            "Run steganography checks (steghide/zsteg)?", default=False
+        )
+        steghide_choice = False
+        zsteg_choice = False
+        zsteg_results_file = None
         if run_steg:
-            print_info("Running steganography checks on output PNGs...")
-            for _, out_folder in folders:
-                png_files = [
-                    f for f in os.listdir(out_folder) if f.lower().endswith(".png")
-                ]
-                for fname in tqdm(
-                    png_files, desc=f"Steg check {os.path.basename(out_folder)}"
-                ):
-                    fpath = os.path.join(out_folder, fname)
-                    if steg_tools and steg_tools[0]:
-                        print_info(f"[Steghide] Checking {fpath}")
-                        if not dry_run:
-                            _run_steghide_check(fpath)
-                        else:
-                            print_info(f"[Dry run] Would run steghide on {fpath}")
-                    if steg_tools and steg_tools[1]:
-                        print_info(f"[zsteg] Checking {fpath}")
-                        if not dry_run:
-                            _run_zsteg_check(
-                                fpath, zsteg_results_file=zsteg_results_file
-                            )
-                        else:
-                            print_info(f"[Dry run] Would run zsteg on {fpath}")
-    print_success("Sanitization complete.")
-    play_done_sound()
-    clear_memory()
-    clear_cuda_cache()
-    if zsteg_results_file:
-        return zsteg_results_file
-    return None
+            steghide_choice = ask_yes_no(
+                "Use steghide for steganography checks?", default=False
+            )
+            zsteg_choice = ask_yes_no(
+                "Use zsteg for steganography checks?", default=True
+            )
+            summary["🕵️  Steganography"] = (
+                f"steghide: {'Run' if steghide_choice else 'Skipped'}, zsteg: {'Run' if zsteg_choice else 'Skipped'}"
+            )
+            if not (steghide_choice or zsteg_choice):
+                print_info("Skipping steganography checks (no tool selected).")
+            else:
+                if zsteg_choice:
+                    zsteg_results_file = os.path.join(
+                        tempfile.gettempdir(),
+                        f"zsteg_results_{uuid.uuid4().hex[:8]}.txt",
+                    )
+                    with open(zsteg_results_file, "w", encoding="utf-8") as f:
+                        f.write("ZSTEG RESULTS LEGEND:\n")
+                        f.write("- text: Possible hidden text found in a channel.\n")
+                        f.write("- file: Possible embedded file signature detected.\n")
+                        f.write("- No hidden data: No suspicious output.\n")
+                        f.write(
+                            "- Stack overflow: zsteg Ruby bug, not a workflow error.\n\n"
+                        )
+                print_info("Running steganography checks on output PNGs...")
+                for _, out_folder in folders:
+                    if not os.path.exists(out_folder):
+                        print_warning(f"Folder does not exist: {out_folder}")
+                        continue
+                    png_files = [
+                        f for f in os.listdir(out_folder) if f.lower().endswith(".png")
+                    ]
+                    for fname in tqdm(
+                        png_files, desc=f"Steg check {os.path.basename(out_folder)}"
+                    ):
+                        fpath = os.path.join(out_folder, fname)
+                        if steghide_choice:
+                            print_info(f"[Steghide] Checking {fpath}")
+                            if not dry_run:
+                                _run_steghide_check(fpath)
+                            else:
+                                print_info(f"[Dry run] Would run steghide on {fpath}")
+                        if zsteg_choice:
+                            print_info(f"[zsteg] Checking {fpath}")
+                            if not dry_run:
+                                _run_zsteg_check(
+                                    fpath, zsteg_results_file=zsteg_results_file
+                                )
+                            else:
+                                print_info(f"[Dry run] Would run zsteg on {fpath}")
+        else:
+            summary["🕵️  Steganography"] = "steghide: Skipped, zsteg: Skipped"
+            print_info("Skipping steganography checks.")
+        if zsteg_results_file:
+            summary["📄 Zsteg results file"] = zsteg_results_file
+        print_success("Sanitization complete.")
+        play_done_sound()
+        clear_memory()
+        clear_cuda_cache()
+        return summary
 
 
 def _batch_rename_pngs(folder: str, dry_run: bool = False):

@@ -11,9 +11,6 @@ def get_path_with_history(
     is_optional=False,
     allow_hq_lq_options=True,
 ):
-    print(
-        f"[DEBUG] get_path_with_history called with is_optional={is_optional}, allow_hq_lq_options={allow_hq_lq_options}"
-    )
     """
     Prompt the user for a path, allowing selection from history, manual entry, or HQ/LQ from settings.
     - allow_hq_lq: If True, user can select HQ/LQ from settings.

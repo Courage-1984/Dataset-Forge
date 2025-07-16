@@ -6,69 +6,78 @@ from dataset_forge.utils.printing import (
     print_warning,
     print_error,
     print_prompt,
+    print_header,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
 import subprocess
+from dataset_forge.utils.input_utils import ask_yes_no, get_folder_path
 
 
 def sanitize_images_menu():
     from dataset_forge.actions import sanitize_images_actions
 
-    """Menu for sanitizing images: metadata removal, renaming, normalization, ICC to sRGB, steganography checks."""
+    print_header("🧹 Sanitize Images Workflow 🧹", char="=", color=Mocha.lavender)
     while True:
-        print_info("\n=== Sanitize Images ===")
-        print_info("1. Single folder")
-        print_info("2. HQ/LQ paired folders")
-        print_info("0. Back")
-        mode = input("Select mode [1-2, 0]: ").strip()
+        print_section("Select Input Mode", char="-", color=Mocha.sapphire)
+        print_info("[1] Single folder")
+        print_info("[2] HQ/LQ paired folders")
+        print_info("[0] Back to Utilities Menu")
+        mode = input("Enter your choice: ").strip()
         if mode == "0":
             break
         if mode not in ("1", "2"):
-            print_warning("Invalid selection.")
+            print_warning("Invalid selection. Please enter 1, 2, or 0.")
             continue
         if mode == "1":
-            folder = input("Enter folder path: ").strip()
-            if not folder or not os.path.isdir(folder):
-                print_error("Folder does not exist.")
+            input_path = get_folder_path("Select the folder to sanitize")
+            if not input_path:
+                print_error("No folder selected. Returning to menu.")
                 continue
-            input_path = folder
         else:
-            hq = input("Enter HQ folder path: ").strip()
-            lq = input("Enter LQ folder path: ").strip()
-            if not os.path.isdir(hq) or not os.path.isdir(lq):
-                print_error("Both HQ and LQ folders must exist.")
+            print_section("Select HQ/LQ Folders", char="-", color=Mocha.sapphire)
+            hq = get_folder_path("Select the HQ folder")
+            lq = get_folder_path("Select the LQ folder")
+            if not hq or not lq:
+                print_error("Both HQ and LQ folders must be selected.")
                 continue
-            # Use parent directory as input_path
             input_path = os.path.dirname(hq.rstrip("/\\"))
-        output_folder = input(
-            "Enter output folder (will be created if missing): "
-        ).strip()
+        output_folder = get_folder_path(
+            "Select the output folder (will be created if missing)"
+        )
         if not output_folder:
             print_error("Output folder is required.")
             continue
         if os.path.abspath(output_folder) == os.path.abspath(input_path):
             print_error("Output folder must be different from input folder.")
             continue
-        remove_alpha = (
-            input("Remove transparency (alpha channel)? [y/N]: ").strip().lower() == "y"
+        print_section("Workflow Options", char="-", color=Mocha.sapphire)
+        dry_run = ask_yes_no(
+            "Perform a dry run (no changes will be made)?", default=False
         )
-        icc_to_srgb = (
-            input("Run ICC to sRGB conversion? [Y/n]: ").strip().lower() != "n"
+        print_header("Summary of Selected Options", char="-", color=Mocha.green)
+        print_info(
+            f"Input mode: {'Single folder' if mode == '1' else 'HQ/LQ paired folders'}"
         )
-        run_steg = (
-            input("Run steganography checks (steghide/zsteg)? [y/N]: ").strip().lower()
-            == "y"
-        )
-        steg_tools = (False, False)
-        if run_steg:
-            steghide = input("Use steghide? [Y/n]: ").strip().lower() != "n"
-            zsteg = input("Use zsteg? [Y/n]: ").strip().lower() != "n"
-            steg_tools = (steghide, zsteg)
-        dry_run = input("Dry run (no changes)? [y/N]: ").strip().lower() == "y"
-        print_info("\n=== Environment Diagnostics: PATH and zsteg ===")
+        if mode == "1":
+            print_info(f"Input folder: {input_path}")
+        else:
+            print_info(f"HQ folder: {hq}")
+            print_info(f"LQ folder: {lq}")
+        print_info(f"Output folder: {output_folder}")
+        print_info(f"Dry run: {'Yes' if dry_run else 'No'}")
+        print_section("Confirm and Run", char="-", color=Mocha.green)
+        if not ask_yes_no("Proceed with these settings?", default=True):
+            print_warning("Operation cancelled by user. Returning to menu.")
+            continue
+        print_section("Environment Diagnostics", char="-", color=Mocha.yellow)
         try:
-            result = subprocess.run(["python", "-u", "print_zsteg_env.py"], check=False)
+            import subprocess
+
+            result = subprocess.run(
+                ["python", "-u", "tools/print_zsteg_env.py"], check=False
+            )
             if result.returncode != 0:
                 print_info("[Diagnostics] print_zsteg_env.py did not run successfully.")
         except FileNotFoundError:
@@ -76,18 +85,23 @@ def sanitize_images_menu():
         except Exception as e:
             print_warning(f"Could not run print_zsteg_env.py: {e}")
         print_info("=== End Diagnostics ===\n")
-        zsteg_results_file = sanitize_images_actions.sanitize_images(
+        # --- Run the workflow (all step prompts now handled inside) ---
+        summary = sanitize_images_actions.sanitize_images(
             input_path,
             output_folder,
-            remove_alpha=remove_alpha,
-            icc_to_srgb=icc_to_srgb,
-            run_steg=run_steg,
-            steg_tools=steg_tools,
             dry_run=dry_run,
         )
-        if zsteg_results_file:
-            print_success(
-                f"Sanitization completed. Results saved to: {zsteg_results_file}"
-            )
-        else:
-            print_success("Sanitization completed.")
+        # --- Print visually distinct summary box ---
+        print_header(
+            "📝 Sanitize Images Workflow Summary 📝", char="=", color=Mocha.green
+        )
+        for step, status in summary.items():
+            if step == "📄 Zsteg results file":
+                continue
+            color = Mocha.green if ("Run" in status) else Mocha.peach
+            print(color + f"{step:35} : {status}" + Mocha.reset)
+        if "📄 Zsteg results file" in summary:
+            print_info(f"📄 Zsteg results file: {summary['📄 Zsteg results file']}")
+        print_section("", char="-", color=Mocha.lavender)
+        input("Press Enter to return to the Sanitize Images menu...")
+        print_header("🧹 Sanitize Images Workflow 🧹", char="=", color=Mocha.lavender)
