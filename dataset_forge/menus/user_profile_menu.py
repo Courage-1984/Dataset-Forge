@@ -74,19 +74,27 @@ def get_menu_options(menu_func):
 
 def user_profile_menu():
     from dataset_forge.actions import user_profile_actions
+    from dataset_forge.utils.printing import print_error
 
     options = user_profile_menu.__menu_options__
     while True:
-        action = show_menu(
+        key = show_menu(
             "User Profile Management",
             options,
             header_color=Mocha.mauve,
             char="=",
         )
-        if action is None:
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None:
             break
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def profile_management_menu():

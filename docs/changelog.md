@@ -32,6 +32,14 @@
 - Handles Unicode, subprocess, and Windows-specific issues
 - Manual/script tests for BHI filtering and pepeline
 - All tests pass as of this integration
+- Refactored all DPID logic to use the new modular structure (`dataset_forge.dpid.*`). Legacy imports from `dataset_forge.utils.dpid_phhofm` removed.
+- All menus now use the robust menu loop pattern (get key, look up action, call if callable, handle errors).
+- All user-facing workflows are responsible for their own 'Press Enter to return to the menu...' prompt. Menu loops no longer include this prompt.
+- All output, prompts, and progress messages now use the centralized printing utilities and Catppuccin Mocha color scheme. No raw print statements remain in user-facing workflows.
+- Exception handling and debug prints added to menu actions and workflows for easier debugging and error diagnosis.
+- Major test suite improvements: added and improved unit/integration tests for DPID, CBIR, deduplication, reporting, utilities, session state, and more.
+- All core business logic and utilities now covered by tests.
+- Fixed test import errors, function signatures, and monkeypatches for reliability.
 
 ## [July 2025]
 

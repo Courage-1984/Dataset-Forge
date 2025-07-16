@@ -169,16 +169,21 @@ def personal_links_menu():
 
 def links_menu():
     options = links_menu.__menu_options__
+    from dataset_forge.utils.printing import print_error
+
     while True:
-        action = show_menu("🔗 Links", options, header_color=Mocha.lavender)
+        key = show_menu("🔗 Links", options, header_color=Mocha.lavender)
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
+            break
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
-            continue
-        if action is None or action == "0":
-            break
-        func = options[action][1]
-        if callable(func):
-            func()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 links_menu.__menu_options__ = {

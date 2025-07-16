@@ -3,7 +3,14 @@ from dataset_forge.utils.progress_utils import tqdm
 from typing import Optional
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_header,
+    print_section,
+    print_info,
+    print_success,
+    print_error,
+    print_prompt,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # You may need to adjust these imports based on your project structure
@@ -40,7 +47,6 @@ def run_ic9600_tiling(
     from store.run_best_tile_ic9600 import BestTile, IC9600Complexity, ProcessType
 
     if hq_folder and lq_folder:
-        # HQ/LQ paired mode
         assert (
             out_hq_folder and out_lq_folder
         ), "Output folders for HQ and LQ must be specified."
@@ -49,8 +55,10 @@ def run_ic9600_tiling(
         hq_images = set(os.listdir(hq_folder))
         lq_images = set(os.listdir(lq_folder))
         common_images = sorted(hq_images & lq_images)
-        print(f"Found {len(common_images)} aligned HQ/LQ pairs.")
+        print_header("🧩 IC9600 Tiling: HQ/LQ Paired Folders")
+        print_info(f"Found {len(common_images)} aligned HQ/LQ pairs.")
         # Process HQ
+        print_section("Processing HQ images...")
         hq_tiler = BestTile(
             in_folder=hq_folder,
             out_folder=out_hq_folder,
@@ -63,6 +71,7 @@ def run_ic9600_tiling(
             func=IC9600Complexity(device=device),
         )
         # Process LQ
+        print_section("Processing LQ images...")
         lq_tiler = BestTile(
             in_folder=lq_folder,
             out_folder=out_lq_folder,
@@ -77,13 +86,13 @@ def run_ic9600_tiling(
         # Only process aligned pairs
         hq_tiler.all_images = common_images
         lq_tiler.all_images = common_images
-        print("Processing HQ images...")
         hq_tiler.run()
-        print("Processing LQ images...")
         lq_tiler.run()
+        print_success("HQ/LQ tiling complete.")
     elif single_folder:
         assert out_folder, "Output folder must be specified for single-folder mode."
         os.makedirs(out_folder, exist_ok=True)
+        print_header("🧩 IC9600 Tiling: Single Folder")
         tiler = BestTile(
             in_folder=single_folder,
             out_folder=out_folder,
@@ -95,9 +104,14 @@ def run_ic9600_tiling(
             image_gray=image_gray,
             func=IC9600Complexity(device=device),
         )
-        print(f"Processing {len(tiler.all_images)} images in single-folder mode...")
+        print_info(
+            f"Processing {len(tiler.all_images)} images in single-folder mode..."
+        )
         tiler.run()
+        print_success("Single-folder tiling complete.")
     else:
-        raise ValueError(
+        print_error(
             "You must specify either (hq_folder and lq_folder) or single_folder."
         )
+    print_prompt("Press Enter to return to the menu...")
+    input()

@@ -4,6 +4,7 @@ from dataset_forge.menus.model_management_menu import (
 )
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
+from dataset_forge.utils.printing import print_error
 
 
 def training_inference_menu():
@@ -19,19 +20,25 @@ def training_inference_menu():
             "8": ("✏️  Edit .hcl Config File (wtp_dataset_destroyer)", None),
             "9": ("✏️  Edit .yml Config File (traiNNer-redux)", None),
             "10": ("📋 List/Upscale with Model", None),
-            "11": ("🧠 OpenModelDB Model Browser", openmodeldb_model_browser_mode_menu),
+            "11": ("🧠 OpenModelDB Model Browser", openmodeldb_model_browser_menu),
             "0": ("⬅️  Back to Main Menu", None),
         }
-        choice = show_menu(
+        key = show_menu(
             "🚀 Training & Inference",
             options,
             Mocha.lavender,
         )
-        if choice is None or choice == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def openmodeldb_model_browser_mode_menu():

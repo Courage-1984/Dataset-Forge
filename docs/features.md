@@ -2,8 +2,6 @@
 
 # Features (tl;dr)
 
-
-
 # Features (main menus)
 
 ## ⚙️ Core & Configuration
@@ -36,30 +34,30 @@
 
 ## ✨ Image Processing & Augmentation
 
-- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, remove alpha channel
+- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel
 - **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
 - **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
-- **🚀 Augmentation**: List, create, edit or delete *recipes* or run advanced augmentation pipelines (using recipes)
+- **🚀 Augmentation**: List, create, edit or delete _recipes_ or run advanced augmentation pipelines (using recipes)
 - **📋 Metadata**: Scrub EXIF Metadata, Convert ICC Profile to sRGB
 - **✏️ Find & extract sketches/drawings/line art**: Find & extract sketches/drawings/line art using pre-trained model
 - **🗳️ Batch Processing**: Efficient batch operations for large datasets
 
 ## 🚀 Training & Inference
 
-- **🛠️  Run wtp_dataset_destroyer**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) integration, create HQ/LQ pairs with custom degradations
+- **🛠️ Run wtp_dataset_destroyer**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) integration, create HQ/LQ pairs with custom degradations
 - **🚀 Run traiNNer-redux**: [traiNNer-redux](https://github.com/the-database/traiNNer-redux) integration, train your own SISR models
 - **🧠 OpenModelDB Model Browser**: Robust integration with [OpenModelDB](https://openmodeldb.info/)
 - **⚙️ Config files**: Add, load, view & edit configs
 
-## 🛠️  Utilities
+## 🛠️ Utilities
 
-- **🖼️  Create Comparisons**: Create striking image / gif comparisons
+- **🖼️ Create Comparisons**: Create striking image / gif comparisons
 - **📦 Compression**: Compress images or directories
 - **🧹 Sanitize Images**: Comprehensive image file sanitization (alpha channel, colour profile, steganography, metadata)
 - **🌳 Enhanced Directory Tree**: Directory tree visualization using emojis
 - **🧹 Filter non-Images**: Filter all non image type files
 
-## ⚙️  System & Settings
+## ⚙️ System & Settings
 
 - **📁 Set HQ/LQ Folder**: set HQ/LQ image pair folders to use throughout Dataset Forge
 - **👤 User Profile Management**: Create and manage custom profiles for Dataset Forge
@@ -78,8 +76,7 @@
 - **🛑 View Error Summary**: Logs errors to file and CLI, with summary granularity and critical error notifications (sound/visual)
 - **🩺 Run Health Checks**: Automated checks for RAM, disk, CUDA, Python version, and permissions, with CLI output and recommendations
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
-- **⏱️  View Menu Load Times**: View the menu load times
-
+- **⏱️ View Menu Load Times**: View the menu load times
 
 # Features (expanded/misc)
 
@@ -87,6 +84,22 @@
 - **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
 
+## Testing & Validation
+
+- Dataset Forge includes a comprehensive, cross-platform test suite using pytest.
+- All core business logic, utilities, and integration flows are covered by unit and integration tests.
+- Tests cover DPID, CBIR, deduplication, reporting, audio, memory, parallel, and session state features.
+- Tests are robust on Windows and Linux, and use fixtures and monkeypatching for reliability.
+- All new features and bugfixes must include appropriate tests.
+
 ---
+
+## July 2025 Improvements
+
+- All menus now use a robust, error-resistant loop pattern for reliability.
+- All DPID logic is modular and uses the new `dataset_forge.dpid.*` structure.
+- All user-facing workflows provide clear, styled feedback and prompts.
+- CLI output is visually consistent and uses the Catppuccin Mocha color scheme throughout.
+- Exception handling and debug prints ensure errors are caught and shown to the user.
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).

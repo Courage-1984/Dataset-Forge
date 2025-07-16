@@ -692,6 +692,7 @@ def downsample_images_menu():
         "downsample_images",
         f"scale=1/{scale_factor:.2f}, {operation}, aspect_mode={aspect_mode}, {successful}/{len(image_files)} images",
     )
+    input("Press Enter to return to the menu...")
 
 
 def hdr_to_sdr_menu():
@@ -867,6 +868,7 @@ def hdr_to_sdr_menu():
         "hdr_to_sdr",
         f"method={method_choice}, gamma={gamma}, saturation={saturation}, {operation}, {successful}/{len(image_files)} images",
     )
+    input("Press Enter to return to the menu...")
 
 
 def dataset_colour_adjustment(hq_folder, lq_folder):
@@ -988,6 +990,7 @@ def dataset_colour_adjustment(hq_folder, lq_folder):
         "dataset_colour_adjustment",
         f"{selected_adjustment}={value}, {operation}, {successful}/{len(matching_files)} pairs",
     )
+    input("Press Enter to return to the menu...")
 
 
 def grayscale_conversion(hq_folder, lq_folder):
@@ -1118,6 +1121,7 @@ def grayscale_conversion(hq_folder, lq_folder):
         "grayscale_conversion",
         f"{operation}, {successful}/{len(matching_files)} pairs",
     )
+    input("Press Enter to return to the menu...")
 
 
 def remove_alpha_channels_menu():
@@ -1240,6 +1244,7 @@ def remove_alpha_channels_menu():
         "remove_alpha_channels",
         f"{operation}, {successful}/{len(image_files)} images",
     )
+    input("Press Enter to return to the menu...")
 
 
 def crop_image_menu():
@@ -1264,6 +1269,7 @@ def crop_image_menu():
     input_folder = get_path_with_history("Enter path to input folder:")
     if not input_folder or not os.path.isdir(input_folder):
         print_error("Input path must be a valid directory.")
+        input("Press Enter to return to the menu...")
         return
     try:
         left = int(input("Enter left coordinate (pixels): ").strip())
@@ -1272,6 +1278,7 @@ def crop_image_menu():
         lower = int(input("Enter lower coordinate (pixels): ").strip())
     except Exception:
         print_error("Invalid crop coordinates.")
+        input("Press Enter to return to the menu...")
         return
     crop_box = (left, upper, right, lower)
     operation = get_file_operation_choice()
@@ -1280,11 +1287,13 @@ def crop_image_menu():
         dest_dir = get_destination_path("Enter destination folder: ")
         if not dest_dir:
             print_error("Operation aborted as destination path was not provided.")
+            input("Press Enter to return to the menu...")
             return
         os.makedirs(dest_dir, exist_ok=True)
     image_files = [f for f in os.listdir(input_folder) if is_image_file(f)]
     if not image_files:
         print_error("No image files found in the input folder.")
+        input("Press Enter to return to the menu...")
         return
     print_info(f"\nFound {len(image_files)} images to crop.")
     config = ParallelConfig(
@@ -1323,6 +1332,7 @@ def crop_image_menu():
         "crop_images",
         f"crop_box={crop_box}, {operation}, {successful}/{len(image_files)} images",
     )
+    input("Press Enter to return to the menu...")
 
 
 def flip_image_menu():
@@ -1347,6 +1357,7 @@ def flip_image_menu():
     input_folder = get_path_with_history("Enter path to input folder:")
     if not input_folder or not os.path.isdir(input_folder):
         print_error("Input path must be a valid directory.")
+        input("Press Enter to return to the menu...")
         return
     print_info("Select flip direction:")
     print_info("1. Horizontal (left-right)")
@@ -1358,6 +1369,7 @@ def flip_image_menu():
         flip_type = "vertical"
     else:
         print_error("Invalid flip direction.")
+        input("Press Enter to return to the menu...")
         return
     operation = get_file_operation_choice()
     dest_dir = ""
@@ -1365,11 +1377,13 @@ def flip_image_menu():
         dest_dir = get_destination_path("Enter destination folder: ")
         if not dest_dir:
             print_error("Operation aborted as destination path was not provided.")
+            input("Press Enter to return to the menu...")
             return
         os.makedirs(dest_dir, exist_ok=True)
     image_files = [f for f in os.listdir(input_folder) if is_image_file(f)]
     if not image_files:
         print_error("No image files found in the input folder.")
+        input("Press Enter to return to the menu...")
         return
     print_info(f"\nFound {len(image_files)} images to flip.")
     config = ParallelConfig(
@@ -1411,6 +1425,7 @@ def flip_image_menu():
         "flip_images",
         f"flip_type={flip_type}, {operation}, {successful}/{len(image_files)} images",
     )
+    input("Press Enter to return to the menu...")
 
 
 def rotate_image_menu():
@@ -1435,11 +1450,13 @@ def rotate_image_menu():
     input_folder = get_path_with_history("Enter path to input folder:")
     if not input_folder or not os.path.isdir(input_folder):
         print_error("Input path must be a valid directory.")
+        input("Press Enter to return to the menu...")
         return
     try:
         angle = float(input("Enter rotation angle (degrees, positive=CCW): ").strip())
     except Exception:
         print_error("Invalid angle.")
+        input("Press Enter to return to the menu...")
         return
     operation = get_file_operation_choice()
     dest_dir = ""
@@ -1447,11 +1464,13 @@ def rotate_image_menu():
         dest_dir = get_destination_path("Enter destination folder: ")
         if not dest_dir:
             print_error("Operation aborted as destination path was not provided.")
+            input("Press Enter to return to the menu...")
             return
         os.makedirs(dest_dir, exist_ok=True)
     image_files = [f for f in os.listdir(input_folder) if is_image_file(f)]
     if not image_files:
         print_error("No image files found in the input folder.")
+        input("Press Enter to return to the menu...")
         return
     print_info(f"\nFound {len(image_files)} images to rotate.")
     config = ParallelConfig(
@@ -1490,3 +1509,187 @@ def rotate_image_menu():
         "rotate_images",
         f"angle={angle}, {operation}, {successful}/{len(image_files)} images",
     )
+    input("Press Enter to return to the menu...")
+
+
+def shuffle_images_menu():
+    print("DEBUG: Entered shuffle_images_menu")
+    try:
+        from dataset_forge.utils.input_utils import (
+            get_path_with_history,
+            get_file_operation_choice,
+            get_destination_path,
+        )
+        from dataset_forge.utils.printing import (
+            print_header,
+            print_info,
+            print_error,
+            print_success,
+        )
+        from dataset_forge.utils.color import Mocha
+        from dataset_forge.actions import dataset_actions
+        import os
+        import random
+        import shutil
+
+        print_header("Shuffle Images", color=Mocha.lavender)
+        print_info("Choose input mode:")
+        print_info("  1. \U0001F4C2 HQ/LQ paired folders")
+        print_info("  2. \U0001F5C1 Single folder")
+        print_info("  0. \u274c Cancel")
+        mode = input("\U0001F3AF Select mode: ").strip()
+        print(f"DEBUG: mode={{mode!r}}")
+        if mode == "0":
+            input("Press Enter to return to the menu...")
+            return
+        elif mode == "1":
+            hq_folder = get_path_with_history("Enter HQ folder path:")
+            lq_folder = get_path_with_history("Enter LQ folder path:")
+            print(f"DEBUG: hq_folder={{hq_folder!r}}, lq_folder={{lq_folder!r}}")
+            if not hq_folder or not lq_folder:
+                print_error("Both HQ and LQ folder paths are required.")
+                input("Press Enter to return to the menu...")
+                return
+            dataset_actions.shuffle_image_pairs(hq_folder, lq_folder)
+            input("Press Enter to return to the menu...")
+        elif mode == "2":
+            folder = get_path_with_history("Enter folder path:")
+            print(f"DEBUG: folder={{folder!r}}")
+            if not folder or not os.path.isdir(folder):
+                print_error("Input path must be a valid directory.")
+                input("Press Enter to return to the menu...")
+                return
+            shuffle_images_single_folder(folder)
+            input("Press Enter to return to the menu...")
+        else:
+            print_error("Invalid selection.")
+            input("Press Enter to return to the menu...")
+            return
+    except Exception as e:
+        from dataset_forge.utils.printing import print_error
+        print_error(f"Exception in shuffle_images_menu: {e}")
+        import traceback
+        traceback.print_exc()
+        input("Press Enter to return to the menu...")
+
+
+def shuffle_images_single_folder(folder_path):
+    print(f"DEBUG: Entered shuffle_images_single_folder with folder_path={{folder_path!r}}")
+    try:
+        from dataset_forge.utils.input_utils import (
+            get_file_operation_choice,
+            get_destination_path,
+        )
+        from dataset_forge.utils.printing import print_info, print_success, print_error
+        from dataset_forge.utils.file_utils import get_unique_filename, is_image_file
+        from dataset_forge.utils.progress_utils import tqdm
+        import os
+        import random
+        import shutil
+
+        image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
+        print(f"DEBUG: image_files={{image_files}}")
+        if not image_files:
+            print_error("No image files found in the folder.")
+            return
+        print_info(f"Found {len(image_files)} images to shuffle and rename.")
+        operation = get_file_operation_choice()
+        print(f"DEBUG: operation={{operation!r}}")
+        output_dir = folder_path
+        if operation != "inplace":
+            output_dir = get_destination_path(
+                "Enter destination folder for shuffled images:"
+            )
+            print(f"DEBUG: output_dir={{output_dir!r}}")
+            if not output_dir:
+                print_error(
+                    f"Operation aborted as no destination path was provided for {operation}."
+                )
+                return
+            os.makedirs(output_dir, exist_ok=True)
+            print_info(f"Shuffled images will be {operation}d and renamed in: {output_dir}")
+        else:
+            print_info("Shuffling and renaming files in-place within original folder.")
+
+        # Shuffle file order
+        shuffled_files = list(image_files)
+        random.shuffle(shuffled_files)
+        print(f"DEBUG: shuffled_files={{shuffled_files}}")
+
+        # Temporary renaming for inplace shuffle to avoid collisions
+        temp_suffix = "_shuffletemp_" + str(random.randint(10000, 99999))
+        files_in_final_location = []
+
+        print_info("\nStage 1: Preparing files for shuffling...")
+        if operation == "inplace":
+            for idx, orig_name in enumerate(
+                tqdm(shuffled_files, desc="Renaming to Temp (Inplace)")
+            ):
+                ext = os.path.splitext(orig_name)[1]
+                src_path = os.path.join(folder_path, orig_name)
+                temp_name = f"{idx:05d}{temp_suffix}{ext}"
+                temp_path = os.path.join(folder_path, temp_name)
+                try:
+                    if os.path.exists(src_path):
+                        os.rename(src_path, temp_path)
+                        files_in_final_location.append((temp_path, ext))
+                    else:
+                        print_error(f"Source {src_path} not found.")
+                except Exception as e:
+                    print_error(f"Error renaming {orig_name} to temporary: {e}")
+        else:
+            for orig_name in tqdm(
+                shuffled_files, desc=f"{operation.capitalize()}ing to Destination"
+            ):
+                ext = os.path.splitext(orig_name)[1]
+                src_path = os.path.join(folder_path, orig_name)
+                dest_path = os.path.join(
+                    output_dir, get_unique_filename(output_dir, orig_name)
+                )
+                try:
+                    if operation == "copy":
+                        shutil.copy2(src_path, dest_path)
+                    elif operation == "move":
+                        shutil.move(src_path, dest_path)
+                    files_in_final_location.append((dest_path, ext))
+                except Exception as e:
+                    print_error(
+                        f"Error {operation}ing file {orig_name} to destination: {e}"
+                    )
+
+        print(f"DEBUG: files_in_final_location={{files_in_final_location}}")
+        print_info("\nStage 2: Renaming files to final shuffled order...")
+        for idx, (current_path, ext) in enumerate(
+            tqdm(files_in_final_location, desc="Final Renaming")
+        ):
+            new_name = f"{idx+1:05d}{ext}"
+            final_path = os.path.join(os.path.dirname(current_path), new_name)
+            try:
+                if current_path != final_path:
+                    if os.path.exists(final_path):
+                        print_error(
+                            f"Final Renaming: Target path {final_path} unexpectedly exists before rename."
+                        )
+                        continue
+                    os.rename(current_path, final_path)
+            except Exception as e:
+                print_error(
+                    f"Error during final rename of '{os.path.basename(current_path)}' to '{new_name}': {e}"
+                )
+
+        print_success("\nShuffle Images Summary")
+        print_info(f"Total images considered: {len(image_files)}")
+        print_info(
+            f"Successfully processed (shuffled & renamed): {len(files_in_final_location)} images."
+        )
+        if operation == "inplace":
+            print_info(f"  Files were renamed in-place in {folder_path}.")
+        else:
+            print_info(f"  Files were {operation}d and renamed in {output_dir}.")
+        input("Press Enter to return to the menu...")
+    except Exception as e:
+        from dataset_forge.utils.printing import print_error
+        print_error(f"Exception in shuffle_images_single_folder: {e}")
+        import traceback
+        traceback.print_exc()
+        input("Press Enter to return to the menu...")

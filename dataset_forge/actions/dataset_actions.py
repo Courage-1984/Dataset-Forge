@@ -24,7 +24,14 @@ from dataset_forge.actions.operations_actions import (
 import os
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.actions.ic9600_tiling_actions import run_ic9600_tiling
-from dataset_forge.utils.printing import print_header, print_success, print_error
+from dataset_forge.utils.printing import (
+    print_header,
+    print_section,
+    print_success,
+    print_error,
+    print_info,
+    print_prompt,
+)
 from dataset_forge.dpid import (
     run_basicsr_dpid_single_folder,
     run_basicsr_dpid_hq_lq,
@@ -41,27 +48,31 @@ import threading
 
 
 def create_multiscale_dataset(*args, **kwargs):
-    print("\n--- Create Multiscale Dataset (DPID) ---")
-    print("Select DPID method:")
-    print("[1] BasicSR DPID")
-    print("[2] OpenMMLab DPID")
-    print("[3] Phhofm DPID")
+    print_header("🎯 Create Multiscale Dataset (DPID)")
+    print_section("Select DPID method:")
+    print_info("[1] BasicSR DPID")
+    print_info("[2] OpenMMLab DPID")
+    print_info("[3] 🌟 Phhofm DPID (Recommended)")
     method = input("Enter choice [1-3]: ").strip()
     if method not in {"1", "2", "3"}:
-        print("Invalid method.")
+        print_error("Invalid method.")
+        print_prompt("Press Enter to return to the menu...")
+        input()
         return
-    print("\nSelect mode:")
-    print("[1] Single folder")
-    print("[2] HQ/LQ paired folders")
+    print_section("Select mode:")
+    print_info("[1] Single folder")
+    print_info("[2] HQ/LQ paired folders")
     mode = input("Enter choice [1-2]: ").strip()
     if mode not in {"1", "2"}:
-        print("Invalid mode.")
+        print_error("Invalid mode.")
+        print_prompt("Press Enter to return to the menu...")
+        input()
         return
-    print("\nSelect downscale factor:")
-    print("[1] 25% (0.25)")
-    print("[2] 50% (0.5)")
-    print("[3] 75% (0.75)")
-    print("[4] 25%, 50% AND 75% (all)")
+    print_section("Select downscale factor:")
+    print_info("[1] 25% (0.25)")
+    print_info("[2] 50% (0.5)")
+    print_info("[3] 75% (0.75)")
+    print_info("[4] 25%, 50% AND 75% (all)")
     scale_choice = input("Enter choice [1-4]: ").strip()
     if scale_choice == "1":
         scales = [0.25]
@@ -72,13 +83,14 @@ def create_multiscale_dataset(*args, **kwargs):
     elif scale_choice == "4":
         scales = [0.25, 0.5, 0.75]
     else:
-        print("Invalid scale choice.")
+        print_error("Invalid scale choice.")
+        print_prompt("Press Enter to return to the menu...")
+        input()
         return
     overwrite = input("Overwrite existing files? [y/N]: ").strip().lower() == "y"
-
-    # Prompt for DPID kernel parameters with defaults
     dpid_kwargs = {}
-    if method in {"1", "2"}:  # BasicSR or OpenMMLab
+    if method in {"1", "2"}:
+        print_section("DPID kernel parameters (press Enter for defaults):")
         kernel_size = input("DPID kernel size [default 21]: ").strip()
         sigma = input("DPID sigma [default 2.0]: ").strip()
         lambd = input("DPID lambda [default 0.5]: ").strip()
@@ -96,8 +108,6 @@ def create_multiscale_dataset(*args, **kwargs):
             dpid_kwargs["sig_x"] = float(sig_x) if sig_x else 2.0
             dpid_kwargs["sig_y"] = float(sig_y) if sig_y else 2.0
             dpid_kwargs["theta"] = float(theta) if theta else 0.0
-    # Phhofm DPID does not use these parameters in the stub, but could be extended
-
     if mode == "1":
         input_folder = input("Enter input folder path: ").strip()
         output_base = input("Enter output base folder path: ").strip()
@@ -147,12 +157,13 @@ def create_multiscale_dataset(*args, **kwargs):
                 scales,
                 overwrite=overwrite,
             )
-    print("\nDone!")
+    print_success("Multiscale dataset creation complete!")
+    print_prompt("Press Enter to return to the menu...")
+    input()
 
 
 def image_tiling():
-    """Perform image tiling on a folder or HQ/LQ pair using IC9600."""
-    print_header("Image Tiling (IC9600)")
+    print_header("🧩 Image Tiling (IC9600)")
     mode = input("Select mode: [1] HQ/LQ paired folders, [2] Single folder: ").strip()
     try:
         if mode == "1":
@@ -217,6 +228,8 @@ def image_tiling():
             print_error("Invalid mode selected.")
     except Exception as e:
         print_error(f"Error during tiling: {e}")
+    print_prompt("Press Enter to return to the menu...")
+    input()
 
 
 def combine_datasets():
@@ -327,8 +340,11 @@ def batch_rename(
 
 
 def extract_frames_from_video():
-    """Extract frames from a video file for dataset creation."""
+    print_header("🎬 Extract Frames from Video")
     extract_frames_menu()
+    print_success("Frame extraction workflow complete!")
+    print_prompt("Press Enter to return to the menu...")
+    input()
 
 
 def images_orientation_organization(*args, **kwargs):

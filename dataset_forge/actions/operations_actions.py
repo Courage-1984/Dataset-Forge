@@ -22,11 +22,22 @@ import concurrent.futures
 from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
 import subprocess
 from dataset_forge.utils.image_ops import ColorAdjuster
-from dataset_forge.utils import dpid_phhofm
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.dpid.basicsr_dpid import (
+    run_basicsr_dpid_single_folder,
+    run_basicsr_dpid_hq_lq,
+)
+from dataset_forge.dpid.openmmlab_dpid import (
+    run_openmmlab_dpid_single_folder,
+    run_openmmlab_dpid_hq_lq,
+)
+from dataset_forge.dpid.phhofm_dpid import (
+    run_phhofm_dpid_single_folder,
+    run_phhofm_dpid_hq_lq,
+)
 
 
 def split_dataset_in_half(hq_folder, lq_folder):
@@ -2451,32 +2462,13 @@ def convert_to_webp_menu(hq_folder, lq_folder):
 
 
 # --- DPID Implementation: BasicSR ---
-def dpid_basicsr(img, h, w, l=0.5):
-    # img: float32, range [0, 1]
-    img = np.clip(img, 0, 1)
-    img_lr = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
-    img_sr = cv2.resize(
-        img_lr, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LINEAR
-    )
-    detail = img - img_sr
-    img_lr = img_lr + l * cv2.resize(detail, (w, h), interpolation=cv2.INTER_LINEAR)
-    img_lr = np.clip(img_lr, 0, 1)
-    return img_lr
+def dpid_basicsr(*args, **kwargs):
+    raise NotImplementedError("Use dataset_forge.dpid.basicsr_dpid instead.")
 
 
 # --- DPID Implementation: OpenMMLab ---
-def dpid_openmmlab(img, h, w, l=0.5):
-    # img: float32, range [0, 1]
-    # This is a direct adaptation of the BasicSR version, as OpenMMLab's is nearly identical for DPID
-    img = np.clip(img, 0, 1)
-    img_lr = cv2.resize(img, (w, h), interpolation=cv2.INTER_LINEAR)
-    img_sr = cv2.resize(
-        img_lr, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_LINEAR
-    )
-    detail = img - img_sr
-    img_lr = img_lr + l * cv2.resize(detail, (w, h), interpolation=cv2.INTER_LINEAR)
-    img_lr = np.clip(img_lr, 0, 1)
-    return img_lr
+def dpid_openmmlab(*args, **kwargs):
+    raise NotImplementedError("Use dataset_forge.dpid.openmmlab_dpid instead.")
 
 
 # --- Downsampling Menu ---
@@ -2566,7 +2558,7 @@ def downsample_images_menu():
             input("Skip existing files? (y/n, default n): ").strip().lower() == "y"
         )
         verbose = input("Verbose output? (y/n, default n): ").strip().lower() == "y"
-        processed, skipped, failed = dpid_phhofm.downscale_hq_lq_pair(
+        processed, skipped, failed = run_phhofm_dpid_hq_lq(
             hq_folder,
             lq_folder,
             out_hq_folder,
@@ -2613,7 +2605,7 @@ def downsample_images_menu():
             input("Skip existing files? (y/n, default n): ").strip().lower() == "y"
         )
         verbose = input("Verbose output? (y/n, default n): ").strip().lower() == "y"
-        processed, skipped, failed = dpid_phhofm.downscale_folder(
+        processed, skipped, failed = run_phhofm_dpid_single_folder(
             input_folder,
             output_folder,
             scale,

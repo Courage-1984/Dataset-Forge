@@ -59,4 +59,22 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 ---
 
+## July 2025 Update
+
+- Menus now use a robust loop pattern and provide clear error/debug feedback.
+- All user-facing workflows end with a styled prompt to return to the menu.
+- DPID workflows are modular and use the new import structure.
+- CLI output and prompts are visually consistent and styled.
+
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
+
+## Running the Test Suite
+
+To run all tests (recommended after any major change):
+
+```
+venv312\Scripts\activate
+venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+```
+
+The test suite covers all major features and runs quickly. Tests use fixtures and monkeypatching for reliability.

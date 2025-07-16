@@ -29,6 +29,7 @@ def require_hq_lq(func):
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
+        print(f"DEBUG: lazy_action importing {module_path}.{func_name}")
         import importlib
 
         return getattr(importlib.import_module(module_path), func_name)(*args, **kwargs)
@@ -44,6 +45,7 @@ def basic_transformations_menu():
     )
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
+    from dataset_forge.utils.printing import print_error
 
     options = {
         "1": ("✂️  Crop Image", crop_image_menu),
@@ -61,20 +63,32 @@ def basic_transformations_menu():
                 "dataset_forge.actions.transform_actions", "remove_alpha_channels_menu"
             ),
         ),
+        "6": (
+            "🔀 Shuffle Images",
+            lazy_action(
+                "dataset_forge.actions.transform_actions", "shuffle_images_menu"
+            ),
+        ),
         "0": ("⬅️  Back", None),
     }
     while True:
-        action = show_menu(
+        key = show_menu(
             "🔄 Basic Transformations",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
-        input("Press Enter to return to the menu...")
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def not_implemented_menu():

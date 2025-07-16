@@ -144,18 +144,26 @@ def comprehensive_validation_menu():
         "3": ("⭐ Automated Dataset Quality Scoring", quality_scoring_workflow),
         "0": ("⬅️  Back", None),
     }
+    from dataset_forge.utils.printing import print_error
 
     while True:
-        action = show_menu(
+        key = show_menu(
             "📊 Dataset Analysis & Reporting",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def find_fix_issues_menu():
@@ -233,18 +241,26 @@ def find_fix_issues_menu():
         "4": ("🖼️ Find Images with Alpha Channel", find_alpha_channels_menu),
         "0": ("⬅️  Back", None),
     }
+    from dataset_forge.utils.printing import print_error
 
     while True:
-        action = show_menu(
+        key = show_menu(
             "🔍 Find & Fix Issues",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def analyze_properties_menu():
@@ -409,6 +425,10 @@ def analyze_properties_menu():
             else:
                 print_warning("Invalid selection. Please try again.")
 
+        # At the end of the workflow, after all processing:
+        print_prompt("\n⏸️ Press Enter to return to the menu...")
+        input()
+
     options = {
         "1": ("🔍 Check Dataset Consistency", check_consistency_workflow),
         "2": ("📐 Check/Test Aspect Ratios", test_aspect_ratio_workflow),
@@ -418,19 +438,26 @@ def analyze_properties_menu():
         "6": ("⭐ BHI Filtering Analysis", lazy_action(__name__, "bhi_filtering_menu")),
         "0": ("⬅️  Back", None),
     }
+    from dataset_forge.utils.printing import print_error
 
     while True:
-        choice = show_menu(
+        key = show_menu(
             "📊 Analyze Properties",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def analysis_validation_menu():
@@ -447,16 +474,23 @@ def analysis_validation_menu():
         ),
         "0": ("⬅️  Back to Main Menu", None),
     }
+    from dataset_forge.utils.printing import print_error
 
     while True:
-        choice = show_menu(
+        key = show_menu(
             "🔍 Analysis & Validation",
             options,
             header_color=Mocha.lavender,
             char="=",
         )
-        if choice is None or choice == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             return
-        action = options[choice][1]
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )

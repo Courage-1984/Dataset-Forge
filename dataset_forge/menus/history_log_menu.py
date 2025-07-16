@@ -46,15 +46,21 @@ def select_log_to_view():
 
 def history_log_menu():
     options = history_log_menu.__menu_options__
+    from dataset_forge.utils.printing import print_error
+
     while True:
-        choice = show_menu(
-            "Change/History Log Menu", options, header_color=Mocha.lavender
-        )
-        if choice is None or choice == "0":
+        key = show_menu("Change/History Log Menu", options, header_color=Mocha.lavender)
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 history_log_menu.__menu_options__ = {

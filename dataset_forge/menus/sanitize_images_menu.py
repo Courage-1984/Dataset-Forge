@@ -91,4 +91,3 @@ def sanitize_images_menu():
             )
         else:
             print_success("Sanitization completed.")
-        input("\nPress Enter to return to the menu...")

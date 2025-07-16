@@ -28,8 +28,6 @@
 
 # Features (tl;dr)
 
-
-
 # Features (main menus)
 
 ## ⚙️ Core & Configuration
@@ -62,30 +60,30 @@
 
 ## ✨ Image Processing & Augmentation
 
-- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, remove alpha channel
+- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel
 - **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
 - **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
-- **🚀 Augmentation**: List, create, edit or delete *recipes* or run advanced augmentation pipelines (using recipes)
+- **🚀 Augmentation**: List, create, edit or delete _recipes_ or run advanced augmentation pipelines (using recipes)
 - **📋 Metadata**: Scrub EXIF Metadata, Convert ICC Profile to sRGB
 - **✏️ Find & extract sketches/drawings/line art**: Find & extract sketches/drawings/line art using pre-trained model
 - **🗳️ Batch Processing**: Efficient batch operations for large datasets
 
 ## 🚀 Training & Inference
 
-- **🛠️  Run wtp_dataset_destroyer**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) integration, create HQ/LQ pairs with custom degradations
+- **🛠️ Run wtp_dataset_destroyer**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) integration, create HQ/LQ pairs with custom degradations
 - **🚀 Run traiNNer-redux**: [traiNNer-redux](https://github.com/the-database/traiNNer-redux) integration, train your own SISR models
 - **🧠 OpenModelDB Model Browser**: Robust integration with [OpenModelDB](https://openmodeldb.info/)
 - **⚙️ Config files**: Add, load, view & edit configs
 
-## 🛠️  Utilities
+## 🛠️ Utilities
 
-- **🖼️  Create Comparisons**: Create striking image / gif comparisons
+- **🖼️ Create Comparisons**: Create striking image / gif comparisons
 - **📦 Compression**: Compress images or directories
 - **🧹 Sanitize Images**: Comprehensive image file sanitization (alpha channel, colour profile, steganography, metadata)
 - **🌳 Enhanced Directory Tree**: Directory tree visualization using emojis
 - **🧹 Filter non-Images**: Filter all non image type files
 
-## ⚙️  System & Settings
+## ⚙️ System & Settings
 
 - **📁 Set HQ/LQ Folder**: set HQ/LQ image pair folders to use throughout Dataset Forge
 - **👤 User Profile Management**: Create and manage custom profiles for Dataset Forge
@@ -104,8 +102,7 @@
 - **🛑 View Error Summary**: Logs errors to file and CLI, with summary granularity and critical error notifications (sound/visual)
 - **🩺 Run Health Checks**: Automated checks for RAM, disk, CUDA, Python version, and permissions, with CLI output and recommendations
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
-- **⏱️  View Menu Load Times**: View the menu load times
-
+- **⏱️ View Menu Load Times**: View the menu load times
 
 # Features (expanded/misc)
 
@@ -114,6 +111,14 @@
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
 
 ---
+
+## July 2025 Improvements
+
+- All menus now use a robust, error-resistant loop pattern for reliability.
+- All DPID logic is modular and uses the new `dataset_forge.dpid.*` structure.
+- All user-facing workflows provide clear, styled feedback and prompts.
+- CLI output is visually consistent and uses the Catppuccin Mocha color scheme throughout.
+- Exception handling and debug prints ensure errors are caught and shown to the user.
 
 For advanced implementation details, code patterns, and developer best practices, see [advanced.md](advanced.md) and [style_guide.md](style_guide.md).
 
@@ -347,6 +352,13 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 ---
 
+## July 2025 Update
+
+- Menus now use a robust loop pattern and provide clear error/debug feedback.
+- All user-facing workflows end with a styled prompt to return to the menu.
+- DPID workflows are modular and use the new import structure.
+- CLI output and prompts are visually consistent and styled.
+
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
 
 ---
@@ -377,6 +389,41 @@ This document covers advanced usage, configuration, and developer patterns for D
 ---
 
 For user workflows and feature summaries, see [features.md](features.md). For code style and requirements, see [style_guide.md](style_guide.md).
+
+## Robust Menu Loop Pattern (July 2025)
+
+All Dataset Forge menus now use a robust menu loop pattern to ensure reliability and maintainability. This pattern ensures that:
+
+- The user's menu selection (key) is always used to look up the corresponding action in the options dictionary.
+- Only callable actions are executed; if the action is not callable, a clear error is printed.
+- Debug prints for both the selected key and resolved action are included for easier debugging.
+
+**Pattern Example:**
+
+```python
+while True:
+    key = show_menu("Menu Title", options, ...)
+    print(f"DEBUG: key={key!r}, type={type(key)}")
+    if key is None or key == "0":
+        break
+    action = options.get(key, (None, None))[1]
+    print(f"DEBUG: action={action!r}, type={type(action)}")
+    if callable(action):
+        action()
+    else:
+        print_error(f"Selected action is not callable: {action!r} (type={type(action)})")
+```
+
+**Why this matters:**
+
+- Prevents menu loops from breaking if the user input is not mapped to a callable.
+- Ensures all menu actions are robust to user error and code changes.
+- Makes debugging easier by providing clear output for both valid and invalid selections.
+
+**Enforcement:**
+
+- As of July 2025, all menus in Dataset Forge have been updated to use this pattern.
+- If you add a new menu, you must use this pattern for consistency and reliability.
 
 ---
 
@@ -688,6 +735,35 @@ while True:
 
 For questions, see [Contributing](contributing.md) or ask the project maintainer.
 
+## DPID Modularity (NEW)
+
+- All DPID logic must use the new modular structure: `from dataset_forge.dpid.phhofm_dpid import ...`, etc.
+- Do NOT import DPID logic from `dataset_forge.utils.dpid_phhofm` or legacy locations.
+
+## Robust Menu Loop Pattern (UPDATED)
+
+- All menus and submenus must use the robust menu loop pattern:
+  - Get the user's choice (key) from `show_menu`.
+  - Look up the action in the options dictionary.
+  - Call the action if callable, with debug/error handling.
+- Add debug prints and exception handling to menu actions for easier debugging.
+
+## Workflow Prompt Handling (NEW)
+
+- All user-facing workflows (not menu loops) are responsible for their own 'Press Enter to return to the menu...' prompt.
+- Menu loops must NOT include this prompt.
+
+## Centralized Printing & Style (UPDATED)
+
+- All output, prompts, and progress must use the centralized printing utilities:
+  - `print_header`, `print_section`, `print_info`, `print_success`, `print_error`, `print_prompt`
+- All user-facing code must use the Catppuccin Mocha color scheme.
+- No raw print statements in user-facing code.
+
+## Exception Handling & Debug Prints (NEW)
+
+- Add exception handling and debug prints to menu actions and workflows to catch and diagnose errors.
+
 ---
 
 
@@ -728,6 +804,11 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Handles Unicode, subprocess, and Windows-specific issues
 - Manual/script tests for BHI filtering and pepeline
 - All tests pass as of this integration
+- Refactored all DPID logic to use the new modular structure (`dataset_forge.dpid.*`). Legacy imports from `dataset_forge.utils.dpid_phhofm` removed.
+- All menus now use the robust menu loop pattern (get key, look up action, call if callable, handle errors).
+- All user-facing workflows are responsible for their own 'Press Enter to return to the menu...' prompt. Menu loops no longer include this prompt.
+- All output, prompts, and progress messages now use the centralized printing utilities and Catppuccin Mocha color scheme. No raw print statements remain in user-facing workflows.
+- Exception handling and debug prints added to menu actions and workflows for easier debugging and error diagnosis.
 
 ## [July 2025]
 

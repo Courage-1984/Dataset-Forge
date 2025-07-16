@@ -11,8 +11,8 @@ __pycache__
 dataset_forge/__pycache__
 
 # Project-specific directories
-./dpid
-dpid
+# ./dpid
+# dpid
 ./Dataset_Preprocessing
 Dataset_Preprocessing
 ./store
@@ -73,3 +73,5 @@ resdet
 ./wtp_dataset_destroyer
 wtp_dataset_destroyer
 
+./test_datasets
+test_datasets

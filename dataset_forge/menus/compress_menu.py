@@ -93,4 +93,3 @@ def compress_menu():
         print_success("Compression completed successfully!")
     except Exception as e:
         print_error(f"Compression failed: {e}")
-    input("\nPress Enter to return to the menu...")

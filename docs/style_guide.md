@@ -216,3 +216,38 @@ while True:
 ---
 
 For questions, see [Contributing](contributing.md) or ask the project maintainer.
+
+## DPID Modularity (NEW)
+
+- All DPID logic must use the new modular structure: `from dataset_forge.dpid.phhofm_dpid import ...`, etc.
+- Do NOT import DPID logic from `dataset_forge.utils.dpid_phhofm` or legacy locations.
+
+## Robust Menu Loop Pattern (UPDATED)
+
+- All menus and submenus must use the robust menu loop pattern:
+  - Get the user's choice (key) from `show_menu`.
+  - Look up the action in the options dictionary.
+  - Call the action if callable, with debug/error handling.
+- Add debug prints and exception handling to menu actions for easier debugging.
+
+## Workflow Prompt Handling (NEW)
+
+- All user-facing workflows (not menu loops) are responsible for their own 'Press Enter to return to the menu...' prompt.
+- Menu loops must NOT include this prompt.
+
+## Centralized Printing & Style (UPDATED)
+
+- All output, prompts, and progress must use the centralized printing utilities:
+  - `print_header`, `print_section`, `print_info`, `print_success`, `print_error`, `print_prompt`
+- All user-facing code must use the Catppuccin Mocha color scheme.
+- No raw print statements in user-facing code.
+
+## Exception Handling & Debug Prints (NEW)
+
+- Add exception handling and debug prints to menu actions and workflows to catch and diagnose errors.
+
+## Testing Requirements
+
+- All new features and bugfixes must include appropriate unit and/or integration tests.
+- Tests must use Google-style docstrings and be PEP8-compliant.
+- Use pytest fixtures and monkeypatching for robust, isolated tests.

@@ -122,6 +122,7 @@ def visual_dedup_menu():
         else:
             print_warning("Invalid operation selected.")
             continue
+        # At the end of the workflow, after all processing:
         print_prompt("\n⏸️ Press Enter to return to the Visual Deduplication menu...")
         input()
 

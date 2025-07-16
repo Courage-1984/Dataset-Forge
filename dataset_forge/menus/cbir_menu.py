@@ -165,5 +165,6 @@ def cbir_menu():
                     print(f"  {msg}")
         else:
             print_warning("Invalid operation selected.")
+        # At the end of the workflow, after all processing:
         print_prompt("\n⏸️ Press Enter to return to the CBIR menu...")
         input()

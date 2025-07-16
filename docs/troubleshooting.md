@@ -39,6 +39,11 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 - For monitoring/analytics issues, check the logs in the ./logs/ directory.
 - If tests fail, ensure your environment matches the requirements and all dependencies are installed.
 
+## Test Failures
+
+- If you encounter a failing test, check for function signature mismatches, especially with parallel utilities that pass extra kwargs (e.g., play_audio).
+- Ensure all monkeypatches and fixtures match the expected types and return values.
+
 ---
 
 For further help, see [usage.md](usage.md) or contact the project maintainer.

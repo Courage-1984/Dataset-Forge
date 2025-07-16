@@ -14,10 +14,19 @@ from dataset_forge.utils.memory_utils import (
     clear_memory,
     clear_cuda_cache,
     auto_cleanup,
+    to_device_safe,
 )
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_header,
+    print_section,
+    print_info,
+    print_success,
+    print_error,
+    print_prompt,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 import threading
+from torch.cuda.amp import autocast
 
 
 class LayerNorm(torch.nn.Module):
@@ -55,14 +64,18 @@ def release_memory():
 
 @monitor_all("extract_frames_menu", critical_on_error=True)
 def extract_frames_menu():
-    print("\n--- Extract Frames from Video (Batch/Multi-Model) ---")
+    print_header("🎬 Extract Frames from Video (Batch/Multi-Model)")
     video_path = input("Enter path to video file: ").strip()
     if not os.path.isfile(video_path):
-        print("Error: Video file does not exist.")
+        print_error("Video file does not exist.")
+        print_prompt("Press Enter to return to the menu...")
+        input()
         return
     base_out_dir = input("Enter base output directory for frames: ").strip()
     if not base_out_dir:
-        print("Error: Output directory required.")
+        print_error("Output directory required.")
+        print_prompt("Press Enter to return to the menu...")
+        input()
         return
     os.makedirs(base_out_dir, exist_ok=True)
 
@@ -75,9 +88,9 @@ def extract_frames_menu():
         ("VITL", EmbeddedModel.VITL),
         ("VITG", EmbeddedModel.VITG),
     ]
-    print("Select embedding model(s) (comma separated, e.g. 1,3):")
+    print_section("Select embedding model(s) (comma separated, e.g. 1,3):")
     for i, (name, _) in enumerate(model_options):
-        print(f"  {i+1}. {name}")
+        print_info(f"  {i+1}. {name}")
     while True:
         model_choices = input("Model(s) [1-6, default 1]: ").strip() or "1"
         try:
@@ -88,7 +101,7 @@ def extract_frames_menu():
                 break
         except Exception:
             pass
-        print("Invalid input. Please enter valid model numbers, e.g. 1,3.")
+        print_error("Invalid input. Please enter valid model numbers, e.g. 1,3.")
     selected_models = [model_options[idx] for idx in model_idxs]
 
     # Distance function selection (multi-select, same count as models or one for all)
@@ -96,9 +109,11 @@ def extract_frames_menu():
         ("euclid", "Euclidean Distance"),
         ("cosine", "Cosine Distance"),
     ]
-    print("Select distance function(s) for each model (comma separated, e.g. 1,2):")
+    print_section(
+        "Select distance function(s) for each model (comma separated, e.g. 1,2):"
+    )
     for i, (_, desc) in enumerate(dist_options):
-        print(f"  {i+1}. {desc}")
+        print_info(f"  {i+1}. {desc}")
     while True:
         dist_choices = input("Distance(s) [1-2, default 1]: ").strip() or "1"
         try:
@@ -113,7 +128,9 @@ def extract_frames_menu():
                 break
         except Exception:
             pass
-        print("Invalid input. Please enter valid distance numbers, e.g. 1,2 or just 1.")
+        print_error(
+            "Invalid input. Please enter valid distance numbers, e.g. 1,2 or just 1."
+        )
     selected_dists = [dist_options[idx][0] for idx in dist_idxs]
 
     # Batch size
@@ -121,7 +138,7 @@ def extract_frames_menu():
     try:
         batch_size = int(batch_size) if batch_size else 5000
     except Exception:
-        print("Invalid batch size, using 5000.")
+        print_error("Invalid batch size, using 5000.")
         batch_size = 5000
 
     # Max frames per batch
@@ -129,7 +146,7 @@ def extract_frames_menu():
     try:
         max_len = int(max_len) if max_len else 1000
     except Exception:
-        print("Invalid max, using 1000.")
+        print_error("Invalid max, using 1000.")
         max_len = 1000
 
     # Thresholds (per model)
@@ -143,7 +160,7 @@ def extract_frames_menu():
         try:
             t = float(t) if t else default_threshold
         except Exception:
-            print(f"Invalid threshold, using default {default_threshold}.")
+            print_error(f"Invalid threshold, using default {default_threshold}.")
             t = default_threshold
         thresholds.append(t)
 
@@ -152,7 +169,7 @@ def extract_frames_menu():
     try:
         scale = int(scale) if scale else 4
     except Exception:
-        print("Invalid scale, using 4.")
+        print_error("Invalid scale, using 4.")
         scale = 4
 
     # Device
@@ -176,7 +193,7 @@ def extract_frames_menu():
     for i, ((model_name, model_enum), dist_name) in enumerate(
         zip(selected_models, selected_dists)
     ):
-        print(f"\nProcessing with {model_name} ({dist_name})...")
+        print_section(f"Processing with {model_name} ({dist_name})...")
         out_dir = os.path.join(base_out_dir, f"frames_{model_name}_{dist_name}")
         os.makedirs(out_dir, exist_ok=True)
         embedder = ImgToEmbedding(
@@ -200,16 +217,17 @@ def extract_frames_menu():
                 and start <= int(fname[len("frame_") : -len(".png")]) < end
             ]
             if len(existing) >= max_len:
-                print(f"Skipping frames {start} to {end} (already processed)")
+                print_info(f"Skipping frames {start} to {end} (already processed)")
                 continue
-            print(f"Processing frames {start} to {end} ({model_name})")
+            print_info(f"Processing frames {start} to {end} ({model_name})")
             video_to_frame(video_path, out_dir, start_frame=start, end_frame=end)
 
-    print("\nAll selected models processed.")
+    print_success("All selected models processed.")
     clear_memory()
     clear_cuda_cache()
-    print_success("Frame extraction complete.")
     play_done_sound()
+    print_prompt("Press Enter to return to the menu...")
+    input()
 
 
 # --- END Extract Frames Utility ---
@@ -294,7 +312,7 @@ class ImgToEmbedding:
         self.amp = amp
         model_obj, preprocess = enum_to_model(model)
         if isinstance(model_obj, nn.Module):
-            self.model = to_device_safe(model_obj, self.device)
+            self.model = to_device_safe(model_obj, str(self.device))
         else:
             self.model = model_obj
         self.preprocess = preprocess
@@ -316,22 +334,22 @@ class ImgToEmbedding:
         if self.preprocess is not None:
             # Use model's preprocess pipeline
             tensor = self.preprocess(T.ToPILImage()(x.astype("uint8"))).unsqueeze(0)
-            return to_device_safe(tensor, self.device)
+            return to_device_safe(tensor, str(self.device))
         if self.vit:
             tensor = self.check_img_size(
                 torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[None, :, :, :]
             )
-            return to_device_safe(tensor, self.device)
+            return to_device_safe(tensor, str(self.device))
         tensor = torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
             None, :, :, :
         ]
-        return to_device_safe(tensor, self.device)
+        return to_device_safe(tensor, str(self.device))
 
     @torch.inference_mode()
     @auto_cleanup
     def __call__(self, x):
         # Optionally add resizing logic here if needed
-        with torch.amp.autocast(self.device.__str__(), torch.float16, self.amp):
+        with autocast(enabled=self.amp, dtype=torch.float16):
             x = self.img_to_tensor(x)
             if not callable(self.model):
                 raise RuntimeError(

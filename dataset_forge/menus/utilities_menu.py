@@ -39,6 +39,8 @@ def lazy_action(module_path, func_name):
 
 
 def utilities_menu():
+    from dataset_forge.utils.printing import print_error
+
     options = {
         "1": (
             "🖼️  Create Comparison Images (Side-by-side)",
@@ -87,17 +89,23 @@ def utilities_menu():
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
-        choice = show_menu(
+        key = show_menu(
             "🛠️  Utilities",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def filter_non_images_menu():
@@ -164,7 +172,6 @@ def filter_non_images_menu():
         print_success(f"Filter non-Images complete. Results: {result}")
     except Exception as e:
         print_error(f"Error: {e}")
-    input("\nPress Enter to return to the menu...")
 
 
 def directory_tree_menu():

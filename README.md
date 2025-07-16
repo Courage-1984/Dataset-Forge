@@ -55,7 +55,6 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 - For GPU acceleration, ensure your CUDA and cuDNN versions match your PyTorch install. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
 - If you use a different CUDA/cuDNN version, install the matching PyTorch build.
 
-
 > **IMPORTANT:** You must install the correct version of torch/torchvision/torchaudio for your CUDA version **before** running `pip install .`. If you skip this, pip will install the CPU-only version of torch by default. See the Quick Start below for the recommended command.
 
 > **IMPORTANT:** On Windows, python-magic (required for 'Enhanced Directory Tree') requires extra DLLs in System32. See [Special Installation Instructions](docs/special_installation.md) for full details.
@@ -63,7 +62,6 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 > **IMPORTANT:** You must install VapourSynth before installing or using [getnative](https://github.com/Infiziert90/getnative). See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
 
 > **IMPORTANT:** You must compile/buiild [resdet](https://github.com/0x09/resdet) first before using resdet. See the [Requirements.txt](requirements.txt) and [Special Installation Instructions](docs/special_installation.md) for full details.
-
 
 ---
 
@@ -119,3 +117,22 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
   <a href="https://github.com/Courage-1984/Dataset-Forge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-CC--BY--SA--4.0-blue" alt="License"></a>
   <!-- Add CI/build/test badges here if available -->
 </p>
+
+## 🧪 Comprehensive Test Suite
+
+Dataset Forge now includes a robust, cross-platform test suite covering all major features:
+
+- DPID implementations (BasicSR, OpenMMLab, Phhofm)
+- CBIR and deduplication workflows
+- Report generation
+- Audio feedback, memory, parallel, and progress utilities
+- Session state, config, and error handling
+
+**Run all tests:**
+
+```sh
+venv312\Scripts\activate
+venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+```
+
+All new features and bugfixes must include appropriate tests. See [docs/features.md](docs/features.md) and [docs/usage.md](docs/usage.md) for details.

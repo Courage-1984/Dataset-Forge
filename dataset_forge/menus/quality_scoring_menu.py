@@ -11,20 +11,27 @@ def quality_scoring_menu():
         filter_images_by_quality,
         score_hq_lq_folders,
     )
+    from dataset_forge.utils.printing import print_error
 
     options = quality_scoring_menu.__menu_options__
     while True:
-        choice = show_menu(
+        key = show_menu(
             "Automated Dataset Quality Scoring",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 # Register a static menu for favorites (customize as needed)

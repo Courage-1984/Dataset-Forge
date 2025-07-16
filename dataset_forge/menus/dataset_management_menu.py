@@ -38,7 +38,7 @@ def dataset_creation_menu():
 
     options = {
         "1": (
-            "🎯 Create Multiscale Dataset",
+            "📐 Create Multiscale Dataset",
             dataset_actions.create_multiscale_dataset,
         ),
         "2": (
@@ -50,18 +50,28 @@ def dataset_creation_menu():
     }
 
     while True:
-        action = show_menu(
-            "🎨 Dataset Creation & Modification",
+        key = show_menu(
+            "🎯 Create Dataset from Source",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        print(f"DEBUG: key={key!r}, type={type(key)}")
+        if key is None or key == "0":
             break
+        action = options.get(key, (None, None))[1]
+        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
-            action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
+            print(f"DEBUG: Calling action for menu selection: {action}")
+            try:
+                action()
+            except Exception as e:
+                print_error(f"Exception in menu action: {e}")
+                input("Press Enter to return to the menu...")
+        else:
+            print_error(
+                f"Selected action is not callable: {action!r} (type={type(action)})"
+            )
 
 
 def combine_split_menu():
@@ -94,8 +104,6 @@ def combine_split_menu():
             break
         if callable(action):
             action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
 
 def hq_lq_pairs_menu():
@@ -138,8 +146,6 @@ def hq_lq_pairs_menu():
             break
         if callable(action):
             action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
 
 def clean_organize_menu():
@@ -184,11 +190,11 @@ def clean_organize_menu():
         dest_dir = None
         if op in ("move", "copy"):
             dest_hq = get_folder_path(
-                "📁 Destination directory for HQ (leave blank for no move/copy): "
+                "Destination directory for HQ (leave blank for no move/copy): "
             )
             dest_lq = (
                 get_folder_path(
-                    "📁 Destination directory for LQ (leave blank for no move/copy): "
+                    "Destination directory for LQ (leave blank for no move/copy): "
                 )
                 if lq_folder
                 else None
@@ -199,9 +205,9 @@ def clean_organize_menu():
                     dest_dir = {}
                 dest_dir["lq"] = dest_lq
         try:
-            dataset_actions.de_dupe(
-                hq_folder,
-                lq_folder if lq_folder else None,
+            dataset_actions.dedupe(
+                hq_folder=hq_folder,
+                lq_folder=lq_folder,
                 hash_type=hash_type,
                 mode=mode,
                 max_dist=max_dist,
@@ -210,7 +216,7 @@ def clean_organize_menu():
             )
             print_success("✅ De-duplication complete.")
         except Exception as e:
-            print_error(f"❌ Error during de-duplication: {e}")
+            print_error(f"❌ Error: {e}")
 
     def remove_small_pairs():
         hq = get_folder_path("📁 Enter HQ folder path: ")
@@ -286,17 +292,15 @@ def clean_organize_menu():
         ),
         "0": ("⬅️  Back", None),
     }
-
     while True:
-        choice = show_menu(
+        action = show_menu(
             "🧹 Clean & Organize",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        if action is None or action == "0":
             break
-        action = options[choice][1]
         if callable(action):
             action()
 
