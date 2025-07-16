@@ -22,18 +22,20 @@ from dataset_forge.actions.analysis_ops_actions import (
 )
 from dataset_forge.utils.image_ops import get_image_size
 from dataset_forge.utils.monitoring import monitor_all
+from dataset_forge.utils.cache_utils import in_memory_cache
 
 
 @monitor_all("analyze_single_image")
+@in_memory_cache(maxsize=128)
 def analyze_single_image(image_path: str) -> dict:
     """
-    Analyze a single image and return its properties.
-
+    Analyze a single image and return its properties. (In-memory cached)
     Args:
         image_path: Path to the image file
-
     Returns:
         dict: Image properties including dimensions, format, mode, etc.
+    Note:
+        This function is cached in-memory for fast repeated analysis of the same file in a session.
     """
     try:
         with Image.open(image_path) as img:

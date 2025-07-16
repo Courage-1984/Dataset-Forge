@@ -95,3 +95,52 @@ Dataset Forge includes a comprehensive static analysis tool for code quality and
   - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
 
 Review the actionable report and detailed results before submitting code or documentation changes.
+
+## ⚡ Caching System: Technical Details (NEW July 2025)
+
+Dataset Forge uses a hybrid caching system for performance:
+
+- **In-Memory Caching:**
+
+  - Uses `functools.lru_cache` via the `@in_memory_cache` decorator (see `utils/cache_utils.py`).
+  - Applied to lightweight, frequently-called functions (e.g., image property analysis, directory scans).
+  - Cache is per-session and cleared on process exit or via function-specific calls.
+
+- **Disk Caching:**
+
+  - Uses `joblib.Memory` via the `@disk_cache` decorator (see `utils/cache_utils.py`).
+  - Applied to expensive, large-result functions (e.g., CBIR feature extraction).
+  - Cache is persistent across sessions and stored in `store/cache/`.
+  - Disk cache can be cleared from the System Monitoring menu or by deleting the folder.
+
+- **Cache Management:**
+
+  - Use the System Monitoring menu to clear all caches.
+  - Disk cache is auto-ignored by git (see `.gitignore`).
+
+- **How to Use in Your Code:**
+
+  - Import decorators from `dataset_forge.utils.cache_utils`:
+    ```python
+    from dataset_forge.utils.cache_utils import in_memory_cache, disk_cache
+    ```
+  - Decorate your function:
+
+    ```python
+    @in_memory_cache(maxsize=128)
+    def my_func(...):
+        ...
+
+    @disk_cache
+    def expensive_func(...):
+        ...
+    ```
+
+  - Use `clear_disk_cache()` and `clear_in_memory_cache(func)` to clear caches programmatically.
+
+- **Best Practices:**
+  - Use in-memory cache for small, fast, frequently-repeated operations.
+  - Use disk cache for large, expensive, or cross-session results.
+  - Always document cache usage in your function docstrings.
+
+See `docs/features.md` for user-facing info and `README_full.md` for a merged overview.

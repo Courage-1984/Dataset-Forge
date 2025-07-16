@@ -15,6 +15,8 @@ import importlib
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.printing import print_info
+from dataset_forge.utils.cache_utils import clear_disk_cache
+from dataset_forge.utils.printing import print_success
 
 # Import monitoring utilities (stubs for now)
 from dataset_forge.utils import monitoring
@@ -127,6 +129,14 @@ def show_menu_load_times():
         monitoring.print_performance_summary(menu_summary)
 
 
+def clear_caches():
+    """Clear all caches (in-memory and disk)."""
+    clear_disk_cache()
+    print_success(
+        "All disk caches cleared. (In-memory caches are cleared per function as needed)"
+    )
+
+
 def system_monitoring_menu():
     global monitor_instance
     if monitor_instance is None:
@@ -159,6 +169,7 @@ def system_monitoring_menu():
             lazy_action(__name__, "manage_background_tasks"),
         ),
         "6": ("⏱️  View Menu Load Times", show_menu_load_times),
+        "7": ("🧹 Clear All Caches (Disk & In-Memory)", clear_caches),
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:

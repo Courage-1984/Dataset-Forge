@@ -1,26 +1,125 @@
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
+
 # Dataset Forge Full Documentation
 
 ---
 
 # Table of Contents
 
-- [Features](features.md)
+- [Features (tl;dr)](features.md)
+- [Features (main menus)](features.md#features-main-menus)
+  - [⚙️ Core & Configuration](features.md#-core--configuration)
+  - [📂 Dataset Management](features.md#-dataset-management)
+  - [🔍 Analysis & Validation](features.md#-analysis--validation)
+  - [✨ Image Processing & Augmentation](features.md#-image-processing--augmentation)
+  - [🚀 Training & Inference](features.md#-training--inference)
+  - [🛠️ Utilities](features.md#-utilities)
+  - [⚙️ System & Settings](features.md#-system--settings)
+  - [🔗 Links](features.md#-links)
+  - [🩺 System Monitoring & Health](features.md#-system-monitoring--health)
+  - [⚡ Caching System (NEW July 2025)](features.md#-caching-system-new-july-2025)
+- [Features (expanded/misc)](features.md#features-expandedmisc)
+  - [Testing & Validation](features.md#testing--validation)
+  - [🧑‍💻 Developer Tools: Static Analysis & Code Quality](features.md#-developer-tools-static-analysis--code-quality)
+  - [July 2025 Improvements](features.md#july-2025-improvements)
 - [Special Installation Instructions](special_installation.md)
+  - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
+  - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
+  - [3. python-magic (for `Enhanced Directory Tree`)](special_installation.md#3-python-magic-for-enhanced-directory-tree)
+  - [Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection](special_installation.md#installing-and-using-resdethttpsgithubcom0x09resdet-for-native-resolution-detection)
+    - [Method 1: Windows (WSL - Recommended for CLI Integration)](special_installation.md#method-1-windows-wsl---recommended-for-cli-integration)
+    - [Method 2: Windows (MSYS2 MINGW64 Shell)](special_installation.md#method-2-windows-msys2-mingw64-shell)
+    - [Usage in Dataset Forge](special_installation.md#usage-in-dataset-forge)
 - [Usage Guide](usage.md)
+  - [🚀 Quick Start](usage.md#-quick-start)
+  - [👣 Main Workflows](usage.md#-main-workflows)
+    - [Dataset Management](usage.md#dataset-management)
+    - [Analysis & Validation](usage.md#analysis--validation)
+    - [Image Processing & Augmentation](usage.md#image-processing--augmentation)
+    - [Monitoring & Analytics](usage.md#monitoring--analytics)
+  - [July 2025 Update](usage.md#july-2025-update)
+  - [Running the Test Suite](usage.md#running-the-test-suite)
+  - [🧑‍💻 Static Analysis & Code Quality](usage.md#-static-analysis--code-quality)
 - [Advanced Features & Configuration](advanced.md)
+  - [Advanced Configuration](advanced.md#advanced-configuration)
+  - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
+  - [Robust Menu Loop Pattern (July 2025)](advanced.md#robust-menu-loop-pattern-july-2025)
+  - [Advanced Testing Patterns](advanced.md#advanced-testing-patterns)
+  - [🧑‍💻 Advanced Developer Tools: Static Analysis](advanced.md#-advanced-developer-tools-static-analysis)
+  - [⚡ Caching System: Technical Details (NEW July 2025)](advanced.md#-caching-system-technical-details-new-july-2025)
 - [Project Architecture](architecture.md)
+  - [Directory Structure](architecture.md#directory-structure)
+  - [Monitoring & Analytics](architecture.md#monitoring--analytics)
+  - [Test Suite Integration](architecture.md#test-suite-integration)
 - [Troubleshooting](troubleshooting.md)
-- [Style Guide](style_guide.md)
+  - [Dependancy & Library Issues](troubleshooting.md#dependancy--library-issues)
+  - [Menu Timing & Profiling Issues](troubleshooting.md#menu-timing--profiling-issues)
+  - [Menu Loop Issues](troubleshooting.md#menu-loop-issues)
+  - [Other Issues](troubleshooting.md#other-issues)
+  - [Test Failures](troubleshooting.md#test-failures)
+  - [Static Analysis Tool Issues](troubleshooting.md#static-analysis-tool-issues)
+- [Dataset Forge Style Guide](style_guide.md)
+  - [General Principles](style_guide.md#general-principles)
+  - [Project Architecture](style_guide.md#project-architecture)
+  - [Coding Standards](style_guide.md#coding-standards)
+  - [Import Organization](style_guide.md#import-organization)
+  - [Memory Management](style_guide.md#memory-management)
+  - [Parallel Processing](style_guide.md#parallel-processing)
+  - [Progress Tracking & User Feedback](style_guide.md#progress-tracking--user-feedback)
+  - [Color Scheme & UI](style_guide.md#color-scheme--ui)
+  - [Menu System](style_guide.md#menu-system)
+  - [Input Handling](style_guide.md#input-handling)
+  - [File Operations](style_guide.md#file-operations)
+  - [Image Processing](style_guide.md#image-processing)
+  - [Logging & Error Handling](style_guide.md#logging--error-handling)
+  - [Session State & Configuration](style_guide.md#session-state--configuration)
+  - [DPID (Degradation) Patterns](style_guide.md#dpid-degradation-patterns)
+  - [Audio & User Feedback](style_guide.md#audio--user-feedback)
+  - [Testing & Validation](style_guide.md#testing--validation)
+  - [Performance Optimization](style_guide.md#performance-optimization)
+  - [Monitoring, Analytics & Error Tracking](style_guide.md#monitoring-analytics--error-tracking)
+  - [Error Handling & Recovery](style_guide.md#error-handling--recovery)
+  - [Documentation Requirements](style_guide.md#documentation-requirements)
+  - [Security Considerations](style_guide.md#security-considerations)
+  - [Dependency Management](style_guide.md#dependency-management)
+  - [Git Ignore Patterns](style_guide.md#git-ignore-patterns)
+  - [Final Reminders](style_guide.md#final-reminders)
+  - [DPID Modularity (NEW)](style_guide.md#dpid-modularity-new)
+  - [Robust Menu Loop Pattern (UPDATED)](style_guide.md#robust-menu-loop-pattern-updated)
+  - [Workflow Prompt Handling (NEW)](style_guide.md#workflow-prompt-handling-new)
+  - [Centralized Printing & Style (UPDATED)](style_guide.md#centralized-printing--style-updated)
+  - [Exception Handling & Debug Prints (NEW)](style_guide.md#exception-handling--debug-prints-new)
+  - [Testing Requirements](style_guide.md#testing-requirements)
+  - [Static Analysis & Code Quality (NEW)](style_guide.md#static-analysis--code-quality-new)
 - [Changelog](changelog.md)
+  - [[Unreleased]](changelog.md#unreleased)
+  - [[July 2025]](changelog.md#july-2025)
 - [Contributing](contributing.md)
-- [FAQ](faq.md)
+  - [How to Contribute](contributing.md#how-to-contribute)
+  - [Development Guidelines](contributing.md#development-guidelines)
+  - [Doc Maintenance](contributing.md#doc-maintenance)
+  - [Static Analysis & Code Quality (NEW)](contributing.md#static-analysis--code-quality-new)
+- [Frequently Asked Questions (FAQ)](faq.md)
+    - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
+    - [What platforms are supported?](faq.md#what-platforms-are-supported)
+    - [What Python version is required?](faq.md#what-python-version-is-required)
+    - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
+    - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
+    - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
+    - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
+    - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
+    - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
+    - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
+    - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
 - [License](license.md)
+
 
 ---
 
+
 # Features
+
 
 # Features (tl;dr)
 
@@ -100,13 +199,65 @@
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
 - **⏱️ View Menu Load Times**: View the menu load times
 
+## ⚡ Caching System (NEW July 2025)
+
+Dataset Forge now features a robust caching system to accelerate repeated operations:
+
+- **In-Memory Caching:** Frequently-used, lightweight results (e.g., image property analysis, directory scans) are cached in RAM for the current session.
+- **Disk Caching:** Expensive, large results (e.g., deep feature embeddings for CBIR) are cached persistently in `store/cache/` for reuse across sessions.
+- **Automatic Integration:** Caching is transparently applied to key functions:
+  - CBIR feature extraction (CLIP, ResNet, VGG embeddings)
+  - Directory image scans
+  - Image property analysis
+- **Cache Management:**
+  - A new menu option in System Monitoring allows you to clear all caches (disk and in-memory) with one click.
+  - Disk cache is stored in `store/cache/` (auto-ignored by git).
+
+**Benefits:**
+
+- Dramatically faster repeated analysis, deduplication, and reporting on large datasets.
+- Reduces redundant computation and I/O.
+
+See `docs/advanced.md` for technical details and customization.
+
 # Features (expanded/misc)
 
 - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
 - **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
 
+## Testing & Validation
+
+- Dataset Forge includes a comprehensive, cross-platform test suite using pytest.
+- All core business logic, utilities, and integration flows are covered by unit and integration tests.
+- Tests cover DPID, CBIR, deduplication, reporting, audio, memory, parallel, and session state features.
+- Tests are robust on Windows and Linux, and use fixtures and monkeypatching for reliability.
+- All new features and bugfixes must include appropriate tests.
+
 ---
+
+## 🧑‍💻 Developer Tools: Static Analysis & Code Quality
+
+- **Static Analysis Tool:** Located at `tools/find_code_issues/find_code_issues.py`.
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
 
 ## July 2025 Improvements
 
@@ -120,7 +271,9 @@ For advanced implementation details, code patterns, and developer best practices
 
 ---
 
+
 # Special Installation
+
 
 # Special Installation Instructions
 
@@ -283,7 +436,9 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ---
 
+
 # Usage
+
 
 # Usage Guide
 
@@ -353,9 +508,51 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
 
+## Running the Test Suite
+
+To run all tests (recommended after any major change):
+
+```
+venv312\Scripts\activate
+venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+```
+
+The test suite covers all major features and runs quickly. Tests use fixtures and monkeypatching for reliability.
+
 ---
 
+## 🧑‍💻 Static Analysis & Code Quality
+
+Dataset Forge includes a static analysis tool for maintainers and contributors:
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+Review the actionable report and detailed results before submitting code or documentation changes.
+
+---
+
+
 # Advanced
+
 
 # Advanced Features & Configuration
 
@@ -415,9 +612,98 @@ while True:
 - As of July 2025, all menus in Dataset Forge have been updated to use this pattern.
 - If you add a new menu, you must use this pattern for consistency and reliability.
 
+## Advanced Testing Patterns
+
+- The test suite uses pytest fixtures and monkeypatching to isolate tests and mock external dependencies (audio, file I/O, heavy computation).
+- To add tests for new features, create a new test file in tests/test_utils/ or tests/ as appropriate.
+- All new features and bugfixes must include appropriate tests.
+
 ---
 
+## 🧑‍💻 Advanced Developer Tools: Static Analysis
+
+Dataset Forge includes a comprehensive static analysis tool for code quality and maintainability:
+
+- **Script:** `tools/find_code_issues/find_code_issues.py`
+- **Tools used:** vulture, pytest-cov, coverage, pyan3, pyflakes, ast
+- **Checks performed:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Extending:**
+  - The script is modular and can be extended to add new static analysis checks or output formats. See the script for extension points.
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+Review the actionable report and detailed results before submitting code or documentation changes.
+
+## ⚡ Caching System: Technical Details (NEW July 2025)
+
+Dataset Forge uses a hybrid caching system for performance:
+
+- **In-Memory Caching:**
+
+  - Uses `functools.lru_cache` via the `@in_memory_cache` decorator (see `utils/cache_utils.py`).
+  - Applied to lightweight, frequently-called functions (e.g., image property analysis, directory scans).
+  - Cache is per-session and cleared on process exit or via function-specific calls.
+
+- **Disk Caching:**
+
+  - Uses `joblib.Memory` via the `@disk_cache` decorator (see `utils/cache_utils.py`).
+  - Applied to expensive, large-result functions (e.g., CBIR feature extraction).
+  - Cache is persistent across sessions and stored in `store/cache/`.
+  - Disk cache can be cleared from the System Monitoring menu or by deleting the folder.
+
+- **Cache Management:**
+
+  - Use the System Monitoring menu to clear all caches.
+  - Disk cache is auto-ignored by git (see `.gitignore`).
+
+- **How to Use in Your Code:**
+
+  - Import decorators from `dataset_forge.utils.cache_utils`:
+    ```python
+    from dataset_forge.utils.cache_utils import in_memory_cache, disk_cache
+    ```
+  - Decorate your function:
+
+    ```python
+    @in_memory_cache(maxsize=128)
+    def my_func(...):
+        ...
+
+    @disk_cache
+    def expensive_func(...):
+        ...
+    ```
+
+  - Use `clear_disk_cache()` and `clear_in_memory_cache(func)` to clear caches programmatically.
+
+- **Best Practices:**
+  - Use in-memory cache for small, fast, frequently-repeated operations.
+  - Use disk cache for large, expensive, or cross-session results.
+  - Always document cache usage in your function docstrings.
+
+See `docs/features.md` for user-facing info and `README_full.md` for a merged overview.
+
+---
+
+
 # Architecture
+
 
 # Project Architecture
 
@@ -434,7 +720,8 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **assets/**: Any asset files required
 - **docs/**: Project documentation
 - **tests/**: Unit & integration tests
-- **tools/**: _Tools_ used in the project outside of the main CLI
+- **tools/**: Project tools and developer utilities (e.g., static analysis, documentation merging)
+  - **find_code_issues/find_code_issues.py**: Static analysis and code quality tool for maintainers. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. Outputs actionable reports to the same directory.
 
 ## Monitoring & Analytics
 
@@ -453,7 +740,9 @@ For coding standards and best practices, see [style_guide.md](style_guide.md).
 
 ---
 
+
 # Troubleshooting
+
 
 # Troubleshooting
 
@@ -494,13 +783,32 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 - For monitoring/analytics issues, check the logs in the ./logs/ directory.
 - If tests fail, ensure your environment matches the requirements and all dependencies are installed.
 
+## Test Failures
+
+- If you encounter a failing test, check for function signature mismatches, especially with parallel utilities that pass extra kwargs (e.g., play_audio).
+- Ensure all monkeypatches and fixtures match the expected types and return values.
+
+---
+
+## Static Analysis Tool Issues
+
+**Problem:** The static analysis script (`tools/find_code_issues/find_code_issues.py`) fails to run, or you get unexpected results.
+
+- Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+- If you get import errors, check your virtual environment and Python version.
+- If the script reports no files found, check your directory structure and that the codebase is present.
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- Review the log file (`find_code_issues.log`) for detailed error messages.
+
 ---
 
 For further help, see [usage.md](usage.md) or contact the project maintainer.
 
 ---
 
+
 # Style Guide
+
 
 # Dataset Forge Style Guide
 
@@ -748,13 +1056,30 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 
 - Add exception handling and debug prints to menu actions and workflows to catch and diagnose errors.
 
+## Testing Requirements
+
+- All new features and bugfixes must include appropriate unit and/or integration tests.
+- Tests must use Google-style docstrings and be PEP8-compliant.
+- Use pytest fixtures and monkeypatching for robust, isolated tests.
+
 ---
+
+## Static Analysis & Code Quality (NEW)
+
+- All public functions/classes/methods **must** have Google-style docstrings. This is enforced by the static analysis tool (`tools/find_code_issues/find_code_issues.py`).
+- Before submitting a PR, contributors **must** run the static analysis tool and address all actionable issues (dead code, untested code, missing docstrings, etc.).
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
+
+---
+
 
 # Changelog
 
+
 [//]: # "Navigation"
 
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage](usage.md)
+[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
 
 # Changelog
 
@@ -791,6 +1116,9 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - All user-facing workflows are responsible for their own 'Press Enter to return to the menu...' prompt. Menu loops no longer include this prompt.
 - All output, prompts, and progress messages now use the centralized printing utilities and Catppuccin Mocha color scheme. No raw print statements remain in user-facing workflows.
 - Exception handling and debug prints added to menu actions and workflows for easier debugging and error diagnosis.
+- Major test suite improvements: added and improved unit/integration tests for DPID, CBIR, deduplication, reporting, utilities, session state, and more.
+- All core business logic and utilities now covered by tests.
+- Fixed test import errors, function signatures, and monkeypatches for reliability.
 
 ## [July 2025]
 
@@ -811,9 +1139,12 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 
 This file will track major changes and releases in the future.
 
+
 ---
 
+
 # Contributing
+
 
 [ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
@@ -868,11 +1199,21 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 ---
 
+## Static Analysis & Code Quality (NEW)
+
+- Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, etc.).
+- All public functions/classes/methods must have Google-style docstrings.
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
+
 For questions, open an issue or contact the project maintainer.
+
 
 ---
 
+
 # Faq
+
 
 # Frequently Asked Questions (FAQ)
 
@@ -935,37 +1276,12 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 ---
 
+
 # License
+
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
 
 ---
-
-# Static Analysis & Code Quality (NEW)
-
-Dataset Forge includes a comprehensive static analysis tool for maintainers and contributors:
-
-- **Location:** `tools/find_code_issues/find_code_issues.py`
-- **Checks:**
-  - Unused (dead) code, functions, classes, and methods
-  - Untested code (missing test coverage)
-  - Functions/classes defined but never called
-  - Test/code mapping (tests without code, code without tests)
-  - Missing docstrings in public functions/classes/methods
-  - Unused imports/variables, and more
-- **How to run:**
-  ```sh
-  python tools/find_code_issues/find_code_issues.py [options]
-  # Run with no options to perform all checks
-  ```
-- **Output:**
-  - Overwrites files in `tools/find_code_issues/` on each run:
-    - `find_code_issues.log` (raw output)
-    - `find_code_issues_report.txt` (actionable summary)
-    - `find_code_issues_view.txt` (detailed results)
-- **Requirements:**
-  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-
-Review the actionable report and detailed results before submitting code or documentation changes.

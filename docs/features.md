@@ -78,6 +78,27 @@
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
 - **⏱️ View Menu Load Times**: View the menu load times
 
+## ⚡ Caching System (NEW July 2025)
+
+Dataset Forge now features a robust caching system to accelerate repeated operations:
+
+- **In-Memory Caching:** Frequently-used, lightweight results (e.g., image property analysis, directory scans) are cached in RAM for the current session.
+- **Disk Caching:** Expensive, large results (e.g., deep feature embeddings for CBIR) are cached persistently in `store/cache/` for reuse across sessions.
+- **Automatic Integration:** Caching is transparently applied to key functions:
+  - CBIR feature extraction (CLIP, ResNet, VGG embeddings)
+  - Directory image scans
+  - Image property analysis
+- **Cache Management:**
+  - A new menu option in System Monitoring allows you to clear all caches (disk and in-memory) with one click.
+  - Disk cache is stored in `store/cache/` (auto-ignored by git).
+
+**Benefits:**
+
+- Dramatically faster repeated analysis, deduplication, and reporting on large datasets.
+- Reduces redundant computation and I/O.
+
+See `docs/advanced.md` for technical details and customization.
+
 # Features (expanded/misc)
 
 - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.

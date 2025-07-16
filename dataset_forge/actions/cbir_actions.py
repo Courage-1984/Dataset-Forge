@@ -19,11 +19,23 @@ from functools import partial
 
 # Import embedding extraction logic from frames_actions
 from dataset_forge.actions.frames_actions import ImgToEmbedding
+from dataset_forge.utils.cache_utils import in_memory_cache, disk_cache
 
 
+@in_memory_cache(maxsize=32)
 def load_images_from_folder(
     folder: str, max_images: Optional[int] = None
 ) -> List[Tuple[str, Image.Image]]:
+    """
+    Load images from a folder (with in-memory caching).
+    Args:
+        folder: Path to folder
+        max_images: Max number of images to load
+    Returns:
+        List of (path, PIL.Image) tuples
+    Note:
+        This function is cached in-memory for fast repeated access in the same session.
+    """
     images = []
     supported_exts = {".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".webp"}
     image_paths = []
@@ -76,9 +88,21 @@ def get_model_enum(model_name: str):
         raise ValueError(f"Unknown model: {model_name}")
 
 
+@disk_cache
 def extract_embeddings(
     images: List[Tuple[str, Image.Image]], model_name: str, device: str = "cuda"
 ) -> np.ndarray:
+    """
+    Extract deep embeddings for a list of images (with persistent disk caching).
+    Args:
+        images: List of (path, PIL.Image) tuples
+        model_name: 'clip', 'resnet', or 'vgg'
+        device: Device string
+    Returns:
+        np.ndarray of embeddings
+    Note:
+        This function is disk-cached for fast repeated access across sessions.
+    """
     if model_name == "clip":
         # Use existing CLIP logic from visual_dedup_actions
         try:
