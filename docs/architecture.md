@@ -9,6 +9,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
   - **enhanced_metadata_menu.py**: Enhanced Metadata Management menu (batch extract, view/edit, filter, anonymize)
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
+  - **align_images_actions.py**: Batch projective alignment of images using SIFT+FLANN (called from Dataset Management menu)
   - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
@@ -97,6 +98,10 @@ The Umzi Dataset_Preprocessing workflows are now fully modularized within Datase
 - **Enhanced Metadata Management:**
   - Modular menu and actions for batch metadata extraction, editing, filtering, and anonymization.
   - Uses exiftool, pandas, SQLite, Pillow, and centralized utilities.
+
+## Menu Integration
+
+- The Dataset Management menu now includes an '🧭 Align Images' option, which calls the align_images_workflow in actions/align_images_actions.py using the lazy import pattern.
 
 ---
 

@@ -23,6 +23,7 @@
 - Process, augment, and transform images
 - Remove duplicates and validate data
 - Extract, view, edit, filter, and anonymize image metadata (EXIF, IPTC, XMP) with the Enhanced Metadata Management menu ([see docs](docs/features.md#🗂️-enhanced-metadata-management-new-july-2025)).
+- Align images from two folders (flat or recursive) using projective transformation (SIFT+FLANN) with the '🧭 Align Images' menu option ([see docs](docs/features.md#🧭-align-images-batch-projective-alignment)).
 
 It's designed to streamline the tedious work of preparing image datasets for training ML models, with an intuitive interface and robust processing capabilities. Please see [Features](docs/features.md).
 

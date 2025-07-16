@@ -20,6 +20,7 @@
 - **🧹 Clean & Organize**: De-dupe (Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, CBIR (Semantic Duplicate Detection)), batch renaming
 - **🔄 Orientation Organization**: Sort by landscape/portrait/square
 - **📏 Size Filtering**: Remove small/invalid image pairs
+- **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
 
 ## 🔍 Analysis & Validation
 

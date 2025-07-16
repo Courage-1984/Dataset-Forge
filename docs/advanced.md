@@ -194,3 +194,9 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - Public APIs are required for all major features to ensure testability and programmatic access.
 
 See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite) for more.
+
+## Align Images: Advanced Options (Planned)
+
+- The Align Images workflow is modular and robust, supporting both flat and recursive batch processing.
+- Advanced options (e.g., number of SIFT matches, FLANN parameters) are planned for future releases.
+- The implementation is fully testable and covered by non-interactive tests using feature-rich dummy images.

@@ -39,6 +39,7 @@
   - [🚀 Quick Start](usage.md#-quick-start)
   - [👣 Main Workflows](usage.md#-main-workflows)
     - [Dataset Management](usage.md#dataset-management)
+    - [Align Images (Batch Projective Alignment)](usage.md#align-images-batch-projective-alignment)
     - [Analysis & Validation](usage.md#analysis--validation)
     - [Image Processing & Augmentation](usage.md#image-processing--augmentation)
     - [Monitoring & Analytics](usage.md#monitoring--analytics)
@@ -60,6 +61,7 @@
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
   - [🗂️ Enhanced Metadata Management (NEW July 2025)](advanced.md#-enhanced-metadata-management-new-july-2025)
   - [🧪 Advanced Test Design Patterns (July 2025)](advanced.md#-advanced-test-design-patterns-july-2025)
+  - [Align Images: Advanced Options (Planned)](advanced.md#align-images-advanced-options-planned)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
@@ -67,6 +69,7 @@
   - [Test Suite Integration](architecture.md#test-suite-integration)
     - [Testing & Quality Assurance (Updated July 2025)](architecture.md#testing--quality-assurance-updated-july-2025)
     - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
+  - [Menu Integration](architecture.md#menu-integration)
 - [Troubleshooting](troubleshooting.md)
   - [Dependancy & Library Issues](troubleshooting.md#dependancy--library-issues)
   - [Menu Timing & Profiling Issues](troubleshooting.md#menu-timing--profiling-issues)
@@ -161,6 +164,7 @@
 - **🧹 Clean & Organize**: De-dupe (Visual deduplication, hash-based deduplication, ImageDedup advanced duplicate detection, CBIR (Semantic Duplicate Detection)), batch renaming
 - **🔄 Orientation Organization**: Sort by landscape/portrait/square
 - **📏 Size Filtering**: Remove small/invalid image pairs
+- **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
 
 ## 🔍 Analysis & Validation
 
@@ -565,6 +569,15 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 - Create, combine, split, and shuffle datasets using the Dataset Management menu.
 - Use Clean & Organize to deduplicate, batch rename, and filter images.
 
+### Align Images (Batch Projective Alignment)
+
+- Select '🧭 Align Images' from the Dataset Management menu.
+- Choose two folders (source and reference). Images are matched by filename.
+- Choose output folder. Optionally select flat or recursive (subfolder) processing.
+- The workflow aligns each matching image pair using SIFT+FLANN projective transformation.
+- Output images are saved in the specified output folder, preserving subfolder structure if recursive.
+- **Note:** Images must have detectable features (edges, shapes, or text) for alignment to succeed. Solid color images will not align.
+
 ### Analysis & Validation
 
 - Run validation and generate reports from the Analysis & Validation menu.
@@ -891,6 +904,12 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 
 See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite) for more.
 
+## Align Images: Advanced Options (Planned)
+
+- The Align Images workflow is modular and robust, supporting both flat and recursive batch processing.
+- Advanced options (e.g., number of SIFT matches, FLANN parameters) are planned for future releases.
+- The implementation is fully testable and covered by non-interactive tests using feature-rich dummy images.
+
 ---
 
 
@@ -906,6 +925,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
   - **enhanced_metadata_menu.py**: Enhanced Metadata Management menu (batch extract, view/edit, filter, anonymize)
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
+  - **align_images_actions.py**: Batch projective alignment of images using SIFT+FLANN (called from Dataset Management menu)
   - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
@@ -994,6 +1014,10 @@ The Umzi Dataset_Preprocessing workflows are now fully modularized within Datase
 - **Enhanced Metadata Management:**
   - Modular menu and actions for batch metadata extraction, editing, filtering, and anonymization.
   - Uses exiftool, pandas, SQLite, Pillow, and centralized utilities.
+
+## Menu Integration
+
+- The Dataset Management menu now includes an '🧭 Align Images' option, which calls the align_images_workflow in actions/align_images_actions.py using the lazy import pattern.
 
 ---
 
@@ -1457,6 +1481,8 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
   - Added new menu for batch extract, view/edit, filter, and anonymize image metadata (EXIF, IPTC, XMP) using exiftool, Pillow, pandas, and SQLite.
   - Fully integrated with centralized printing, memory, progress, and logging utilities.
   - Documented in all relevant docs and .cursorrules.
+- Added '🧭 Align Images (Batch Projective Alignment)' feature to Dataset Management menu. Allows batch alignment of images from two folders (flat or recursive) using SIFT+FLANN projective transformation. Robust error handling, modular implementation, and public API.
+- Added robust, non-interactive test for Align Images using feature-rich dummy images to ensure SIFT keypoint detection and alignment.
 
 ## [July 2025]
 

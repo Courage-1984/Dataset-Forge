@@ -43,6 +43,15 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 - Create, combine, split, and shuffle datasets using the Dataset Management menu.
 - Use Clean & Organize to deduplicate, batch rename, and filter images.
 
+### Align Images (Batch Projective Alignment)
+
+- Select '🧭 Align Images' from the Dataset Management menu.
+- Choose two folders (source and reference). Images are matched by filename.
+- Choose output folder. Optionally select flat or recursive (subfolder) processing.
+- The workflow aligns each matching image pair using SIFT+FLANN projective transformation.
+- Output images are saved in the specified output folder, preserving subfolder structure if recursive.
+- **Note:** Images must have detectable features (edges, shapes, or text) for alignment to succeed. Solid color images will not align.
+
 ### Analysis & Validation
 
 - Run validation and generate reports from the Analysis & Validation menu.

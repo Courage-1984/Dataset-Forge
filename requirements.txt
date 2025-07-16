@@ -81,19 +81,16 @@ imagededup
 # =============================
 # Testing
 # =============================
-
 pytest
 
 # =============================
 # Optional/External Tools
 # =============================
-
 # getnative
 # ^ first install VapourSynth. See [Special Installation Instructions](docs/special_installation.md) for details.
 
 # resdet
 # ^ See [Special Installation Instructions](docs/special_installation.md) for details.
-
 
 # =============================
 # find_code_issues.py:
@@ -110,7 +107,6 @@ pyflakes
 # =============================
 # exiftool (external, required for full metadata extraction/editing)
 pandas
-# sqlite3 is part of the Python standard library
 
 # =============================
 # Align Images (imageAlignmentTool.py)
@@ -127,3 +123,4 @@ dataset-support
 tqdm
 python-hcl2
 colour-science
+

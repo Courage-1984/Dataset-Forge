@@ -318,6 +318,12 @@ def dataset_management_menu():
         ),
         "3": ("🔗 Manage HQ/LQ Pairs", lazy_action(__name__, "hq_lq_pairs_menu")),
         "4": ("🧹 Clean & Organize", lazy_action(__name__, "clean_organize_menu")),
+        "5": (
+            "🧭 Align Images (Batch Projective Alignment)",
+            lazy_action(
+                "dataset_forge.actions.align_images_actions", "align_images_workflow"
+            ),
+        ),
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
