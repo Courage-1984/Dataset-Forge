@@ -1860,3 +1860,25 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICEN
 [Back to Table of Contents](#table-of-contents)
 
 ---
+
+# 🔊 Project Sounds & Audio Feedback
+
+Dataset Forge uses four distinct sounds to provide immediate feedback for key events:
+
+| Sound    | File         | When it Plays                                 | Meaning for User                 |
+| -------- | ------------ | --------------------------------------------- | -------------------------------- |
+| Startup  | startup.mp3  | When the application starts                   | App is ready to use              |
+| Success  | done.wav     | After long or successful operations           | Operation completed successfully |
+| Error    | error.mp3    | On any user-facing error or failed operation  | Attention: an error occurred     |
+| Shutdown | shutdown.mp3 | When the application exits (normal or Ctrl+C) | App is shutting down             |
+
+- All user-facing errors always trigger the error sound for immediate notification.
+- Success and error sounds are also used in progress bars and batch operations.
+- Sounds are played using the centralized audio utilities (see [Style Guide](style_guide.md#audio--user-feedback)).
+- (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
+
+These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
+
+See also: [Usage Guide](usage.md#🔊-project-sounds--audio-feedback)
+
+---

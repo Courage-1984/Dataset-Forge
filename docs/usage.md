@@ -36,6 +36,17 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
    ./run.bat
    ```
 
+## 🔊 Project Sounds & Audio Feedback
+
+Dataset Forge provides instant audio feedback for key events:
+
+- **Startup (startup.mp3):** When the app starts (ready to use)
+- **Success (done.wav):** After long or successful operations (operation completed)
+- **Error (error.mp3):** On any user-facing error (attention required)
+- **Shutdown (shutdown.mp3):** When the app exits (normal or Ctrl+C)
+
+See [Features](features.md#🔊-project-sounds--audio-feedback) for a full table and more details.
+
 ## 👣 Main Workflows
 
 ### Dataset Management
