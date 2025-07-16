@@ -75,3 +75,19 @@ wtp_dataset_destroyer
 
 ./test_datasets
 test_datasets
+
+./.coverage
+.coverage
+
+./tools/find_code_issues.log
+tools/find_code_issues.log
+
+./reports/images/
+reports/images/
+
+./tools/find_code_issues/
+tools/find_code_issues/
+
+./Dataset_Preprocessing
+Dataset_Preprocessing
+

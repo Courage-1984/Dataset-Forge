@@ -78,3 +78,32 @@ venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
 ```
 
 The test suite covers all major features and runs quickly. Tests use fixtures and monkeypatching for reliability.
+
+---
+
+## 🧑‍💻 Static Analysis & Code Quality
+
+Dataset Forge includes a static analysis tool for maintainers and contributors:
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+Review the actionable report and detailed results before submitting code or documentation changes.

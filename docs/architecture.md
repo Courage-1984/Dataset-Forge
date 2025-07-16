@@ -15,7 +15,8 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **assets/**: Any asset files required
 - **docs/**: Project documentation
 - **tests/**: Unit & integration tests
-- **tools/**: *Tools* used in the project outside of the main CLI
+- **tools/**: Project tools and developer utilities (e.g., static analysis, documentation merging)
+  - **find_code_issues/find_code_issues.py**: Static analysis and code quality tool for maintainers. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. Outputs actionable reports to the same directory.
 
 ## Monitoring & Analytics
 

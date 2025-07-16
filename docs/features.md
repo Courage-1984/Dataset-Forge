@@ -94,6 +94,29 @@
 
 ---
 
+## 🧑‍💻 Developer Tools: Static Analysis & Code Quality
+
+- **Static Analysis Tool:** Located at `tools/find_code_issues/find_code_issues.py`.
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
 ## July 2025 Improvements
 
 - All menus now use a robust, error-resistant loop pattern for reliability.

@@ -251,3 +251,12 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - All new features and bugfixes must include appropriate unit and/or integration tests.
 - Tests must use Google-style docstrings and be PEP8-compliant.
 - Use pytest fixtures and monkeypatching for robust, isolated tests.
+
+---
+
+## Static Analysis & Code Quality (NEW)
+
+- All public functions/classes/methods **must** have Google-style docstrings. This is enforced by the static analysis tool (`tools/find_code_issues/find_code_issues.py`).
+- Before submitting a PR, contributors **must** run the static analysis tool and address all actionable issues (dead code, untested code, missing docstrings, etc.).
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.

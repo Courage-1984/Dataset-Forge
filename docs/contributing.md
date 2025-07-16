@@ -51,4 +51,11 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 ---
 
+## Static Analysis & Code Quality (NEW)
+
+- Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, etc.).
+- All public functions/classes/methods must have Google-style docstrings.
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
+
 For questions, open an issue or contact the project maintainer.

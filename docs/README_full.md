@@ -1,6 +1,5 @@
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
-
 # Dataset Forge Full Documentation
 
 ---
@@ -19,12 +18,9 @@
 - [FAQ](faq.md)
 - [License](license.md)
 
-
 ---
 
-
 # Features
-
 
 # Features (tl;dr)
 
@@ -124,9 +120,7 @@ For advanced implementation details, code patterns, and developer best practices
 
 ---
 
-
 # Special Installation
-
 
 # Special Installation Instructions
 
@@ -289,9 +283,7 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ---
 
-
 # Usage
-
 
 # Usage Guide
 
@@ -363,9 +355,7 @@ For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting
 
 ---
 
-
 # Advanced
-
 
 # Advanced Features & Configuration
 
@@ -427,9 +417,7 @@ while True:
 
 ---
 
-
 # Architecture
-
 
 # Project Architecture
 
@@ -446,7 +434,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **assets/**: Any asset files required
 - **docs/**: Project documentation
 - **tests/**: Unit & integration tests
-- **tools/**: *Tools* used in the project outside of the main CLI
+- **tools/**: _Tools_ used in the project outside of the main CLI
 
 ## Monitoring & Analytics
 
@@ -465,9 +453,7 @@ For coding standards and best practices, see [style_guide.md](style_guide.md).
 
 ---
 
-
 # Troubleshooting
-
 
 # Troubleshooting
 
@@ -514,9 +500,7 @@ For further help, see [usage.md](usage.md) or contact the project maintainer.
 
 ---
 
-
 # Style Guide
-
 
 # Dataset Forge Style Guide
 
@@ -766,13 +750,11 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 
 ---
 
-
 # Changelog
-
 
 [//]: # "Navigation"
 
-[← Back to Main README](../README.md) | [Features](features.md) | [Usage Guide](usage.md)
+[← Back to Main README](../README.md) | [Features](features.md) | [Usage](usage.md)
 
 # Changelog
 
@@ -829,12 +811,9 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 
 This file will track major changes and releases in the future.
 
-
 ---
 
-
 # Contributing
-
 
 [ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
@@ -891,12 +870,9 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 For questions, open an issue or contact the project maintainer.
 
-
 ---
 
-
 # Faq
-
 
 # Frequently Asked Questions (FAQ)
 
@@ -959,12 +935,37 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 ---
 
-
 # License
-
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
 
 ---
+
+# Static Analysis & Code Quality (NEW)
+
+Dataset Forge includes a comprehensive static analysis tool for maintainers and contributors:
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+Review the actionable report and detailed results before submitting code or documentation changes.

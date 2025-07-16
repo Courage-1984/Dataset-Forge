@@ -46,4 +46,16 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 
 ---
 
+## Static Analysis Tool Issues
+
+**Problem:** The static analysis script (`tools/find_code_issues/find_code_issues.py`) fails to run, or you get unexpected results.
+
+- Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+- If you get import errors, check your virtual environment and Python version.
+- If the script reports no files found, check your directory structure and that the codebase is present.
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- Review the log file (`find_code_issues.log`) for detailed error messages.
+
+---
+
 For further help, see [usage.md](usage.md) or contact the project maintainer.

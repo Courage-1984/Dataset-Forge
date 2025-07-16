@@ -94,6 +94,18 @@ pytest
 # resdet
 # ^ See [Special Installation Instructions](docs/special_installation.md) for details.
 
+
+# =============================
+# find_code_issues.py:
+# =============================
+vulture
+pytest
+pytest-cov
+coverage
+pyan3
+pyflakes
+
+
 # =============================
 # Unsorted
 # =============================

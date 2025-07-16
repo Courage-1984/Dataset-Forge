@@ -63,3 +63,35 @@ while True:
 - The test suite uses pytest fixtures and monkeypatching to isolate tests and mock external dependencies (audio, file I/O, heavy computation).
 - To add tests for new features, create a new test file in tests/test_utils/ or tests/ as appropriate.
 - All new features and bugfixes must include appropriate tests.
+
+---
+
+## 🧑‍💻 Advanced Developer Tools: Static Analysis
+
+Dataset Forge includes a comprehensive static analysis tool for code quality and maintainability:
+
+- **Script:** `tools/find_code_issues/find_code_issues.py`
+- **Tools used:** vulture, pytest-cov, coverage, pyan3, pyflakes, ast
+- **Checks performed:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Extending:**
+  - The script is modular and can be extended to add new static analysis checks or output formats. See the script for extension points.
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+Review the actionable report and detailed results before submitting code or documentation changes.

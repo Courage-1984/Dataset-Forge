@@ -11,3 +11,4 @@
 - [Contributing](contributing.md)
 - [FAQ](faq.md)
 - [License](license.md)
+- [Static Analysis & Code Quality](usage.md#static-analysis--code-quality)

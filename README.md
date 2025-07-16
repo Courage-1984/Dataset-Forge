@@ -43,6 +43,35 @@ It's designed to streamline the tedious work of preparing image datasets for tra
 
 ---
 
+## 🧑‍💻 Static Analysis & Code Quality
+
+Dataset Forge includes a comprehensive static analysis tool for maintainers and contributors:
+
+- **Location:** `tools/find_code_issues/find_code_issues.py`
+- **Checks:**
+  - Unused (dead) code, functions, classes, and methods
+  - Untested code (missing test coverage)
+  - Functions/classes defined but never called
+  - Test/code mapping (tests without code, code without tests)
+  - Missing docstrings in public functions/classes/methods
+  - Unused imports/variables, and more
+- **How to run:**
+  ```sh
+  python tools/find_code_issues/find_code_issues.py [options]
+  # Run with no options to perform all checks
+  ```
+- **Output:**
+  - Overwrites files in `tools/find_code_issues/` on each run:
+    - `find_code_issues.log` (raw output)
+    - `find_code_issues_report.txt` (actionable summary)
+    - `find_code_issues_view.txt` (detailed results)
+- **Requirements:**
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+
+See [docs/usage.md](docs/usage.md) and [docs/features.md](docs/features.md) for details.
+
+---
+
 ## 🖥️ Supported Platforms & Requirements
 
 - **Python**: 3.12+ (tested on 3.12)
