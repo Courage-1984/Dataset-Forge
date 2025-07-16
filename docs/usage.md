@@ -79,7 +79,25 @@ For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting
 
 ## 🧪 Running the Test Suite
 
-To run all tests:
+To run all tests, you can now use the flexible test runner script:
+
+```sh
+python tools/run_tests.py
+```
+
+This script provides a menu to select between different test run modes, or you can pass an option directly:
+
+- **Option 1:** Basic: venv312\Scripts\activate + pytest
+- **Option 2:** Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+- **Option 3:** Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
+
+Example:
+
+```sh
+python tools/run_tests.py 2  # Recommended
+```
+
+You can still run pytest directly if you prefer:
 
 ```sh
 venv312\Scripts\activate
@@ -180,6 +198,29 @@ All options are fully interactive, use Dataset Forge's input and printing utilit
 # 🛠️ Utility Scripts (tools/)
 
 This section documents the user-facing utility scripts in the `tools/` directory. These scripts assist with code quality, documentation, environment setup, and troubleshooting.
+
+## run_tests.py: Flexible Test Runner (NEW July 2025)
+
+A flexible script for running the test suite with multiple options and interactive menu.
+
+- **Location:** `tools/run_tests.py`
+- **Purpose:** Lets you run the test suite in different modes (basic, recommended, verbose) with or without output capture.
+- **How to run:**
+  ```sh
+  python tools/run_tests.py
+  # or, to skip the menu:
+  python tools/run_tests.py 2  # Recommended
+  python tools/run_tests.py 3  # Verbose (no output capture)
+  ```
+- **Options:**
+  - `1` Basic: venv312\Scripts\activate + pytest
+  - `2` Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+  - `3` Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
+- **Menu:** If no option is given, a menu will be shown to select the mode interactively.
+- **Troubleshooting:**
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure.
+  - Review the console output for error messages.
 
 ## find_code_issues.py: Static Analysis Tool
 

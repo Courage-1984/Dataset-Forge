@@ -55,6 +55,7 @@
   - [merge_docs.py: Documentation Merging Tool](usage.md#mergedocspy-documentation-merging-tool)
   - [install.py: Environment Setup Tool](usage.md#installpy-environment-setup-tool)
   - [print_zsteg_env.py: zsteg Environment Check](usage.md#printzstegenvpy-zsteg-environment-check)
+  - [run_tests.py: Flexible Test Runner (NEW July 2025)](usage.md#run_tests.py-flexible-test-runner-new-july-2025)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
@@ -93,6 +94,7 @@
     - [merge_docs.py](troubleshooting.md#mergedocspy)
     - [install.py](troubleshooting.md#installpy)
     - [print_zsteg_env.py](troubleshooting.md#printzstegenvpy)
+    - [run_tests.py](troubleshooting.md#run_tests.py)
 - [Dataset Forge Style Guide](style_guide.md)
   - [General Principles](style_guide.md#general-principles)
   - [Project Architecture](style_guide.md#project-architecture)
@@ -330,6 +332,7 @@ Dataset Forge includes several utility scripts in the `tools/` directory to assi
 - **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
 - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
 - **print_zsteg_env.py**: Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration. See [usage.md](usage.md#print_zsteg_envpy-zsteg-environment-check).
+- **run_tests.py**: Flexible test runner for running the test suite with multiple options and interactive menu. See [usage.md](usage.md#run_tests.py-flexible-test-runner-new-july-2025) for full usage and options.
 
 For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
 
@@ -806,6 +809,29 @@ A comprehensive static analysis tool for maintainers and contributors.
   - If `zsteg` is not found, ensure it is installed and in your PATH.
   - On Windows, you may need to restart your terminal after adding to PATH.
 
+## run_tests.py: Flexible Test Runner (NEW July 2025)
+
+A flexible script for running the test suite with multiple options and interactive menu.
+
+- **Location:** `tools/run_tests.py`
+- **Purpose:** Lets you run the test suite in different modes (basic, recommended, verbose) with or without output capture.
+- **How to run:**
+  ```sh
+  python tools/run_tests.py
+  # or, to skip the menu:
+  python tools/run_tests.py 2  # Recommended
+  python tools/run_tests.py 3  # Verbose (no output capture)
+  ```
+- **Options:**
+  - `1` Basic: venv312\Scripts\activate + pytest
+  - `2` Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
+  - `3` Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
+- **Menu:** If no option is given, a menu will be shown to select the mode interactively.
+- **Troubleshooting:**
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure.
+  - Review the console output for error messages.
+
 ---
 
 # Advanced
@@ -1274,6 +1300,15 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
   - On Windows, you may need to restart your terminal after adding to PATH.
 - **Problem:** PATH is not updated.
   - Double-check your environment variable settings and restart your terminal.
+
+### run_tests.py
+
+- **Problem:** Script fails to run, or you get unexpected results.
+  - Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
+  - If you get import errors, check your virtual environment and Python version.
+  - If the script reports no files found, check your directory structure and that the codebase is present.
+  - The script overwrites its output files in `tools/run_tests.py` on each run.
+  - Review the console output for error messages.
 
 ---
 

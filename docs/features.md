@@ -123,6 +123,16 @@ Dataset Forge now includes a robust, cross-platform test suite covering all majo
 - Audio feedback, memory, parallel, and progress utilities
 - Session state, config, and error handling
 
+**Run all tests:**
+
+You can now use the flexible test runner script for convenience:
+
+```sh
+python tools/run_tests.py
+```
+
+This script provides a menu to select the test mode, or you can pass an option (see below). See [usage.md](usage.md#🦾-running-the-test-suite) for details.
+
 **Test suite highlights:**
 
 - All features have public, non-interactive APIs for programmatic access and testing.
@@ -171,6 +181,7 @@ See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-pat
 
 Dataset Forge includes several utility scripts in the `tools/` directory to assist with development, documentation, and environment setup. These scripts are user-facing and documented in detail in [usage.md](usage.md#utility-scripts-tools).
 
+- **run_tests.py**: Flexible test runner for the test suite. Lets you choose between basic, recommended, and verbose pytest runs via menu or CLI argument. See [usage.md](usage.md#run_testspy-flexible-test-runner-new-july-2025) for usage and options.
 - **find_code_issues.py**: Comprehensive static analysis tool for code quality and maintainability. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. See [usage.md](usage.md#find_code_issuespy-static-analysis-tool) for full usage and options.
 - **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
 - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
