@@ -105,6 +105,19 @@ coverage
 pyan3
 pyflakes
 
+# =============================
+# Enhanced Metadata Management
+# =============================
+# exiftool (external, required for full metadata extraction/editing)
+pandas
+# sqlite3 is part of the Python standard library
+
+# =============================
+# Align Images (imageAlignmentTool.py)
+# =============================
+argparse
+logging
+
 
 # =============================
 # Unsorted
@@ -114,10 +127,3 @@ dataset-support
 tqdm
 python-hcl2
 colour-science
-
-# =============================
-# Enhanced Metadata Management
-# =============================
-# exiftool (external, required for full metadata extraction/editing)
-pandas
-# sqlite3 is part of the Python standard library

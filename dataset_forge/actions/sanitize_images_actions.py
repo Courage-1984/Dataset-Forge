@@ -35,6 +35,104 @@ from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.utils.input_utils import ask_yes_no
 from dataset_forge.utils.color import Mocha
 
+import subprocess
+from PIL import Image
+import os
+
+def remove_metadata(input_path: str, output_path: str) -> bool:
+    """
+    Remove all metadata from an image using exiftool.
+
+    Args:
+        input_path: Path to the input image file
+        output_path: Path to the output image file
+
+    Returns:
+        True if successful, False otherwise
+    """
+    cmd = ["exiftool", "-all=", "-o", output_path, input_path]
+    try:
+        subprocess.run(cmd, check=True, capture_output=True)
+        return True
+    except Exception:
+        return False
+
+def convert_to_png(input_path: str, output_path: str) -> bool:
+    """
+    Convert an image to PNG format.
+
+    Args:
+        input_path: Path to the input image file
+        output_path: Path to the output PNG file
+
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        with Image.open(input_path) as img:
+            img.save(output_path, format="PNG")
+        return True
+    except Exception:
+        return False
+
+def remove_alpha(input_path: str, output_path: str) -> bool:
+    """
+    Remove the alpha channel from a PNG image.
+
+    Args:
+        input_path: Path to the input PNG file
+        output_path: Path to the output PNG file (no alpha)
+
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        with Image.open(input_path) as img:
+            if img.mode in ("RGBA", "LA"):
+                bg = Image.new("RGB", img.size, (255, 255, 255))
+                bg.paste(img, mask=img.split()[-1])
+                bg.save(output_path, format="PNG")
+            else:
+                img.save(output_path, format="PNG")
+        return True
+    except Exception as e:
+        print_error(f"remove_alpha failed: {e}")
+        return False
+
+def run_steghide_check(input_path: str) -> dict:
+    """
+    Run steghide to check for hidden data in an image.
+
+    Args:
+        input_path: Path to the image file
+
+    Returns:
+        Dictionary with steghide output or error
+    """
+    cmd = ["steghide", "info", input_path]
+    try:
+        result = subprocess.run(cmd, capture_output=True, check=True, text=True)
+        return {"result": result.stdout}
+    except Exception as e:
+        return {"error": str(e)}
+
+def run_zsteg_check(input_path: str) -> dict:
+    """
+    Run zsteg to check for hidden data in a PNG image.
+
+    Args:
+        input_path: Path to the PNG file
+
+    Returns:
+        Dictionary with zsteg output or error
+    """
+    cmd = ["zsteg", input_path]
+    try:
+        result = subprocess.run(cmd, capture_output=True, check=True, text=True)
+        return {"result": result.stdout}
+    except Exception as e:
+        return {"error": str(e)}
+
 SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp")
 
 

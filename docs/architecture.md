@@ -78,6 +78,13 @@ flowchart TD
 - Comprehensive automated test suite using pytest.
 - Covers CLI, menu timing, error feedback, memory, parallelism, and file/image utilities.
 
+### Testing & Quality Assurance (Updated July 2025)
+
+- All business logic is modular and exposed via public APIs for testability.
+- The test suite covers all major features, using monkeypatching, dummy objects, and multiprocessing-safe patterns.
+- Tests are robust, cross-platform, and non-interactive.
+- Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
+
 ### Umzi's Dataset_Preprocessing Integration
 
 The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge:

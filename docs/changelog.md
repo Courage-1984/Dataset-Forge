@@ -74,5 +74,9 @@
 - Comprehensive test suite covering CLI, memory, parallelism, and error feedback
 - requirements.txt is now grouped and commented by category
 - Added install order warnings for VapourSynth/getnative and CUDA/torch
+- Comprehensive test suite upgrade: all major features now have robust, non-interactive, public APIs and are fully covered by real tests.
+- Test suite uses monkeypatching, dummy objects, and multiprocessing-safe patterns.
+- Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
+- Documentation updated to reflect new test patterns and requirements.
 
 This file will track major changes and releases in the future.

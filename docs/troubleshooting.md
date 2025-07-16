@@ -46,6 +46,16 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 
 ---
 
+## 🧪 Test Suite Troubleshooting (July 2025)
+
+- **Monkeypatch signature mismatch:** Ensure dummy functions/classes accept all arguments used in the real code (e.g., `color=None`, `**kwargs`).
+- **Multiprocessing pickling errors:** Worker functions must be defined at module level, not nested inside other functions.
+- **XFAIL tests:** Some tests (e.g., ignore patterns in directory tree) are marked XFAIL by design; see docs for details.
+
+See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite).
+
+---
+
 ## Static Analysis Tool Issues
 
 **Problem:** The static analysis script (`tools/find_code_issues/find_code_issues.py`) fails to run, or you get unexpected results.

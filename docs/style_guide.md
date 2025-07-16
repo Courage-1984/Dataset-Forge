@@ -278,3 +278,13 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - exiftool, pandas, and SQLite are required for full metadata support; document their usage and troubleshooting.
 - All user-facing errors must trigger error sound and be logged.
 - All new features must include robust error handling, memory management, and user feedback.
+
+## Testing Patterns & Requirements (Updated July 2025)
+
+- All features must provide public, non-interactive APIs for programmatic access and testing.
+- Tests should use monkeypatching and dummy objects to isolate logic and avoid external dependencies.
+- Multiprocessing tests must use module-level worker functions for pickling compatibility.
+- All tests must be robust, isolated, and cross-platform.
+- Mark expected failures (XFAIL) and document them in the test and docs.
+
+See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanced.md#advanced-test-design-patterns).

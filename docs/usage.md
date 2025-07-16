@@ -68,16 +68,22 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
 
-## Running the Test Suite
+## 🧪 Running the Test Suite
 
-To run all tests (recommended after any major change):
+To run all tests:
 
-```
+```sh
 venv312\Scripts\activate
 venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
 ```
 
-The test suite covers all major features and runs quickly. Tests use fixtures and monkeypatching for reliability.
+- All major features are covered by robust, non-interactive tests.
+- Tests use monkeypatching and dummy objects for reliability.
+- One test is marked XFAIL (ignore patterns in directory tree); this is expected and not a failure.
+
+### Using Public APIs for Testing
+
+All major features (enhanced metadata, quality scoring, sanitize images, visual deduplication, etc.) provide public, non-interactive API functions for programmatic use and testing. See the relevant modules in `dataset_forge/actions/` for details and usage examples.
 
 ---
 

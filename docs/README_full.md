@@ -20,6 +20,7 @@
   - [🩺 System Monitoring & Health](features.md#-system-monitoring--health)
   - [⚡ Caching System (NEW July 2025)](features.md#-caching-system-new-july-2025)
 - [Features (expanded/misc)](features.md#features-expandedmisc)
+  - [🧪 Comprehensive Test Suite (Updated July 2025)](features.md#-comprehensive-test-suite-updated-july-2025)
   - [Testing & Validation](features.md#testing--validation)
   - [🧑‍💻 Developer Tools: Static Analysis & Code Quality](features.md#-developer-tools-static-analysis--code-quality)
 - [Special Installation Instructions](special_installation.md)
@@ -42,7 +43,8 @@
     - [Image Processing & Augmentation](usage.md#image-processing--augmentation)
     - [Monitoring & Analytics](usage.md#monitoring--analytics)
   - [July 2025 Update](usage.md#july-2025-update)
-  - [Running the Test Suite](usage.md#running-the-test-suite)
+  - [🧪 Running the Test Suite](usage.md#-running-the-test-suite)
+    - [Using Public APIs for Testing](usage.md#using-public-apis-for-testing)
   - [🧑‍💻 Static Analysis & Code Quality](usage.md#-static-analysis--code-quality)
   - [Using Umzi's Dataset_Preprocessing](usage.md#using-umzis-datasetpreprocessing)
     - [🧹 Sanitize Images (NEW July 2025)](usage.md#-sanitize-images-new-july-2025)
@@ -57,11 +59,13 @@
   - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
   - [🗂️ Enhanced Metadata Management (NEW July 2025)](advanced.md#-enhanced-metadata-management-new-july-2025)
+  - [🧪 Advanced Test Design Patterns (July 2025)](advanced.md#-advanced-test-design-patterns-july-2025)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
   - [Monitoring & Analytics](architecture.md#monitoring--analytics)
   - [Test Suite Integration](architecture.md#test-suite-integration)
+    - [Testing & Quality Assurance (Updated July 2025)](architecture.md#testing--quality-assurance-updated-july-2025)
     - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
 - [Troubleshooting](troubleshooting.md)
   - [Dependancy & Library Issues](troubleshooting.md#dependancy--library-issues)
@@ -69,6 +73,7 @@
   - [Menu Loop Issues](troubleshooting.md#menu-loop-issues)
   - [Other Issues](troubleshooting.md#other-issues)
   - [Test Failures](troubleshooting.md#test-failures)
+  - [🧪 Test Suite Troubleshooting (July 2025)](troubleshooting.md#-test-suite-troubleshooting-july-2025)
   - [Static Analysis Tool Issues](troubleshooting.md#static-analysis-tool-issues)
   - [Metadata Management Issues (NEW July 2025)](troubleshooting.md#metadata-management-issues-new-july-2025)
 - [Dataset Forge Style Guide](style_guide.md)
@@ -106,6 +111,7 @@
   - [Static Analysis & Code Quality (NEW)](style_guide.md#static-analysis--code-quality-new)
   - [Interactive Workflow Prompt Pattern (July 2025)](style_guide.md#interactive-workflow-prompt-pattern-july-2025)
   - [New Menu Integration (NEW)](style_guide.md#new-menu-integration-new)
+  - [Testing Patterns & Requirements (Updated July 2025)](style_guide.md#testing-patterns--requirements-updated-july-2025)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
   - [[July 2025]](changelog.md#july-2025)
@@ -242,6 +248,29 @@ See `docs/advanced.md` for technical details and customization.
 - **Audio error feedback**: All user-facing errors trigger an error sound (error.mp3) for immediate notification.
 - **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
+
+## 🧪 Comprehensive Test Suite (Updated July 2025)
+
+Dataset Forge now includes a robust, cross-platform test suite covering all major features:
+
+- Enhanced Metadata Management (extract, edit, filter, anonymize)
+- Quality Scoring (single and batch, via public API)
+- Sanitize Images (remove metadata, convert, remove alpha, steganography checks)
+- Visual Deduplication (find, move, copy, remove duplicate groups)
+- DPID implementations (BasicSR, OpenMMLab, Phhofm)
+- CBIR and deduplication workflows
+- Report generation
+- Audio feedback, memory, parallel, and progress utilities
+- Session state, config, and error handling
+
+**Test suite highlights:**
+
+- All features have public, non-interactive APIs for programmatic access and testing.
+- Tests use monkeypatching and dummy objects to avoid reliance on external binaries or real files.
+- Multiprocessing tests use module-level worker functions for compatibility.
+- Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
+
+See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-patterns) for details.
 
 ## Testing & Validation
 
@@ -561,16 +590,22 @@ This guide covers the main user workflows for Dataset Forge. For advanced config
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
 
-## Running the Test Suite
+## 🧪 Running the Test Suite
 
-To run all tests (recommended after any major change):
+To run all tests:
 
-```
+```sh
 venv312\Scripts\activate
 venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
 ```
 
-The test suite covers all major features and runs quickly. Tests use fixtures and monkeypatching for reliability.
+- All major features are covered by robust, non-interactive tests.
+- Tests use monkeypatching and dummy objects for reliability.
+- One test is marked XFAIL (ignore patterns in directory tree); this is expected and not a failure.
+
+### Using Public APIs for Testing
+
+All major features (enhanced metadata, quality scoring, sanitize images, visual deduplication, etc.) provide public, non-interactive API functions for programmatic use and testing. See the relevant modules in `dataset_forge/actions/` for details and usage examples.
 
 ---
 
@@ -847,6 +882,15 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
   - All actions use centralized printing, memory, progress, and logging utilities.
   - Robust error handling and user feedback throughout.
 
+## 🧪 Advanced Test Design Patterns (July 2025)
+
+- All tests use monkeypatching and dummy objects to isolate logic and avoid external dependencies.
+- Multiprocessing tests require worker functions to be at module level for pickling compatibility.
+- All new features must include robust, non-interactive tests using the public API.
+- Public APIs are required for all major features to ensure testability and programmatic access.
+
+See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite) for more.
+
 ---
 
 
@@ -931,6 +975,13 @@ flowchart TD
 - Comprehensive automated test suite using pytest.
 - Covers CLI, menu timing, error feedback, memory, parallelism, and file/image utilities.
 
+### Testing & Quality Assurance (Updated July 2025)
+
+- All business logic is modular and exposed via public APIs for testability.
+- The test suite covers all major features, using monkeypatching, dummy objects, and multiprocessing-safe patterns.
+- Tests are robust, cross-platform, and non-interactive.
+- Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
+
 ### Umzi's Dataset_Preprocessing Integration
 
 The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge:
@@ -997,6 +1048,16 @@ This guide provides solutions to common issues in Dataset Forge. For advanced us
 
 - If you encounter a failing test, check for function signature mismatches, especially with parallel utilities that pass extra kwargs (e.g., play_audio).
 - Ensure all monkeypatches and fixtures match the expected types and return values.
+
+---
+
+## 🧪 Test Suite Troubleshooting (July 2025)
+
+- **Monkeypatch signature mismatch:** Ensure dummy functions/classes accept all arguments used in the real code (e.g., `color=None`, `**kwargs`).
+- **Multiprocessing pickling errors:** Worker functions must be defined at module level, not nested inside other functions.
+- **XFAIL tests:** Some tests (e.g., ignore patterns in directory tree) are marked XFAIL by design; see docs for details.
+
+See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite).
 
 ---
 
@@ -1321,6 +1382,16 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - All user-facing errors must trigger error sound and be logged.
 - All new features must include robust error handling, memory management, and user feedback.
 
+## Testing Patterns & Requirements (Updated July 2025)
+
+- All features must provide public, non-interactive APIs for programmatic access and testing.
+- Tests should use monkeypatching and dummy objects to isolate logic and avoid external dependencies.
+- Multiprocessing tests must use module-level worker functions for pickling compatibility.
+- All tests must be robust, isolated, and cross-platform.
+- Mark expected failures (XFAIL) and document them in the test and docs.
+
+See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanced.md#advanced-test-design-patterns).
+
 ---
 
 
@@ -1403,6 +1474,10 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Comprehensive test suite covering CLI, memory, parallelism, and error feedback
 - requirements.txt is now grouped and commented by category
 - Added install order warnings for VapourSynth/getnative and CUDA/torch
+- Comprehensive test suite upgrade: all major features now have robust, non-interactive, public APIs and are fully covered by real tests.
+- Test suite uses monkeypatching, dummy objects, and multiprocessing-safe patterns.
+- Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
+- Documentation updated to reflect new test patterns and requirements.
 
 This file will track major changes and releases in the future.
 

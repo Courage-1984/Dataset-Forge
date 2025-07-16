@@ -325,64 +325,85 @@ def visual_dedup_workflow(
     return results
 
 
+def _move_group_worker(args):
+    group, destination_dir, dry_run = args
+    group_moved = []
+    for i, file_path in enumerate(group[1:], 1):
+        if os.path.exists(file_path):
+            filename = os.path.basename(file_path)
+            dest_path = os.path.join(destination_dir, f"dup_{i}_{filename}")
+            if not dry_run:
+                try:
+                    shutil.move(file_path, dest_path)
+                    group_moved.append(file_path)
+                except Exception as e:
+                    print_error(f"Error moving {file_path}: {e}")
+            else:
+                print_info(f"Would move: {file_path} -> {dest_path}")
+                group_moved.append(file_path)
+    return group_moved
+
+
+def _copy_group_worker(args):
+    group, destination_dir, dry_run = args
+    group_copied = []
+    for i, file_path in enumerate(group[1:], 1):
+        if os.path.exists(file_path):
+            filename = os.path.basename(file_path)
+            dest_path = os.path.join(destination_dir, f"dup_{i}_{filename}")
+            if not dry_run:
+                try:
+                    shutil.copy2(file_path, dest_path)
+                    group_copied.append(file_path)
+                except Exception as e:
+                    print_error(f"Error copying {file_path}: {e}")
+            else:
+                print_info(f"Would copy: {file_path} -> {dest_path}")
+                group_copied.append(file_path)
+    return group_copied
+
+
+def _remove_group_worker(args):
+    group, dry_run = args
+    group_removed = []
+    for file_path in group[1:]:
+        if os.path.exists(file_path):
+            if not dry_run:
+                try:
+                    os.remove(file_path)
+                    group_removed.append(file_path)
+                except Exception as e:
+                    print_error(f"Error removing {file_path}: {e}")
+            else:
+                print_info(f"Would remove: {file_path}")
+                group_removed.append(file_path)
+    return group_removed
+
+
 @monitor_all("move_duplicate_groups", critical_on_error=True)
 def move_duplicate_groups(
     groups: List[List[str]], destination_dir: str, dry_run: bool = True
 ) -> List[str]:
     """
     Move duplicate files from groups to destination directory with parallel processing.
-
-    Args:
-        groups: List of duplicate groups (each group is a list of file paths)
-        destination_dir: Directory to move duplicates to
-        dry_run: If True, only show what would be moved
-
-    Returns:
-        List of moved file paths
     """
     if not dry_run:
         os.makedirs(destination_dir, exist_ok=True)
-
     moved_files = []
-
-    def process_group(group: List[str]) -> List[str]:
-        group_moved = []
-        # Keep the first file, move the rest
-        for i, file_path in enumerate(group[1:], 1):
-            if os.path.exists(file_path):
-                filename = os.path.basename(file_path)
-                dest_path = os.path.join(destination_dir, f"dup_{i}_{filename}")
-
-                if not dry_run:
-                    try:
-                        shutil.move(file_path, dest_path)
-                        group_moved.append(file_path)
-                    except Exception as e:
-                        print_error(f"Error moving {file_path}: {e}")
-                else:
-                    print_info(f"Would move: {file_path} -> {dest_path}")
-                    group_moved.append(file_path)
-
-        return group_moved
-
-    # Process groups in parallel
     config = ParallelConfig(
         max_workers=parallel_config.get("max_workers"),
         processing_type=ProcessingType.THREAD,  # File I/O bound
         use_gpu=False,  # No GPU needed for file operations
     )
-
     all_moved = smart_map(
-        process_group,
-        groups,
+        _move_group_worker,
+        [(group, destination_dir, dry_run) for group in groups],
         desc="Moving duplicates",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
     )
-
     for group_moved in all_moved:
         moved_files.extend(group_moved)
-
     return moved_files
 
 
@@ -392,58 +413,24 @@ def copy_duplicate_groups(
 ) -> List[str]:
     """
     Copy duplicate files from groups to destination directory with parallel processing.
-
-    Args:
-        groups: List of duplicate groups (each group is a list of file paths)
-        destination_dir: Directory to copy duplicates to
-        dry_run: If True, only show what would be copied
-
-    Returns:
-        List of copied file paths
     """
     if not dry_run:
         os.makedirs(destination_dir, exist_ok=True)
-
     copied_files = []
-
-    def process_group(group: List[str]) -> List[str]:
-        group_copied = []
-        # Keep the first file, copy the rest
-        for i, file_path in enumerate(group[1:], 1):
-            if os.path.exists(file_path):
-                filename = os.path.basename(file_path)
-                dest_path = os.path.join(destination_dir, f"dup_{i}_{filename}")
-
-                if not dry_run:
-                    try:
-                        shutil.copy2(file_path, dest_path)
-                        group_copied.append(file_path)
-                    except Exception as e:
-                        print_error(f"Error copying {file_path}: {e}")
-                else:
-                    print_info(f"Would copy: {file_path} -> {dest_path}")
-                    group_copied.append(file_path)
-
-        return group_copied
-
-    # Process groups in parallel
     config = ParallelConfig(
         max_workers=parallel_config.get("max_workers"),
         processing_type=ProcessingType.THREAD,  # File I/O bound
         use_gpu=False,  # No GPU needed for file operations
     )
-
     all_copied = smart_map(
-        process_group,
-        groups,
+        _copy_group_worker,
+        [(group, destination_dir, dry_run) for group in groups],
         desc="Copying duplicates",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
     )
-
     for group_copied in all_copied:
         copied_files.extend(group_copied)
-
     return copied_files
 
 
@@ -451,52 +438,53 @@ def copy_duplicate_groups(
 def remove_duplicate_groups(groups: List[List[str]], dry_run: bool = True) -> List[str]:
     """
     Remove duplicate files from groups with parallel processing.
-
-    Args:
-        groups: List of duplicate groups (each group is a list of file paths)
-        dry_run: If True, only show what would be removed
-
-    Returns:
-        List of removed file paths
     """
     removed_files = []
-
-    def process_group(group: List[str]) -> List[str]:
-        group_removed = []
-        # Keep the first file, remove the rest
-        for file_path in group[1:]:
-            if os.path.exists(file_path):
-                if not dry_run:
-                    try:
-                        os.remove(file_path)
-                        group_removed.append(file_path)
-                    except Exception as e:
-                        print_error(f"Error removing {file_path}: {e}")
-                else:
-                    print_info(f"Would remove: {file_path}")
-                    group_removed.append(file_path)
-
-        return group_removed
-
-    # Process groups in parallel
     config = ParallelConfig(
         max_workers=parallel_config.get("max_workers"),
         processing_type=ProcessingType.THREAD,  # File I/O bound
         use_gpu=False,  # No GPU needed for file operations
     )
-
     all_removed = smart_map(
-        process_group,
-        groups,
+        _remove_group_worker,
+        [(group, dry_run) for group in groups],
         desc="Removing duplicates",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
     )
-
     for group_removed in all_removed:
         removed_files.extend(group_removed)
-
     return removed_files
+
+
+def find_duplicate_groups(
+    folder: str,
+    method: str = "clip",
+    threshold: float = None,
+    max_images: int = None,
+    device: str = "cuda" if torch.cuda.is_available() else "cpu",
+) -> list:
+    """
+    Public API: Find duplicate groups in a folder using the specified method (clip or lpips).
+
+    Args:
+        folder: Path to the folder containing images
+        method: 'clip' or 'lpips'
+        threshold: Similarity threshold (default: 0.98 for clip, 0.2 for lpips)
+        max_images: Max images to process (optional)
+        device: 'cuda' or 'cpu'
+    Returns:
+        List of duplicate groups (each group is a list of file paths)
+    """
+    if method == "lpips":
+        threshold = threshold or 0.2
+    else:
+        threshold = threshold or 0.98
+    images = load_images_from_folder(folder, max_images)
+    if method == "lpips":
+        return find_near_duplicates_lpips(images, threshold, device)
+    else:
+        return find_near_duplicates_clip(images, threshold, device)
 
 
 # Import statements at the end to avoid circular imports

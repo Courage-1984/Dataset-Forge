@@ -60,3 +60,33 @@ def score_hq_lq_folders(hq_folder, lq_folder, model_name="niqe", device="cpu"):
     print(f"Scoring LQ folder: {lq_folder}")
     lq_scores = score_images_with_pyiqa(lq_folder, model_name, device)
     return hq_scores, lq_scores
+
+
+def score_image_with_pyiqa(
+    image_path: str, model_name: str = "niqe", device: str = "cpu"
+) -> float:
+    """
+    Score a single image using pyiqa.
+
+    Args:
+        image_path: Path to the image file
+        model_name: Name of the IQA model (default: "niqe")
+        device: Device to use ("cpu" or "cuda")
+
+    Returns:
+        The quality score as a float
+
+    Raises:
+        ImportError: If pyiqa is not installed
+        Exception: If scoring fails
+    """
+    if pyiqa is None:
+        raise ImportError(
+            "pyiqa is not installed. Please install it to use quality scoring."
+        )
+    model = pyiqa.create_metric(model_name, device=device)
+    try:
+        score = float(model(image_path))
+        return score
+    except Exception as e:
+        raise Exception(f"Failed to score {image_path}: {e}")

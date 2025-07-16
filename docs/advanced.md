@@ -185,3 +185,12 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - **Integration:**
   - All actions use centralized printing, memory, progress, and logging utilities.
   - Robust error handling and user feedback throughout.
+
+## 🧪 Advanced Test Design Patterns (July 2025)
+
+- All tests use monkeypatching and dummy objects to isolate logic and avoid external dependencies.
+- Multiprocessing tests require worker functions to be at module level for pickling compatibility.
+- All new features must include robust, non-interactive tests using the public API.
+- Public APIs are required for all major features to ensure testability and programmatic access.
+
+See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite) for more.

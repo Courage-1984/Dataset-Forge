@@ -2,6 +2,7 @@ import os
 import subprocess
 import pandas as pd
 from PIL import Image, ExifTags
+from typing import List, Dict
 from dataset_forge.utils.printing import (
     print_info,
     print_error,
@@ -287,3 +288,115 @@ def batch_anonymize_metadata():
         else:
             print_success("All images anonymized successfully.")
         clear_memory()
+
+
+def extract_metadata(input_path: str, output_csv: str) -> int:
+    """
+    Extract metadata from all images in input_path using exiftool and save to CSV.
+
+    Args:
+        input_path: Path to image file or folder
+        output_csv: Path to output CSV file
+
+    Returns:
+        Number of images processed
+    """
+    if os.path.isdir(input_path):
+        cmd = [
+            "exiftool",
+            "-csv",
+            "-r",
+            input_path,
+        ]
+    else:
+        cmd = ["exiftool", "-csv", input_path]
+    try:
+        result = subprocess.run(cmd, capture_output=True, check=True, text=True)
+        with open(output_csv, "w", encoding="utf-8") as f:
+            f.write(result.stdout)
+        df = pd.read_csv(output_csv)
+        return len(df)
+    except Exception as e:
+        raise RuntimeError(f"Failed to extract metadata: {e}")
+
+def edit_metadata(input_path: str, edits: Dict[str, str]) -> bool:
+    """
+    Edit metadata for a single image using exiftool.
+
+    Args:
+        input_path: Path to image file
+        edits: Dict of exiftool tag names to new values
+
+    Returns:
+        True if successful, False otherwise
+    """
+    cmd = ["exiftool"]
+    for tag, value in edits.items():
+        cmd.append(f"-{tag}={value}")
+    cmd.append(input_path)
+    try:
+        result = subprocess.run(cmd, capture_output=True, check=True, text=True)
+        return result.returncode == 0
+    except Exception as e:
+        return False
+
+def filter_by_metadata(input_path: str, filter_dict: Dict[str, str]) -> List[str]:
+    """
+    Filter images in a folder by metadata values.
+
+    Args:
+        input_path: Path to folder of images
+        filter_dict: Dict of exiftool tag names to required values
+
+    Returns:
+        List of image file paths matching the filter
+    """
+    import tempfile
+    with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp:
+        csv_path = tmp.name
+    try:
+        n = extract_metadata(input_path, csv_path)
+        df = pd.read_csv(csv_path)
+        mask = pd.Series([True] * len(df))
+        for tag, value in filter_dict.items():
+            if tag in df.columns:
+                mask &= df[tag] == value
+            else:
+                mask &= False
+        matched_files = df[mask]["SourceFile"].tolist() if "SourceFile" in df.columns else []
+        return matched_files
+    finally:
+        if os.path.exists(csv_path):
+            os.remove(csv_path)
+
+def anonymize_metadata(input_path: str, output_path: str) -> int:
+    """
+    Remove all metadata from images in input_path and save to output_path.
+
+    Args:
+        input_path: Path to image file or folder
+        output_path: Path to output folder
+
+    Returns:
+        Number of images processed
+    """
+    if not os.path.exists(output_path):
+        os.makedirs(output_path, exist_ok=True)
+    if os.path.isdir(input_path):
+        files = [
+            os.path.join(input_path, f)
+            for f in os.listdir(input_path)
+            if f.lower().endswith((".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"))
+        ]
+    else:
+        files = [input_path]
+    count = 0
+    for f in files:
+        out_f = os.path.join(output_path, os.path.basename(f))
+        cmd = ["exiftool", "-all=", "-o", out_f, f]
+        try:
+            subprocess.run(cmd, check=True, capture_output=True)
+            count += 1
+        except Exception:
+            continue
+    return count

@@ -108,6 +108,29 @@ See `docs/advanced.md` for technical details and customization.
 - **Persistent Logging**: All analytics and errors are logged to ./logs/ for later review
 - **Memory & CUDA Cleanup**: Automatic cleanup on exit/errors for all tracked processes/threads
 
+## 🧪 Comprehensive Test Suite (Updated July 2025)
+
+Dataset Forge now includes a robust, cross-platform test suite covering all major features:
+
+- Enhanced Metadata Management (extract, edit, filter, anonymize)
+- Quality Scoring (single and batch, via public API)
+- Sanitize Images (remove metadata, convert, remove alpha, steganography checks)
+- Visual Deduplication (find, move, copy, remove duplicate groups)
+- DPID implementations (BasicSR, OpenMMLab, Phhofm)
+- CBIR and deduplication workflows
+- Report generation
+- Audio feedback, memory, parallel, and progress utilities
+- Session state, config, and error handling
+
+**Test suite highlights:**
+
+- All features have public, non-interactive APIs for programmatic access and testing.
+- Tests use monkeypatching and dummy objects to avoid reliance on external binaries or real files.
+- Multiprocessing tests use module-level worker functions for compatibility.
+- Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
+
+See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-patterns) for details.
+
 ## Testing & Validation
 
 - Dataset Forge includes a comprehensive, cross-platform test suite using pytest.
