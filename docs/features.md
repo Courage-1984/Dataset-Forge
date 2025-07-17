@@ -82,6 +82,34 @@
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
 - **⏱️ View Menu Load Times**: View the menu load times
 
+## 🚀 Performance Optimization (NEW July 2025)
+
+- **⚡ GPU Acceleration**: Comprehensive GPU-accelerated preprocessing operations including brightness/contrast, saturation/hue, sharpness/blur, and batch transformations
+- **🌐 Distributed Processing**: Multi-machine and single-machine multi-GPU processing using Dask and Ray with automatic resource detection
+- **🎯 Intelligent Sample Prioritization**: Quality-based sample prioritization using advanced image analysis (sharpness, contrast, noise, artifacts, complexity)
+- **⚡ Pipeline Compilation**: JIT compilation using Numba, Cython, and PyTorch JIT for performance-critical code paths
+- **📊 Performance Analytics**: Comprehensive monitoring and analytics for all optimization features
+- **⚙️ Auto-Optimization**: Automatic optimization strategy selection based on system resources and task characteristics
+
+### **Performance Optimization Menu**
+
+Accessible from the main menu as "🚀 Performance Optimization", providing:
+
+- **🎮 GPU Acceleration**: Test, configure, and benchmark GPU operations
+- **🌐 Distributed Processing**: Start/stop clusters, configure workers, monitor performance
+- **🎯 Sample Prioritization**: Configure quality analysis, test prioritization strategies
+- **⚡ Pipeline Compilation**: Test compilation backends, configure optimization settings
+- **📊 Performance Analytics**: Monitor system performance, GPU usage, distributed metrics
+- **⚙️ Optimization Settings**: Configure global optimization preferences and thresholds
+
+### **Integration Benefits**
+
+- **⚡ 10-100x Speedup**: GPU acceleration for image processing bottlenecks
+- **🌐 Scalable Processing**: Distribute work across multiple machines and GPUs
+- **🎯 Quality-First**: Process highest-quality samples first for better results
+- **⚡ Compiled Performance**: JIT compilation for numerical and image processing operations
+- **📊 Real-Time Monitoring**: Live performance metrics and optimization suggestions
+
 ## ⚡ Enhanced Caching System (UPDATED July 2025)
 
 Dataset Forge features a comprehensive, production-ready caching system with advanced features, monitoring, and management capabilities:

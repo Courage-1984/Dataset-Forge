@@ -363,6 +363,237 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
 - This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.
 
+## Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.
+
+### **Core Architecture**
+
+The performance optimization suite is built around four main components:
+
+1. **GPU Acceleration:** PyTorch-based image processing with automatic device management
+2. **Distributed Processing:** Dask and Ray integration for scalable computing
+3. **Sample Prioritization:** Quality-based processing order optimization
+   4peline Compilation:\*\* JIT compilation for performance-critical code paths
+
+### **GPU Acceleration (dataset_forge/utils/gpu_acceleration.py)**
+
+**Features:**
+
+- GPU-accelerated image preprocessing operations (brightness/contrast, saturation/hue, sharpness/blur)
+- Automatic device detection and memory management
+- Batch transformation support with PyTorch/TorchVision
+- GPU image analysis and SIFT keypoint detection
+- Cached operations with TTL and compression
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.gpu_acceleration import GPUImageProcessor, gpu_brightness_contrast
+
+# GPU-accelerated image transformations
+result = gpu_brightness_contrast(image, brightness=1.2, contrast=1.1)
+
+# Batch processing
+processor = GPUImageProcessor()
+results = processor.gpu_batch_transform(images, transform_config)
+
+# GPU image analysis
+analysis = processor.gpu_image_analysis(image)
+```
+
+**Key Features:**
+
+- **Device Management:** Automatic CUDA detection and memory cleanup
+- **Batch Processing:** Efficient processing of large image batches
+- **Memory Optimization:** Automatic tensor management and cleanup
+- **Caching:** TTL-based caching for expensive operations
+
+### **Distributed Processing (dataset_forge/utils/distributed_processing.py)**
+
+**Features:**
+
+- Multi-machine and single-machine multi-GPU processing
+- Dask and Ray integration with automatic resource detection
+- Auto-detection of optimal processing mode and worker count
+- Cluster management with dashboard and monitoring
+- Batch processing with progress tracking and error handling
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.distributed_processing import distributed_map, start_distributed_processing
+
+# Start distributed processing
+start_distributed_processing()
+
+# Process items with distributed computing
+results = distributed_map(process_function, items, desc="Processing")
+
+# Multi-GPU processing
+from dataset_forge.utils.distributed_processing import multi_gpu_map
+results = multi_gpu_map(process_function, items, desc="Multi-GPU Processing")
+```
+
+**Key Features:**
+
+- **Auto-Detection:** Automatically detects available resources and optimal configuration
+- **Fallback Support:** Graceful fallback to local processing when distributed resources unavailable
+- **Error Handling:** Robust error aggregation and reporting
+- **Progress Tracking:** Real-time progress monitoring with descriptive messages
+
+### **Sample Prioritization (dataset_forge/utils/sample_prioritization.py)**
+
+**Features:**
+
+- Quality-based sample prioritization using advanced image analysis
+- Sharpness, contrast, noise, artifact, and complexity analysis
+- Hybrid scoring with configurable weights
+- Adaptive batch creation based on priority scores
+- Extensible analysis framework
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.sample_prioritization import prioritize_samples, PrioritizationStrategy
+
+# Prioritize samples by quality
+prioritized = prioritize_samples(image_paths, strategy=PrioritizationStrategy.QUALITY_SCORE)
+
+# Analyze image quality
+from dataset_forge.utils.sample_prioritization import QualityAnalyzer
+analyzer = QualityAnalyzer()
+quality_metrics = analyzer.analyze_quality(image_path)
+```
+
+**Key Features:**
+
+- **Quality Analysis:** Comprehensive image quality assessment
+- **Complexity Analysis:** Edge density, texture complexity, color variety analysis
+- **Configurable Weights:** Adjustable importance of different quality metrics
+- **Adaptive Batching:** Intelligent batch creation based on priority scores
+
+### **Pipeline Compilation (dataset_forge/utils/pipeline_compilation.py)**
+
+**Features:**
+
+- JIT compilation using Numba, Cython, and PyTorch JIT
+- Auto-detection of optimal compilation strategy
+- Decorator-based compilation with fallback support
+- Pre-compiled utility functions for common operations
+- Compilation status monitoring and management
+
+**Implementation:**
+
+```python
+from dataset_forge.utils.pipeline_compilation import compile_function, auto_compile, CompilationType
+
+# Manual compilation
+compiled_func = compile_function(original_func)
+result = compiled_func(data)
+
+# Auto-compilation decorator
+@auto_compile(CompilationType.AUTO)
+def process_data(data):
+    return complex_processing(data)
+```
+
+**Key Features:**
+
+- **Multi-Backend Support:** Numba, Cython, and PyTorch JIT compilation
+- **Auto-Detection:** Automatically selects optimal compilation strategy
+- **Fallback Support:** Graceful fallback when compilation fails
+- **Performance Monitoring:** Compilation time and performance tracking
+
+### **Performance Optimization Menu**
+
+The Performance Optimization menu provides a centralized interface for all optimization features:
+
+- **GPU Acceleration:** Test, configure, and benchmark GPU operations
+- **Distributed Processing:** Start/stop clusters, configure workers, monitor performance
+- **Sample Prioritization:** Configure quality analysis, test prioritization strategies
+- **Pipeline Compilation:** Test compilation backends, configure optimization settings
+- **Performance Analytics:** Monitor system performance, GPU usage, distributed metrics
+- **Optimization Settings:** Configure global optimization preferences and thresholds
+
+### **Integration Patterns**
+
+**Combining Optimization Strategies:**
+
+```python
+# End-to-end optimized pipeline
+from dataset_forge.utils.sample_prioritization import prioritize_samples
+from dataset_forge.utils.gpu_acceleration import gpu_batch_transform
+from dataset_forge.utils.distributed_processing import distributed_map
+from dataset_forge.utils.pipeline_compilation import compile_function
+
+# 1. Prioritize samples by quality
+prioritized_samples = prioritize_samples(image_paths)
+
+# 2. Process with GPU acceleration
+def process_batch(batch):
+    return gpu_batch_transform(batch, transform_config)
+
+# 3. Compile the processing function
+compiled_process = compile_function(process_batch)
+
+# 4. Distribute processing across multiple machines/GPUs
+results = distributed_map(compiled_process, prioritized_samples, desc="Optimized Processing")
+```
+
+**Performance Monitoring:**
+
+- Real-time performance metrics and optimization suggestions
+- GPU usage monitoring and memory management
+- Distributed processing cluster status and health
+- Compilation performance tracking and optimization
+
+### **Best Practices**
+
+**GPU Acceleration:**
+
+- Use batch processing for maximum GPU utilization
+- Monitor memory usage and implement proper cleanup
+- Cache expensive operations with appropriate TTL
+- Handle device availability gracefully
+
+**Distributed Processing:**
+
+- Start with local processing and scale up as needed
+- Monitor cluster health and resource utilization
+- Implement robust error handling and recovery
+- Use appropriate batch sizes for your workload
+
+**Sample Prioritization:**
+
+- Configure quality weights based on your specific use case
+- Use hybrid scoring for balanced quality and complexity
+- Implement adaptive batching for optimal resource utilization
+- Monitor prioritization effectiveness and adjust strategies
+
+**Pipeline Compilation:**
+
+- Use auto-compilation for automatic optimization
+- Monitor compilation time and performance gains
+- Implement fallback mechanisms for compilation failures
+- Profile and optimize performance-critical code paths
+
+### **Troubleshooting**
+
+**Common Issues:**
+
+- **GPU Memory Issues:** Monitor memory usage and implement proper cleanup
+- **Distributed Processing Failures:** Check cluster health and resource availability
+- **Compilation Failures:** Verify dependencies and use fallback mechanisms
+- **Performance Degradation:** Monitor metrics and adjust optimization strategies
+
+**Debug Tools:**
+
+- Performance analytics provide detailed optimization metrics
+- GPU monitoring tools for memory and utilization tracking
+- Distributed processing dashboard for cluster health monitoring
+- Compilation status monitoring for optimization effectiveness
+
+See `docs/features.md` for user-facing information and `README_full.md` for a comprehensive overview.
+
 ## Interactive Workflow Prompt Handling (July 2025)
 
 - The sanitize images workflow now handles all step prompts interactively within the workflow function, not in the menu.

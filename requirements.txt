@@ -48,6 +48,27 @@ joblib
 GPUtil
 
 # =============================
+# Distributed Processing (NEW)
+# =============================
+dask[complete]
+# dask-distributed
+dask[distributed]
+ray[default]
+
+# =============================
+# Pipeline Compilation (NEW)
+# =============================
+numba
+cython
+setuptools
+
+# =============================
+# GPU Acceleration (NEW)
+# =============================
+kornia
+albumentations
+
+# =============================
 # File, Path, and Directory Utilities
 # =============================
 python-magic==0.4.27

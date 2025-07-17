@@ -37,6 +37,7 @@ flowchart TD
     B --> B6["Umzi's Dataset_Preprocessing Menu"]
     B --> B7["Settings, User Profile, Utilities"]
     B --> B8["Enhanced Metadata Menu"]
+    B --> B9["Performance Optimization Menu"]
     B1 --> C1["dataset_forge/actions/dataset_actions.py"]
     B2 --> C2["analysis_actions.py, analysis_ops_actions.py"]
     B3 --> C3["augmentation_actions.py, tiling_actions.py"]
@@ -45,6 +46,7 @@ flowchart TD
     B6 --> C6["umzi_dataset_preprocessing_actions.py"]
     B7 --> C7["settings_actions.py, user_profile_actions.py, ..."]
     B8 --> C8["enhanced_metadata_actions.py"]
+    B9 --> C9["performance_optimization_menu.py"]
     C1 --> D["Utils (file_utils, image_ops, memory_utils, ...)"]
     C2 --> D
     C3 --> D
@@ -52,23 +54,42 @@ flowchart TD
     C5 --> D
     C6 --> D
     C7 --> D
+    C8 --> D
+    C9 --> G
     D --> E["DPID Implementations (dpid/)"]
     D --> F["External Libraries"]
     E --> F
-    subgraph "Data & Config"
-      G1["configs/"]
-      G2["reports/"]
-      G3["assets/"]
+    subgraph "Performance Optimization Utils"
+      G1["gpu_acceleration.py"]
+      G2["distributed_processing.py"]
+      G3["sample_prioritization.py"]
+      G4["pipeline_compilation.py"]
     end
-    D --> G1
-    D --> G2
-    D --> G3
-    E --> G1
-    E --> G2
-    E --> G3
-    F --> G1
-    F --> G2
-    F --> G3
+    G --> G1
+    G --> G2
+    G --> G3
+    G --> G4
+    G1 --> F
+    G2 --> F
+    G3 --> F
+    G4 --> F
+    subgraph "Data & Config"
+      H1["configs/"]
+      H2["reports/"]
+      H3["assets/"]
+    end
+    D --> H1
+    D --> H2
+    D --> H3
+    E --> H1
+    E --> H2
+    E --> H3
+    F --> H1
+    F --> H2
+    F --> H3
+    G --> H1
+    G --> H2
+    G --> H3
 ```
 
 ## Monitoring & Analytics
@@ -157,3 +178,13 @@ F -->|<70| I[❌ Unusable]
 ---
 
 For coding standards and best practices, see [style_guide.md](style_guide.md).
+
+## Performance Optimization Suite
+
+- **Performance Optimization Menu:** Centralized UI for GPU acceleration, distributed processing, sample prioritization, and pipeline compilation (see menus/performance_optimization_menu.py).
+- **GPU Acceleration:** PyTorch-based image processing with automatic device management (see utils/gpu_acceleration.py).
+- **Distributed Processing:** Dask and Ray integration for scalable computing (see utils/distributed_processing.py).
+- **Sample Prioritization:** Quality-based processing order optimization (see utils/sample_prioritization.py).
+- **Pipeline Compilation:** JIT compilation for performance-critical code paths (see utils/pipeline_compilation.py).
+- **Integration:** All features follow modular design, robust menu loop, lazy import, memory management, and parallel processing patterns.
+- **Testing:** Comprehensive test suite in tests/test_utils/test_performance_optimization.py covering all optimization features, with robust error handling and edge case testing.

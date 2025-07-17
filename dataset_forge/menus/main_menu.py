@@ -85,6 +85,13 @@ def main_menu():
                     "enhanced_metadata_menu",
                 ),
             ),
+            "11": (
+                "🚀 Performance Optimization",
+                lazy_menu(
+                    "dataset_forge.menus.performance_optimization_menu",
+                    "performance_optimization_menu",
+                ),
+            ),
             "0": ("🚪 Exit", None),
         }
         choice = show_menu(

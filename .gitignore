@@ -54,14 +54,14 @@ store/
 results/
 logs/
 test_datasets/
-Dataset_Preprocessing/
-dpid_implementation_examples/
-Kim's_Directory_Tree_Maker/
+# Dataset_Preprocessing/
+# dpid_implementation_examples/
+# Kim's_Directory_Tree_Maker/
 OpenModelDB/
-example_uspscale/
-resdet/
-wtp_dataset_destroyer/
-example_Align_Images/
+# example_uspscale/
+# resdet/
+# wtp_dataset_destroyer/
+# example_Align_Images/
 
 # =============================
 # Configs and Path History
