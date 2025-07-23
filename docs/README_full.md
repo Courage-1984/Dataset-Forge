@@ -1,5 +1,6 @@
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
+
 # Dataset Forge Full Documentation
 
 ---
@@ -10,6 +11,7 @@
 - [Features (main menus)](features.md#features-main-menus)
   - [⚙️ Core & Configuration](features.md#-core--configuration)
   - [📂 Dataset Management](features.md#-dataset-management)
+    - [🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)](features.md#-umzis-datasetpreprocessing-pepedp-powered-july-2025)
   - [🔍 Analysis & Validation](features.md#-analysis--validation)
   - [✨ Image Processing & Augmentation](features.md#-image-processing--augmentation)
   - [🚀 Training & Inference](features.md#-training--inference)
@@ -64,7 +66,7 @@
   - [🧪 Running the Test Suite](usage.md#-running-the-test-suite)
     - [Using Public APIs for Testing](usage.md#using-public-apis-for-testing)
   - [🧑‍💻 Static Analysis & Code Quality](usage.md#-static-analysis--code-quality)
-  - [Using Umzi's Dataset_Preprocessing](usage.md#using-umzis-datasetpreprocessing)
+  - [Using Umzi's Dataset_Preprocessing (PepeDP-powered)](usage.md#using-umzis-datasetpreprocessing-pepedp-powered)
     - [🧹 Sanitize Images (NEW July 2025)](usage.md#-sanitize-images-new-july-2025)
     - [🗂️ Enhanced Metadata Management (NEW July 2025)](usage.md#-enhanced-metadata-management-new-july-2025)
 - [🛠️ Utility Scripts (tools/)](usage.md#-utility-scripts-tools)
@@ -96,39 +98,39 @@
 - [Validate and repair cache integrity](advanced.md#validate-and-repair-cache-integrity)
 - [Warmup frequently used data](advanced.md#warmup-frequently-used-data)
 - [Export statistics](advanced.md#export-statistics)
-  - [**Advanced Features**](advanced.md#advanced-features)
-  - [**Integration with Existing Functions**](advanced.md#integration-with-existing-functions)
+    - [**Advanced Features**](advanced.md#advanced-features)
+    - [**Integration with Existing Functions**](advanced.md#integration-with-existing-functions)
 - [Image operations with TTL-based caching](advanced.md#image-operations-with-ttl-based-caching)
 - [Model loading with specialized caching](advanced.md#model-loading-with-specialized-caching)
 - [File operations with in-memory caching](advanced.md#file-operations-with-in-memory-caching)
-  - [**Best Practices**](advanced.md#best-practices)
-  - [**Troubleshooting**](advanced.md#troubleshooting)
-  - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
+    - [**Best Practices**](advanced.md#best-practices)
+    - [**Troubleshooting**](advanced.md#troubleshooting)
+  - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing-pepedp-powered-july-2025)
   - [Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.](advanced.md#advanced-performance-optimization-suite-new-july-2025t-forge-implements-a-comprehensive-performance-optimization-suite-designed-for-maximum-efficiency-in-image-dataset-processing-this-suite-provides-gpu-acceleration-distributed-processing-intelligent-sample-prioritization-and-pipeline-compilation-capabilities)
     - [**Core Architecture**](advanced.md#core-architecture)
     - [**GPU Acceleration (dataset_forge/utils/gpu_acceleration.py)**](advanced.md#gpu-acceleration-datasetforgeutilsgpuaccelerationpy)
 - [GPU-accelerated image transformations](advanced.md#gpu-accelerated-image-transformations)
 - [Batch processing](advanced.md#batch-processing)
 - [GPU image analysis](advanced.md#gpu-image-analysis)
-  - [**Distributed Processing (dataset_forge/utils/distributed_processing.py)**](advanced.md#distributed-processing-datasetforgeutilsdistributedprocessingpy)
+    - [**Distributed Processing (dataset_forge/utils/distributed_processing.py)**](advanced.md#distributed-processing-datasetforgeutilsdistributedprocessingpy)
 - [Start distributed processing](advanced.md#start-distributed-processing)
 - [Process items with distributed computing](advanced.md#process-items-with-distributed-computing)
 - [Multi-GPU processing](advanced.md#multi-gpu-processing)
-  - [**Sample Prioritization (dataset_forge/utils/sample_prioritization.py)**](advanced.md#sample-prioritization-datasetforgeutilssampleprioritizationpy)
+    - [**Sample Prioritization (dataset_forge/utils/sample_prioritization.py)**](advanced.md#sample-prioritization-datasetforgeutilssampleprioritizationpy)
 - [Prioritize samples by quality](advanced.md#prioritize-samples-by-quality)
 - [Analyze image quality](advanced.md#analyze-image-quality)
-  - [**Pipeline Compilation (dataset_forge/utils/pipeline_compilation.py)**](advanced.md#pipeline-compilation-datasetforgeutilspipelinecompilationpy)
+    - [**Pipeline Compilation (dataset_forge/utils/pipeline_compilation.py)**](advanced.md#pipeline-compilation-datasetforgeutilspipelinecompilationpy)
 - [Manual compilation](advanced.md#manual-compilation)
 - [Auto-compilation decorator](advanced.md#auto-compilation-decorator)
-  - [**Performance Optimization Menu**](advanced.md#performance-optimization-menu)
-  - [**Integration Patterns**](advanced.md#integration-patterns)
+    - [**Performance Optimization Menu**](advanced.md#performance-optimization-menu)
+    - [**Integration Patterns**](advanced.md#integration-patterns)
 - [End-to-end optimized pipeline](advanced.md#end-to-end-optimized-pipeline)
 - [1. Prioritize samples by quality](advanced.md#1-prioritize-samples-by-quality)
 - [2. Process with GPU acceleration](advanced.md#2-process-with-gpu-acceleration)
 - [3. Compile the processing function](advanced.md#3-compile-the-processing-function)
 - [4. Distribute processing across multiple machines/GPUs](advanced.md#4-distribute-processing-across-multiple-machinesgpus)
-  - [**Best Practices**](advanced.md#best-practices)
-  - [**Troubleshooting**](advanced.md#troubleshooting)
+    - [**Best Practices**](advanced.md#best-practices)
+    - [**Troubleshooting**](advanced.md#troubleshooting)
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
   - [🗂️ Enhanced Metadata Management (NEW July 2025)](advanced.md#-enhanced-metadata-management-new-july-2025)
   - [🧪 Advanced Test Design Patterns (July 2025)](advanced.md#-advanced-test-design-patterns-july-2025)
@@ -141,7 +143,7 @@
   - [Enhanced Caching System](architecture.md#enhanced-caching-system)
   - [Test Suite Integration](architecture.md#test-suite-integration)
     - [Testing & Quality Assurance (Updated July 2025)](architecture.md#testing--quality-assurance-updated-july-2025)
-    - [Umzi's Dataset_Preprocessing Integration](architecture.md#umzis-datasetpreprocessing-integration)
+    - [Umzi's Dataset_Preprocessing Integration (PepeDP-powered, July 2025)](architecture.md#umzis-datasetpreprocessing-integration-pepedp-powered-july-2025)
     - [Dataset Health Scoring Workflow](architecture.md#dataset-health-scoring-workflow)
   - [Menu Integration](architecture.md#menu-integration)
   - [Performance Optimization Suite](architecture.md#performance-optimization-suite)
@@ -198,8 +200,10 @@
   - [Interactive Workflow Prompt Pattern (July 2025)](style_guide.md#interactive-workflow-prompt-pattern-july-2025)
   - [New Menu Integration (NEW)](style_guide.md#new-menu-integration-new)
   - [Testing Patterns & Requirements (Updated July 2025)](style_guide.md#testing-patterns--requirements-updated-july-2025)
+  - [Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)](style_guide.md#umzis-datasetpreprocessing-pepedp-powered-july-2025)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
+    - [🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)](changelog.md#-pepedp-powered-umzis-datasetpreprocessing-integration-july-2025)
     - [🚀 Performance Optimization Suite (NEW July 2025)](changelog.md#-performance-optimization-suite-new-july-2025)
       - [**GPU Acceleration**](changelog.md#gpu-acceleration)
       - [**Distributed Processing**](changelog.md#distributed-processing)
@@ -218,22 +222,25 @@
   - [Doc Maintenance](contributing.md#doc-maintenance)
   - [Static Analysis & Code Quality (NEW)](contributing.md#static-analysis--code-quality-new)
 - [Frequently Asked Questions (FAQ)](faq.md)
-  - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
-  - [What platforms are supported?](faq.md#what-platforms-are-supported)
-  - [What Python version is required?](faq.md#what-python-version-is-required)
-  - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
-  - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
-  - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
-  - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
-  - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
-  - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
-  - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
-  - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
+    - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
+    - [What platforms are supported?](faq.md#what-platforms-are-supported)
+    - [What Python version is required?](faq.md#what-python-version-is-required)
+    - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
+    - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
+    - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
+    - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
+    - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
+    - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
+    - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
+    - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
 - [License](license.md)
+
 
 ---
 
+
 # Features
+
 
 # Features (tl;dr)
 
@@ -257,6 +264,15 @@
 - **📏 Size Filtering**: Remove small/invalid image pairs
 - **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
 - **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows.
+
+### 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
+
+- **Best Tile Extraction**: Extracts the most informative tiles from images using Laplacian or IC9600 complexity, with robust parallelism and thresholding.
+- **Video Frame Extraction (Embedding Deduplication)**: Extracts diverse frames from video using deep embeddings (ConvNext, DINOv2, etc.) and distance thresholding.
+- **Duplicate Image Detection and Removal**: Finds and moves duplicate images using embedding similarity (Euclidean/cosine) and configurable thresholds.
+- **Threshold-Based Image Filtering (IQA)**: Filters images by quality using advanced IQA models (HyperIQA, ANIIQA, IC9600, etc.), with batch and median thresholding.
+
+All workflows are modular, testable, and use the latest PepeDP API. See [Usage Guide](usage.md#using-umzis-datasetpreprocessing) for details and examples.
 
 ## 🔍 Analysis & Validation
 
@@ -564,7 +580,9 @@ These sounds help you know instantly when an operation finishes, fails, or the a
 
 ---
 
+
 # Special Installation
+
 
 # Special Installation Instructions
 
@@ -731,6 +749,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
+
 ---
 
 ## 1. Advanced Metadata Operations (for exiftool integration)
@@ -752,18 +771,17 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 ### Method 2: Windows (Chocolatey)
 
 1. Download ExifTool.exe:
-
    ```sh
    choco install exiftool -y
    ```
 
 2. This will install `exiftool.exe` to:
-
    ```sh
    C:\ProgramData\chocolatey\lib\exiftool\tools\
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
 
 ---
 
@@ -799,7 +817,9 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ---
 
+
 # Usage
+
 
 # Usage Guide
 
@@ -960,17 +980,16 @@ Dataset Forge includes a static analysis tool for maintainers and contributors:
 
 Review the actionable report and detailed results before submitting code or documentation changes.
 
-## Using Umzi's Dataset_Preprocessing
+## Using Umzi's Dataset_Preprocessing (PepeDP-powered)
 
-You can access Umzi's Dataset_Preprocessing from the main menu (option 9: 🧩 Umzi's Dataset_Preprocessing). This menu provides the following workflows:
+You can access Umzi's Dataset_Preprocessing from the main menu. The following workflows are available:
 
-- **Best Tile Extraction**: Extracts the most informative tile(s) from images in a folder. Prompts for input/output folders, tile size, complexity function, and other options.
-- **Video Frame Extraction**: Extracts frames from a video based on embedding distance. Prompts for video path, output folder, model, and threshold.
-- **Image Deduplication**: Create embeddings for all images in a folder, or find duplicate clusters from embeddings. Prompts for folders, model, and thresholds.
-- **IQA Filtering**: Filter or sort images by IQA score using various algorithms. Prompts for input folder, algorithm, and thresholds.
-- **Embedding Extraction**: Extract and print the embedding for a single image.
+- **Best Tile Extraction**: Select input/output folders, tile size, complexity function (Laplacian/IC9600), and options. Extracts the best tiles using PepeDP's BestTile.
+- **Video Frame Extraction (Embedding Deduplication)**: Select video, output folder, embedding model, and threshold. Extracts diverse frames using PepeDP's VideoToFrame.
+- **Duplicate Image Detection and Removal**: Select input/output folders, embedding model, and threshold. Finds and moves duplicates using PepeDP's create_embedd, filtered_pairs, and move_duplicate_files.
+- **Threshold-Based Image Filtering (IQA)**: Select input/output folders, IQA model, batch size, and thresholds. Filters images using PepeDP's ThresholdAlg.
 
-All options are fully interactive, use Dataset Forge's input and printing utilities, and are covered by robust unit and CLI tests. See the main menu for access.
+All workflows are fully testable: you can call the action functions with all arguments provided to bypass prompts for automated testing.
 
 ### 🧹 Sanitize Images (NEW July 2025)
 
@@ -1145,7 +1164,9 @@ A comprehensive static analysis tool for maintainers and contributors.
 
 ---
 
+
 # Advanced
+
 
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
@@ -1500,15 +1521,15 @@ def is_image_file(filename):
 
 See `docs/features.md` for user-facing information and `README_full.md` for a comprehensive overview.
 
-## Advanced: Modular Integration of Umzi's Dataset_Preprocessing
+## Advanced: Modular Integration of Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
 
-The original Dataset_Preprocessing_consolidated_script.py has been fully ported into Dataset Forge as a modular, maintainable set of actions and menu files:
+The original Dataset_Preprocessing_consolidated_script.py has been fully ported into Dataset Forge as a modular, maintainable set of actions and menu files, now powered by PepeDP:
 
-- All business logic is in `dataset_forge/actions/umzi_dataset_preprocessing_actions.py`, following project conventions for memory management, progress tracking, and error handling.
+- All business logic is in `dataset_forge/actions/umzi_dataset_preprocessing_actions.py` as thin wrappers around PepeDP classes/functions. All user inputs are overridable via function arguments for robust, non-interactive testing.
 - The menu interface is in `dataset_forge/menus/umzi_dataset_preprocessing_menu.py`, using lazy imports and the robust menu loop pattern.
-- All workflows are testable, with comprehensive unit and CLI integration tests.
+- All four main workflows (Best Tile Extraction, Video Frame Extraction, Duplicate Detection, IQA Filtering) are testable, with comprehensive unit and CLI integration tests. All tests call the action functions with arguments to bypass prompts.
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
-- This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.
+- This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability, testability, and robust documentation.
 
 ## Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.
 
@@ -1799,7 +1820,9 @@ All DPID implementations (including Umzi's) are covered by robust, non-interacti
 
 ---
 
+
 # Architecture
+
 
 # Project Architecture
 
@@ -1939,13 +1962,13 @@ flowchart TD
 - Tests are robust, cross-platform, and non-interactive.
 - Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
 
-### Umzi's Dataset_Preprocessing Integration
+### Umzi's Dataset_Preprocessing Integration (PepeDP-powered, July 2025)
 
-The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge:
+The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge and powered by PepeDP:
 
-- Business logic is in `actions/umzi_dataset_preprocessing_actions.py`.
-- UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`.
-- Uses lazy imports, robust menu loop, and centralized utilities.
+- Business logic is in `actions/umzi_dataset_preprocessing_actions.py` as thin wrappers around PepeDP classes/functions. All user inputs are overridable via function arguments for robust, non-interactive testing.
+- UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`, using lazy imports, robust menu loop, and centralized utilities.
+- All four main workflows (Best Tile Extraction, Video Frame Extraction, Duplicate Detection, IQA Filtering) are robustly tested with public, non-interactive APIs.
 - See `docs/advanced.md` for a detailed discussion of the porting and modularization process.
 
 - **Enhanced Metadata Management:**
@@ -1996,7 +2019,9 @@ All DPID implementations are modular and testable, including Umzi's DPID (pepedp
 
 ---
 
+
 # Troubleshooting
+
 
 # Troubleshooting
 
@@ -2193,7 +2218,9 @@ For further help, see [usage.md](usage.md) or contact the project maintainer.
 
 ---
 
+
 # Style Guide
+
 
 # Dataset Forge Style Guide
 
@@ -2499,9 +2526,17 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 
 See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanced.md#advanced-test-design-patterns).
 
+## Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
+
+- All menu actions must be thin wrappers around PepeDP, with all user inputs overridable for tests.
+- All workflows must provide public, non-interactive APIs for robust, automated testing.
+- All new features must be documented in all relevant docs and README_full.md.
+
 ---
 
+
 # Changelog
+
 
 [//]: # "Navigation"
 
@@ -2510,6 +2545,13 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 # Changelog
 
 ## [Unreleased]
+
+### 🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)
+
+- Replaced all legacy Umzi Dataset_Preprocessing logic with thin, testable wrappers around PepeDP.
+- All four main workflows (Best Tile Extraction, Video Frame Extraction, Duplicate Detection, IQA Filtering) now use the latest PepeDP API.
+- All workflows are robust, modular, and fully covered by non-interactive, public API tests.
+- Updated all relevant documentation, style guide, and .mdc rules.
 
 ### 🚀 Performance Optimization Suite (NEW July 2025)
 
@@ -2692,9 +2734,12 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 This file will track major changes and releases in the future.
 
+
 ---
 
+
 # Contributing
+
 
 [ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
@@ -2758,9 +2803,12 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 For questions, open an issue or contact the project maintainer.
 
+
 ---
 
+
 # Faq
+
 
 # Frequently Asked Questions (FAQ)
 
@@ -2823,23 +2871,12 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 ---
 
+
 # License
+
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
-
----
-
-## 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
-
-Dataset Forge now features robust, testable integration with [PepeDP](https://github.com/umzi2/PepeDP) for Umzi's Dataset_Preprocessing workflows:
-
-- **Best Tile Extraction**
-- **Video Frame Extraction (Embedding Deduplication)**
-- **Duplicate Image Detection and Removal**
-- **Threshold-Based Image Filtering (IQA)**
-
-All workflows are modular, testable, and use the latest PepeDP API. See [Features](features.md#🧩-umzis-dataset_preprocessing-pepedp-powered-july-2025) and [Usage Guide](usage.md#using-umzis-datasetpreprocessing-pepedp-powered) for details and examples.
 
 ---
