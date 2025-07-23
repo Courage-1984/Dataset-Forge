@@ -89,10 +89,15 @@ jinja2
 # Miscellaneous Utilities
 # =============================
 pyyaml
-pepeline
-pepedpid
 importlib
 gdown
+
+# =============================
+# umzi
+# =============================
+pepeline
+pepedpid
+pepedp
 
 # =============================
 # Deduplication & Similarity

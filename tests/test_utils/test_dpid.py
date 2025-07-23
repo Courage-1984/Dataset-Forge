@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from PIL import Image
 import os
-from dataset_forge.dpid import basicsr_dpid, openmmlab_dpid, phhofm_dpid
+from dataset_forge.dpid import basicsr_dpid, openmmlab_dpid, phhofm_dpid, umzi_dpid
 
 
 def make_dummy_image(path, size=(8, 8)):
@@ -59,3 +59,52 @@ def test_run_phhofm_dpid_single_folder(tmp_path, monkeypatch):
     )
     out_subdir = out_dir / "50pct"
     assert (out_subdir / "a.png").exists()
+
+
+def test_run_umzi_dpid_single_folder(tmp_path, monkeypatch):
+    """Test Umzi DPID single folder downscale creates output files (mock dpid_resize)."""
+    in_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    in_dir.mkdir()
+    out_dir.mkdir()
+    img = in_dir / "a.png"
+    make_dummy_image(img)
+    # Patch dpid_resize to just return the input image
+    monkeypatch.setattr(umzi_dpid, "dpid_resize", lambda img, h, w, f: img)
+    monkeypatch.setattr(umzi_dpid, "read", lambda path: np.array(Image.open(path)))
+    monkeypatch.setattr(
+        umzi_dpid, "save", lambda arr, path: Image.fromarray(arr).save(path)
+    )
+    umzi_dpid.run_umzi_dpid_single_folder(
+        str(in_dir), str(out_dir), scales=[0.5], overwrite=True
+    )
+    out_subdir = out_dir / "50pct"
+    assert (out_subdir / "a.png").exists()
+
+
+def test_run_umzi_dpid_hq_lq(tmp_path, monkeypatch):
+    """Test Umzi DPID HQ/LQ downscale creates output files (mock dpid_resize)."""
+    hq_dir = tmp_path / "hq"
+    lq_dir = tmp_path / "lq"
+    out_hq = tmp_path / "out_hq"
+    out_lq = tmp_path / "out_lq"
+    hq_dir.mkdir()
+    lq_dir.mkdir()
+    out_hq.mkdir()
+    out_lq.mkdir()
+    img = hq_dir / "a.png"
+    make_dummy_image(img)
+    (lq_dir / "a.png").write_bytes(img.read_bytes())
+    # Patch dpid_resize to just return the input image
+    monkeypatch.setattr(umzi_dpid, "dpid_resize", lambda img, h, w, f: img)
+    monkeypatch.setattr(umzi_dpid, "read", lambda path: np.array(Image.open(path)))
+    monkeypatch.setattr(
+        umzi_dpid, "save", lambda arr, path: Image.fromarray(arr).save(path)
+    )
+    umzi_dpid.run_umzi_dpid_hq_lq(
+        str(hq_dir), str(lq_dir), str(out_hq), str(out_lq), scales=[0.5], overwrite=True
+    )
+    out_subdir_hq = out_hq / "50pct"
+    out_subdir_lq = out_lq / "50pct"
+    assert (out_subdir_hq / "a.png").exists()
+    assert (out_subdir_lq / "a.png").exists()

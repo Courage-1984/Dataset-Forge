@@ -17,11 +17,16 @@ from dataset_forge.dpid.phhofm_dpid import (
     run_phhofm_dpid_single_folder,
     run_phhofm_dpid_hq_lq,
 )
+from dataset_forge.dpid.umzi_dpid import (
+    run_umzi_dpid_single_folder,
+    run_umzi_dpid_hq_lq,
+)
 
 DPID_METHODS = {
     "basicsr": "DPID (BasicSR)",
     "openmmlab": "DPID (OpenMMLab)",
     "phhofm": "DPID (Phhofm's pepedpid)",
+    "umzi": "DPID (Umzi's pepedpid)",
 }
 
 SCALE_MAP = {"75%": 0.75, "50%": 0.5, "25%": 0.25}
@@ -82,6 +87,18 @@ def multiscale_downscale(
                 )
                 processed = len([f for f in os.listdir(out_hq) if is_image_file(f)])
                 skipped = failed = 0
+            elif dpid_method == "umzi":
+                run_umzi_dpid_hq_lq(
+                    hq_folder,
+                    lq_folder,
+                    out_hq,
+                    out_lq,
+                    [scale],
+                    overwrite=False,
+                    lambd=l,
+                )
+                processed = len([f for f in os.listdir(out_hq) if is_image_file(f)])
+                skipped = failed = 0
             else:
                 raise ValueError(f"Unknown DPID method: {dpid_method}")
             results[(scale, dpid_method)] = {
@@ -109,6 +126,12 @@ def multiscale_downscale(
                 skipped = failed = 0
             elif dpid_method == "openmmlab":
                 run_openmmlab_dpid_single_folder(
+                    input_path, output_base, [scale], overwrite=False, lambd=l
+                )
+                processed = len([f for f in os.listdir(out_folder) if is_image_file(f)])
+                skipped = failed = 0
+            elif dpid_method == "umzi":
+                run_umzi_dpid_single_folder(
                     input_path, output_base, [scale], overwrite=False, lambd=l
                 )
                 processed = len([f for f in os.listdir(out_folder) if is_image_file(f)])

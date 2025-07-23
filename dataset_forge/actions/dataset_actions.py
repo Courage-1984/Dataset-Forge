@@ -40,6 +40,10 @@ from dataset_forge.dpid import (
     run_phhofm_dpid_single_folder,
     run_phhofm_dpid_hq_lq,
 )
+from dataset_forge.dpid.umzi_dpid import (
+    run_umzi_dpid_single_folder,
+    run_umzi_dpid_hq_lq,
+)
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
@@ -53,8 +57,9 @@ def create_multiscale_dataset(*args, **kwargs):
     print_info("[1] BasicSR DPID")
     print_info("[2] OpenMMLab DPID")
     print_info("[3] 🌟 Phhofm DPID (Recommended)")
-    method = input("Enter choice [1-3]: ").strip()
-    if method not in {"1", "2", "3"}:
+    print_info("[4] 🌟 Umzi DPID (Recommended)")
+    method = input("Enter choice [1-4]: ").strip()
+    if method not in {"1", "2", "3", "4"}:
         print_error("Invalid method.")
         print_prompt("Press Enter to return to the menu...")
         input()
@@ -89,7 +94,7 @@ def create_multiscale_dataset(*args, **kwargs):
         return
     overwrite = input("Overwrite existing files? [y/N]: ").strip().lower() == "y"
     dpid_kwargs = {}
-    if method in {"1", "2"}:
+    if method in {"1", "2", "3", "4"}:
         print_section("DPID kernel parameters (press Enter for defaults):")
         kernel_size = input("DPID kernel size [default 21]: ").strip()
         sigma = input("DPID sigma [default 2.0]: ").strip()
@@ -108,6 +113,10 @@ def create_multiscale_dataset(*args, **kwargs):
             dpid_kwargs["sig_x"] = float(sig_x) if sig_x else 2.0
             dpid_kwargs["sig_y"] = float(sig_y) if sig_y else 2.0
             dpid_kwargs["theta"] = float(theta) if theta else 0.0
+    if method == "4":
+        print_section("DPID lambda parameter (press Enter for default 0.5):")
+        lambd = input("DPID lambda [default 0.5]: ").strip()
+        dpid_kwargs["lambd"] = float(lambd) if lambd else 0.5
     if mode == "1":
         input_folder = input("Enter input folder path: ").strip()
         output_base = input("Enter output base folder path: ").strip()
@@ -122,6 +131,10 @@ def create_multiscale_dataset(*args, **kwargs):
         elif method == "3":
             run_phhofm_dpid_single_folder(
                 input_folder, output_base, scales, overwrite=overwrite
+            )
+        elif method == "4":
+            run_umzi_dpid_single_folder(
+                input_folder, output_base, scales, overwrite=overwrite, **dpid_kwargs
             )
     else:
         hq_folder = input("Enter HQ folder path: ").strip()
@@ -156,6 +169,16 @@ def create_multiscale_dataset(*args, **kwargs):
                 out_lq_base,
                 scales,
                 overwrite=overwrite,
+            )
+        elif method == "4":
+            run_umzi_dpid_hq_lq(
+                hq_folder,
+                lq_folder,
+                out_hq_base,
+                out_lq_base,
+                scales,
+                overwrite=overwrite,
+                **dpid_kwargs,
             )
     print_success("Multiscale dataset creation complete!")
     print_prompt("Press Enter to return to the menu...")

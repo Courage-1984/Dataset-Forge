@@ -38,6 +38,10 @@ from dataset_forge.dpid.phhofm_dpid import (
     run_phhofm_dpid_single_folder,
     run_phhofm_dpid_hq_lq,
 )
+from dataset_forge.dpid.umzi_dpid import (
+    run_umzi_dpid_single_folder,
+    run_umzi_dpid_hq_lq,
+)
 
 
 def split_dataset_in_half(hq_folder, lq_folder):
@@ -2267,39 +2271,115 @@ def split_adjust_dataset(hq_folder, lq_folder):
     print(
         "  7. Split single folder by custom percentages (comma-separated, e.g. 60,20,20)"
     )
+    print("  8. Umzi's DPID Downscaler (pepedpid)")
+    method = input("Enter method number (default 1): ").strip() or "1"
+    if method != "7" and method != "8":
+        # ... existing code for other methods ...
+        return
+    if method == "7":
+        from dataset_forge import dpid_phhofm
 
-    while True:
-        choice = input("Enter your choice for Split/Adjust (number): ").strip()
-        if choice == "1":
-            split_dataset_in_half(hq_folder, lq_folder)
-        elif choice == "2":
-            remove_pairs_by_count_percentage(hq_folder, lq_folder)
-        elif choice == "3":
-            remove_pairs_by_size(hq_folder, lq_folder)
-        elif choice == "4":
-            remove_pairs_by_dimensions(hq_folder, lq_folder)
-        elif choice == "5":
-            remove_pairs_by_file_type(hq_folder, lq_folder)
-        elif choice == "6":
-            break
-        elif choice == "7":
-            # Debug print to show what lq_folder actually is
-            print(f"[DEBUG] lq_folder value: {lq_folder!r}")
-            # Only allow this if LQ folder is blank (single folder mode)
-            if lq_folder is not None and lq_folder.strip() != "":
-                print(
-                    "This option is only available for single-folder splits (leave LQ folder blank)."
+        print("Phhofm's DPID Downscaler selected.")
+        # ... existing code for Phhofm ...
+        return
+    if method == "8":
+        print("Umzi's DPID Downscaler selected.")
+        print("Choose mode:")
+        print("  1. Single folder")
+        print("  2. HQ/LQ paired folders (preserve alignment)")
+        mode = input("Select mode (1=single, 2=pair): ").strip()
+        if mode == "2":
+            hq_folder = input("Enter HQ folder path: ").strip()
+            lq_folder = input("Enter LQ folder path: ").strip()
+            out_hq_folder = input("Enter HQ output folder: ").strip()
+            out_lq_folder = input("Enter LQ output folder: ").strip()
+            scale = input("Enter downscale factor (e.g. 0.75, 0.5, 0.25): ").strip()
+            try:
+                scale = float(scale)
+                if not (0 < scale < 1):
+                    raise ValueError
+            except Exception:
+                print("Invalid scale factor.")
+                return
+            lambd = (
+                input("Enter DPID lambda (0=smooth, 1=detail, default 0.5): ").strip()
+                or "0.5"
+            )
+            try:
+                lambd = float(lambd)
+            except Exception:
+                lambd = 0.5
+            overwrite = (
+                input("Overwrite existing files? (y/n, default n): ").strip().lower()
+                == "y"
+            )
+            processed = skipped = failed = 0
+            try:
+                run_umzi_dpid_hq_lq(
+                    hq_folder,
+                    lq_folder,
+                    out_hq_folder,
+                    out_lq_folder,
+                    [scale],
+                    overwrite=overwrite,
+                    lambd=lambd,
                 )
-            else:
-                print("You selected: Split single folder by custom percentages.")
-                print(
-                    "Enter a comma-separated list of percentages (e.g. 60,20,20) for how to split the folder."
+                processed = len(
+                    [f for f in os.listdir(out_hq_folder) if is_image_file(f)]
                 )
-                split_single_folder_in_sets(hq_folder)
+            except Exception as e:
+                print(f"Error: {e}")
+                failed = 1
+            print(f"\nOperation complete:")
+            print(f"  Processed: {processed} pairs")
+            print(f"  Skipped:   {skipped} pairs")
+            print(f"  Failed:    {failed} pairs")
+            print(f"  Output HQ: {out_hq_folder}")
+            print(f"  Output LQ: {out_lq_folder}")
         else:
-            print("Invalid choice for Split/Adjust. Please try again.")
-        # After an operation, re-display split/adjust menu or break to main?
-        # Current: re-displays split/adjust menu. User must select 6 to go back.
+            input_folder = input("Enter input folder path: ").strip()
+            output_folder = input("Enter output folder path: ").strip()
+            scale = input("Enter downscale factor (e.g. 0.75, 0.5, 0.25): ").strip()
+            try:
+                scale = float(scale)
+                if not (0 < scale < 1):
+                    raise ValueError
+            except Exception:
+                print("Invalid scale factor.")
+                return
+            lambd = (
+                input("Enter DPID lambda (0=smooth, 1=detail, default 0.5): ").strip()
+                or "0.5"
+            )
+            try:
+                lambd = float(lambd)
+            except Exception:
+                lambd = 0.5
+            overwrite = (
+                input("Overwrite existing files? (y/n, default n): ").strip().lower()
+                == "y"
+            )
+            processed = skipped = failed = 0
+            try:
+                run_umzi_dpid_single_folder(
+                    input_folder,
+                    output_folder,
+                    [scale],
+                    overwrite=overwrite,
+                    lambd=lambd,
+                )
+                processed = len(
+                    [f for f in os.listdir(output_folder) if is_image_file(f)]
+                )
+            except Exception as e:
+                print(f"Error: {e}")
+                failed = 1
+            print(f"\nOperation complete:")
+            print(f"  Processed: {processed} images")
+            print(f"  Skipped:   {skipped} images")
+            print(f"  Failed:    {failed} images")
+            print(f"  Output:    {output_folder}")
+        return
 
 
 def optimize_png_menu(hq_folder, lq_folder):
@@ -2482,8 +2562,9 @@ def downsample_images_menu():
     print("  5. OpenCV INTER_CUBIC")
     print("  6. PIL LANCZOS")
     print("  7. Phhofm's DPID Downscaler (pepedpid)")
+    print("  8. Umzi's DPID Downscaler (pepedpid)")
     method = input("Enter method number (default 1): ").strip() or "1"
-    if method != "7":
+    if method != "7" and method != "8":
         # ... existing code for other methods ...
         input_folder = input("Enter path to HR (100%) images folder: ").strip()
         if not os.path.isdir(input_folder):
