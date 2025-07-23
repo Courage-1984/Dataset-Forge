@@ -21,6 +21,7 @@
 - **🔄 Orientation Organization**: Sort by landscape/portrait/square
 - **📏 Size Filtering**: Remove small/invalid image pairs
 - **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
+- **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows.
 
 ## 🔍 Analysis & Validation
 
@@ -193,7 +194,7 @@ Dataset Forge now includes a robust, cross-platform test suite covering all majo
 - Quality Scoring (single and batch, via public API)
 - Sanitize Images (remove metadata, convert, remove alpha, steganography checks)
 - Visual Deduplication (find, move, copy, remove duplicate groups)
-- DPID implementations (BasicSR, OpenMMLab, Phhofm)
+- DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
 - CBIR and deduplication workflows
 - Report generation
 - Audio feedback, memory, parallel, and progress utilities

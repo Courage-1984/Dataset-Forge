@@ -201,4 +201,32 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
+## 4. pepedpid (for Umzi's DPID)
+
+Umzi's DPID (pepedpid) is a new DPID implementation for downscaling images. It requires the `pepedpid` Python package.
+
+**Steps:**
+
+1. Activate your virtual environment:
+
+```bat
+venv312\Scripts\activate
+```
+
+2. Install pepedpid:
+
+```bat
+pip install pepedpid
+```
+
+- `pepedpid` is listed in requirements.txt and will be installed automatically if you use `pip install .` or `pip install -r requirements.txt`.
+- If you get ImportError when using Umzi's DPID, ensure pepedpid is installed in your active environment.
+
+**Troubleshooting:**
+
+- If you get ImportError, check your virtual environment and that pepedpid is installed.
+- For further help, see [troubleshooting.md](troubleshooting.md).
+
+---
+
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).

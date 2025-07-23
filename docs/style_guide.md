@@ -130,8 +130,7 @@ while True:
 
 ## DPID (Degradation) Patterns
 
-- Use centralized DPID utilities: `from dataset_forge.utils.dpid_phhofm import process_image, downscale_folder`
-- Support multiple DPID implementations.
+- Supported DPID implementations: BasicSR, OpenMMLab, Phhofm, and Umzi (pepedpid). All DPID modules are modular, testable, and covered by robust, non-interactive tests using pytest and monkeypatching.
 - Use parallel processing for efficiency.
 
 ## Audio & User Feedback

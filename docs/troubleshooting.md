@@ -182,3 +182,13 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 - Monitor cache hit rates and memory usage
 
 For further help, see [usage.md](usage.md) or contact the project maintainer.
+
+## DPID & pepedpid Issues (NEW July 2025)
+
+**Problem:** ImportError or menu option for Umzi's DPID (pepedpid) not working.
+
+- Ensure pepedpid is installed: `pip install pepedpid`
+- If you get ImportError, check your virtual environment and that pepedpid is installed in the correct environment.
+- If you get errors running DPID workflows, ensure you are using the correct menu option and that your input folders contain valid images.
+- All DPID implementations (including Umzi's) are modular and covered by robust, non-interactive tests. If tests fail, check for monkeypatching or signature mismatches in your test environment.
+- For further help, see [usage.md](usage.md) or contact the project maintainer.

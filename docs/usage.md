@@ -90,7 +90,7 @@ See [Features](features.md#🔊-project-sounds--audio-feedback) for a full table
 
 - Menus now use a robust loop pattern and provide clear error/debug feedback.
 - All user-facing workflows end with a styled prompt to return to the menu.
-- DPID workflows are modular and use the new import structure.
+- DPID workflows are modular and support four methods: BasicSR, OpenMMLab, Phhofm, and Umzi (pepedpid). You can select Umzi's DPID in all DPID menus for both single-folder and HQ/LQ paired workflows.
 - CLI output and prompts are visually consistent and styled.
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
@@ -122,7 +122,7 @@ venv312\Scripts\activate
 venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
 ```
 
-- All major features are covered by robust, non-interactive tests.
+- All major features are covered by robust, non-interactive tests. This includes all DPID implementations (BasicSR, OpenMMLab, Phhofm, and Umzi), which are fully tested using public APIs and monkeypatching for reliability.
 - Tests use monkeypatching and dummy objects for reliability.
 - One test is marked XFAIL (ignore patterns in directory tree); this is expected and not a failure.
 

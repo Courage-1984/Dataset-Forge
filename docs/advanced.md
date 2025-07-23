@@ -635,3 +635,17 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 - The Align Images workflow is modular and robust, supporting both flat and recursive batch processing.
 - Advanced options (e.g., number of SIFT matches, FLANN parameters) are planned for future releases.
 - The implementation is fully testable and covered by non-interactive tests using feature-rich dummy images.
+
+## DPID Modular Integration (July 2025)
+
+Dataset Forge supports multiple DPID (degradation) methods for downscaling images, including:
+
+- BasicSR DPID
+- OpenMMLab DPID
+- Phhofm DPID (pepedpid)
+- **Umzi DPID (pepedpid)**
+
+All DPID implementations are modular, live in `dataset_forge/dpid/`, and are exposed via public APIs for both single-folder and HQ/LQ paired workflows. Umzi's DPID is implemented in `umzi_dpid.py` and can be selected in all DPID menus. The API matches the other DPID modules and uses the same error handling, memory management, and I/O conventions.
+
+**Testing:**
+All DPID implementations (including Umzi's) are covered by robust, non-interactive tests using pytest and monkeypatching. Tests validate that output files are created for both single-folder and HQ/LQ workflows, and that the API is reliable and isolated from external dependencies.

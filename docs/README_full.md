@@ -50,6 +50,7 @@
   - [1. Advanced Metadata Operations (for exiftool integration)](special_installation.md#1-advanced-metadata-operations-for-exiftool-integration)
     - [Method 1: Windows](special_installation.md#method-1-windows)
     - [Method 2: Windows (Chocolatey)](special_installation.md#method-2-windows-chocolatey)
+  - [4. pepedpid (for Umzi's DPID)](special_installation.md#4-pepedpid-for-umzis-dpid)
 - [Usage Guide](usage.md)
   - [🚀 Quick Start](usage.md#-quick-start)
   - [🔊 Project Sounds & Audio Feedback](usage.md#-project-sounds--audio-feedback)
@@ -133,6 +134,7 @@
   - [🗂️ Enhanced Metadata Management (NEW July 2025)](advanced.md#-enhanced-metadata-management-new-july-2025)
   - [🧪 Advanced Test Design Patterns (July 2025)](advanced.md#-advanced-test-design-patterns-july-2025)
   - [Align Images: Advanced Options (Planned)](advanced.md#align-images-advanced-options-planned)
+  - [DPID Modular Integration (July 2025)](advanced.md#dpid-modular-integration-july-2025)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
@@ -159,6 +161,7 @@
     - [install.py](troubleshooting.md#installpy)
     - [print_zsteg_env.py](troubleshooting.md#printzstegenvpy)
   - [Enhanced Caching System Issues (NEW July 2025)](troubleshooting.md#enhanced-caching-system-issues-new-july-2025)
+  - [DPID & pepedpid Issues (NEW July 2025)](troubleshooting.md#dpid--pepedpid-issues-new-july-2025)
 - [Dataset Forge Style Guide](style_guide.md)
   - [General Principles](style_guide.md#general-principles)
   - [Project Architecture](style_guide.md#project-architecture)
@@ -208,6 +211,7 @@
       - [**Dependencies**](changelog.md#dependencies)
     - [🔧 Technical Improvements](changelog.md#-technical-improvements)
     - [📚 Documentation](changelog.md#-documentation)
+    - [🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)](changelog.md#-dpid-umzis-dpid-pepedpid-integration-july-2025)
   - [[July 2025]](changelog.md#july-2025)
 - [Contributing](contributing.md)
   - [How to Contribute](contributing.md#how-to-contribute)
@@ -256,6 +260,7 @@
 - **🔄 Orientation Organization**: Sort by landscape/portrait/square
 - **📏 Size Filtering**: Remove small/invalid image pairs
 - **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
+- **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows.
 
 ## 🔍 Analysis & Validation
 
@@ -428,7 +433,7 @@ Dataset Forge now includes a robust, cross-platform test suite covering all majo
 - Quality Scoring (single and batch, via public API)
 - Sanitize Images (remove metadata, convert, remove alpha, steganography checks)
 - Visual Deduplication (find, move, copy, remove duplicate groups)
-- DPID implementations (BasicSR, OpenMMLab, Phhofm)
+- DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
 - CBIR and deduplication workflows
 - Report generation
 - Audio feedback, memory, parallel, and progress utilities
@@ -768,6 +773,34 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
+## 4. pepedpid (for Umzi's DPID)
+
+Umzi's DPID (pepedpid) is a new DPID implementation for downscaling images. It requires the `pepedpid` Python package.
+
+**Steps:**
+
+1. Activate your virtual environment:
+
+```bat
+venv312\Scripts\activate
+```
+
+2. Install pepedpid:
+
+```bat
+pip install pepedpid
+```
+
+- `pepedpid` is listed in requirements.txt and will be installed automatically if you use `pip install .` or `pip install -r requirements.txt`.
+- If you get ImportError when using Umzi's DPID, ensure pepedpid is installed in your active environment.
+
+**Troubleshooting:**
+
+- If you get ImportError, check your virtual environment and that pepedpid is installed.
+- For further help, see [troubleshooting.md](troubleshooting.md).
+
+---
+
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
 
 ---
@@ -866,7 +899,7 @@ See [Features](features.md#🔊-project-sounds--audio-feedback) for a full table
 
 - Menus now use a robust loop pattern and provide clear error/debug feedback.
 - All user-facing workflows end with a styled prompt to return to the menu.
-- DPID workflows are modular and use the new import structure.
+- DPID workflows are modular and support four methods: BasicSR, OpenMMLab, Phhofm, and Umzi (pepedpid). You can select Umzi's DPID in all DPID menus for both single-folder and HQ/LQ paired workflows.
 - CLI output and prompts are visually consistent and styled.
 
 For troubleshooting and advanced usage, see [troubleshooting.md](troubleshooting.md) and [advanced.md](advanced.md).
@@ -898,7 +931,7 @@ venv312\Scripts\activate
 venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
 ```
 
-- All major features are covered by robust, non-interactive tests.
+- All major features are covered by robust, non-interactive tests. This includes all DPID implementations (BasicSR, OpenMMLab, Phhofm, and Umzi), which are fully tested using public APIs and monkeypatching for reliability.
 - Tests use monkeypatching and dummy objects for reliability.
 - One test is marked XFAIL (ignore patterns in directory tree); this is expected and not a failure.
 
@@ -1760,6 +1793,20 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 - Advanced options (e.g., number of SIFT matches, FLANN parameters) are planned for future releases.
 - The implementation is fully testable and covered by non-interactive tests using feature-rich dummy images.
 
+## DPID Modular Integration (July 2025)
+
+Dataset Forge supports multiple DPID (degradation) methods for downscaling images, including:
+
+- BasicSR DPID
+- OpenMMLab DPID
+- Phhofm DPID (pepedpid)
+- **Umzi DPID (pepedpid)**
+
+All DPID implementations are modular, live in `dataset_forge/dpid/`, and are exposed via public APIs for both single-folder and HQ/LQ paired workflows. Umzi's DPID is implemented in `umzi_dpid.py` and can be selected in all DPID menus. The API matches the other DPID modules and uses the same error handling, memory management, and I/O conventions.
+
+**Testing:**
+All DPID implementations (including Umzi's) are covered by robust, non-interactive tests using pytest and monkeypatching. Tests validate that output files are created for both single-folder and HQ/LQ workflows, and that the API is reliable and isolated from external dependencies.
+
 ---
 
 
@@ -1778,7 +1825,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
   - **align_images_actions.py**: Batch projective alignment of images using SIFT+FLANN (called from Dataset Management menu)
   - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
+- **dataset_forge/dpid/**: Multiple DPID (degradation) implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
 - **assets/**: Any asset files required
@@ -1823,6 +1870,8 @@ flowchart TD
     C8 --> D
     C9 --> G
     D --> E["DPID Implementations (dpid/)"]
+    E --> F
+    E --> E1["Umzi DPID (pepedpid)"]
     D --> F["External Libraries"]
     E --> F
     subgraph "Performance Optimization Utils"
@@ -1954,6 +2003,8 @@ For coding standards and best practices, see [style_guide.md](style_guide.md).
 - **Pipeline Compilation:** JIT compilation for performance-critical code paths (see utils/pipeline_compilation.py).
 - **Integration:** All features follow modular design, robust menu loop, lazy import, memory management, and parallel processing patterns.
 - **Testing:** Comprehensive test suite in tests/test_utils/test_performance_optimization.py covering all optimization features, with robust error handling and edge case testing.
+
+All DPID implementations are modular and testable, including Umzi's DPID (pepedpid), which is fully integrated and covered by robust, non-interactive tests.
 
 ---
 
@@ -2144,6 +2195,16 @@ See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md
 
 For further help, see [usage.md](usage.md) or contact the project maintainer.
 
+## DPID & pepedpid Issues (NEW July 2025)
+
+**Problem:** ImportError or menu option for Umzi's DPID (pepedpid) not working.
+
+- Ensure pepedpid is installed: `pip install pepedpid`
+- If you get ImportError, check your virtual environment and that pepedpid is installed in the correct environment.
+- If you get errors running DPID workflows, ensure you are using the correct menu option and that your input folders contain valid images.
+- All DPID implementations (including Umzi's) are modular and covered by robust, non-interactive tests. If tests fail, check for monkeypatching or signature mismatches in your test environment.
+- For further help, see [usage.md](usage.md) or contact the project maintainer.
+
 ---
 
 
@@ -2280,8 +2341,7 @@ while True:
 
 ## DPID (Degradation) Patterns
 
-- Use centralized DPID utilities: `from dataset_forge.utils.dpid_phhofm import process_image, downscale_folder`
-- Support multiple DPID implementations.
+- Supported DPID implementations: BasicSR, OpenMMLab, Phhofm, and Umzi (pepedpid). All DPID modules are modular, testable, and covered by robust, non-interactive tests using pytest and monkeypatching.
 - Use parallel processing for efficiency.
 
 ## Audio & User Feedback
@@ -2613,6 +2673,13 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
   - Documented in all relevant docs and .cursorrules.
 - Added '🧭 Align Images (Batch Projective Alignment)' feature to Dataset Management menu. Allows batch alignment of images from two folders (flat or recursive) using SIFT+FLANN projective transformation. Robust error handling, modular implementation, and public API.
 - Added robust, non-interactive test for Align Images using feature-rich dummy images to ensure SIFT keypoint detection and alignment.
+
+### 🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)
+
+- **New DPID implementation:** Added Umzi's DPID (pepedpid) as a modular DPID method in `dataset_forge/dpid/umzi_dpid.py`.
+- **Menu integration:** Umzi's DPID is now selectable in all DPID menus (single-folder and HQ/LQ workflows).
+- **Testing:** Comprehensive, non-interactive tests for Umzi's DPID (single-folder and HQ/LQ) using pytest and monkeypatching.
+- **Documentation:** Updated all relevant docs and .cursorrules to reflect the new DPID method, its usage, and its test coverage.
 
 ## [July 2025]
 

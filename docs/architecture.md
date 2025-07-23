@@ -12,7 +12,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
   - **align_images_actions.py**: Batch projective alignment of images using SIFT+FLANN (called from Dataset Management menu)
   - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dataset_forge/dpid/**: Multiple DPID (degradation) implementations
+- **dataset_forge/dpid/**: Multiple DPID (degradation) implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
 - **assets/**: Any asset files required
@@ -57,6 +57,8 @@ flowchart TD
     C8 --> D
     C9 --> G
     D --> E["DPID Implementations (dpid/)"]
+    E --> F
+    E --> E1["Umzi DPID (pepedpid)"]
     D --> F["External Libraries"]
     E --> F
     subgraph "Performance Optimization Utils"
@@ -188,3 +190,5 @@ For coding standards and best practices, see [style_guide.md](style_guide.md).
 - **Pipeline Compilation:** JIT compilation for performance-critical code paths (see utils/pipeline_compilation.py).
 - **Integration:** All features follow modular design, robust menu loop, lazy import, memory management, and parallel processing patterns.
 - **Testing:** Comprehensive test suite in tests/test_utils/test_performance_optimization.py covering all optimization features, with robust error handling and edge case testing.
+
+All DPID implementations are modular and testable, including Umzi's DPID (pepedpid), which is fully integrated and covered by robust, non-interactive tests.
