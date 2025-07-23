@@ -149,7 +149,7 @@ Suggestions:
 ## 💜 Credits
 
 - Thanks [Kim2091](https://github.com/Kim2091)❤️ for [helpful-scripts](https://github.com/Kim2091/helpful-scripts)
-- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) & [Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing)
+- Thanks [umzi2](https://github.com/umzi2)❤️ for [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer) & [PepeDP](https://github.com/umzi2/PepeDP)
 - Thanks [the-database](https://github.com/the-database)❤️ for [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
 - Thanks [Phhofm](https://github.com/Phhofm)❤️ for [sisr](https://github.com/Phhofm/sisr)
 
@@ -250,3 +250,16 @@ Dataset Forge includes a comprehensive static analysis tool for maintainers and 
   - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
 
 See [docs/usage.md](docs/usage.md) and [docs/features.md](docs/features.md) for details.
+
+---
+
+## 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
+
+Dataset Forge now features robust, testable integration with [PepeDP](https://github.com/umzi2/PepeDP) for Umzi's Dataset_Preprocessing workflows:
+
+- **Best Tile Extraction**
+- **Video Frame Extraction (Embedding Deduplication)**
+- **Duplicate Image Detection and Removal**
+- **Threshold-Based Image Filtering (IQA)**
+
+All workflows are modular, testable, and use the latest PepeDP API. See [Features](docs/features.md#🧩-umzis-dataset_preprocessing-pepedp-powered-july-2025) and [Usage Guide](docs/usage.md#using-umzis-datasetpreprocessing-pepedp-powered) for details and examples.

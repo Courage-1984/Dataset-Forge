@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+### 🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)
+
+- Replaced all legacy Umzi Dataset_Preprocessing logic with thin, testable wrappers around PepeDP.
+- All four main workflows (Best Tile Extraction, Video Frame Extraction, Duplicate Detection, IQA Filtering) now use the latest PepeDP API.
+- All workflows are robust, modular, and fully covered by non-interactive, public API tests.
+- Updated all relevant documentation, style guide, and .mdc rules.
+
 ### 🚀 Performance Optimization Suite (NEW July 2025)
 
 #### **GPU Acceleration**

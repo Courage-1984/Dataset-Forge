@@ -303,3 +303,9 @@ For questions, see [Contributing](contributing.md) or ask the project maintainer
 - Mark expected failures (XFAIL) and document them in the test and docs.
 
 See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanced.md#advanced-test-design-patterns).
+
+## Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
+
+- All menu actions must be thin wrappers around PepeDP, with all user inputs overridable for tests.
+- All workflows must provide public, non-interactive APIs for robust, automated testing.
+- All new features must be documented in all relevant docs and README_full.md.

@@ -159,17 +159,16 @@ Dataset Forge includes a static analysis tool for maintainers and contributors:
 
 Review the actionable report and detailed results before submitting code or documentation changes.
 
-## Using Umzi's Dataset_Preprocessing
+## Using Umzi's Dataset_Preprocessing (PepeDP-powered)
 
-You can access Umzi's Dataset_Preprocessing from the main menu (option 9: 🧩 Umzi's Dataset_Preprocessing). This menu provides the following workflows:
+You can access Umzi's Dataset_Preprocessing from the main menu. The following workflows are available:
 
-- **Best Tile Extraction**: Extracts the most informative tile(s) from images in a folder. Prompts for input/output folders, tile size, complexity function, and other options.
-- **Video Frame Extraction**: Extracts frames from a video based on embedding distance. Prompts for video path, output folder, model, and threshold.
-- **Image Deduplication**: Create embeddings for all images in a folder, or find duplicate clusters from embeddings. Prompts for folders, model, and thresholds.
-- **IQA Filtering**: Filter or sort images by IQA score using various algorithms. Prompts for input folder, algorithm, and thresholds.
-- **Embedding Extraction**: Extract and print the embedding for a single image.
+- **Best Tile Extraction**: Select input/output folders, tile size, complexity function (Laplacian/IC9600), and options. Extracts the best tiles using PepeDP's BestTile.
+- **Video Frame Extraction (Embedding Deduplication)**: Select video, output folder, embedding model, and threshold. Extracts diverse frames using PepeDP's VideoToFrame.
+- **Duplicate Image Detection and Removal**: Select input/output folders, embedding model, and threshold. Finds and moves duplicates using PepeDP's create_embedd, filtered_pairs, and move_duplicate_files.
+- **Threshold-Based Image Filtering (IQA)**: Select input/output folders, IQA model, batch size, and thresholds. Filters images using PepeDP's ThresholdAlg.
 
-All options are fully interactive, use Dataset Forge's input and printing utilities, and are covered by robust unit and CLI tests. See the main menu for access.
+All workflows are fully testable: you can call the action functions with all arguments provided to bypass prompts for automated testing.
 
 ### 🧹 Sanitize Images (NEW July 2025)
 

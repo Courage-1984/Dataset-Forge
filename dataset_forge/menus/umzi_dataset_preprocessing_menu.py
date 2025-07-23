@@ -5,7 +5,6 @@ from dataset_forge.utils.printing import print_header
 
 
 def umzi_dataset_preprocessing_menu():
-    print_header("Umzi's Dataset_Preprocessing", color=Mocha.lavender)
     options = {
         "1": (
             "🟪 Best Tile Extraction",
@@ -15,45 +14,31 @@ def umzi_dataset_preprocessing_menu():
             ),
         ),
         "2": (
-            "🟦 Video Frame Extraction",
+            "🟦 Video Frame Extraction (Embedding Deduplication)",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "video_frame_extraction_action",
             ),
         ),
         "3": (
-            "🟩 Image Deduplication (create embeddings)",
+            "🟧 Duplicate Image Detection and Removal",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
-                "image_deduplication_create_embeddings_action",
+                "duplicate_image_detection_action",
             ),
         ),
         "4": (
-            "🟧 Image Deduplication (find duplicates)",
-            lazy_action(
-                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
-                "image_deduplication_find_duplicates_action",
-            ),
-        ),
-        "5": (
-            "🟫 IQA Filtering",
+            "🟫 Threshold-Based Image Filtering (IQA)",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "iqa_filtering_action",
-            ),
-        ),
-        "6": (
-            "🟨 Embedding Extraction (single image)",
-            lazy_action(
-                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
-                "embedding_extraction_action",
             ),
         ),
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
         key = show_menu(
-            "Umzi's Dataset_Preprocessing Menu",
+            "Umzi's Dataset_Preprocessing Menu (pepedp)",
             options,
             header_color=Mocha.lavender,
             char="-",

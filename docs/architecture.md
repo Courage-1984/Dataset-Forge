@@ -138,13 +138,13 @@ flowchart TD
 - Tests are robust, cross-platform, and non-interactive.
 - Only one test is marked XFAIL (ignore patterns in directory tree), which is expected and documented.
 
-### Umzi's Dataset_Preprocessing Integration
+### Umzi's Dataset_Preprocessing Integration (PepeDP-powered, July 2025)
 
-The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge:
+The Umzi Dataset_Preprocessing workflows are now fully modularized within Dataset Forge and powered by PepeDP:
 
-- Business logic is in `actions/umzi_dataset_preprocessing_actions.py`.
-- UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`.
-- Uses lazy imports, robust menu loop, and centralized utilities.
+- Business logic is in `actions/umzi_dataset_preprocessing_actions.py` as thin wrappers around PepeDP classes/functions. All user inputs are overridable via function arguments for robust, non-interactive testing.
+- UI/menu is in `menus/umzi_dataset_preprocessing_menu.py`, using lazy imports, robust menu loop, and centralized utilities.
+- All four main workflows (Best Tile Extraction, Video Frame Extraction, Duplicate Detection, IQA Filtering) are robustly tested with public, non-interactive APIs.
 - See `docs/advanced.md` for a detailed discussion of the porting and modularization process.
 
 - **Enhanced Metadata Management:**

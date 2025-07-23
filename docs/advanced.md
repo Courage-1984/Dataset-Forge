@@ -353,15 +353,15 @@ def is_image_file(filename):
 
 See `docs/features.md` for user-facing information and `README_full.md` for a comprehensive overview.
 
-## Advanced: Modular Integration of Umzi's Dataset_Preprocessing
+## Advanced: Modular Integration of Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
 
-The original Dataset_Preprocessing_consolidated_script.py has been fully ported into Dataset Forge as a modular, maintainable set of actions and menu files:
+The original Dataset_Preprocessing_consolidated_script.py has been fully ported into Dataset Forge as a modular, maintainable set of actions and menu files, now powered by PepeDP:
 
-- All business logic is in `dataset_forge/actions/umzi_dataset_preprocessing_actions.py`, following project conventions for memory management, progress tracking, and error handling.
+- All business logic is in `dataset_forge/actions/umzi_dataset_preprocessing_actions.py` as thin wrappers around PepeDP classes/functions. All user inputs are overridable via function arguments for robust, non-interactive testing.
 - The menu interface is in `dataset_forge/menus/umzi_dataset_preprocessing_menu.py`, using lazy imports and the robust menu loop pattern.
-- All workflows are testable, with comprehensive unit and CLI integration tests.
+- All four main workflows (Best Tile Extraction, Video Frame Extraction, Duplicate Detection, IQA Filtering) are testable, with comprehensive unit and CLI integration tests. All tests call the action functions with arguments to bypass prompts.
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
-- This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability and testability.
+- This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability, testability, and robust documentation.
 
 ## Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.
 

@@ -1,6 +1,5 @@
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
-
 # Dataset Forge Full Documentation
 
 ---
@@ -97,13 +96,13 @@
 - [Validate and repair cache integrity](advanced.md#validate-and-repair-cache-integrity)
 - [Warmup frequently used data](advanced.md#warmup-frequently-used-data)
 - [Export statistics](advanced.md#export-statistics)
-    - [**Advanced Features**](advanced.md#advanced-features)
-    - [**Integration with Existing Functions**](advanced.md#integration-with-existing-functions)
+  - [**Advanced Features**](advanced.md#advanced-features)
+  - [**Integration with Existing Functions**](advanced.md#integration-with-existing-functions)
 - [Image operations with TTL-based caching](advanced.md#image-operations-with-ttl-based-caching)
 - [Model loading with specialized caching](advanced.md#model-loading-with-specialized-caching)
 - [File operations with in-memory caching](advanced.md#file-operations-with-in-memory-caching)
-    - [**Best Practices**](advanced.md#best-practices)
-    - [**Troubleshooting**](advanced.md#troubleshooting)
+  - [**Best Practices**](advanced.md#best-practices)
+  - [**Troubleshooting**](advanced.md#troubleshooting)
   - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing)
   - [Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.](advanced.md#advanced-performance-optimization-suite-new-july-2025t-forge-implements-a-comprehensive-performance-optimization-suite-designed-for-maximum-efficiency-in-image-dataset-processing-this-suite-provides-gpu-acceleration-distributed-processing-intelligent-sample-prioritization-and-pipeline-compilation-capabilities)
     - [**Core Architecture**](advanced.md#core-architecture)
@@ -111,25 +110,25 @@
 - [GPU-accelerated image transformations](advanced.md#gpu-accelerated-image-transformations)
 - [Batch processing](advanced.md#batch-processing)
 - [GPU image analysis](advanced.md#gpu-image-analysis)
-    - [**Distributed Processing (dataset_forge/utils/distributed_processing.py)**](advanced.md#distributed-processing-datasetforgeutilsdistributedprocessingpy)
+  - [**Distributed Processing (dataset_forge/utils/distributed_processing.py)**](advanced.md#distributed-processing-datasetforgeutilsdistributedprocessingpy)
 - [Start distributed processing](advanced.md#start-distributed-processing)
 - [Process items with distributed computing](advanced.md#process-items-with-distributed-computing)
 - [Multi-GPU processing](advanced.md#multi-gpu-processing)
-    - [**Sample Prioritization (dataset_forge/utils/sample_prioritization.py)**](advanced.md#sample-prioritization-datasetforgeutilssampleprioritizationpy)
+  - [**Sample Prioritization (dataset_forge/utils/sample_prioritization.py)**](advanced.md#sample-prioritization-datasetforgeutilssampleprioritizationpy)
 - [Prioritize samples by quality](advanced.md#prioritize-samples-by-quality)
 - [Analyze image quality](advanced.md#analyze-image-quality)
-    - [**Pipeline Compilation (dataset_forge/utils/pipeline_compilation.py)**](advanced.md#pipeline-compilation-datasetforgeutilspipelinecompilationpy)
+  - [**Pipeline Compilation (dataset_forge/utils/pipeline_compilation.py)**](advanced.md#pipeline-compilation-datasetforgeutilspipelinecompilationpy)
 - [Manual compilation](advanced.md#manual-compilation)
 - [Auto-compilation decorator](advanced.md#auto-compilation-decorator)
-    - [**Performance Optimization Menu**](advanced.md#performance-optimization-menu)
-    - [**Integration Patterns**](advanced.md#integration-patterns)
+  - [**Performance Optimization Menu**](advanced.md#performance-optimization-menu)
+  - [**Integration Patterns**](advanced.md#integration-patterns)
 - [End-to-end optimized pipeline](advanced.md#end-to-end-optimized-pipeline)
 - [1. Prioritize samples by quality](advanced.md#1-prioritize-samples-by-quality)
 - [2. Process with GPU acceleration](advanced.md#2-process-with-gpu-acceleration)
 - [3. Compile the processing function](advanced.md#3-compile-the-processing-function)
 - [4. Distribute processing across multiple machines/GPUs](advanced.md#4-distribute-processing-across-multiple-machinesgpus)
-    - [**Best Practices**](advanced.md#best-practices)
-    - [**Troubleshooting**](advanced.md#troubleshooting)
+  - [**Best Practices**](advanced.md#best-practices)
+  - [**Troubleshooting**](advanced.md#troubleshooting)
   - [Interactive Workflow Prompt Handling (July 2025)](advanced.md#interactive-workflow-prompt-handling-july-2025)
   - [🗂️ Enhanced Metadata Management (NEW July 2025)](advanced.md#-enhanced-metadata-management-new-july-2025)
   - [🧪 Advanced Test Design Patterns (July 2025)](advanced.md#-advanced-test-design-patterns-july-2025)
@@ -219,25 +218,22 @@
   - [Doc Maintenance](contributing.md#doc-maintenance)
   - [Static Analysis & Code Quality (NEW)](contributing.md#static-analysis--code-quality-new)
 - [Frequently Asked Questions (FAQ)](faq.md)
-    - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
-    - [What platforms are supported?](faq.md#what-platforms-are-supported)
-    - [What Python version is required?](faq.md#what-python-version-is-required)
-    - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
-    - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
-    - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
-    - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
-    - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
-    - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
-    - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
-    - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
+  - [What is Dataset Forge?](faq.md#what-is-dataset-forge)
+  - [What platforms are supported?](faq.md#what-platforms-are-supported)
+  - [What Python version is required?](faq.md#what-python-version-is-required)
+  - [How do I install Dataset Forge and its dependencies?](faq.md#how-do-i-install-dataset-forge-and-its-dependencies)
+  - [Why do I need to install VapourSynth before getnative?](faq.md#why-do-i-need-to-install-vapoursynth-before-getnative)
+  - [How do I fix python-magic errors on Windows?](faq.md#how-do-i-fix-python-magic-errors-on-windows)
+  - [How do I run the test suite?](faq.md#how-do-i-run-the-test-suite)
+  - [How do I use the monitoring and analytics features?](faq.md#how-do-i-use-the-monitoring-and-analytics-features)
+  - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
+  - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
+  - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
 - [License](license.md)
-
 
 ---
 
-
 # Features
-
 
 # Features (tl;dr)
 
@@ -568,9 +564,7 @@ These sounds help you know instantly when an operation finishes, fails, or the a
 
 ---
 
-
 # Special Installation
-
 
 # Special Installation Instructions
 
@@ -737,7 +731,6 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
-
 ---
 
 ## 1. Advanced Metadata Operations (for exiftool integration)
@@ -759,17 +752,18 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 ### Method 2: Windows (Chocolatey)
 
 1. Download ExifTool.exe:
+
    ```sh
    choco install exiftool -y
    ```
 
 2. This will install `exiftool.exe` to:
+
    ```sh
    C:\ProgramData\chocolatey\lib\exiftool\tools\
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
-
 
 ---
 
@@ -805,9 +799,7 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ---
 
-
 # Usage
-
 
 # Usage Guide
 
@@ -1153,9 +1145,7 @@ A comprehensive static analysis tool for maintainers and contributors.
 
 ---
 
-
 # Advanced
-
 
 > **Note:** Architecture diagrams in this documentation use Mermaid code blocks. No Python package is required; diagrams are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
 >
@@ -1809,9 +1799,7 @@ All DPID implementations (including Umzi's) are covered by robust, non-interacti
 
 ---
 
-
 # Architecture
-
 
 # Project Architecture
 
@@ -2008,9 +1996,7 @@ All DPID implementations are modular and testable, including Umzi's DPID (pepedp
 
 ---
 
-
 # Troubleshooting
-
 
 # Troubleshooting
 
@@ -2207,9 +2193,7 @@ For further help, see [usage.md](usage.md) or contact the project maintainer.
 
 ---
 
-
 # Style Guide
-
 
 # Dataset Forge Style Guide
 
@@ -2517,9 +2501,7 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 ---
 
-
 # Changelog
-
 
 [//]: # "Navigation"
 
@@ -2710,12 +2692,9 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 This file will track major changes and releases in the future.
 
-
 ---
 
-
 # Contributing
-
 
 [ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
@@ -2779,12 +2758,9 @@ Thank you for your interest in contributing to **Dataset Forge**! We welcome con
 
 For questions, open an issue or contact the project maintainer.
 
-
 ---
 
-
 # Faq
-
 
 # Frequently Asked Questions (FAQ)
 
@@ -2847,12 +2823,23 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 ---
 
-
 # License
-
 
 # License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See the [LICENSE](../LICENSE) file for details.
+
+---
+
+## 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
+
+Dataset Forge now features robust, testable integration with [PepeDP](https://github.com/umzi2/PepeDP) for Umzi's Dataset_Preprocessing workflows:
+
+- **Best Tile Extraction**
+- **Video Frame Extraction (Embedding Deduplication)**
+- **Duplicate Image Detection and Removal**
+- **Threshold-Based Image Filtering (IQA)**
+
+All workflows are modular, testable, and use the latest PepeDP API. See [Features](features.md#🧩-umzis-dataset_preprocessing-pepedp-powered-july-2025) and [Usage Guide](usage.md#using-umzis-datasetpreprocessing-pepedp-powered) for details and examples.
 
 ---
