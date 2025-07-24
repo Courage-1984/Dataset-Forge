@@ -14,35 +14,36 @@
 
 ---
 
-## What is Dataset Forge?
+## 🧰 What is Dataset Forge?
 
 **Dataset Forge** is a Python command-line tool for managing image datasets used in machine learning, espescially for SISR. It helps researchers and data scientists:
 
 - Clean and organize image datasets (especially high/low quality pairs for super-resolution)
 - Analyze dataset quality and generate reports
 - Process, augment, and transform images
-- Remove duplicates and validate data
-- Extract, view, edit, filter, and anonymize image metadata (EXIF, IPTC, XMP) with the Enhanced Metadata Management menu ([see docs](docs/features.md#🗂️-enhanced-metadata-management-new-july-2025)).
-- Align images from two folders (flat or recursive) using projective transformation (SIFT+FLANN) with the '🧭 Align Images' menu option ([see docs](docs/features.md#🧭-align-images-batch-projective-alignment)).
 
-It's designed to streamline the tedious work of preparing image datasets for training ML models, with an intuitive interface and robust processing capabilities. Please see [Features](docs/features.md).
+It's designed to streamline the work of preparing image datasets for training ML models (with a focus on SISR), with an intuitive interface and robust processing capabilities.
+
+Please see [Features](docs/features.md).
 
 ---
 
 ## 📖 Documentation Links
 
-- [Features](docs/features.md)
-- [Utility Scripts (tools/)](docs/features.md#️-utility-scripts-tools)
+- [Full ToC](docs/toc.md)
 - [Special Installation Instructions](docs/special_installation.md)
+- [Utility Scripts (tools/)](docs/features.md#️-utility-scripts-tools)
+- [Features](docs/features.md)
 - [Usage Guide](docs/usage.md)
 - [Advanced Features & Configuration](docs/advanced.md)
 - [Project Architecture](docs/architecture.md)
 - [Troubleshooting](docs/troubleshooting.md)
-- [Contributing](docs/contributing.md)
 - [Style Guide](docs/style_guide.md)
+- [Contributing](docs/contributing.md)
 - [FAQ](docs/faq.md)
 - [Changelog](docs/changelog.md)
 - [License](docs/license.md)
+- [Full README](docs/README_full.md)
 
 ---
 
@@ -107,11 +108,12 @@ This section collects all future feature/functionality ideas, goals, and impleme
 - [ ] **Debug Mode**: I want to add a _Debug Mode_ to my project, which when used, activates the showing of more verbose output and debug output/print
 - [ ] **tl;dr**: Create a '# Features (tl;dr)' section in ./docs/features.md
 - [ ] **_Packaging_**: "Compile Dataset-Forge" AND/OR "Create docker file/container"
+- [ ] **Automated Documentation**
 - [ ] **Augmentation**: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
 - [x] **Dataset Health Scoring**: Add a "Dataset Health Scoring" workflow and menu option
 - [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
 - [ ] **Phhofm's sisr**: Investigate Phhofm's [sisr](https://github.com/Phhofm/sisr) for stuff i can add to DF
-- [ ] **the-database's img-ab**: Fork and improve.
+- [x] **the-database's img-ab**: Fork and improve.
 - [ ] **Links .json's**: Further customize, add metadata, description, etc/
 - [ ] **Advanced Filtering / AI-Powered Features**:
 
@@ -125,7 +127,6 @@ Style Transfer: Apply artistic styles to datasets
 Content-Aware Cropping: Intelligent image cropping
 
 ```
-
 - [ ] **Advanced Data Augmentation**:
 
 ```
@@ -139,10 +140,8 @@ Suggestions:
 - GAN-based Augmentations: For advanced users, integrate with a pre-trained StyleGAN to generate synthetic data variations.
 
 ```
-
-- [ ] **Example**: Improve error reporting for Example workflows
-
-<!-- Add your TODOs and feature ideas below -->
+- [ ] **Onboarding**: Add 'onboarding' doc/flow
+- [ ] **Build**: Release a stable build at some point
 
 ---
 
@@ -155,7 +154,7 @@ Suggestions:
 
 ---
 
-## License
+## 🪪 License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](LICENSE) for details.
 
@@ -163,37 +162,17 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
 
 <!-- Badges -->
 <p align="center">
-  <a href="https://github.com/Courage-1984/Dataset-Forge/actions"><img src="https://img.shields.io/github/workflow/status/Courage-1984/Dataset-Forge/CI?label=build" alt="Build Status"></a>
   <a href="https://github.com/Courage-1984/Dataset-Forge/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-CC--BY--SA--4.0-blue" alt="License"></a>
   <a href="https://img.shields.io/badge/python-3.12%2B-blue.svg"><img src="https://img.shields.io/badge/python-3.12%2B-blue.svg" alt="Python Version"></a>
   <a href="https://img.shields.io/github/issues/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/issues/Courage-1984/Dataset-Forge" alt="Issues"></a>
   <a href="https://img.shields.io/github/stars/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/stars/Courage-1984/Dataset-Forge" alt="Stars"></a>
   <a href="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge" alt="Last Commit"></a>
+    <a href="https://github.com/Courage-1984/Dataset-Forge/actions"><img src="https://img.shields.io/github/workflow/status/Courage-1984/Dataset-Forge/CI?label=build" alt="Build Status"></a>
 </p>
 
-# VERBOSE:
+---
 
-## 🧪 Comprehensive Test Suite
-
-Dataset Forge now includes a robust, cross-platform test suite covering all major features:
-
-- Enhanced caching system (in-memory, disk, model, smart caching)
-- DPID implementations (BasicSR, OpenMMLab, Phhofm)
-- CBIR and deduplication workflows
-- Report generation
-- Audio feedback, memory, parallel, and progress utilities
-- Session state, config, and error handling
-
-**Run all tests:**
-
-```sh
-venv312\Scripts\activate
-venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
-```
-
-All new features and bugfixes must include appropriate tests. See [docs/features.md](docs/features.md) and [docs/usage.md](docs/usage.md) for details.
-
-## Project Architecture
+## Project Architecture (outdated/WIP flowchart)
 
 A high-level overview of Dataset Forge's modular architecture:
 
@@ -224,42 +203,4 @@ flowchart TD
 
 ---
 
-## 🧑‍💻 Static Analysis & Code Quality
-
-Dataset Forge includes a comprehensive static analysis tool for maintainers and contributors:
-
-- **Location:** `tools/find_code_issues/find_code_issues.py`
-- **Checks:**
-  - Unused (dead) code, functions, classes, and methods
-  - Untested code (missing test coverage)
-  - Functions/classes defined but never called
-  - Test/code mapping (tests without code, code without tests)
-  - Missing docstrings in public functions/classes/methods
-  - Unused imports/variables, and more
-- **How to run:**
-  ```sh
-  python tools/find_code_issues/find_code_issues.py [options]
-  # Run with no options to perform all checks
-  ```
-- **Output:**
-  - Overwrites files in `tools/find_code_issues/` on each run:
-    - `find_code_issues.log` (raw output)
-    - `find_code_issues_report.txt` (actionable summary)
-    - `find_code_issues_view.txt` (detailed results)
-- **Requirements:**
-  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-
-See [docs/usage.md](docs/usage.md) and [docs/features.md](docs/features.md) for details.
-
----
-
-## 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
-
-Dataset Forge now features robust, testable integration with [PepeDP](https://github.com/umzi2/PepeDP) for Umzi's Dataset_Preprocessing workflows:
-
-- **Best Tile Extraction**
-- **Video Frame Extraction (Embedding Deduplication)**
-- **Duplicate Image Detection and Removal**
-- **Threshold-Based Image Filtering (IQA)**
-
-All workflows are modular, testable, and use the latest PepeDP API. See [Features](docs/features.md#🧩-umzis-dataset_preprocessing-pepedp-powered-july-2025) and [Usage Guide](docs/usage.md#using-umzis-datasetpreprocessing-pepedp-powered) for details and examples.
+#### *VERBOSE*:

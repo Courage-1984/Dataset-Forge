@@ -9,7 +9,6 @@ from dataset_forge.actions.batch_rename_actions import (
     batch_rename_single_folder,
     batch_rename_hq_lq_folders,
 )
-from dataset_forge.actions.frames_actions import extract_frames_menu
 from dataset_forge.actions.orientation_organizer_actions import (
     organize_images_by_orientation,
     organize_hq_lq_by_orientation,
@@ -23,7 +22,6 @@ from dataset_forge.actions.operations_actions import (
 )
 import os
 from dataset_forge.utils.progress_utils import tqdm
-from dataset_forge.actions.ic9600_tiling_actions import run_ic9600_tiling
 from dataset_forge.utils.printing import (
     print_header,
     print_section,
@@ -185,76 +183,6 @@ def create_multiscale_dataset(*args, **kwargs):
     input()
 
 
-def image_tiling():
-    print_header("🧩 Image Tiling (IC9600)")
-    mode = input("Select mode: [1] HQ/LQ paired folders, [2] Single folder: ").strip()
-    try:
-        if mode == "1":
-            hq_folder = input("Enter HQ folder path: ").strip()
-            lq_folder = input("Enter LQ folder path: ").strip()
-            out_hq_folder = input("Enter output HQ tiles folder: ").strip()
-            out_lq_folder = input("Enter output LQ tiles folder: ").strip()
-            tile_size = int(input("Tile size (default 1024): ").strip() or "1024")
-            scale = int(input("Scale factor (default 1): ").strip() or "1")
-            dynamic_n_tiles = (
-                input("Dynamic number of tiles per image? [Y/n]: ").strip().lower()
-                != "n"
-            )
-            laplacian_thread = float(
-                input("Laplacian threshold (default 0.01): ").strip() or "0.01"
-            )
-            image_gray = (
-                input("Process images as grayscale? [y/N]: ").strip().lower() == "y"
-            )
-            device = input("Device [cuda/cpu] (default cuda): ").strip() or "cuda"
-            run_ic9600_tiling(
-                hq_folder=hq_folder,
-                lq_folder=lq_folder,
-                out_hq_folder=out_hq_folder,
-                out_lq_folder=out_lq_folder,
-                tile_size=tile_size,
-                scale=scale,
-                dynamic_n_tiles=dynamic_n_tiles,
-                laplacian_thread=laplacian_thread,
-                image_gray=image_gray,
-                device=device,
-            )
-            print_success("HQ/LQ tiling complete.")
-        elif mode == "2":
-            single_folder = input("Enter folder path: ").strip()
-            out_folder = input("Enter output tiles folder: ").strip()
-            tile_size = int(input("Tile size (default 1024): ").strip() or "1024")
-            scale = int(input("Scale factor (default 1): ").strip() or "1")
-            dynamic_n_tiles = (
-                input("Dynamic number of tiles per image? [Y/n]: ").strip().lower()
-                != "n"
-            )
-            laplacian_thread = float(
-                input("Laplacian threshold (default 0.01): ").strip() or "0.01"
-            )
-            image_gray = (
-                input("Process images as grayscale? [y/N]: ").strip().lower() == "y"
-            )
-            device = input("Device [cuda/cpu] (default cuda): ").strip() or "cuda"
-            run_ic9600_tiling(
-                single_folder=single_folder,
-                out_folder=out_folder,
-                tile_size=tile_size,
-                scale=scale,
-                dynamic_n_tiles=dynamic_n_tiles,
-                laplacian_thread=laplacian_thread,
-                image_gray=image_gray,
-                device=device,
-            )
-            print_success("Single-folder tiling complete.")
-        else:
-            print_error("Invalid mode selected.")
-    except Exception as e:
-        print_error(f"Error during tiling: {e}")
-    print_prompt("Press Enter to return to the menu...")
-    input()
-
-
 def combine_datasets():
     """Combine multiple HQ/LQ datasets into one."""
     combiner = DatasetCombiner()
@@ -360,14 +288,6 @@ def batch_rename(
         batch_rename_single_folder(
             input_path, prefix=prefix, padding=padding, dry_run=dry_run
         )
-
-
-def extract_frames_from_video():
-    print_header("🎬 Extract Frames from Video")
-    extract_frames_menu()
-    print_success("Frame extraction workflow complete!")
-    print_prompt("Press Enter to return to the menu...")
-    input()
 
 
 def images_orientation_organization(*args, **kwargs):

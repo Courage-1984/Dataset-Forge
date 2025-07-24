@@ -6,14 +6,15 @@ import os
 def test_umzi_menu_entrypoint():
     env = os.environ.copy()
     env["PYTHONIOENCODING"] = "utf-8"
-    # '9' selects Umzi's Dataset_Preprocessing, then '0' to exit
+    # '1' selects Dataset Management, '7' selects Umzi's Dataset Preprocessing, then '0' to exit
     result = subprocess.run(
         [sys.executable, "main.py"],
-        input=b"9\n0\n0\n",
+        input=b"1\n7\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n",
         capture_output=True,
         timeout=15,
         env=env,
     )
     assert result.returncode == 0
-    assert b"Umzi's Dataset_Preprocessing Menu" in result.stdout
-    assert b"Best Tile Extraction" in result.stdout
+    stdout = result.stdout.decode("utf-8")
+    assert "🐸 Umzi's Dataset Preprocessing (PepeDP)" in stdout
+    assert "Best Tile Extraction" in stdout

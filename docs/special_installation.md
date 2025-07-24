@@ -100,7 +100,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
+## 4. Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
 
 ### Method 1: Windows (WSL - Recommended for CLI Integration)
 
@@ -165,10 +165,9 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 - On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
 - If resdet is not found, you will receive a clear error message with installation instructions.
 
-
 ---
 
-## 1. Advanced Metadata Operations (for exiftool integration)
+## 5. Advanced Metadata Operations (for [exiftool](https://exiftool.org/) integration)
 
 ### Method 1: Windows
 
@@ -197,35 +196,6 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
-
-
----
-
-## 4. pepedpid (for Umzi's DPID)
-
-Umzi's DPID (pepedpid) is a new DPID implementation for downscaling images. It requires the `pepedpid` Python package.
-
-**Steps:**
-
-1. Activate your virtual environment:
-
-```bat
-venv312\Scripts\activate
-```
-
-2. Install pepedpid:
-
-```bat
-pip install pepedpid
-```
-
-- `pepedpid` is listed in requirements.txt and will be installed automatically if you use `pip install .` or `pip install -r requirements.txt`.
-- If you get ImportError when using Umzi's DPID, ensure pepedpid is installed in your active environment.
-
-**Troubleshooting:**
-
-- If you get ImportError, check your virtual environment and that pepedpid is installed.
-- For further help, see [troubleshooting.md](troubleshooting.md).
 
 ---
 

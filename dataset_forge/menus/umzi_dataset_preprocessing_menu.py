@@ -7,28 +7,28 @@ from dataset_forge.utils.printing import print_header
 def umzi_dataset_preprocessing_menu():
     options = {
         "1": (
-            "🟪 Best Tile Extraction",
+            "🧩 Best Tile Extraction (Tiles)",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "best_tile_extraction_action",
             ),
         ),
         "2": (
-            "🟦 Video Frame Extraction (Embedding Deduplication)",
+            "🎬 Video Frame Extraction (Embedding Deduplication)",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "video_frame_extraction_action",
             ),
         ),
         "3": (
-            "🟧 Duplicate Image Detection and Removal",
+            "🧹 Duplicate Image Detection & Removal",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "duplicate_image_detection_action",
             ),
         ),
         "4": (
-            "🟫 Threshold-Based Image Filtering (IQA)",
+            "🧪 Threshold-Based Image Filtering (IQA)",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "iqa_filtering_action",
@@ -38,7 +38,7 @@ def umzi_dataset_preprocessing_menu():
     }
     while True:
         key = show_menu(
-            "Umzi's Dataset_Preprocessing Menu (pepedp)",
+            "🐸 Umzi's Dataset Preprocessing (PepeDP)",
             options,
             header_color=Mocha.lavender,
             char="-",

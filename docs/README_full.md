@@ -7,6 +7,18 @@
 
 # Table of Contents
 
+- [Special Installation Instructions](special_installation.md)
+  - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
+  - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
+  - [3. python-magic (for `Enhanced Directory Tree`)](special_installation.md#3-python-magic-for-enhanced-directory-tree)
+  - [4. Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection](special_installation.md#4-installing-and-using-resdethttpsgithubcom0x09resdet-for-native-resolution-detection)
+    - [Method 1: Windows (WSL - Recommended for CLI Integration)](special_installation.md#method-1-windows-wsl---recommended-for-cli-integration)
+    - [Method 2: Windows (MSYS2 MINGW64 Shell)](special_installation.md#method-2-windows-msys2-mingw64-shell)
+    - [Method 3: Windows (Windows pre-build binary)](special_installation.md#method-3-windows-windows-pre-build-binary)
+    - [Usage in Dataset Forge](special_installation.md#usage-in-dataset-forge)
+  - [5. Advanced Metadata Operations (for [exiftool](https://exiftool.org/) integration)](special_installation.md#5-advanced-metadata-operations-for-exiftoolhttpsexiftoolorg-integration)
+    - [Method 1: Windows](special_installation.md#method-1-windows)
+    - [Method 2: Windows (Chocolatey)](special_installation.md#method-2-windows-chocolatey)
 - [Features (tl;dr)](features.md)
 - [Features (main menus)](features.md#features-main-menus)
   - [⚙️ Core & Configuration](features.md#-core--configuration)
@@ -39,19 +51,6 @@
   - [🛠️ Utility Scripts (tools/)](features.md#-utility-scripts-tools)
 - [🩺 Dataset Health Scoring (NEW July 2025)](features.md#-dataset-health-scoring-new-july-2025)
 - [🔊 Project Sounds & Audio Feedback](features.md#-project-sounds--audio-feedback)
-- [Special Installation Instructions](special_installation.md)
-  - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
-  - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
-  - [3. python-magic (for `Enhanced Directory Tree`)](special_installation.md#3-python-magic-for-enhanced-directory-tree)
-  - [Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection](special_installation.md#installing-and-using-resdethttpsgithubcom0x09resdet-for-native-resolution-detection)
-    - [Method 1: Windows (WSL - Recommended for CLI Integration)](special_installation.md#method-1-windows-wsl---recommended-for-cli-integration)
-    - [Method 2: Windows (MSYS2 MINGW64 Shell)](special_installation.md#method-2-windows-msys2-mingw64-shell)
-    - [Method 3: Windows (Windows pre-build binary)](special_installation.md#method-3-windows-windows-pre-build-binary)
-    - [Usage in Dataset Forge](special_installation.md#usage-in-dataset-forge)
-  - [1. Advanced Metadata Operations (for exiftool integration)](special_installation.md#1-advanced-metadata-operations-for-exiftool-integration)
-    - [Method 1: Windows](special_installation.md#method-1-windows)
-    - [Method 2: Windows (Chocolatey)](special_installation.md#method-2-windows-chocolatey)
-  - [4. pepedpid (for Umzi's DPID)](special_installation.md#4-pepedpid-for-umzis-dpid)
 - [Usage Guide](usage.md)
   - [🚀 Quick Start](usage.md#-quick-start)
   - [🔊 Project Sounds & Audio Feedback](usage.md#-project-sounds--audio-feedback)
@@ -201,21 +200,6 @@
   - [New Menu Integration (NEW)](style_guide.md#new-menu-integration-new)
   - [Testing Patterns & Requirements (Updated July 2025)](style_guide.md#testing-patterns--requirements-updated-july-2025)
   - [Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)](style_guide.md#umzis-datasetpreprocessing-pepedp-powered-july-2025)
-- [Changelog](changelog.md)
-  - [[Unreleased]](changelog.md#unreleased)
-    - [🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)](changelog.md#-pepedp-powered-umzis-datasetpreprocessing-integration-july-2025)
-    - [🚀 Performance Optimization Suite (NEW July 2025)](changelog.md#-performance-optimization-suite-new-july-2025)
-      - [**GPU Acceleration**](changelog.md#gpu-acceleration)
-      - [**Distributed Processing**](changelog.md#distributed-processing)
-      - [**Intelligent Sample Prioritization**](changelog.md#intelligent-sample-prioritization)
-      - [**Pipeline Compilation**](changelog.md#pipeline-compilation)
-      - [**Performance Optimization Menu**](changelog.md#performance-optimization-menu)
-      - [**Comprehensive Testing**](changelog.md#comprehensive-testing)
-      - [**Dependencies**](changelog.md#dependencies)
-    - [🔧 Technical Improvements](changelog.md#-technical-improvements)
-    - [📚 Documentation](changelog.md#-documentation)
-    - [🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)](changelog.md#-dpid-umzis-dpid-pepedpid-integration-july-2025)
-  - [[July 2025]](changelog.md#july-2025)
 - [Contributing](contributing.md)
   - [How to Contribute](contributing.md#how-to-contribute)
   - [Development Guidelines](contributing.md#development-guidelines)
@@ -233,8 +217,230 @@
     - [What should I do if I get CUDA or GPU errors?](faq.md#what-should-i-do-if-i-get-cuda-or-gpu-errors)
     - [What if a menu or feature is missing or crashes?](faq.md#what-if-a-menu-or-feature-is-missing-or-crashes)
     - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
+- [Changelog](changelog.md)
+  - [[Unreleased]](changelog.md#unreleased)
+    - [🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)](changelog.md#-pepedp-powered-umzis-datasetpreprocessing-integration-july-2025)
+    - [🚀 Performance Optimization Suite (NEW July 2025)](changelog.md#-performance-optimization-suite-new-july-2025)
+      - [**GPU Acceleration**](changelog.md#gpu-acceleration)
+      - [**Distributed Processing**](changelog.md#distributed-processing)
+      - [**Intelligent Sample Prioritization**](changelog.md#intelligent-sample-prioritization)
+      - [**Pipeline Compilation**](changelog.md#pipeline-compilation)
+      - [**Performance Optimization Menu**](changelog.md#performance-optimization-menu)
+      - [**Comprehensive Testing**](changelog.md#comprehensive-testing)
+      - [**Dependencies**](changelog.md#dependencies)
+    - [🔧 Technical Improvements](changelog.md#-technical-improvements)
+    - [📚 Documentation](changelog.md#-documentation)
+    - [🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)](changelog.md#-dpid-umzis-dpid-pepedpid-integration-july-2025)
+  - [[July 2025]](changelog.md#july-2025)
 - [License](license.md)
 
+
+---
+
+
+# Special Installation
+
+
+# Special Installation Instructions
+
+This guide covers special installation requirements for certain dependencies in Dataset Forge. These steps are **critical** for correct operation, especially on Windows. Please read carefully and follow the order for each component.
+
+---
+
+## 1. PyTorch with CUDA (GPU Acceleration)
+
+**You must install the correct CUDA-enabled version of torch/torchvision/torchaudio _before_ installing other requirements.**
+
+**Quick Steps:**
+
+```bat
+venv312\Scripts\activate
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+- Replace `cu121` with your CUDA version if needed. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
+- If you skip this, pip will install the CPU-only version by default.
+- Only after this, run `pip install .` or `pip install -r requirements.txt`.
+
+**Troubleshooting:**
+
+- Mismatched CUDA/cuDNN versions will cause import errors or no GPU support.
+- See [requirements.txt](../requirements.txt) and [PyTorch docs](https://pytorch.org/get-started/locally/).
+
+---
+
+## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)
+
+**VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
+
+**Steps (Windows):**
+
+1. Download and install [VapourSynth](http://www.vapoursynth.com/) (includes imwri plugin).
+2. Open a terminal and run:
+
+```bat
+py vsrepo.py install descale
+py vsrepo.py install ffms2
+py vsrepo.py install lsmas
+```
+
+3. Activate your virtual environment:
+
+```bat
+venv312\Scripts\activate
+```
+
+4. Install getnative:
+
+```bat
+pip install getnative
+```
+
+- See [Getnative Recommended Windows Installation](https://github.com/Infiziert90/getnative?tab=readme-ov-file#recommended-windows-installation) for more details.
+
+**Troubleshooting:**
+
+- Install VapourSynth _before_ getnative or any requirements that depend on it.
+- If getnative fails to import, check that VapourSynth is installed and on your PATH.
+- Also make sure directory containing `vsrepo.py` and the plugin's folder containing the `.dll`s are also on your PATH.
+
+---
+
+## 3. python-magic (for `Enhanced Directory Tree`)
+
+**Windows users:** You must install both the Python packages and the required DLLs.
+
+**Steps:**
+
+1. Install the packages:
+
+```bat
+venv312\Scripts\activate
+pip install python-magic python-magic-bin libmagic
+```
+
+2. Copy the following files from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`:
+
+   - `libgnurx-0.dll`
+   - `magic.mgc`
+   - `magic1.dll`
+
+   (These are prebuilt for 64-bit Windows. See source: [libmagicwin64](https://github.com/pidydx/libmagicwin64) for details.)
+
+3. When using python-magic, specify the magic file path if needed:
+
+```python
+import magic
+file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
+```
+
+**Troubleshooting:**
+
+- If you get import errors, ensure the DLLs are in `System32` and you are using the correct magic file path.
+- See [python-magic docs](https://github.com/ahupp/python-magic) and [libmagicwin64](https://github.com/pidydx/libmagicwin64).
+
+---
+
+## 4. Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
+
+### Method 1: Windows (WSL - Recommended for CLI Integration)
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/0x09/resdet.git
+   cd resdet
+   ```
+2. Build resdet:
+   ```sh
+   cd path/to/resdet
+   make clean
+   ./configure
+   make
+   ```
+3. Install resdet to your WSL PATH:
+   ```sh
+   sudo cp resdet /usr/local/bin/
+   sudo chmod +x /usr/local/bin/resdet
+   # Or, to use make install:
+   sudo make install
+   ```
+4. **Note:** The Dataset Forge CLI will automatically use WSL to run resdet on Windows. Ensure resdet is available in your WSL environment's PATH.
+
+### Method 2: Windows (MSYS2 MINGW64 Shell)
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/0x09/resdet.git
+   ```
+2. Open **MSYS2 MINGW64 Shell**.
+3. Install dependencies:
+   ```sh
+   pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-fftw mingw-w64-x86_64-pkg-config autoconf automake libtool
+   ```
+4. Set PKG_CONFIG_PATH:
+   ```sh
+   export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
+   ```
+5. Build resdet:
+   ```sh
+   cd path/to/resdet
+   make clean
+   ./configure --prefix=/mingw64
+   make
+   ```
+6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
+
+### Method 3: Windows (Windows pre-build binary)
+
+1. Extract the following files from `assets/resdet_windows.zip`:
+
+   - `resdet.exe`
+
+   (This is a prebuilt for 64-bit Windows that I compiled.)
+
+2. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
+
+### Usage in Dataset Forge
+
+- The CLI will detect your platform and use the appropriate resdet binary.
+- On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
+- If resdet is not found, you will receive a clear error message with installation instructions.
+
+---
+
+## 5. Advanced Metadata Operations (for [exiftool](https://exiftool.org/) integration)
+
+### Method 1: Windows
+
+1. Download ExifTool.exe:
+
+   https://exiftool.org/
+
+2. Download the Windows Executable (e.g., `exiftool-12.70.zip`).
+
+3. Extract it and rename `exiftool(-k).exe` to `exiftool.exe` for command-line use.
+
+4. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+> **IMPORTANT:** Note that if you move the .exe to another folder, you must also move the "exiftool_files" folder to the same location.
+
+### Method 2: Windows (Chocolatey)
+
+1. Download ExifTool.exe:
+   ```sh
+   choco install exiftool -y
+   ```
+
+2. This will install `exiftool.exe` to:
+   ```sh
+   C:\ProgramData\chocolatey\lib\exiftool\tools\
+   ```
+
+3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+---
+
+For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
 
 ---
 
@@ -577,243 +783,6 @@ Dataset Forge uses four distinct sounds to provide immediate feedback for key ev
 - (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
 
 These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
-
----
-
-
-# Special Installation
-
-
-# Special Installation Instructions
-
-This guide covers special installation requirements for certain dependencies in Dataset Forge. These steps are **critical** for correct operation, especially on Windows. Please read carefully and follow the order for each component.
-
----
-
-## 1. PyTorch with CUDA (GPU Acceleration)
-
-**You must install the correct CUDA-enabled version of torch/torchvision/torchaudio _before_ installing other requirements.**
-
-**Quick Steps:**
-
-```bat
-venv312\Scripts\activate
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-```
-
-- Replace `cu121` with your CUDA version if needed. See [PyTorch Get Started](https://pytorch.org/get-started/locally/) for details.
-- If you skip this, pip will install the CPU-only version by default.
-- Only after this, run `pip install .` or `pip install -r requirements.txt`.
-
-**Troubleshooting:**
-
-- Mismatched CUDA/cuDNN versions will cause import errors or no GPU support.
-- See [requirements.txt](../requirements.txt) and [PyTorch docs](https://pytorch.org/get-started/locally/).
-
----
-
-## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)
-
-**VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
-
-**Steps (Windows):**
-
-1. Download and install [VapourSynth](http://www.vapoursynth.com/) (includes imwri plugin).
-2. Open a terminal and run:
-
-```bat
-py vsrepo.py install descale
-py vsrepo.py install ffms2
-py vsrepo.py install lsmas
-```
-
-3. Activate your virtual environment:
-
-```bat
-venv312\Scripts\activate
-```
-
-4. Install getnative:
-
-```bat
-pip install getnative
-```
-
-- See [Getnative Recommended Windows Installation](https://github.com/Infiziert90/getnative?tab=readme-ov-file#recommended-windows-installation) for more details.
-
-**Troubleshooting:**
-
-- Install VapourSynth _before_ getnative or any requirements that depend on it.
-- If getnative fails to import, check that VapourSynth is installed and on your PATH.
-- Also make sure directory containing `vsrepo.py` and the plugin's folder containing the `.dll`s are also on your PATH.
-
----
-
-## 3. python-magic (for `Enhanced Directory Tree`)
-
-**Windows users:** You must install both the Python packages and the required DLLs.
-
-**Steps:**
-
-1. Install the packages:
-
-```bat
-venv312\Scripts\activate
-pip install python-magic python-magic-bin libmagic
-```
-
-2. Copy the following files from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`:
-
-   - `libgnurx-0.dll`
-   - `magic.mgc`
-   - `magic1.dll`
-
-   (These are prebuilt for 64-bit Windows. See source: [libmagicwin64](https://github.com/pidydx/libmagicwin64) for details.)
-
-3. When using python-magic, specify the magic file path if needed:
-
-```python
-import magic
-file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
-```
-
-**Troubleshooting:**
-
-- If you get import errors, ensure the DLLs are in `System32` and you are using the correct magic file path.
-- See [python-magic docs](https://github.com/ahupp/python-magic) and [libmagicwin64](https://github.com/pidydx/libmagicwin64).
-
----
-
-## Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
-
-### Method 1: Windows (WSL - Recommended for CLI Integration)
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/0x09/resdet.git
-   cd resdet
-   ```
-2. Build resdet:
-   ```sh
-   cd path/to/resdet
-   make clean
-   ./configure
-   make
-   ```
-3. Install resdet to your WSL PATH:
-   ```sh
-   sudo cp resdet /usr/local/bin/
-   sudo chmod +x /usr/local/bin/resdet
-   # Or, to use make install:
-   sudo make install
-   ```
-4. **Note:** The Dataset Forge CLI will automatically use WSL to run resdet on Windows. Ensure resdet is available in your WSL environment's PATH.
-
-### Method 2: Windows (MSYS2 MINGW64 Shell)
-
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/0x09/resdet.git
-   ```
-2. Open **MSYS2 MINGW64 Shell**.
-3. Install dependencies:
-   ```sh
-   pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-fftw mingw-w64-x86_64-pkg-config autoconf automake libtool
-   ```
-4. Set PKG_CONFIG_PATH:
-   ```sh
-   export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
-   ```
-5. Build resdet:
-   ```sh
-   cd path/to/resdet
-   make clean
-   ./configure --prefix=/mingw64
-   make
-   ```
-6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
-
-### Method 3: Windows (Windows pre-build binary)
-
-1. Extract the following files from `assets/resdet_windows.zip`:
-
-   - `resdet.exe`
-
-   (This is a prebuilt for 64-bit Windows that I compiled.)
-
-2. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
-
-### Usage in Dataset Forge
-
-- The CLI will detect your platform and use the appropriate resdet binary.
-- On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
-- If resdet is not found, you will receive a clear error message with installation instructions.
-
-
----
-
-## 1. Advanced Metadata Operations (for exiftool integration)
-
-### Method 1: Windows
-
-1. Download ExifTool.exe:
-
-   https://exiftool.org/
-
-2. Download the Windows Executable (e.g., `exiftool-12.70.zip`).
-
-3. Extract it and rename `exiftool(-k).exe` to `exiftool.exe` for command-line use.
-
-4. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
-
-> **IMPORTANT:** Note that if you move the .exe to another folder, you must also move the "exiftool_files" folder to the same location.
-
-### Method 2: Windows (Chocolatey)
-
-1. Download ExifTool.exe:
-   ```sh
-   choco install exiftool -y
-   ```
-
-2. This will install `exiftool.exe` to:
-   ```sh
-   C:\ProgramData\chocolatey\lib\exiftool\tools\
-   ```
-
-3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
-
-
----
-
-## 4. pepedpid (for Umzi's DPID)
-
-Umzi's DPID (pepedpid) is a new DPID implementation for downscaling images. It requires the `pepedpid` Python package.
-
-**Steps:**
-
-1. Activate your virtual environment:
-
-```bat
-venv312\Scripts\activate
-```
-
-2. Install pepedpid:
-
-```bat
-pip install pepedpid
-```
-
-- `pepedpid` is listed in requirements.txt and will be installed automatically if you use `pip install .` or `pip install -r requirements.txt`.
-- If you get ImportError when using Umzi's DPID, ensure pepedpid is installed in your active environment.
-
-**Troubleshooting:**
-
-- If you get ImportError, check your virtual environment and that pepedpid is installed.
-- For further help, see [troubleshooting.md](troubleshooting.md).
-
----
-
-For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
 
 ---
 
@@ -2535,6 +2504,140 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 ---
 
 
+# Contributing
+
+
+[ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
+
+# Contributing
+
+Thank you for your interest in contributing to **Dataset Forge**! We welcome contributions from the community to improve features, fix bugs, and enhance documentation.
+
+## How to Contribute
+
+1. **Read the [Style Guide](style_guide.md):**
+   - All code must follow the project's coding standards, modular architecture, and documentation requirements.
+2. **Fork the repository** and create a new branch for your feature or fix.
+3. **Write clear, well-documented code:**
+   - Use Google-style docstrings and type hints for all public functions/classes.
+   - Add or update tests in `tests/` for new features or bugfixes.
+   - Update or add documentation in the appropriate `docs/` file(s).
+4. **Test your changes:**
+   - Activate the virtual environment: `venv312\Scripts\activate`
+   - Run the test suite: `pytest`
+   - Ensure all tests pass on your platform (Windows and/or Linux).
+5. **Submit a Pull Request (PR):**
+   - Describe your changes clearly in the PR description.
+   - Reference any related issues or discussions.
+   - If your change affects documentation, mention which files were updated.
+   - Be responsive to code review feedback.
+
+## Development Guidelines
+
+- **Modular Design:**
+  - UI in `menus/`, business logic in `actions/`, helpers in `utils/`.
+  - Use lazy imports for menu actions (see [advanced.md](advanced.md)).
+- **Memory & Performance:**
+  - Use centralized memory and parallel processing utilities.
+  - Always clean up memory after large operations.
+- **Testing:**
+  - Add tests for new features and bugfixes.
+  - Use pytest fixtures and monkeypatching as needed.
+- **Documentation:**
+  - Update relevant docs in `docs/` and regenerate `README_full.md` and `toc.md` using `merge_docs.py` after changes.
+  - Keep navigation links at the top of each doc file.
+- **Commit Messages:**
+  - Use clear, descriptive commit messages (e.g., `feat: add CBIR duplicate detection`, `fix: handle VapourSynth import error`).
+- **Community Standards:**
+  - Be respectful and constructive in all communications.
+  - Report bugs or suggest features via GitHub Issues.
+
+## Doc Maintenance
+
+- After updating any documentation, always regenerate `docs/README_full.md` and `docs/toc.md` using `merge_docs.py`.
+- For major changes, update `docs/changelog.md`.
+- For new documentation sections, create a new markdown file in `docs/` and add it to the Table of Contents in `README.md` and `docs/toc.md`.
+
+---
+
+## Static Analysis & Code Quality (NEW)
+
+- Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, etc.).
+- All public functions/classes/methods must have Google-style docstrings.
+- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
+
+For questions, open an issue or contact the project maintainer.
+
+
+---
+
+
+# Faq
+
+
+# Frequently Asked Questions (FAQ)
+
+---
+
+### What is Dataset Forge?
+
+Dataset Forge is a modular Python CLI tool for managing, analyzing, and transforming image datasets, with a focus on HQ/LQ pairs for super-resolution and ML workflows.
+
+### What platforms are supported?
+
+- Windows (primary)
+- Linux (not yet tested)
+- macOS (not yet tested)
+
+### What Python version is required?
+
+Python 3.12+ is recommended. The project supports Python 3.8+ but is tested on 3.12.
+
+### How do I install Dataset Forge and its dependencies?
+
+See the [Quick Start](../README.md#-quick-start) and [Special Installation Instructions](special_installation.md).
+
+### Why do I need to install VapourSynth before getnative?
+
+getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [Special Installation Instructions](special_installation.md).
+
+### How do I fix python-magic errors on Windows?
+
+You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [Special Installation Instructions](special_installation.md).
+
+### How do I run the test suite?
+
+Activate the virtual environment and run `pytest`. See [usage.md](usage.md).
+
+### How do I use the monitoring and analytics features?
+
+Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md).
+
+### What should I do if I get CUDA or GPU errors?
+
+- Ensure your CUDA and cuDNN versions match your PyTorch install.
+- Close other GPU-intensive applications.
+- Lower batch size or use CPU fallback if you run out of memory.
+- See [troubleshooting.md](troubleshooting.md).
+
+### What if a menu or feature is missing or crashes?
+
+- Make sure you are running the latest version.
+- Check the logs in the `./logs/` directory for error details.
+- See [troubleshooting.md](troubleshooting.md) for solutions to common issues.
+
+### How do I get help or report a bug?
+
+Open an issue on GitHub or contact the project maintainer.
+
+---
+
+If your question is not answered here, check the [usage guide](usage.md), [troubleshooting guide](troubleshooting.md), or open an issue.
+
+---
+
+
 # Changelog
 
 
@@ -2734,140 +2837,6 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 
 This file will track major changes and releases in the future.
 
-
----
-
-
-# Contributing
-
-
-[ Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
-
-# Contributing
-
-Thank you for your interest in contributing to **Dataset Forge**! We welcome contributions from the community to improve features, fix bugs, and enhance documentation.
-
-## How to Contribute
-
-1. **Read the [Style Guide](style_guide.md):**
-   - All code must follow the project's coding standards, modular architecture, and documentation requirements.
-2. **Fork the repository** and create a new branch for your feature or fix.
-3. **Write clear, well-documented code:**
-   - Use Google-style docstrings and type hints for all public functions/classes.
-   - Add or update tests in `tests/` for new features or bugfixes.
-   - Update or add documentation in the appropriate `docs/` file(s).
-4. **Test your changes:**
-   - Activate the virtual environment: `venv312\Scripts\activate`
-   - Run the test suite: `pytest`
-   - Ensure all tests pass on your platform (Windows and/or Linux).
-5. **Submit a Pull Request (PR):**
-   - Describe your changes clearly in the PR description.
-   - Reference any related issues or discussions.
-   - If your change affects documentation, mention which files were updated.
-   - Be responsive to code review feedback.
-
-## Development Guidelines
-
-- **Modular Design:**
-  - UI in `menus/`, business logic in `actions/`, helpers in `utils/`.
-  - Use lazy imports for menu actions (see [advanced.md](advanced.md)).
-- **Memory & Performance:**
-  - Use centralized memory and parallel processing utilities.
-  - Always clean up memory after large operations.
-- **Testing:**
-  - Add tests for new features and bugfixes.
-  - Use pytest fixtures and monkeypatching as needed.
-- **Documentation:**
-  - Update relevant docs in `docs/` and regenerate `README_full.md` and `toc.md` using `merge_docs.py` after changes.
-  - Keep navigation links at the top of each doc file.
-- **Commit Messages:**
-  - Use clear, descriptive commit messages (e.g., `feat: add CBIR duplicate detection`, `fix: handle VapourSynth import error`).
-- **Community Standards:**
-  - Be respectful and constructive in all communications.
-  - Report bugs or suggest features via GitHub Issues.
-
-## Doc Maintenance
-
-- After updating any documentation, always regenerate `docs/README_full.md` and `docs/toc.md` using `merge_docs.py`.
-- For major changes, update `docs/changelog.md`.
-- For new documentation sections, create a new markdown file in `docs/` and add it to the Table of Contents in `README.md` and `docs/toc.md`.
-
----
-
-## Static Analysis & Code Quality (NEW)
-
-- Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, etc.).
-- All public functions/classes/methods must have Google-style docstrings.
-- The script overwrites its output files in `tools/find_code_issues/` on each run.
-- See [docs/usage.md](usage.md) and [docs/features.md](features.md) for details.
-
-For questions, open an issue or contact the project maintainer.
-
-
----
-
-
-# Faq
-
-
-# Frequently Asked Questions (FAQ)
-
----
-
-### What is Dataset Forge?
-
-Dataset Forge is a modular Python CLI tool for managing, analyzing, and transforming image datasets, with a focus on HQ/LQ pairs for super-resolution and ML workflows.
-
-### What platforms are supported?
-
-- Windows (primary)
-- Linux (not yet tested)
-- macOS (not yet tested)
-
-### What Python version is required?
-
-Python 3.12+ is recommended. The project supports Python 3.8+ but is tested on 3.12.
-
-### How do I install Dataset Forge and its dependencies?
-
-See the [Quick Start](../README.md#-quick-start) and [Special Installation Instructions](special_installation.md).
-
-### Why do I need to install VapourSynth before getnative?
-
-getnative depends on VapourSynth. If VapourSynth is not installed first, getnative will fail to import or function. See [Special Installation Instructions](special_installation.md).
-
-### How do I fix python-magic errors on Windows?
-
-You must copy the required DLLs from `assets/libmagicwin64-master.zip` to `C:/Windows/System32/`. See [Special Installation Instructions](special_installation.md).
-
-### How do I run the test suite?
-
-Activate the virtual environment and run `pytest`. See [usage.md](usage.md).
-
-### How do I use the monitoring and analytics features?
-
-Access the System Monitoring menu from the CLI to view live resource usage, error tracking, analytics, and health checks. See [features.md](features.md).
-
-### What should I do if I get CUDA or GPU errors?
-
-- Ensure your CUDA and cuDNN versions match your PyTorch install.
-- Close other GPU-intensive applications.
-- Lower batch size or use CPU fallback if you run out of memory.
-- See [troubleshooting.md](troubleshooting.md).
-
-### What if a menu or feature is missing or crashes?
-
-- Make sure you are running the latest version.
-- Check the logs in the `./logs/` directory for error details.
-- See [troubleshooting.md](troubleshooting.md) for solutions to common issues.
-
-### How do I get help or report a bug?
-
-Open an issue on GitHub or contact the project maintainer.
-
----
-
-If your question is not answered here, check the [usage guide](usage.md), [troubleshooting guide](troubleshooting.md), or open an issue.
 
 ---
 

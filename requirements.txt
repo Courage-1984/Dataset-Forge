@@ -18,7 +18,7 @@ seaborn
 # =============================
 torch
 torchvision
-torchaudio
+# torchaudio
 lpips
 open-clip-torch
 timm

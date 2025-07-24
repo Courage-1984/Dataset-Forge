@@ -63,10 +63,12 @@ def performance_optimization_menu():
         }
 
         try:
-            action = show_menu("Performance Optimization", options, Mocha.lavender)
-            if action is None:
+            key = show_menu("Performance Optimization", options, Mocha.lavender)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Performance Optimization Menu...")
             break
@@ -93,10 +95,12 @@ def gpu_acceleration_menu():
         }
 
         try:
-            action = show_menu("GPU Acceleration", options, Mocha.sky)
-            if action is None:
+            key = show_menu("GPU Acceleration", options, Mocha.sky)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting GPU Acceleration Menu...")
             break
@@ -124,10 +128,12 @@ def distributed_processing_menu():
         }
 
         try:
-            action = show_menu("Distributed Processing", options, Mocha.sky)
-            if action is None:
+            key = show_menu("Distributed Processing", options, Mocha.sky)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Distributed Processing Menu...")
             break
@@ -150,10 +156,12 @@ def sample_prioritization_menu():
         }
 
         try:
-            action = show_menu("Sample Prioritization", options, Mocha.sky)
-            if action is None:
+            key = show_menu("Sample Prioritization", options, Mocha.sky)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Sample Prioritization Menu...")
             break
@@ -182,10 +190,12 @@ def pipeline_compilation_menu():
         }
 
         try:
-            action = show_menu("Pipeline Compilation", options, Mocha.sky)
-            if action is None:
+            key = show_menu("Pipeline Compilation", options, Mocha.sky)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Pipeline Compilation Menu...")
             break
@@ -210,10 +220,12 @@ def performance_analytics_menu():
         }
 
         try:
-            action = show_menu("Performance Analytics", options, Mocha.sky)
-            if action is None:
+            key = show_menu("Performance Analytics", options, Mocha.sky)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Performance Analytics Menu...")
             break
@@ -236,10 +248,12 @@ def optimization_settings_menu():
         }
 
         try:
-            action = show_menu("Optimization Settings", options, Mocha.sky)
-            if action is None:
+            key = show_menu("Optimization Settings", options, Mocha.sky)
+            if key is None:
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Optimization Settings Menu...")
             break

@@ -11,18 +11,19 @@ TOC_FILE = os.path.join(DOCS_DIR, "toc.md")
 
 # Order of files to merge (edit as needed)
 DOC_ORDER = [
-    "features.md",
     "special_installation.md",
+    "features.md",
     "usage.md",
     "advanced.md",
     "architecture.md",
     "troubleshooting.md",
     "style_guide.md",
-    "changelog.md",
     "contributing.md",
     "faq.md",
+    "changelog.md",
     "license.md",
 ]
+
 
 NAV_LINKS = (
     "[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | "

@@ -35,6 +35,7 @@ def lazy_action(module_path, func_name):
 def dataset_creation_menu():
     """Sub-menu for dataset creation and modification."""
     from dataset_forge.actions import dataset_actions
+    from dataset_forge.utils.menu import lazy_action
 
     options = {
         "1": (
@@ -42,10 +43,19 @@ def dataset_creation_menu():
             dataset_actions.create_multiscale_dataset,
         ),
         "2": (
-            "🎬 Extract Frames from Video",
-            dataset_actions.extract_frames_from_video,
+            "🎬 Video Frame Extraction (PepeDP)",
+            lazy_action(
+                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
+                "video_frame_extraction_action",
+            ),
         ),
-        "3": ("🧩 Image Tiling", dataset_actions.image_tiling),
+        "3": (
+            "🧩 Best Tile Extraction (PepeDP)",
+            lazy_action(
+                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
+                "best_tile_extraction_action",
+            ),
+        ),
         "0": ("⬅️  Back", None),
     }
 
@@ -329,6 +339,13 @@ def dataset_management_menu():
             lazy_action(
                 "dataset_forge.menus.dataset_health_scoring_menu",
                 "dataset_health_scoring_menu",
+            ),
+        ),
+        "7": (
+            "🐸 Umzi's Dataset Preprocessing (PepeDP)",
+            lazy_action(
+                "dataset_forge.menus.umzi_dataset_preprocessing_menu",
+                "umzi_dataset_preprocessing_menu",
             ),
         ),
         "0": ("⬅️  Back to Main Menu", None),
