@@ -10,6 +10,7 @@ from dataset_forge.utils.printing import (
     print_info,
     print_success,
     print_error,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 
@@ -17,7 +18,7 @@ from dataset_forge.utils.color import Mocha
 def compress_menu():
     from dataset_forge.actions.compress_actions import compress_images
 
-    print_header("Compress Images", color=Mocha.lavender)
+    print_header("🗜️ Compress Images - Input/Output Selection", color=Mocha.lavender)
     print_info("Choose input mode:")
     mode_options = {
         "1": ("HQ/LQ paired folders", "paired"),
@@ -35,7 +36,7 @@ def compress_menu():
     else:
         single_folder = get_folder_path("Enter folder path: ")
         hq_path = lq_path = None
-
+    print_header("🗜️ Compress Images - Output Format Selection", color=Mocha.lavender)
     print_info("\nChoose output format:")
     fmt_options = {
         "1": ("PNG (lossless, supports Oxipng)", "png"),
@@ -78,7 +79,7 @@ def compress_menu():
             print_info("Cancelled.")
             return
 
-    print_info("\nStarting compression...")
+    print_section("Compress Images Progress", color=Mocha.lavender)
     try:
         compress_images(
             hq_path=hq_path,

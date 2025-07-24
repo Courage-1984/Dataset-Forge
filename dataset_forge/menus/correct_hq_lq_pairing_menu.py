@@ -5,6 +5,7 @@ from dataset_forge.utils.printing import (
     print_success,
     print_error,
     print_prompt,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.progress_utils import tqdm
@@ -21,7 +22,9 @@ def correct_hq_lq_pairing_menu():
         fuzzy_hq_lq_pairing_logic,
     )
 
-    print_header("Correct/Create HQ LQ Pairing", color=Mocha.lavender)
+    print_header(
+        "🔗 Correct/Create HQ LQ Pairing - Input/Output Selection", color=Mocha.lavender
+    )
     print_info(
         "This tool helps you pair HQ and LQ folders, check alignment, test scale, and correct scale if needed.\n"
     )
@@ -46,6 +49,7 @@ def correct_hq_lq_pairing_menu():
         except ValueError:
             print_error("Invalid input. Please enter a number.")
 
+    print_section("HQ/LQ Pairing Progress", color=Mocha.lavender)
     print_info("\nStep 1: Comparing folders for missing files...")
     compare_folders_menu()
 
@@ -74,7 +78,13 @@ correct_hq_lq_pairing_menu.__menu_options__ = {
 
 
 def fuzzy_hq_lq_pairing_menu():
-    print_header("Automatic HQ/LQ Pairing (Fuzzy Matching)", color=Mocha.lavender)
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
+
+    print_header(
+        "🔗 Automatic HQ/LQ Pairing (Fuzzy Matching) - Input/Output Selection",
+        color=Mocha.lavender,
+    )
     print_info(
         "This tool uses perceptual hashes or embeddings to pair HQ and LQ images even if filenames differ.\n"
     )
@@ -83,6 +93,7 @@ def fuzzy_hq_lq_pairing_menu():
     if not os.path.isdir(hq_folder) or not os.path.isdir(lq_folder):
         print_error("Both HQ and LQ paths must be valid directories.")
         return
+    print_section("Fuzzy HQ/LQ Pairing Progress", color=Mocha.lavender)
     print_info("\nRunning fuzzy HQ/LQ pairing... (progress bar will be shown)")
     pairs = fuzzy_hq_lq_pairing_logic(hq_folder, lq_folder)
     print_info(f"\nFound {len(pairs)} HQ/LQ pairs using fuzzy matching.")

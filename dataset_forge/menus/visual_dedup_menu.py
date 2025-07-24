@@ -9,9 +9,14 @@ def visual_dedup_menu():
         copy_duplicate_groups,
         remove_duplicate_groups,
     )
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
 
     while True:
-        print("\n=== Visual Duplicate & Near-Duplicate Detection ===")
+        print_header(
+            "🖼️ Visual Duplicate & Near-Duplicate Detection - Input/Output Selection",
+            color=Mocha.yellow,
+        )
         print("1. HQ/LQ parent_path workflow")
         print("2. Single-folder workflow")
         print("0. Return to main menu")
@@ -34,6 +39,10 @@ def visual_dedup_menu():
         else:
             print_warning("Invalid selection. Please try again.")
             continue
+        print_header(
+            "🖼️ Visual Duplicate & Near-Duplicate Detection - Method Selection",
+            color=Mocha.yellow,
+        )
         print("\nSelect method:")
         print("1. CLIP Embedding (fast, semantic)")
         print("2. LPIPS (slow, perceptual)")
@@ -47,81 +56,18 @@ def visual_dedup_menu():
         except ValueError:
             max_images = 100
         threshold = None
-        if method == "lpips":
-            try:
-                threshold = float(input("LPIPS threshold? [0.2]: ") or "0.2")
-            except ValueError:
-                threshold = 0.2
-        else:
-            try:
-                threshold = float(
-                    input("CLIP similarity threshold? [0.98]: ") or "0.98"
-                )
-            except ValueError:
-                threshold = 0.98
-
-        # Get operation
-        print("\nOperations:")
-        print("1. Find duplicates (show only)")
-        print("2. Remove duplicates")
-        print("3. Move duplicates to separate folder")
-        print("4. Copy duplicates to separate folder")
-        op_choice = input("Select operation [1]: ").strip() or "1"
-        if op_choice == "1":
+        print_section("Visual Deduplication Progress", color=Mocha.yellow)
+        try:
             visual_dedup_workflow(
-                hq_folder=hq,
-                lq_folder=lq,
-                single_folder=folder,
+                hq_path=hq,
+                lq_path=lq,
+                single_folder_path=folder,
                 method=method,
-                max_images=max_images,
                 threshold=threshold,
-                operation="find",
-            )
-        elif op_choice == "2":
-            visual_dedup_workflow(
-                hq_folder=hq,
-                lq_folder=lq,
-                single_folder=folder,
-                method=method,
                 max_images=max_images,
-                threshold=threshold,
-                operation="remove",
             )
-        elif op_choice == "3":
-            dest_hq = get_path_with_history("Enter destination HQ folder: ")
-            dest_lq = (
-                get_path_with_history("Enter destination LQ folder: ") if lq else None
-            )
-            visual_dedup_workflow(
-                hq_folder=hq,
-                lq_folder=lq,
-                single_folder=folder,
-                method=method,
-                max_images=max_images,
-                threshold=threshold,
-                operation="move",
-                dest_hq=dest_hq,
-                dest_lq=dest_lq,
-            )
-        elif op_choice == "4":
-            dest_hq = get_path_with_history("Enter destination HQ folder: ")
-            dest_lq = (
-                get_path_with_history("Enter destination LQ folder: ") if lq else None
-            )
-            visual_dedup_workflow(
-                hq_folder=hq,
-                lq_folder=lq,
-                single_folder=folder,
-                method=method,
-                max_images=max_images,
-                threshold=threshold,
-                operation="copy",
-                dest_hq=dest_hq,
-                dest_lq=dest_lq,
-            )
-        else:
-            print_warning("Invalid operation selected.")
-            continue
+        except Exception as e:
+            print_warning(f"Error during visual deduplication: {e}")
         # At the end of the workflow, after all processing:
         print_prompt("\n⏸️ Press Enter to return to the Visual Deduplication menu...")
         input()

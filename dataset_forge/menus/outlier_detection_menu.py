@@ -6,6 +6,12 @@ from dataset_forge.utils.input_utils import get_path_with_history
 
 
 def outlier_detection_menu():
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
+
+    print_header(
+        "🔎 Outlier & Anomaly Detection - Input/Output Selection", color=Mocha.maroon
+    )
     print_info("\nOutlier & Anomaly Detection:")
     print_info(
         "Detect images that are very different from the rest using clustering or embedding-based methods."
@@ -22,11 +28,13 @@ def outlier_detection_menu():
         lq = get_path_with_history(
             "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
+        print_section("Outlier Detection Progress", color=Mocha.maroon)
         detect_outliers(hq_folder=hq, lq_folder=lq)
     elif mode == "2":
         folder = get_path_with_history(
             "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
         )
+        print_section("Outlier Detection Progress", color=Mocha.maroon)
         detect_outliers(single_path=folder)
     else:
         print_warning("Invalid mode selected.")

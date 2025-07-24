@@ -24,10 +24,15 @@ from dataset_forge.actions.config_actions import (
 
 
 def config_menu():
-    options = config_menu.__menu_options__
-    from dataset_forge.utils.printing import print_error
+    from dataset_forge.utils.printing import print_error, print_header, print_section
+    from dataset_forge.utils.color import Mocha
 
+    options = config_menu.__menu_options__
     while True:
+        print_header(
+            "⚙️ Configuration & Model Management - Input/Output Selection",
+            color=Mocha.mauve,
+        )
         key = show_menu(
             "Configuration & Model Management",
             options,
@@ -40,6 +45,7 @@ def config_menu():
         action = options.get(key, (None, None))[1]
         print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
+            print_section("Configuration Progress", color=Mocha.mauve)
             action()
         else:
             print_error(

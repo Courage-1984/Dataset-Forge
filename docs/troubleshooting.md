@@ -192,3 +192,7 @@ For further help, see [usage.md](usage.md) or contact the project maintainer.
 - If you get errors running DPID workflows, ensure you are using the correct menu option and that your input folders contain valid images.
 - All DPID implementations (including Umzi's) are modular and covered by robust, non-interactive tests. If tests fail, check for monkeypatching or signature mismatches in your test environment.
 - For further help, see [usage.md](usage.md) or contact the project maintainer.
+
+## Missing Workflow Headings
+
+If you don’t see clear workflow headings before prompts and progress bars, the workflow may be outdated or not following project standards. Please update the workflow to match the Style Guide.

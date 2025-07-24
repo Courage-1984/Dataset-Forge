@@ -177,6 +177,10 @@ F -->|<70| I[❌ Unusable]
 
 - The Dataset Management menu now includes an '🧭 Align Images' option, which calls the align_images_workflow in actions/align_images_actions.py using the lazy import pattern.
 
+## UI Layer and Workflow Patterns
+
+All menu actions and interactive workflows must print clear, Mocha-styled headings before input/output prompts and before progress bars, as described in the Style Guide. This is a required part of the UI/UX contract for Dataset Forge.
+
 ---
 
 For coding standards and best practices, see [style_guide.md](style_guide.md).

@@ -14,6 +14,7 @@ from dataset_forge.utils.printing import (
     print_warning,
     print_error,
     print_prompt,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.progress_utils import tqdm
@@ -2771,6 +2772,12 @@ def advanced_insights_analysis():
 
 def directory_tree_menu():
     """Main directory tree menu with enhanced features."""
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
+
+    print_header(
+        "🌳 Enhanced Directory Tree - Input/Output Selection", color=Mocha.peach
+    )
     options = {
         "1": ("🌳 Quick Tree Generation", quick_tree_generation),
         "2": ("⚙️ Advanced Tree Generation", advanced_tree_generation),
@@ -2785,6 +2792,7 @@ def directory_tree_menu():
 
     while True:
         try:
+            print_section("Directory Tree Generation Progress", color=Mocha.peach)
             choice = show_menu(
                 "🌳 Enhanced Directory Tree Generator", options, Mocha.lavender
             )

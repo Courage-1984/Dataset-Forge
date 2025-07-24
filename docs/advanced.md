@@ -649,3 +649,7 @@ All DPID implementations are modular, live in `dataset_forge/dpid/`, and are exp
 
 **Testing:**
 All DPID implementations (including Umzi's) are covered by robust, non-interactive tests using pytest and monkeypatching. Tests validate that output files are created for both single-folder and HQ/LQ workflows, and that the API is reliable and isolated from external dependencies.
+
+### Menu/Workflow Patterns: Workflow Heading Pattern
+
+All interactive workflows and menu actions must print a clear, Mocha-styled heading before input/output prompts and before progress bars or long-running operations. This is enforced for all new and refactored workflows. See the Style Guide for rationale, code examples, and enforcement checklist.

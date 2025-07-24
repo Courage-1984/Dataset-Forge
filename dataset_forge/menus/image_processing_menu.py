@@ -191,9 +191,18 @@ def extract_sketches_menu():
         extract_sketches_workflow,
     )
     from dataset_forge.utils.input_utils import get_path_with_history
-    from dataset_forge.utils.printing import print_info, print_error
+    from dataset_forge.utils.printing import (
+        print_info,
+        print_error,
+        print_header,
+        print_section,
+    )
+    from dataset_forge.utils.color import Mocha
 
-    print_header("✏️  Find & extract sketches/drawings/line art", color=Mocha.mauve)
+    print_header(
+        "✏️  Find & extract sketches/drawings/line art - Input/Output Selection",
+        color=Mocha.mauve,
+    )
     print_info("Choose input mode:")
     print_info("  1. 📂 HQ/LQ paired folders")
     print_info("  2. 📁 Single folder")
@@ -211,6 +220,7 @@ def extract_sketches_menu():
             )
         except Exception:
             confidence = 0.5
+        print_section("Sketch Extraction Progress", color=Mocha.mauve)
         extract_sketches_workflow(
             hq_folder=hq_folder, lq_folder=lq_folder, confidence_threshold=confidence
         )
@@ -225,6 +235,7 @@ def extract_sketches_menu():
             )
         except Exception:
             confidence = 0.5
+        print_section("Sketch Extraction Progress", color=Mocha.mauve)
         extract_sketches_workflow(single_folder=folder, confidence_threshold=confidence)
     elif choice == "0":
         print_info("❌ Operation cancelled.")

@@ -5,6 +5,7 @@ from dataset_forge.utils.printing import (
     print_success,
     print_warning,
     print_header,
+    print_section,
 )
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
@@ -13,41 +14,43 @@ import os
 
 def imagededup_menu():
     """Menu for imagededup operations."""
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
 
     def single_folder_dedup():
         """Handle single folder deduplication."""
         from dataset_forge.actions.imagededup_actions import imagededup_workflow
 
-        print_header("Single Folder Deduplication")
-
+        print_header(
+            "🖼️ Image Deduplication - Input/Output Selection", color=Mocha.yellow
+        )
         # Get folder path
         folder = get_folder_path("Enter folder path: ")
-
         # Get hash method
+        print_header(
+            "🖼️ Image Deduplication - Hash Method Selection", color=Mocha.yellow
+        )
         print("\nHash methods:")
         print("1. PHash (Perceptual Hash) - Recommended")
         print("2. DHash (Difference Hash)")
         print("3. AHash (Average Hash)")
         print("4. WHash (Wavelet Hash)")
-
         hash_choice = input("Select hash method [1]: ").strip() or "1"
         hash_methods = {"1": "phash", "2": "dhash", "3": "ahash", "4": "whash"}
         hash_method = hash_methods.get(hash_choice, "phash")
-
         # Get threshold
         try:
             threshold = int(input("Max distance threshold [10]: ").strip() or "10")
         except ValueError:
             threshold = 10
-
-            # Get operation
+        # Get operation
+        print_header("🖼️ Image Deduplication - Operation Selection", color=Mocha.yellow)
         print("\nOperations:")
         print("1. Find duplicates (show only)")
         print("2. Remove duplicates")
         print("3. Move duplicates to separate folder")
         print("4. Generate duplicate report")
         print("5. Debug directory contents")
-
         op_choice = input("Select operation [1]: ").strip() or "1"
         operations = {
             "1": "find",
@@ -57,19 +60,16 @@ def imagededup_menu():
             "5": "debug",
         }
         operation = operations.get(op_choice, "find")
-
         # Get additional parameters based on operation
         destination_dir = None
         output_file = None
         dry_run = True
-
         if operation == "find":
             save_results = (
                 input("Save results to file? (y/n) [n]: ").strip().lower() or "n"
             )
             if save_results == "y":
                 output_file = input("Enter output file path: ").strip()
-
         elif operation in ["remove", "move"]:
             confirm = (
                 input("This will permanently modify files. Continue? (y/n) [n]: ")
@@ -82,12 +82,10 @@ def imagededup_menu():
             else:
                 print_warning("Operation cancelled.")
                 return
-
         if operation == "move":
             destination_dir = get_folder_path(
                 "Enter destination folder for duplicates: "
             )
-
         elif operation == "report":
             destination_dir = input(
                 "Enter report output directory (leave blank for default): "
@@ -97,11 +95,10 @@ def imagededup_menu():
         elif operation == "debug":
             # Debug operation doesn't need additional parameters
             pass
-
+        print_section("Image Deduplication Progress", color=Mocha.yellow)
         # Run the operation
         try:
             if operation == "debug":
-                # Handle debug operation separately
                 from dataset_forge.actions.imagededup_actions import ImageDedupHandler
 
                 handler = ImageDedupHandler(hash_method)
@@ -117,14 +114,12 @@ def imagededup_menu():
                     output_file=output_file,
                     dry_run=dry_run,
                 )
-
             if operation == "find":
                 duplicates = result.get("duplicates", {})
                 total_duplicates = sum(len(dups) for dups in duplicates.values())
                 print_success(
                     f"Found {len(duplicates)} duplicate groups with {total_duplicates} total duplicate files."
                 )
-
                 if duplicates:
                     print("\nDuplicate groups:")
                     for i, (original, dups) in enumerate(duplicates.items(), 1):
@@ -133,7 +128,6 @@ def imagededup_menu():
                         print(f"  Duplicates ({len(dups)}):")
                         for dup in dups:
                             print(f"    - {dup}")
-
         except Exception as e:
             print_error(f"Error during deduplication: {e}")
 

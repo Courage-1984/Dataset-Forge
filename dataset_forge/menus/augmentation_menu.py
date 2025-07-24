@@ -12,6 +12,7 @@ from dataset_forge.utils.printing import (
     print_warning,
     print_info,
     print_error,
+    print_header,
 )
 from dataset_forge.utils.menu import show_menu, lazy_action
 from dataset_forge.utils.color import Mocha
@@ -32,10 +33,13 @@ except ImportError:
 
 
 def augmentation_menu():
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
     from dataset_forge.actions import augmentation_actions as aug
 
     options = augmentation_menu.__menu_options__
     while True:
+        print_header("🚀 Augmentation - Input/Output Selection", color=Mocha.sapphire)
         choice = show_menu(
             "🚀 Augmentation",
             options,
@@ -46,6 +50,7 @@ def augmentation_menu():
             break
         action = options[choice][1]
         if callable(action):
+            print_section("Augmentation Progress", color=Mocha.sapphire)
             action()
 
 

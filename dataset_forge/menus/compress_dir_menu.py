@@ -5,6 +5,7 @@ from dataset_forge.utils.printing import (
     print_info,
     print_success,
     print_error,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.input_utils import get_folder_path
@@ -13,7 +14,7 @@ from dataset_forge.utils.input_utils import get_folder_path
 def compress_dir_menu():
     from dataset_forge.actions.compress_dir_actions import compress_directory
 
-    print_header("Compress Directory", color=Mocha.lavender)
+    print_header("🗜️ Compress Directory - Input/Output Selection", color=Mocha.lavender)
     input_dir = get_folder_path("Enter input directory path: ")
     if not input_dir:
         print_error("No input directory specified.")
@@ -40,6 +41,7 @@ def compress_dir_menu():
         print_error("Invalid format. Using jpeg.")
         format_choice = "jpeg"
 
+    print_section("Compress Directory Progress", color=Mocha.lavender)
     print_info("Starting directory compression...")
     try:
         compress_directory(input_dir, output_dir, quality=quality, format=format_choice)

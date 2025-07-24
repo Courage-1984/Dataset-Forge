@@ -339,4 +339,19 @@ A comprehensive static analysis tool for maintainers and contributors.
 - The workflow is fully automated and robust to input errors.
 - All steps are covered by automated tests for reliability.
 
+## Example: Workflow Headings in Action
+
+When running a workflow, you will see clear headings before input prompts and before progress bars:
+
+```
+🧩 Best Tile Extraction (PepeDP) - Input/Output Selection
+Input folder: ...
+Output folder: ...
+...
+Best Tile Extraction Progress
+[progress bar]
+```
+
+This pattern is used throughout Dataset Forge for all interactive workflows. See the Style Guide for more information.
+
 [Back to Table of Contents](#table-of-contents)

@@ -17,8 +17,12 @@ from dataset_forge.utils.input_utils import ask_yes_no, get_folder_path
 
 def sanitize_images_menu():
     from dataset_forge.actions import sanitize_images_actions
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
 
-    print_header("🧹 Sanitize Images Workflow 🧹", char="=", color=Mocha.lavender)
+    print_header(
+        "🧹 Sanitize Images Workflow - Input/Output Selection", color=Mocha.lavender
+    )
     while True:
         print_section("Select Input Mode", char="-", color=Mocha.sapphire)
         print_info("[1] Single folder")
@@ -85,6 +89,7 @@ def sanitize_images_menu():
         except Exception as e:
             print_warning(f"Could not run print_zsteg_env.py: {e}")
         print_info("=== End Diagnostics ===\n")
+        print_section("Sanitize Images Progress", color=Mocha.lavender)
         # --- Run the workflow (all step prompts now handled inside) ---
         summary = sanitize_images_actions.sanitize_images(
             input_path,

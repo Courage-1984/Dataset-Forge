@@ -92,7 +92,7 @@ def create_multiscale_dataset(*args, **kwargs):
         return
     overwrite = input("Overwrite existing files? [y/N]: ").strip().lower() == "y"
     dpid_kwargs = {}
-    if method in {"1", "2", "3", "4"}:
+    if method in {"1", "2"}:
         print_section("DPID kernel parameters (press Enter for defaults):")
         kernel_size = input("DPID kernel size [default 21]: ").strip()
         sigma = input("DPID sigma [default 2.0]: ").strip()
@@ -111,35 +111,74 @@ def create_multiscale_dataset(*args, **kwargs):
             dpid_kwargs["sig_x"] = float(sig_x) if sig_x else 2.0
             dpid_kwargs["sig_y"] = float(sig_y) if sig_y else 2.0
             dpid_kwargs["theta"] = float(theta) if theta else 0.0
-    if method == "4":
+    elif method == "3":
         print_section("DPID lambda parameter (press Enter for default 0.5):")
         lambd = input("DPID lambda [default 0.5]: ").strip()
         dpid_kwargs["lambd"] = float(lambd) if lambd else 0.5
+    elif method == "4":
+        print_section("DPID lambda parameter (press Enter for default 0.5):")
+        lambd = input("DPID lambda [default 0.5]: ").strip()
+        dpid_kwargs["lambd"] = float(lambd) if lambd else 0.5
+
+    # --- Print heading before input/output folder prompts ---
+    from dataset_forge.utils.color import Mocha
+
     if mode == "1":
+        if method == "1":
+            print_header("[BasicSR DPID] Input/Output Selection", color=Mocha.blue)
+        elif method == "2":
+            print_header(
+                "[OpenMMLab DPID] Input/Output Selection", color=Mocha.sapphire
+            )
+        elif method == "3":
+            print_header("[Phhofm DPID] Input/Output Selection", color=Mocha.green)
+        elif method == "4":
+            print_header("[Umzi DPID] Input/Output Selection", color=Mocha.mauve)
         input_folder = input("Enter input folder path: ").strip()
         output_base = input("Enter output base folder path: ").strip()
+        # --- Print heading before progress bar ---
         if method == "1":
+            print_section("BasicSR DPID Progress", color=Mocha.blue)
             run_basicsr_dpid_single_folder(
                 input_folder, output_base, scales, overwrite=overwrite, **dpid_kwargs
             )
         elif method == "2":
+            print_section("OpenMMLab DPID Progress", color=Mocha.sapphire)
             run_openmmlab_dpid_single_folder(
                 input_folder, output_base, scales, overwrite=overwrite, **dpid_kwargs
             )
         elif method == "3":
+            print_section("Phhofm DPID Progress", color=Mocha.green)
             run_phhofm_dpid_single_folder(
                 input_folder, output_base, scales, overwrite=overwrite
             )
         elif method == "4":
+            print_section("Umzi DPID Progress", color=Mocha.mauve)
             run_umzi_dpid_single_folder(
                 input_folder, output_base, scales, overwrite=overwrite, **dpid_kwargs
             )
     else:
+        if method == "1":
+            print_header(
+                "[BasicSR DPID] HQ/LQ Input/Output Selection", color=Mocha.blue
+            )
+        elif method == "2":
+            print_header(
+                "[OpenMMLab DPID] HQ/LQ Input/Output Selection", color=Mocha.sapphire
+            )
+        elif method == "3":
+            print_header(
+                "[Phhofm DPID] HQ/LQ Input/Output Selection", color=Mocha.green
+            )
+        elif method == "4":
+            print_header("[Umzi DPID] HQ/LQ Input/Output Selection", color=Mocha.mauve)
         hq_folder = input("Enter HQ folder path: ").strip()
         lq_folder = input("Enter LQ folder path: ").strip()
         out_hq_base = input("Enter output HQ base folder path: ").strip()
         out_lq_base = input("Enter output LQ base folder path: ").strip()
+        # --- Print heading before progress bar ---
         if method == "1":
+            print_section("BasicSR DPID Progress", color=Mocha.blue)
             run_basicsr_dpid_hq_lq(
                 hq_folder,
                 lq_folder,
@@ -150,6 +189,7 @@ def create_multiscale_dataset(*args, **kwargs):
                 **dpid_kwargs,
             )
         elif method == "2":
+            print_section("OpenMMLab DPID Progress", color=Mocha.sapphire)
             run_openmmlab_dpid_hq_lq(
                 hq_folder,
                 lq_folder,
@@ -160,6 +200,7 @@ def create_multiscale_dataset(*args, **kwargs):
                 **dpid_kwargs,
             )
         elif method == "3":
+            print_section("Phhofm DPID Progress", color=Mocha.green)
             run_phhofm_dpid_hq_lq(
                 hq_folder,
                 lq_folder,
@@ -169,6 +210,7 @@ def create_multiscale_dataset(*args, **kwargs):
                 overwrite=overwrite,
             )
         elif method == "4":
+            print_section("Umzi DPID Progress", color=Mocha.mauve)
             run_umzi_dpid_hq_lq(
                 hq_folder,
                 lq_folder,

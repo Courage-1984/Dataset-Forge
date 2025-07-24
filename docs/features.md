@@ -335,3 +335,7 @@ Dataset Forge uses four distinct sounds to provide immediate feedback for key ev
 - (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
 
 These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
+
+## 🖥️ User Experience and CLI Features
+
+- All interactive workflows and menu actions print clear, Mocha-styled headings before input/output prompts and before progress bars or long-running operations. This provides context and improves navigation. See the Style Guide for implementation details.

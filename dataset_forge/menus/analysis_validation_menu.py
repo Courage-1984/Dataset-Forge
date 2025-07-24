@@ -41,9 +41,14 @@ def lazy_action(module_path, func_name):
 
 def comprehensive_validation_menu():
     """Sub-menu for comprehensive validation and reporting."""
+    from dataset_forge.utils.printing import print_header, print_section
+    from dataset_forge.utils.color import Mocha
 
     def progressive_validation_workflow():
-        print_header("🔍 Progressive Dataset Validation", color=Mocha.teal)
+        print_header(
+            "🔍 Progressive Dataset Validation - Input/Output Selection",
+            color=Mocha.teal,
+        )
         hq = get_path_with_history(
             "📁 Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
@@ -56,12 +61,16 @@ def comprehensive_validation_menu():
             progressive_dataset_validation,
         )
 
+        print_section("Progressive Validation Progress", color=Mocha.teal)
         progressive_dataset_validation(hq, lq)
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 
     def rich_reports_workflow():
-        print_header("📊 Rich Reports (HTML/Markdown)", color=Mocha.mauve)
+        print_header(
+            "📊 Rich Reports (HTML/Markdown) - Input/Output Selection",
+            color=Mocha.peach,
+        )
         print_info("Generate a detailed report with plots and sample images.")
         print("1. 📂 HQ/LQ parent_path workflow")
         print("2. 📁 Single-folder workflow")
@@ -93,9 +102,9 @@ def comprehensive_validation_menu():
             )
         except ValueError:
             max_quality_images = 100
-        # Generate report
         from dataset_forge.actions.report_actions import generate_rich_report
 
+        print_section("Rich Reports Progress", color=Mocha.peach)
         generate_rich_report(
             hq_path=hq,
             lq_path=lq,
@@ -109,7 +118,10 @@ def comprehensive_validation_menu():
         input()
 
     def quality_scoring_workflow():
-        print_header("⭐ Automated Dataset Quality Scoring", color=Mocha.yellow)
+        print_header(
+            "⭐ Automated Dataset Quality Scoring - Input/Output Selection",
+            color=Mocha.yellow,
+        )
         print("1. 📊 Score HQ/LQ folders")
         print("2. 📁 Score single folder")
         print("0. ⬅️ Return to main menu")
@@ -125,6 +137,7 @@ def comprehensive_validation_menu():
                 score_hq_lq_folders,
             )
 
+            print_section("Quality Scoring Progress", color=Mocha.yellow)
             score_hq_lq_folders(hq, lq)
         elif choice == "2":
             folder = get_path_with_history(
@@ -134,6 +147,7 @@ def comprehensive_validation_menu():
                 score_images_with_pyiqa,
             )
 
+            print_section("Quality Scoring Progress", color=Mocha.yellow)
             score_images_with_pyiqa(folder)
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()

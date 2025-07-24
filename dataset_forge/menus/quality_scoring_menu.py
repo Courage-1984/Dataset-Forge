@@ -11,10 +11,15 @@ def quality_scoring_menu():
         filter_images_by_quality,
         score_hq_lq_folders,
     )
-    from dataset_forge.utils.printing import print_error
+    from dataset_forge.utils.printing import print_error, print_header, print_section
+    from dataset_forge.utils.color import Mocha
 
     options = quality_scoring_menu.__menu_options__
     while True:
+        print_header(
+            "⭐ Automated Dataset Quality Scoring - Input/Output Selection",
+            color=Mocha.sapphire,
+        )
         key = show_menu(
             "Automated Dataset Quality Scoring",
             options,
@@ -27,6 +32,7 @@ def quality_scoring_menu():
         action = options.get(key, (None, None))[1]
         print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
+            print_section("Quality Scoring Progress", color=Mocha.sapphire)
             action()
         else:
             print_error(

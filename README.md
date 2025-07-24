@@ -127,6 +127,7 @@ Style Transfer: Apply artistic styles to datasets
 Content-Aware Cropping: Intelligent image cropping
 
 ```
+
 - [ ] **Advanced Data Augmentation**:
 
 ```
@@ -140,6 +141,7 @@ Suggestions:
 - GAN-based Augmentations: For advanced users, integrate with a pre-trained StyleGAN to generate synthetic data variations.
 
 ```
+
 - [ ] **Onboarding**: Add 'onboarding' doc/flow
 - [ ] **Build**: Release a stable build at some point
 
@@ -169,6 +171,12 @@ This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](
   <a href="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge"><img src="https://img.shields.io/github/last-commit/Courage-1984/Dataset-Forge" alt="Last Commit"></a>
     <a href="https://github.com/Courage-1984/Dataset-Forge/actions"><img src="https://img.shields.io/github/workflow/status/Courage-1984/Dataset-Forge/CI?label=build" alt="Build Status"></a>
 </p>
+
+---
+
+## 🖥️ CLI Workflow Headings
+
+All interactive workflows print clear, Mocha-styled headings before input/output prompts and before progress bars. This improves user experience and navigation. See the Style Guide for details.
 
 ---
 
@@ -203,4 +211,8 @@ flowchart TD
 
 ---
 
-#### *VERBOSE*:
+#### _VERBOSE_:
+
+```
+
+```

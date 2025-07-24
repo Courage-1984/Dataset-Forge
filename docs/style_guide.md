@@ -309,3 +309,44 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 - All menu actions must be thin wrappers around PepeDP, with all user inputs overridable for tests.
 - All workflows must provide public, non-interactive APIs for robust, automated testing.
 - All new features must be documented in all relevant docs and README_full.md.
+
+## Workflow Heading Pattern for Interactive Workflows
+
+All interactive workflows and menu actions in Dataset Forge must print a clear, Mocha-styled heading:
+
+- **Before input/output prompts** (e.g., "Input/Output Selection")
+- **Before progress bars or long-running operations** (e.g., "Progress")
+
+### How to Implement
+
+- Use `print_header` or `print_section` from `dataset_forge.utils.printing`.
+- Use the Catppuccin Mocha color scheme (see `dataset_forge.utils.color.Mocha`).
+- The heading should clearly indicate the workflow and the stage (e.g., "🧩 Best Tile Extraction (PepeDP) - Input/Output Selection").
+
+### Example
+
+```python
+from dataset_forge.utils.printing import print_header, print_section
+from dataset_forge.utils.color import Mocha
+
+# Before input/output prompts
+print_header("🧩 Best Tile Extraction (PepeDP) - Input/Output Selection", color=Mocha.pink)
+# ... input prompts ...
+
+# Before progress bar
+print_section("Best Tile Extraction Progress", color=Mocha.pink)
+# ... run progress bar ...
+```
+
+### Rationale
+
+- Provides clear context for users at each stage of a workflow.
+- Improves navigation and user experience, especially in complex or multi-step workflows.
+- Ensures consistency across all CLI features and menus.
+
+### Enforcement Checklist
+
+- [ ] All new workflows print a heading before input/output prompts.
+- [ ] All new workflows print a heading before progress bars/long-running operations.
+- [ ] All headings use the Catppuccin Mocha color scheme and centralized printing utilities.
+- [ ] All menu actions and workflows are reviewed for this pattern before merging.

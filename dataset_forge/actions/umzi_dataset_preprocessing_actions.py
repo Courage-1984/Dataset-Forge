@@ -60,6 +60,12 @@ def best_tile_extraction_action(
     try:
         if in_folder is None:
             print("DEBUG: in_folder missing, prompting user...")
+            from dataset_forge.utils.color import Mocha
+
+            print_header(
+                "🧩 Best Tile Extraction (PepeDP) - Input/Output Selection",
+                color=Mocha.pink,
+            )
             in_folder = get_folder_path("Input folder")
         if out_folder is None:
             print("DEBUG: out_folder missing, prompting user...")
@@ -107,6 +113,10 @@ def best_tile_extraction_action(
             image_gray=image_gray,
             func=func,
         )
+        # --- Print heading before progress bar ---
+        from dataset_forge.utils.color import Mocha
+
+        print_section("Best Tile Extraction Progress", color=Mocha.pink)
         print("DEBUG: Running BestTile.run()...")
         bt.run()
         print("DEBUG: BestTile.run() complete.")
@@ -156,6 +166,13 @@ def video_frame_extraction_action(
                 "Distance function", ["euclid", "cosine"], default=0
             )
         dist_fn = euclid_dist if dist_fn_name == "euclid" else cosine_dist
+        # --- Print heading before input/output prompts ---
+        from dataset_forge.utils.color import Mocha
+
+        print_header(
+            "🎬 Video Frame Extraction (PepeDP) - Input/Output Selection",
+            color=Mocha.yellow,
+        )
         if video_path is None:
             print("DEBUG: video_path missing, prompting user...")
             video_path = get_input("Video path", default="video.mp4")
@@ -175,6 +192,8 @@ def video_frame_extraction_action(
             threshold=threshold,
             distance_fn=dist_fn,
         )
+        # --- Print heading before progress bar ---
+        print_section("Video Frame Extraction Progress", color=Mocha.yellow)
         print("DEBUG: Calling VideoToFrame(video_path, out_folder)...")
         vtf(video_path, out_folder)
         print("DEBUG: VideoToFrame call complete.")

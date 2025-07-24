@@ -4,6 +4,7 @@ from dataset_forge.utils.printing import (
     print_warning,
     print_prompt,
     print_info,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.input_utils import get_path_with_history
@@ -15,7 +16,10 @@ def cbir_menu():
     Uses deep learning embeddings (CLIP, ResNet, VGG) to find conceptually similar images.
     """
     while True:
-        print_header("🧠 CBIR (Semantic Duplicate Detection)", color=Mocha.yellow)
+        print_header(
+            "🧠 CBIR (Semantic Duplicate Detection) - Input/Output Selection",
+            color=Mocha.yellow,
+        )
         print("1. HQ/LQ parent_path workflow")
         print("2. Single-folder workflow")
         print("0. Return to previous menu")
@@ -38,6 +42,10 @@ def cbir_menu():
         else:
             print_warning("Invalid selection. Please try again.")
             continue
+        print_header(
+            "🧠 CBIR (Semantic Duplicate Detection) - Model Selection",
+            color=Mocha.yellow,
+        )
         print("\nSelect embedding model:")
         print("1. CLIP (semantic, recommended)")
         print("2. ResNet (classic CNN)")
@@ -68,6 +76,7 @@ def cbir_menu():
             metric = "cosine"
         else:
             metric = "cosine"  # ResNet/VGG: cosine is default, can add option later
+        print_section("CBIR Progress", color=Mocha.yellow)
         # Call CBIR workflow
         from dataset_forge.actions.cbir_actions import cbir_workflow
 
