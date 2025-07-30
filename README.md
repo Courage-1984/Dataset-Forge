@@ -85,7 +85,9 @@ Please see [Features](docs/features.md).
    venv312\Scripts\activate
    # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-   pip install .
+   pip install pepeline pepedpid
+   pip install -r requirements.txt
+   pip install pepedp
    ```
 
    > **Note:** If you use a different CUDA version, see https://pytorch.org/get-started/locally/ for the right install command.

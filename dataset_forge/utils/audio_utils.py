@@ -20,12 +20,12 @@ try:
 except ImportError:
     WINSOUND_AVAILABLE = False
 
-try:
-    from playsound import playsound
+# try:
+#     from playsound import playsound
 
-    PLAYSOUND_AVAILABLE = True
-except ImportError:
-    PLAYSOUND_AVAILABLE = False
+#     PLAYSOUND_AVAILABLE = True
+# except ImportError:
+#     PLAYSOUND_AVAILABLE = False
 
 
 class AudioPlayer:
@@ -99,13 +99,13 @@ class AudioPlayer:
             except Exception as e:
                 print(f"Winsound failed: {e}")
 
-        # Try playsound
-        if PLAYSOUND_AVAILABLE:
-            try:
-                playsound(str(self.audio_file_path), block=True)
-                return
-            except Exception as e:
-                print(f"Playsound failed: {e}")
+        # # Try playsound
+        # if PLAYSOUND_AVAILABLE:
+        #     try:
+        #         playsound(str(self.audio_file_path), block=True)
+        #         return
+        #     except Exception as e:
+        #         print(f"Playsound failed: {e}")
 
         # Try system-specific commands
         try:
