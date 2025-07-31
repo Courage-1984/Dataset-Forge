@@ -424,10 +424,16 @@ def resave_images_menu():
 
         while True:
             try:
-                action = show_menu("🔄 Resave Images", options, Mocha.lavender)
-                if action is None:
-                    break
-                action()
+                key = show_menu(
+                    "🔄 Resave Images",
+                    options,
+                    Mocha.lavender,
+                )
+                if key is None or key == "0":
+                    return
+                action = options[key][1]
+                if callable(action):
+                    action()
             except (KeyboardInterrupt, EOFError):
                 print_info("\nExiting...")
                 break

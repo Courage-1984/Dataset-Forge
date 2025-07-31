@@ -459,3 +459,6 @@ def filter_non_images(
             "Must provide either a single folder or both hq_folder and lq_folder."
         )
     return results
+
+
+dedupe = de_dupe

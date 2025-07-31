@@ -57,14 +57,14 @@ def openmodeldb_model_browser_menu():
             ),
             "0": ("⬅️  Back to Previous Menu", None),
         }
-        choice = show_menu(
+        key = show_menu(
             "OpenModelDB Model Browser",
             options,
             Mocha.lavender,
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             return
-        action = options[choice][1]
+        action = options[key][1]
         if callable(action):
             action(models)
 
@@ -87,10 +87,10 @@ def search_filter_menu(models):
             "5": ("🧩 Advanced/Combined Filter", lambda: filter_advanced(models)),
             "0": ("⬅️  Back", None),
         }
-        choice = show_menu("Search/Filter Models", options, Mocha.lavender)
-        if choice is None or choice == "0":
+        key = show_menu("Search/Filter Models", options, Mocha.lavender)
+        if key is None or key == "0":
             return
-        options[choice][1]()
+        options[key][1]()
 
 
 def filter_by_tag(models):
@@ -175,10 +175,10 @@ def list_models_menu(models):
     }
     options["0"] = ("Back", None)
     while True:
-        choice = show_menu("Select a Model", options, Mocha.lavender)
-        if choice is None or choice == "0":
+        key = show_menu("Select a Model", options, Mocha.lavender)
+        if key is None or key == "0":
             return
-        model_key = options[choice][1]
+        model_key = options[key][1]
         model_details_menu(models, model_key)
 
 
@@ -225,10 +225,10 @@ def list_downloaded_models_menu(models):
         options[str(i + 1)] = (label, f)
     options["0"] = ("Back", None)
     while True:
-        choice = show_menu("Select a Downloaded Model File", options, Mocha.lavender)
-        if choice is None or choice == "0":
+        key = show_menu("Select a Downloaded Model File", options, Mocha.lavender)
+        if key is None or key == "0":
             return
-        selected_file = options[choice][1]
+        selected_file = options[key][1]
         model_info = file_to_model[selected_file]
         downloaded_model_menu(selected_file, model_info)
 
@@ -265,10 +265,10 @@ def downloaded_model_menu(filename, model_info):
         )
     options["0"] = ("Back", None)
     while True:
-        choice = show_menu(f"Downloaded Model: {filename}", options, Mocha.lavender)
-        if choice is None or choice == "0":
+        key = show_menu(f"Downloaded Model: {filename}", options, Mocha.lavender)
+        if key is None or key == "0":
             return
-        options[choice][1]()
+        options[key][1]()
 
 
 def prompt_image_path():
@@ -351,10 +351,10 @@ def model_details_menu(models, model_key):
         "0": ("Back", None),
     }
     while True:
-        choice = show_menu(f"Model: {details['name']}", options, Mocha.lavender)
-        if choice is None or choice == "0":
+        key = show_menu(f"Model: {details['name']}", options, Mocha.lavender)
+        if key is None or key == "0":
             return
-        options[choice][1]()
+        options[key][1]()
 
 
 def test_model_interactive(model_details, models_dir):

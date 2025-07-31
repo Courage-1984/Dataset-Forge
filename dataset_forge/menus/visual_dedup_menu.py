@@ -58,7 +58,7 @@ def visual_dedup_menu():
         threshold = None
         print_section("Visual Deduplication Progress", color=Mocha.yellow)
         try:
-            visual_dedup_workflow(
+            results = visual_dedup_workflow(
                 hq_path=hq,
                 lq_path=lq,
                 single_folder_path=folder,
@@ -68,7 +68,45 @@ def visual_dedup_menu():
             )
         except Exception as e:
             print_warning(f"Error during visual deduplication: {e}")
-        # At the end of the workflow, after all processing:
+            results = None
+        # Post-processing: Offer move/copy/delete if duplicates found
+        if results:
+            # Flatten all groups from all folders
+            all_groups = []
+            for group_list in results.values():
+                all_groups.extend(group_list)
+            if all_groups:
+                print_section("Duplicate Groups Found", color=Mocha.peach)
+                print_info(f"Found {len(all_groups)} duplicate groups.")
+                print_info("What would you like to do with the duplicates?")
+                print("[1] Move to folder")
+                print("[2] Copy to folder")
+                print("[3] Delete in-place")
+                print("[0] Do nothing")
+                action = input("Select action: ").strip()
+                if action == "1":
+                    dest = get_path_with_history(
+                        "Enter destination folder for moved duplicates",
+                        is_destination=True,
+                    )
+                    moved = move_duplicate_groups(all_groups, dest, dry_run=False)
+                    print_info(f"Moved {len(moved)} files to {dest}")
+                elif action == "2":
+                    dest = get_path_with_history(
+                        "Enter destination folder for copied duplicates",
+                        is_destination=True,
+                    )
+                    copied = copy_duplicate_groups(all_groups, dest, dry_run=False)
+                    print_info(f"Copied {len(copied)} files to {dest}")
+                elif action == "3":
+                    removed = remove_duplicate_groups(all_groups, dry_run=False)
+                    print_info(f"Deleted {len(removed)} duplicate files in-place.")
+                else:
+                    print_info("No action taken. Duplicates remain in place.")
+            else:
+                print_info("No duplicate groups found.")
+        else:
+            print_warning("No results returned from deduplication workflow.")
         print_prompt("\n⏸️ Press Enter to return to the Visual Deduplication menu...")
         input()
 

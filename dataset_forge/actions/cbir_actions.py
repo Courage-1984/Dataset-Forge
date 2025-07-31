@@ -4,9 +4,7 @@ from typing import List, Optional, Tuple, Dict
 import numpy as np
 from PIL import Image
 import torch
-from dataset_forge.utils.progress_utils import tqdm, smart_map
-from dataset_forge.utils.parallel_utils import ParallelConfig, ProcessingType
-from dataset_forge.menus.session_state import parallel_config
+from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.printing import (
     print_info,
     print_success,
@@ -56,21 +54,16 @@ def load_images_from_folder(
         except Exception:
             return None
 
-    config = ParallelConfig(
-        max_workers=parallel_config.get("max_workers"),
-        processing_type=ProcessingType.THREAD,
-        use_gpu=parallel_config.get("use_gpu", True),
-    )
-    from dataset_forge.utils.parallel_utils import parallel_image_processing
-
-    loaded_images = parallel_image_processing(
-        load_single_image,
-        image_paths,
-        desc="Loading Images",
-        max_workers=config.max_workers,
-    )
-    images = [img for img in loaded_images if img is not None]
-    return images
+    # Sequential processing to avoid pickling issues
+    loaded_images = []
+    for path in tqdm(image_paths, desc="Loading Images"):
+        try:
+            img = load_single_image(path)
+            if img is not None:
+                loaded_images.append(img)
+        except Exception as e:
+            print_warning(f"Error loading image {path}: {e}")
+    return loaded_images
 
 
 def get_model_enum(model_name: str):
@@ -88,7 +81,7 @@ def get_model_enum(model_name: str):
         raise ValueError(f"Unknown model: {model_name}")
 
 
-@disk_cache
+@disk_cache(compression=True, ttl_seconds=3600)
 def extract_embeddings(
     images: List[Tuple[str, Image.Image]], model_name: str, device: str = "cuda"
 ) -> np.ndarray:
@@ -142,17 +135,20 @@ def extract_embeddings(
                     emb = np.array(emb).flatten()
                 return emb
 
-        config = ParallelConfig(
-            max_workers=parallel_config.get("max_workers"),
-            processing_type=ProcessingType.THREAD,
-            use_gpu=parallel_config.get("use_gpu", True),
-        )
-        embs = smart_map(
-            get_embedding,
-            images,
-            desc="ResNet embedding",
-            max_workers=config.max_workers,
-        )
+        # Sequential processing to avoid pickling issues
+        embs = []
+        for i, img_tuple in enumerate(tqdm(images, desc="ResNet embedding")):
+            try:
+                emb = get_embedding(img_tuple)
+                embs.append(emb)
+            except Exception as e:
+                print_warning(f"Error processing image {i}: {e}")
+                # Add zero embedding for failed images
+                if embs:
+                    embs.append(np.zeros_like(embs[0]))
+                else:
+                    # If no successful embeddings yet, create a dummy one
+                    embs.append(np.zeros(2048))  # ResNet50 feature size
         return np.stack(embs)
     elif model_name == "vgg":
         import timm
@@ -180,14 +176,20 @@ def extract_embeddings(
                     emb = np.array(emb).flatten()
                 return emb
 
-        config = ParallelConfig(
-            max_workers=parallel_config.get("max_workers"),
-            processing_type=ProcessingType.THREAD,
-            use_gpu=parallel_config.get("use_gpu", True),
-        )
-        embs = smart_map(
-            get_embedding, images, desc="VGG embedding", max_workers=config.max_workers
-        )
+        # Sequential processing to avoid pickling issues
+        embs = []
+        for i, img_tuple in enumerate(tqdm(images, desc="VGG embedding")):
+            try:
+                emb = get_embedding(img_tuple)
+                embs.append(emb)
+            except Exception as e:
+                print_warning(f"Error processing image {i}: {e}")
+                # Add zero embedding for failed images
+                if embs:
+                    embs.append(np.zeros_like(embs[0]))
+                else:
+                    # If no successful embeddings yet, create a dummy one
+                    embs.append(np.zeros(512))  # VGG16 feature size
         return np.stack(embs)
     else:
         raise ValueError(f"Unknown model: {model_name}")
@@ -195,8 +197,14 @@ def extract_embeddings(
 
 def compute_similarity_matrix(embs: np.ndarray, metric: str = "cosine") -> np.ndarray:
     if metric == "cosine":
-        norm_embs = embs / np.linalg.norm(embs, axis=1, keepdims=True)
+        # Handle zero vectors to avoid division by zero
+        norms = np.linalg.norm(embs, axis=1, keepdims=True)
+        # Replace zero norms with 1 to avoid division by zero
+        norms = np.where(norms == 0, 1, norms)
+        norm_embs = embs / norms
         sim_matrix = np.dot(norm_embs, norm_embs.T)
+        # Ensure diagonal is 1.0 for self-similarity
+        np.fill_diagonal(sim_matrix, 1.0)
         return sim_matrix
     elif metric == "euclidean":
         from scipy.spatial.distance import cdist

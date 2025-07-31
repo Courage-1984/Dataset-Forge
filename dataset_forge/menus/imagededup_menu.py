@@ -264,15 +264,17 @@ def imagededup_menu():
     }
 
     while True:
-        action = show_menu(
+        key = show_menu(
             "ImageDedup - Advanced Duplicate Detection",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None:
-            break
-        action()
+        if key is None or key == "0":
+            return
+        action = options[key][1]
+        if callable(action):
+            action()
         print_info("\nPress Enter to return to the menu...")
         input()
 

@@ -143,14 +143,15 @@ def colour_tone_levels_menu():
         "0": ("⬅️  Back", None),
     }
     while True:
-        action = show_menu(
+        key = show_menu(
             "🎨 Colour, Tone & Levels Adjustments",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        if key is None or key == "0":
             break
+        action = options.get(key, (None, None))[1]
         if callable(action):
             action()
         input("Press Enter to return to the menu...")
@@ -174,14 +175,15 @@ def metadata_menu():
         "0": ("⬅️  Back", None),
     }
     while True:
-        action = show_menu(
+        key = show_menu(
             "📋 EXIF & ICC Profile Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        if key is None or key == "0":
             break
+        action = options.get(key, (None, None))[1]
         if callable(action):
             action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
@@ -274,14 +276,14 @@ def image_processing_menu():
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
-        choice = show_menu(
+        key = show_menu(
             "✨ Image Processing & Augmentation",
             options,
             header_color=Mocha.sapphire,
             char="=",
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             return
-        action = options[choice][1]
+        action = options[key][1]
         if callable(action):
             action()

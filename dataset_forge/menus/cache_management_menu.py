@@ -61,10 +61,12 @@ def cache_management_menu():
 
     while True:
         try:
-            action = show_menu("Cache Management", options, Mocha.lavender)
-            if action is None:
+            key = show_menu("Cache Management", options, Mocha.lavender)
+            if key is None or key == "0":
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting Cache Management...")
             break
@@ -133,10 +135,12 @@ def clear_caches_menu():
 
     while True:
         try:
-            action = show_menu("Clear Caches", options, Mocha.lavender)
-            if action is None:
+            key = show_menu("Clear Caches", options, Mocha.lavender)
+            if key is None or key == "0":
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nReturning to Cache Management...")
             break
@@ -353,10 +357,12 @@ def cache_maintenance_menu():
 
     while True:
         try:
-            action = show_menu("Cache Maintenance", options, Mocha.lavender)
-            if action is None:
+            key = show_menu("Cache Maintenance", options, Mocha.lavender)
+            if key is None or key == "0":
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nReturning to Cache Management...")
             break
@@ -515,10 +521,12 @@ def cache_warmup_menu():
 
     while True:
         try:
-            action = show_menu("Cache Warmup", options, Mocha.lavender)
-            if action is None:
+            key = show_menu("Cache Warmup", options, Mocha.lavender)
+            if key is None or key == "0":
                 break
-            action()
+            action = options[key][1]
+            if callable(action):
+                action()
         except (KeyboardInterrupt, EOFError):
             print_info("\nReturning to Cache Management...")
             break

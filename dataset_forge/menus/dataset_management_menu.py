@@ -60,17 +60,15 @@ def dataset_creation_menu():
     }
 
     while True:
-        key = show_menu(
+        action = show_menu(
             "🎯 Create Dataset from Source",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
-        if key is None or key == "0":
+        print(f"DEBUG: key={action!r}, type={type(action)}")
+        if action is None or action == "0":
             break
-        action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             print(f"DEBUG: Calling action for menu selection: {action}")
             try:
@@ -359,7 +357,7 @@ def dataset_management_menu():
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
-        choice = show_menu(
+        key = show_menu(
             "📂 Dataset Management",
             options,
             header_color=Mocha.lavender,
@@ -367,8 +365,8 @@ def dataset_management_menu():
             current_menu="Dataset Management",
             menu_context=menu_context,
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             return
-        action = options[choice][1]
+        action = options[key][1]
         if callable(action):
             action()

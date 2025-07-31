@@ -137,14 +137,14 @@ def analysis_menu():
         "0": ("Back to Main Menu", None),
     }
     while True:
-        choice = show_menu(
+        key = show_menu(
             "Analysis Menu",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options[key][1]
         if callable(action):
             action()

@@ -39,6 +39,7 @@ cd Dataset-Forge
 - [Usage Guide](docs/usage.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Contributing](docs/contributing.md)
+- [Development Standards](.cursorrules) - Menu system patterns and coding standards
 - [Full Documentation Index](docs/index.md)
 
 ---

@@ -60,14 +60,14 @@ def transform_menu():
         "0": ("Back to Main Menu", None),
     }
     while True:
-        choice = show_menu(
+        key = show_menu(
             "Transform Menu",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
-            break
-        action = options[choice][1]
+        if key is None or key == "0":
+            return
+        action = options[key][1]
         if callable(action):
             action()

@@ -99,16 +99,16 @@ def main_menu():
                 ),
                 "0": ("🚪 Exit", None),
             }
-            choice = show_menu(
+            key = show_menu(
                 "🎨 Dataset Forge - Main Menu 🎨",
                 options,
                 Mocha.lavender,
                 current_menu="Main Menu",
                 menu_context=menu_context,
             )
-            if choice is None or choice == "0":
+            if key is None or key == "0":
                 return
-            action = options[choice][1]
+            action = options[key][1]
             if callable(action):
                 action()
         except (KeyboardInterrupt, EOFError):

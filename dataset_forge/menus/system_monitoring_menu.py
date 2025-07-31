@@ -174,10 +174,10 @@ def system_monitoring_menu():
     }
     while True:
         try:
-            choice = show_menu("🩺 System Monitoring & Health", options, Mocha.lavender)
-            if choice is None or choice == "0":
+            key = show_menu("🩺 System Monitoring & Health", options, Mocha.lavender)
+            if key is None or key == "0":
                 return
-            action = options[choice][1]
+            action = options[key][1]
             if callable(action):
                 action()
         except (KeyboardInterrupt, EOFError):

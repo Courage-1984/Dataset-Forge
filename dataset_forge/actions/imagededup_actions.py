@@ -16,8 +16,16 @@ except ImportError:
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
-from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.utils.history_log import log_operation
+
+from dataset_forge.utils.printing import (
+    print_info,
+    print_error,
+    print_success,
+    print_warning,
+    print_header,
+    print_section,
+)
 
 
 class ImageDedupHandler:
@@ -161,6 +169,14 @@ class ImageDedupHandler:
         """
         duplicates = self.find_duplicates(image_dir, max_distance_threshold)
 
+        # DEBUG: Print the duplicate mapping
+        print_info("[DEBUG] Duplicate mapping (original -> duplicates):")
+        for original, duplicate_list in duplicates.items():
+            print_info(f"  [ORIGINAL] {original}")
+            for dup_path in duplicate_list:
+                print_info(f"    [DUPLICATE] {dup_path}")
+        print_info(f"[DEBUG] All originals: {list(duplicates.keys())}")
+
         files_to_remove = []
         for original, duplicate_list in duplicates.items():
             # Convert relative paths to absolute paths and verify files exist
@@ -169,7 +185,11 @@ class ImageDedupHandler:
                 if os.path.exists(abs_path):
                     files_to_remove.append(abs_path)
                 else:
-                    print_warning(f"Duplicate file not found in directory: {abs_path}")
+                    print_warning(
+                        f"[DEBUG] Duplicate file not found in directory (skipped): {abs_path}"
+                    )
+
+        print_info(f"[DEBUG] All duplicates to operate on: {files_to_remove}")
 
         return files_to_remove
 
@@ -178,55 +198,88 @@ class ImageDedupHandler:
     ) -> List[str]:
         """
         Remove duplicate images from directory.
-
-        Args:
-            image_dir: Directory containing images
-            max_distance_threshold: Maximum distance for considering images as duplicates
-            dry_run: If True, only show what would be removed without actually removing
-
-        Returns:
-            List of removed file paths
+        Handles circular duplicates by picking one keeper per group.
         """
-        files_to_remove = self.find_duplicates_to_remove(
-            image_dir, max_distance_threshold
-        )
+        duplicates = self.find_duplicates(image_dir, max_distance_threshold)
 
-        if not files_to_remove:
+        # DEBUG: Print the duplicate mapping
+        print_info("[DEBUG] Duplicate mapping (original -> duplicates):")
+        for original, duplicate_list in duplicates.items():
+            print_info(f"  [ORIGINAL] {original}")
+            for dup_path in duplicate_list:
+                print_info(f"    [DUPLICATE] {dup_path}")
+        print_info(f"[DEBUG] All originals: {list(duplicates.keys())}")
+
+        # Strategy: For each group of duplicates, pick one as keeper and move/remove the rest
+        files_to_operate = []
+        processed_groups = set()  # Track which groups we've already processed
+
+        for original, duplicate_list in duplicates.items():
+            if not duplicate_list:  # Skip if no duplicates
+                continue
+
+            # Create a group with the original and all its duplicates
+            group = {original} | set(duplicate_list)
+            group_key = tuple(
+                sorted(group)
+            )  # Use sorted tuple as key to avoid processing same group twice
+
+            if group_key in processed_groups:
+                continue
+            processed_groups.add(group_key)
+
+            print_info(f"[DEBUG] Processing duplicate group: {group}")
+
+            # Pick the keeper (prefer files without "dup_" prefix, then alphabetical order)
+            keepers = [f for f in group if not f.startswith("dup_")]
+            if not keepers:
+                keepers = list(group)  # If all have "dup_" prefix, use all
+            keeper = min(keepers)  # Pick the first alphabetically
+
+            print_info(f"[DEBUG] Selected keeper: {keeper}")
+
+            # Add all other files in the group to the operation list
+            for file_path in group:
+                if file_path != keeper:
+                    abs_path = os.path.join(image_dir, file_path)
+                    if os.path.exists(abs_path):
+                        files_to_operate.append(abs_path)
+                        print_info(f"[DEBUG] Will operate on: {file_path}")
+                    else:
+                        print_warning(f"[DEBUG] File not found (skipped): {abs_path}")
+
+        print_info(f"[DEBUG] Files to operate on: {files_to_operate}")
+
+        if not files_to_operate:
             print_info("No duplicates found.")
             return []
-
-        print_info(f"Found {len(files_to_remove)} duplicate files to remove.")
-
+        print_info(f"Found {len(files_to_operate)} duplicate files to move/remove.")
         if dry_run:
             print_warning(
                 "DRY RUN - No files will be removed. Set dry_run=False to actually remove files."
             )
-            for file_path in files_to_remove:
+            for file_path in files_to_operate:
                 print_info(f"Would remove: {file_path}")
         else:
             removed_files = []
-            for file_path in tqdm(files_to_remove, desc="Removing duplicates"):
+            for file_path in tqdm(files_to_operate, desc="Removing duplicates"):
                 try:
-                    # Check if file exists before trying to remove it
                     if not os.path.exists(file_path):
                         print_warning(
                             f"File not found (may have been removed already): {file_path}"
                         )
                         continue
-
                     os.remove(file_path)
                     removed_files.append(file_path)
                 except Exception as e:
                     print_error(f"Error removing {file_path}: {e}")
-
             print_success(f"Removed {len(removed_files)} duplicate files.")
-            if len(removed_files) < len(files_to_remove):
+            if len(removed_files) < len(files_to_operate):
                 print_info(
-                    f"Note: {len(files_to_remove) - len(removed_files)} files were not removed (may have been removed already or don't exist)"
+                    f"Note: {len(files_to_operate) - len(removed_files)} files were not removed (may have been removed already or don't exist)"
                 )
             return removed_files
-
-        return files_to_remove
+        return files_to_operate
 
     def move_duplicates(
         self,
@@ -237,50 +290,80 @@ class ImageDedupHandler:
     ) -> List[str]:
         """
         Move duplicate images to a separate directory.
-
-        Args:
-            image_dir: Directory containing images
-            destination_dir: Directory to move duplicates to
-            max_distance_threshold: Maximum distance for considering images as duplicates
-            dry_run: If True, only show what would be moved without actually moving
-
-        Returns:
-            List of moved file paths
+        Only moves files that are duplicates (values in mapping), not originals (keys).
         """
-        files_to_move = self.find_duplicates_to_remove(
-            image_dir, max_distance_threshold
-        )
+        duplicates = self.find_duplicates(image_dir, max_distance_threshold)
 
-        if not files_to_move:
+        # DEBUG: Print the duplicate mapping
+        print_info("[DEBUG] Duplicate mapping (original -> duplicates):")
+        for original, duplicate_list in duplicates.items():
+            print_info(f"  [ORIGINAL] {original}")
+            for dup_path in duplicate_list:
+                print_info(f"    [DUPLICATE] {dup_path}")
+        print_info(f"[DEBUG] All originals: {list(duplicates.keys())}")
+
+        # Strategy: For each group of duplicates, pick one as keeper and move/remove the rest
+        files_to_operate = []
+        processed_groups = set()  # Track which groups we've already processed
+
+        for original, duplicate_list in duplicates.items():
+            if not duplicate_list:  # Skip if no duplicates
+                continue
+
+            # Create a group with the original and all its duplicates
+            group = {original} | set(duplicate_list)
+            group_key = tuple(
+                sorted(group)
+            )  # Use sorted tuple as key to avoid processing same group twice
+
+            if group_key in processed_groups:
+                continue
+            processed_groups.add(group_key)
+
+            print_info(f"[DEBUG] Processing duplicate group: {group}")
+
+            # Pick the keeper (prefer files without "dup_" prefix, then alphabetical order)
+            keepers = [f for f in group if not f.startswith("dup_")]
+            if not keepers:
+                keepers = list(group)  # If all have "dup_" prefix, use all
+            keeper = min(keepers)  # Pick the first alphabetically
+
+            print_info(f"[DEBUG] Selected keeper: {keeper}")
+
+            # Add all other files in the group to the operation list
+            for file_path in group:
+                if file_path != keeper:
+                    abs_path = os.path.join(image_dir, file_path)
+                    if os.path.exists(abs_path):
+                        files_to_operate.append(abs_path)
+                        print_info(f"[DEBUG] Will operate on: {file_path}")
+                    else:
+                        print_warning(f"[DEBUG] File not found (skipped): {abs_path}")
+
+        print_info(f"[DEBUG] Files to operate on: {files_to_operate}")
+
+        if not files_to_operate:
             print_info("No duplicates found.")
             return []
-
-        print_info(f"Found {len(files_to_move)} duplicate files to move.")
-
+        print_info(f"Found {len(files_to_operate)} duplicate files to move/remove.")
         if dry_run:
             print_warning(
                 "DRY RUN - No files will be moved. Set dry_run=False to actually move files."
             )
-            for file_path in files_to_move:
+            for file_path in files_to_operate:
                 print_info(f"Would move: {file_path} -> {destination_dir}")
         else:
-            # Create destination directory if it doesn't exist
             os.makedirs(destination_dir, exist_ok=True)
-
             moved_files = []
-            for file_path in tqdm(files_to_move, desc="Moving duplicates"):
+            for file_path in tqdm(files_to_operate, desc="Moving duplicates"):
                 try:
-                    # Check if file exists before trying to move it
                     if not os.path.exists(file_path):
                         print_warning(
                             f"File not found (may have been moved already): {file_path}"
                         )
                         continue
-
                     filename = os.path.basename(file_path)
                     dest_path = os.path.join(destination_dir, filename)
-
-                    # Handle filename conflicts
                     counter = 1
                     while os.path.exists(dest_path):
                         name, ext = os.path.splitext(filename)
@@ -288,22 +371,19 @@ class ImageDedupHandler:
                             destination_dir, f"{name}_{counter}{ext}"
                         )
                         counter += 1
-
                     shutil.move(file_path, dest_path)
                     moved_files.append(file_path)
                 except Exception as e:
                     print_error(f"Error moving {file_path}: {e}")
-
             print_success(
                 f"Moved {len(moved_files)} duplicate files to {destination_dir}."
             )
-            if len(moved_files) < len(files_to_move):
+            if len(moved_files) < len(files_to_operate):
                 print_info(
-                    f"Note: {len(files_to_move) - len(moved_files)} files were not moved (may have been moved already or don't exist)"
+                    f"Note: {len(files_to_operate) - len(moved_files)} files were not moved (may have been moved already or don't exist)"
                 )
             return moved_files
-
-        return files_to_move
+        return files_to_operate
 
     def generate_duplicate_report(
         self,

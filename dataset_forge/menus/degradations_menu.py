@@ -168,7 +168,9 @@ def degradations_menu():
         "0": ("⬅️  Back", None),
     }
     while True:
-        action = show_menu("🧪 Degradations", options, header_color=Mocha.yellow)
-        if action is None or action == "0":
-            break
-        action()
+        key = show_menu("🧪 Degradations", options, header_color=Mocha.yellow)
+        if key is None or key == "0":
+            return
+        action = options[key][1]
+        if callable(action):
+            action()

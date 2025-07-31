@@ -40,15 +40,15 @@ def augmentation_menu():
     options = augmentation_menu.__menu_options__
     while True:
         print_header("🚀 Augmentation - Input/Output Selection", color=Mocha.sapphire)
-        choice = show_menu(
+        key = show_menu(
             "🚀 Augmentation",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
-            break
-        action = options[choice][1]
+        if key is None or key == "0":
+            return
+        action = options[key][1]
         if callable(action):
             print_section("Augmentation Progress", color=Mocha.sapphire)
             action()

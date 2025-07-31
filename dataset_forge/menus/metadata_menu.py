@@ -41,7 +41,7 @@ def metadata_menu():
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
-        action = options.get(key, (None, None))[1]
+        action = options[key][1]
         print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()

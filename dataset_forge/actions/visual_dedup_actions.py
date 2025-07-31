@@ -80,6 +80,16 @@ def get_lpips_model(device: str = "cuda" if torch.cuda.is_available() else "cpu"
     return to_device_safe(lpips.LPIPS(net="vgg"), device)
 
 
+def compute_similarity_batch_args(args: tuple) -> List[Tuple[int, int, float]]:
+    batch_indices, model, imgs_tensor, n = args
+    results = []
+    for i in batch_indices:
+        for j in range(i + 1, n):
+            dist = model(imgs_tensor[i], imgs_tensor[j]).item()
+            results.append((i, j, dist))
+    return results
+
+
 def compute_lpips_matrix(
     images: List[Tuple[str, Image.Image]],
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
@@ -99,17 +109,6 @@ def compute_lpips_matrix(
     ]
     imgs_tensor = [to_device_safe(img.unsqueeze(0), device) for img in imgs_tensor]
 
-    # Compute similarities in parallel batches
-    def compute_similarity_batch(
-        batch_indices: List[int],
-    ) -> List[Tuple[int, int, float]]:
-        results = []
-        for i in batch_indices:
-            for j in range(i + 1, n):
-                dist = model(imgs_tensor[i], imgs_tensor[j]).item()
-                results.append((i, j, dist))
-        return results
-
     # Create batches of indices
     batch_size = max(1, n // (parallel_config.get("max_workers", 4) or 4))
     batches = [list(range(i, min(i + batch_size, n))) for i in range(0, n, batch_size)]
@@ -121,13 +120,12 @@ def compute_lpips_matrix(
         use_gpu=parallel_config.get("use_gpu", True),
     )
 
-    all_results = smart_map(
-        compute_similarity_batch,
-        batches,
+    all_results = []
+    for args in tqdm(
+        [(batch, model, imgs_tensor, n) for batch in batches],
         desc="LPIPS (perceptual) similarity",
-        max_workers=config.max_workers,
-        processing_type=ProcessingType.THREAD,
-    )
+    ):
+        all_results.append(compute_similarity_batch_args(args))
 
     # Fill matrix with results
     for batch_results in all_results:

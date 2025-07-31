@@ -25,15 +25,15 @@ def user_profile_submenu():
     }
 
     while True:
-        choice = show_menu(
+        key = show_menu(
             "👤 User Profile",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             return
-        action = options[choice][1]
+        action = options[key][1]
         if callable(action):
             action()
         # No prompt after Back
@@ -54,14 +54,15 @@ def memory_management_submenu():
     }
 
     while True:
-        action = show_menu(
+        key = show_menu(
             "🧠 Memory Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        if key is None or key == "0":
             break
+        action = options[key][1]
         if callable(action):
             action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
@@ -118,14 +119,15 @@ def cache_management_submenu():
     }
 
     while True:
-        action = show_menu(
+        key = show_menu(
             "⚡ Cache Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        if key is None or key == "0":
             break
+        action = options[key][1]
         if callable(action):
             action()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
@@ -146,15 +148,15 @@ def system_settings_menu():
         "0": ("⬅️  Back to Main Menu", None),
     }
     while True:
-        choice = show_menu(
+        key = show_menu(
             "⚙️  System & Settings",
             options,
             header_color=Mocha.lavender,
             char="=",
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             return
-        action = options[choice][1]
+        action = options[key][1]
         if callable(action):
             action()
 

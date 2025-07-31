@@ -2793,12 +2793,12 @@ def directory_tree_menu():
     while True:
         try:
             print_section("Directory Tree Generation Progress", color=Mocha.peach)
-            choice = show_menu(
+            key = show_menu(
                 "🌳 Enhanced Directory Tree Generator", options, Mocha.lavender
             )
-            if choice is None or choice == "0":
+            if key is None or key == "0":
                 return
-            action = options[choice][1]
+            action = options[key][1]
             if callable(action):
                 action()
         except (KeyboardInterrupt, EOFError):

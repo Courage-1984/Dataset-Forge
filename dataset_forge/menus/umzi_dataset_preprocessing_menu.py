@@ -45,6 +45,6 @@ def umzi_dataset_preprocessing_menu():
         )
         if key is None or key == "0":
             break
-        action = options.get(key, (None, None))[1]
+        action = options[key][1]
         if callable(action):
             action()
