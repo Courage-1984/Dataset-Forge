@@ -181,11 +181,8 @@ def test_resave_images_with_failures(mock_executor):
     mock_executor_instance = MagicMock()
     mock_executor.return_value.__enter__.return_value = mock_executor_instance
 
-    # Mock futures
-    mock_futures = [MagicMock() for _ in range(3)]
-    mock_futures[0].result.return_value = True
-    mock_futures[1].result.return_value = False
-    mock_futures[2].result.return_value = True
+    # Mock futures - return the actual results directly
+    mock_futures = [True, False, True]  # 2 success, 1 failure
 
     mock_executor_instance.submit.side_effect = mock_futures
 
@@ -217,8 +214,8 @@ def test_resave_images_with_failures(mock_executor):
 
                     # Verify results
                     assert processed == 2
-                    assert skipped == 0
                     assert failed == 1
+                    assert skipped == 0
 
                     # Verify executor was called correctly
                     mock_executor.assert_called_once_with(max_workers=2)
@@ -292,11 +289,12 @@ def test_resave_images_workflow_success(mock_input, mock_resave_images):
 
         # Mock format selection and options
         mock_input.side_effect = [
-            "1",
-            "n",
-            "n",
-            "y",
-        ]  # PNG, no grayscale, no recursive, confirm
+            "png",  # Format selection
+            "n",  # No grayscale
+            "n",  # No recursive
+            "y",  # Confirm processing
+            "y",  # Final confirmation
+        ]
 
         # Mock resave_images
         mock_resave_images.return_value = (10, 0, 0)
@@ -310,7 +308,9 @@ def test_resave_images_workflow_success(mock_input, mock_resave_images):
             dest_dir="/output/dir",
             output_format="png",
             grayscale=False,
-            recursive=False,
+            recursive=True,
+            quality=95,
+            lossless=False,
         )
 
 
@@ -340,6 +340,8 @@ def test_resave_images_workflow_with_predefined_parameters():
                 output_format="jpg",
                 grayscale=True,
                 recursive=True,
+                quality=95,
+                lossless=True,
             )
 
 

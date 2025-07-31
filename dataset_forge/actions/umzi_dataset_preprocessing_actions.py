@@ -3,8 +3,15 @@
 Actions for Umzi's Dataset_Preprocessing integration using pepedp.
 """
 
-from dataset_forge.utils.printing import print_info, print_success, print_error
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+)
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.input_utils import (
     get_folder_path,
     get_input,
@@ -116,9 +123,26 @@ def best_tile_extraction_action(
         # --- Print heading before progress bar ---
         from dataset_forge.utils.color import Mocha
 
-        print_section("Best Tile Extraction Progress", color=Mocha.pink)
+        print_header(
+            "🧩 Best Tile Extraction (PepeDP) - Input/Output Selection",
+            color=Mocha.pink,
+        )
         print("DEBUG: Running BestTile.run()...")
-        bt.run()
+        try:
+            bt.run()
+        except Exception as e:
+            print_error(f"Error during Best Tile Extraction: {e}")
+            print_info("This may be due to file access conflicts. Try:")
+            print_info("1. Close any applications that might be accessing the images")
+            print_info(
+                "2. Ensure the output folder is not being accessed by other programs"
+            )
+            print_info(
+                "3. Try running with a smaller batch or different output location"
+            )
+            # Assuming log_operation is defined elsewhere or will be added.
+            # For now, we'll just print the error and return.
+            return
         print("DEBUG: BestTile.run() complete.")
         print_success("Best tile extraction complete.")
     except Exception as e:
@@ -193,9 +217,23 @@ def video_frame_extraction_action(
             distance_fn=dist_fn,
         )
         # --- Print heading before progress bar ---
-        print_section("Video Frame Extraction Progress", color=Mocha.yellow)
+        print_header(
+            "🎬 Video Frame Extraction (PepeDP) - Input/Output Selection",
+            color=Mocha.yellow,
+        )
         print("DEBUG: Calling VideoToFrame(video_path, out_folder)...")
-        vtf(video_path, out_folder)
+        try:
+            vtf(video_path, out_folder)
+        except Exception as e:
+            print_error(f"Error during Video Frame Extraction: {e}")
+            print_info("This may be due to file access conflicts. Try:")
+            print_info("1. Close any applications that might be accessing the video")
+            print_info(
+                "2. Ensure the output folder is not being accessed by other programs"
+            )
+            print_info("3. Try running with a different output location")
+            log_operation("video_frame_extraction", f"Failed: {e}")
+            return
         print("DEBUG: VideoToFrame call complete.")
         print_success("Video frame extraction complete.")
     except Exception as e:
@@ -255,24 +293,35 @@ def duplicate_image_detection_action(
             scale=scale,
         )
         print(f"DEBUG: Calling create_embedd for {in_folder}...")
-        embedded = create_embedd(
-            img_folder=in_folder,
-            embedder=embedder,
-        )
-        print(
-            f"DEBUG: Calling filtered_pairs with threshold={threshold}, dist_fn={dist_fn}..."
-        )
-        paired = filtered_pairs(
-            embeddings=embedded,
-            dist_func=dist_fn,
-            threshold=threshold,
-        )
-        print(f"DEBUG: Calling move_duplicate_files to {out_folder}...")
-        move_duplicate_files(
-            duplicates_dict=paired,
-            src_dir=in_folder,
-            dst_dir=out_folder,
-        )
+        try:
+            embedded = create_embedd(
+                img_folder=in_folder,
+                embedder=embedder,
+            )
+            print(
+                f"DEBUG: Calling filtered_pairs with threshold={threshold}, dist_fn={dist_fn}..."
+            )
+            paired = filtered_pairs(
+                embeddings=embedded,
+                dist_func=dist_fn,
+                threshold=threshold,
+            )
+            print(f"DEBUG: Calling move_duplicate_files to {out_folder}...")
+            move_duplicate_files(
+                duplicates_dict=paired,
+                src_dir=in_folder,
+                dst_dir=out_folder,
+            )
+        except Exception as e:
+            print_error(f"Error during Duplicate Detection: {e}")
+            print_info("This may be due to file access conflicts. Try:")
+            print_info("1. Close any applications that might be accessing the images")
+            print_info(
+                "2. Ensure the output folder is not being accessed by other programs"
+            )
+            print_info("3. Try running with a different output location")
+            log_operation("duplicate_detection", f"Failed: {e}")
+            return
         print_success("Duplicate image detection and removal complete.")
     except Exception as e:
         print_error(f"Error in duplicate_image_detection_action: {e}")
@@ -325,7 +374,18 @@ def iqa_filtering_action(
             move_folder=out_folder,
         )
         print("DEBUG: Running IQA filtering algorithm...")
-        alg()
+        try:
+            alg()
+        except Exception as e:
+            print_error(f"Error during IQA Filtering: {e}")
+            print_info("This may be due to file access conflicts. Try:")
+            print_info("1. Close any applications that might be accessing the images")
+            print_info(
+                "2. Ensure the output folder is not being accessed by other programs"
+            )
+            print_info("3. Try running with a different output location")
+            log_operation("iqa_filtering", f"Failed: {e}")
+            return
         print("DEBUG: IQA filtering complete.")
         print_success("IQA filtering complete.")
     except Exception as e:

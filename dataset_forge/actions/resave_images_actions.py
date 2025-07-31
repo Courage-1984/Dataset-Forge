@@ -10,7 +10,7 @@ import os
 import cv2
 from typing import List, Optional, Tuple
 from functools import partial
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 
 from dataset_forge.utils.memory_utils import auto_cleanup
@@ -27,76 +27,106 @@ from dataset_forge.menus.session_state import parallel_config
 
 
 def process_single_image(
-    input_path: str, dest_dir: str, output_format: str = "png", grayscale: bool = False
+    input_path: str,
+    dest_dir: str,
+    output_format: str = "png",
+    grayscale: bool = False,
+    quality: int = 95,
+    lossless: bool = True,
 ) -> bool:
     """
-    Process a single image by resaving it in the specified format.
+    Process a single image and save it with specified format and options.
 
     Args:
-        input_path: Path to the input image file
-        dest_dir: Directory to save the processed image
-        output_format: Output format (png, jpg, jpeg, etc.)
+        input_path: Path to input image file
+        dest_dir: Directory to save processed image
+        output_format: Output format (png, jpg, webp, bmp, tiff)
         grayscale: Whether to convert to grayscale
+        quality: JPEG/WebP quality (1-100, only used for lossy formats)
+        lossless: Whether to use lossless compression (for PNG, WebP, TIFF)
 
     Returns:
-        True if processing was successful, False otherwise
-
-    Raises:
-        FileNotFoundError: If input file doesn't exist
-        PermissionError: If output directory is not writable
-        ValueError: If image file is corrupted or unsupported
+        True if successful, False otherwise
     """
     try:
-        # Read the image
+        # Read image
         image = cv2.imread(input_path)
-
         if image is None:
             print_error(f"Failed to read image: {input_path}")
             return False
 
-        # Convert the image to grayscale if specified
+        # Convert to grayscale if requested
         if grayscale:
-            if len(image.shape) == 3:  # Color image
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            # If already grayscale, no conversion needed
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # Convert back to BGR for saving (OpenCV requirement)
+            image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 
-        # Get the base name of the file and split it to get the file name and extension
-        filename_only = os.path.basename(input_path)
-        file_name, _ = os.path.splitext(filename_only)
+        # Get filename without extension
+        filename = os.path.splitext(os.path.basename(input_path))[0]
 
-        # Create the output path with the specified format
-        output_filename = f"{file_name}.{output_format.lower()}"
-
-        # Ensure unique filename
-        output_filename = get_unique_filename(dest_dir, output_filename)
+        # Create unique output filename
+        output_filename = get_unique_filename(dest_dir, f"{filename}.{output_format}")
         output_path = os.path.join(dest_dir, output_filename)
 
-        # Determine compression parameters based on format
-        compression_params = []
-        if output_format.lower() in ["jpg", "jpeg"]:
-            compression_params = [cv2.IMWRITE_JPEG_QUALITY, 95]
-        elif output_format.lower() == "png":
-            compression_params = [cv2.IMWRITE_PNG_COMPRESSION, 6]
-        elif output_format.lower() == "webp":
-            compression_params = [cv2.IMWRITE_WEBP_QUALITY, 95]
+        # Ensure output directory exists
+        os.makedirs(dest_dir, exist_ok=True)
 
-        # Write the image to the output path
+        # Set compression parameters based on format and lossless setting
+        compression_params = []
+
+        if output_format.lower() == "png":
+            if lossless:
+                # PNG lossless compression (level 6 for good balance)
+                compression_params = [cv2.IMWRITE_PNG_COMPRESSION, 6]
+            else:
+                # PNG with minimal compression (still lossless)
+                compression_params = [cv2.IMWRITE_PNG_COMPRESSION, 0]
+
+        elif output_format.lower() == "jpg":
+            # JPEG is always lossy, quality determines compression
+            compression_params = [cv2.IMWRITE_JPEG_QUALITY, quality]
+
+        elif output_format.lower() == "webp":
+            if lossless:
+                # WebP lossless
+                compression_params = [cv2.IMWRITE_WEBP_QUALITY, 100]
+            else:
+                # WebP lossy with quality setting
+                compression_params = [cv2.IMWRITE_WEBP_QUALITY, quality]
+
+        elif output_format.lower() == "bmp":
+            # BMP is always lossless, no compression
+            compression_params = []
+
+        elif output_format.lower() == "tiff":
+            if lossless:
+                # TIFF lossless with LZW compression
+                compression_params = [cv2.IMWRITE_TIFF_COMPRESSION, 5]  # LZW
+            else:
+                # TIFF with JPEG compression (lossy)
+                compression_params = [cv2.IMWRITE_TIFF_COMPRESSION, 7]  # JPEG
+
+        # Save image with compression parameters
         success = cv2.imwrite(output_path, image, compression_params)
 
-        if not success:
-            print_error(f"Failed to write image: {output_path}")
+        if success:
+            return True
+        else:
+            print_error(f"Failed to save: {output_filename}")
             return False
-
-        return True
 
     except Exception as e:
         print_error(f"Error processing {input_path}: {e}")
         return False
 
 
-def process_with_params(input_path, dest_dir, output_format, grayscale):
+def process_with_params(
+    input_path, dest_dir, output_format, grayscale, quality, lossless
+):
     """Process a single image with the given parameters."""
-    return process_single_image(input_path, dest_dir, output_format, grayscale)
+    return process_single_image(
+        input_path, dest_dir, output_format, grayscale, quality, lossless
+    )
 
 
 @monitor_all("resave_images", critical_on_error=True)
@@ -107,22 +137,25 @@ def resave_images(
     output_format: str = "png",
     grayscale: bool = False,
     recursive: bool = False,
+    quality: int = 95,
+    lossless: bool = True,
     supported_formats: Optional[List[str]] = None,
 ) -> Tuple[int, int, int]:
     """
     Resave images from input directory to output directory with specified format.
 
     This function processes images in parallel, converting them to the specified
-    output format with optional grayscale conversion. It uses the Dataset Forge
-    parallel processing system for optimal performance.
+    output format with optional grayscale conversion and compression control.
 
     Args:
-        input_dir: Directory containing the input images
-        dest_dir: Directory to store the output images
-        output_format: Output format (png, jpg, jpeg, webp, etc.)
+        input_dir: Directory containing input images
+        dest_dir: Directory to save processed images
+        output_format: Output format (png, jpg, webp, bmp, tiff)
         grayscale: Whether to convert images to grayscale
-        recursive: Whether to process subdirectories recursively
-        supported_formats: List of supported input formats (default: all image formats)
+        recursive: Whether to process subdirectories
+        quality: JPEG/WebP quality (1-100, only used for lossy formats)
+        lossless: Whether to use lossless compression (for PNG, WebP, TIFF)
+        supported_formats: List of supported image formats to process
 
     Returns:
         Tuple of (processed_count, skipped_count, failed_count)
@@ -182,30 +215,46 @@ def resave_images(
         dest_dir=dest_dir,
         output_format=output_format,
         grayscale=grayscale,
+        quality=quality,
+        lossless=lossless,
     )
     results = []
     max_workers = min(2, parallel_config.get("max_workers", 4) or 4)
+
+    # Process images with real-time progress tracking
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for input_path in tqdm(
-            input_paths, desc=f"Resaving images to {output_format.upper()}"
+        # Submit all tasks
+        future_to_path = {
+            executor.submit(process_func, input_path): input_path
+            for input_path in input_paths
+        }
+
+        # Process results with progress bar
+        for future in tqdm(
+            as_completed(future_to_path),
+            total=len(input_paths),
+            desc=f"Resaving images to {output_format.upper()}",
+            unit="img",
         ):
-            results.append(executor.submit(process_func, input_path))
+            result = future.result()
+            results.append(result)
 
     # Count results
-    processed = sum(1 for result in results if result.result())
-    failed = len(input_paths) - processed
-    skipped = 0  # No skipping in this implementation
+    processed = sum(1 for result in results if result)
+    failed = len(results) - processed
 
-    # Log operation
+    # Log operation completion
     log_operation(
         "resave_images",
-        f"Processed {processed}/{len(input_paths)} images to {output_format.upper()}",
+        f"Completed: {processed}/{len(input_paths)} images processed to {output_format.upper()}",
     )
 
     # Print summary
-    print_success(f"Resaving complete: {processed} processed, {failed} failed")
+    print_success(f"✅ Successfully processed: {processed} images")
+    if failed > 0:
+        print_warning(f"⚠️ Failed to process: {failed} images")
 
-    return processed, skipped, failed
+    return processed, 0, failed
 
 
 def resave_images_workflow(
@@ -214,22 +263,28 @@ def resave_images_workflow(
     output_format: str = "png",
     grayscale: bool = False,
     recursive: bool = False,
+    quality: int = 95,
+    lossless: bool = True,
 ) -> None:
     """
-    Interactive workflow for resaving images.
+    Interactive workflow for resaving images with format conversion and compression control.
 
-    This function provides an interactive interface for the resave images functionality,
-    allowing users to specify input/output directories and processing options.
+    This workflow prompts the user for input/output directories and processing options,
+    then calls the resave_images function to process the images.
 
     Args:
-        input_dir: Optional input directory path
-        dest_dir: Optional output directory path
-        output_format: Output format for resaved images
+        input_dir: Optional input directory (if not provided, will prompt user)
+        dest_dir: Optional output directory (if not provided, will prompt user)
+        output_format: Output format (png, jpg, webp, bmp, tiff)
         grayscale: Whether to convert to grayscale
-        recursive: Whether to process subdirectories recursively
+        recursive: Whether to process subdirectories
+        quality: JPEG/WebP quality (1-100, only used for lossy formats)
+        lossless: Whether to use lossless compression (for PNG, WebP, TIFF)
     """
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_header, print_section, print_prompt
+    from dataset_forge.utils.color import Mocha
+    from dataset_forge.utils.monitoring import time_and_record_menu_load
 
     print_header("🔄 Resave Images Workflow")
 
@@ -249,46 +304,52 @@ def resave_images_workflow(
             print_warning("No output directory selected. Exiting workflow.")
             return
 
-            # Get output format
-    if (
-        input_dir is None and dest_dir is None
-    ):  # Only ask for format if no parameters provided
-        print_section("Output Format")
-        format_options = {
-            "1": ("PNG", "png"),
-            "2": ("JPEG", "jpg"),
-            "3": ("WebP", "webp"),
-            "4": ("BMP", "bmp"),
-            "5": ("TIFF", "tiff"),
-        }
+        # Get processing options
+        print_header("🔄 Resave Images - Processing Options", color=Mocha.blue)
 
-        print_info("Select output format:")
-        for key, (name, fmt) in format_options.items():
-            print_info(f"  {key}. {name} (.{fmt})")
-
-        while True:
-            choice = input("\nEnter your choice (1-5): ").strip()
-            if choice in format_options:
-                output_format = format_options[choice][1]
-                break
-            else:
-                print_error("Invalid choice. Please enter 1-5.")
-
-    # Get processing options
-    if (
-        input_dir is None and dest_dir is None
-    ):  # Only ask for options if no parameters provided
-        print_section("Processing Options")
-
-        # Grayscale option
-        grayscale_choice = input("Convert images to grayscale? (y/N): ").strip().lower()
-        grayscale = grayscale_choice in ["y", "yes"]
-
-        # Recursive option
-        recursive_choice = (
-            input("Process subdirectories recursively? (y/N): ").strip().lower()
+        # Get output format
+        format_choice = (
+            input("Output format (png/jpg/webp/bmp/tiff) [default: png]: ")
+            .strip()
+            .lower()
         )
-        recursive = recursive_choice in ["y", "yes"]
+        if format_choice:
+            output_format = format_choice
+
+        # Get quality setting for lossy formats
+        if output_format.lower() in ["jpg", "webp"]:
+            quality_input = input(f"Quality (1-100) [default: {quality}]: ").strip()
+            if quality_input:
+                try:
+                    quality = int(quality_input)
+                    if quality < 1 or quality > 100:
+                        print_warning("Quality must be between 1-100, using default")
+                        quality = 95
+                except ValueError:
+                    print_warning("Invalid quality value, using default")
+                    quality = 95
+
+        # Get lossless setting for formats that support it
+        if output_format.lower() in ["png", "webp", "tiff"]:
+            lossless_input = (
+                input("Use lossless compression? (y/n) [default: y]: ").strip().lower()
+            )
+            if lossless_input:
+                lossless = lossless_input in ["y", "yes", "1", "true"]
+
+        # Get grayscale option
+        grayscale_input = (
+            input("Convert to grayscale? (y/n) [default: n]: ").strip().lower()
+        )
+        if grayscale_input:
+            grayscale = grayscale_input in ["y", "yes", "1", "true"]
+
+        # Get recursive option
+        recursive_input = (
+            input("Process subdirectories? (y/n) [default: n]: ").strip().lower()
+        )
+        if recursive_input:
+            recursive = recursive_input in ["y", "yes", "1", "true"]
 
     # Confirm and process
     print_section("Processing Summary")
@@ -304,13 +365,15 @@ def resave_images_workflow(
         return
 
     try:
-        # Process images
+        # Call the main resave function
         processed, skipped, failed = resave_images(
             input_dir=input_dir,
             dest_dir=dest_dir,
             output_format=output_format,
             grayscale=grayscale,
             recursive=recursive,
+            quality=quality,
+            lossless=lossless,
         )
 
         # Show results

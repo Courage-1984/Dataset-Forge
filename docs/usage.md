@@ -380,11 +380,21 @@ This pattern is used throughout Dataset Forge for all interactive workflows. See
 **Features:**
 
 - **Multiple Output Formats**: Support for PNG, JPEG, WebP, BMP, TIFF
+- **Lossless Options**: Choose between lossless and lossy compression for supported formats
+- **Quality Control**: Adjustable quality settings for JPEG and WebP formats (1-100)
 - **Parallel Processing**: Uses thread-based processing for optimal performance
 - **Memory Efficient**: Limited worker count to prevent memory issues
 - **Unique Filenames**: Prevents overwriting with automatic unique filename generation
 - **Progress Tracking**: Shows real-time progress with descriptive messages
 - **Error Handling**: Robust error handling with detailed reporting
+
+**Compression Options:**
+
+- **PNG**: Lossless compression with configurable compression level
+- **JPEG**: Always lossy with adjustable quality (1-100)
+- **WebP**: Choice between lossless and lossy with quality control
+- **BMP**: Always lossless, no compression
+- **TIFF**: Choice between lossless (LZW) and lossy (JPEG) compression
 
 **Use Cases:**
 
@@ -392,6 +402,8 @@ This pattern is used throughout Dataset Forge for all interactive workflows. See
 - Create grayscale versions of color images
 - Batch format conversion for dataset preparation
 - Optimize images for specific applications or workflows
+- Preserve image quality with lossless compression
+- Reduce file sizes with lossy compression for web/email
 
 **Technical Details:**
 
