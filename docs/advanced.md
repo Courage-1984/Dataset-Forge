@@ -134,6 +134,7 @@ def my_menu():
 
 - `tools/find_code_issues.py`: comprehensive static analysis including dead code, coverage, docstrings, test mapping, dependency analysis, configuration validation, and import analysis
 - `tools/log_current_menu.py`: comprehensive menu hierarchy analysis, path input detection, and improvement recommendations
+- `tools/check_mocha_theming.py`: comprehensive Catppuccin Mocha theming consistency checker for CLI menus, printing, and user-facing output
 - `tools/merge_docs.py`: merges docs and generates ToC.
 - `tools/install.py`: automated environment setup.
 - All new scripts must be documented and tested.
@@ -172,6 +173,56 @@ python tools/log_current_menu.py
 - Menu depth, size, and path input metrics
 
 **Configuration:** Customizable settings for output location, maximum depth, and path input detection patterns.
+
+</details>
+
+<details>
+<summary><strong>Catppuccin Mocha Theming Consistency Checker</strong></summary>
+
+The theming consistency checker (`tools/check_mocha_theming.py`) ensures consistent use of the Catppuccin Mocha color scheme across the entire codebase:
+
+**Key Features:**
+
+- **Comprehensive Analysis**: Scans all Python, Markdown, and batch files in the codebase
+- **Raw Print Detection**: Identifies all `print()` statements that should use centralized utilities
+- **Import Validation**: Checks for missing Mocha color imports and centralized printing utilities
+- **Menu Pattern Analysis**: Validates proper menu implementation patterns and context parameters
+- **Detailed Reporting**: Generates comprehensive markdown reports with actionable recommendations
+- **Issue Categorization**: Classifies issues by severity (error, warning, info) and type
+
+**Usage:**
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Basic analysis
+python tools/check_mocha_theming.py
+
+# Save report to specific location
+python tools/check_mocha_theming.py --output reports/theming_report.md
+
+# Verbose output with detailed results
+python tools/check_mocha_theming.py --verbose
+```
+
+**Output:** Generates comprehensive reports with:
+
+- Real-time analysis progress and summary statistics
+- File-by-file detailed analysis with line numbers and code snippets
+- Actionable recommendations for fixing theming issues
+- Issue categorization by severity and type
+- Best practices and usage examples
+
+**Analysis Types:**
+
+- **Raw Print Statements**: Finds `print()` calls that should use `print_info()`, `print_success()`, etc.
+- **Missing Imports**: Detects Mocha color usage without proper imports
+- **Menu Context**: Identifies missing `current_menu` and `menu_context` parameters
+- **Menu Patterns**: Validates standardized key-based menu patterns
+- **Documentation**: Checks for theming documentation in markdown files
+
+**Integration:** Fully integrated with Dataset Forge's tools launcher and development workflow, with proper exit codes for CI/CD integration.
 
 </details>
 

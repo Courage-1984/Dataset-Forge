@@ -80,12 +80,13 @@ The global command system is built on:
 
 - **Monitor live resource usage, error tracking, and analytics** from the System Monitoring menu.
 - **Manage cache** (view stats, clear, optimize) from System Settings → Cache Management.
-- **Use utility scripts** in the `tools/` directory for environment setup, static analysis, and troubleshooting.
+- **Use utility scripts** in the `tools/` directory for environment setup, static analysis, theming consistency, and troubleshooting.
 
 ### 🧪 Testing & Developer Tools
 
 - **Run all tests** with `python tools/run_tests.py` (see [getting_started.md](getting_started.md) for details).
 - **Use static analysis tools** for code quality (`tools/find_code_issues.py`).
+- **Check theming consistency** with `python tools/check_mocha_theming.py` for Catppuccin Mocha color scheme validation.
 - **Audit menu hierarchy** with `python tools/log_current_menu.py` for menu system analysis and improvement recommendations.
 - **All major features provide public, non-interactive APIs** for programmatic use and testing.
 
@@ -145,6 +146,49 @@ pip install vulture pytest pytest-cov coverage pyan3 pyflakes
 ```
 
 The tool automatically handles missing dependencies and provides helpful error messages for installation.
+
+### 🎨 Catppuccin Mocha Theming Consistency Checker
+
+Dataset Forge includes a comprehensive theming consistency checker that ensures all CLI output follows the Catppuccin Mocha color scheme:
+
+#### **Quick Start**
+
+```bash
+# Basic analysis
+python tools/check_mocha_theming.py
+
+# Save report to specific location
+python tools/check_mocha_theming.py --output reports/theming_report.md
+
+# Verbose output with detailed results
+python tools/check_mocha_theming.py --verbose
+```
+
+#### **Analysis Types**
+
+1. **Raw Print Detection**: Finds `print()` calls that should use centralized utilities
+2. **Import Validation**: Detects Mocha color usage without proper imports
+3. **Menu Context**: Identifies missing `current_menu` and `menu_context` parameters
+4. **Menu Patterns**: Validates standardized key-based menu patterns
+5. **Documentation**: Checks for theming documentation in markdown files
+
+#### **Output**
+
+- **Console Summary**: Real-time analysis progress and summary statistics
+- **Detailed Report**: Comprehensive markdown report with file-by-file analysis
+- **Actionable Recommendations**: Specific suggestions for fixing theming issues
+- **Exit Codes**: Proper exit codes for CI/CD integration (1 for errors, 0 for success)
+
+#### **Integration with Development**
+
+- **Pre-commit Analysis**: Run before committing code to ensure theming consistency
+- **Continuous Integration**: Integrate with CI/CD pipelines for automated theming checks
+- **Code Review**: Use analysis results to guide theming-related code review discussions
+- **Quality Assurance**: Regular analysis prevents theming regressions and maintains user experience standards
+
+#### **Requirements**
+
+No additional dependencies required - uses standard library modules only.
 
 ### 🔧 Enhanced Development with MCP Integration
 

@@ -56,8 +56,11 @@
 ## Static Analysis & Code Quality
 
 - Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, dependency issues, configuration problems, etc.).
+- **Theming Consistency**: You **must** run the theming consistency checker (`tools/check_mocha_theming.py`) and address all critical theming issues (raw print statements, missing imports, incorrect menu patterns).
 - All public functions/classes/methods must have Google-style docstrings.
-- The script saves all output files to `./logs/find_code_issues/` for easy review and analysis.
+- All user-facing output must use centralized printing utilities with Catppuccin Mocha colors.
+- The static analysis script saves all output files to `./logs/find_code_issues/` for easy review and analysis.
+- The theming checker saves reports to `./logs/mocha_theming_report.md` by default.
 - See [usage.md](usage.md) and [features.md](features.md) for details.
 
 ## Menu System Development

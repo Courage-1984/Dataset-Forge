@@ -179,6 +179,7 @@ class ToolsLauncher:
             "merge_docs.py": "Documentation merging and organization tool",
             "log_current_menu.py": "Menu hierarchy auditing and analysis tool",
             "print_zsteg_env.py": "Environment checker for zsteg tool",
+            "check_mocha_theming.py": "Check Catppuccin Mocha theming consistency across codebase",
         }
         
         for file_path in self.tools_dir.glob("*.py"):

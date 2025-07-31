@@ -6,6 +6,28 @@
 
 ## [Unreleased]
 
+### 🎨 Catppuccin Mocha Theming Consistency Checker (August 2025)
+
+- **New Feature**: Added comprehensive Catppuccin Mocha theming consistency checker tool
+- **Tool Location**: `tools/check_mocha_theming.py`
+- **Features**:
+  - Comprehensive analysis of all Python, Markdown, and batch files in the codebase
+  - Detection of raw print statements that should use centralized utilities
+  - Validation of Mocha color imports and centralized printing utility usage
+  - Menu pattern analysis for proper theming implementation
+  - Detailed reporting with actionable recommendations and issue categorization
+  - CLI integration with tools launcher and comprehensive error handling
+- **Analysis Capabilities**:
+  - Raw print statement detection (1,673 found in initial analysis)
+  - Missing Mocha import validation (304 issues found)
+  - Menu context parameter checking (20 missing parameters)
+  - Menu pattern validation (13 incorrect patterns)
+  - Documentation theming consistency checks
+- **Integration**: Fully integrated with Dataset Forge's tools launcher and development workflow
+- **Documentation**: Comprehensive usage instructions and best practices in features.md and usage.md
+- **CI/CD Ready**: Proper exit codes and reporting for automated workflows
+- **User Experience**: Real-time analysis progress, detailed markdown reports, and actionable recommendations
+
 ### 🧹 Cleanup & Optimization Tools (July 2025)
 
 - **New Feature**: Added comprehensive cleanup and optimization tools to System Monitoring & Health menu

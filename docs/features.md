@@ -158,6 +158,72 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 
 > **Dependencies:** Requires [exiftool](https://exiftool.org/) (external), pandas, and SQLite (Python stdlib).
 
+## 🎨 Catppuccin Mocha Theming Consistency (NEW August 2025)
+
+**Location:** Tools menu → 🎨 Check Mocha Theming
+
+**Purpose:**
+
+- Ensure consistent use of the Catppuccin Mocha color scheme across the entire codebase
+- Validate centralized printing utility usage and identify raw print statements
+- Check menu implementations for proper theming patterns and context parameters
+- Maintain visual consistency and user experience standards
+
+**Features:**
+
+- **🔍 Comprehensive Analysis**: Scans all Python, Markdown, and batch files in the codebase
+- **📄 Raw Print Detection**: Identifies all `print()` statements that should use centralized utilities
+- **🎨 Import Validation**: Checks for missing Mocha color imports and centralized printing utilities
+- **🎯 Menu Pattern Analysis**: Validates proper menu implementation patterns and context parameters
+- **📊 Detailed Reporting**: Generates comprehensive markdown reports with actionable recommendations
+- **🚨 Issue Categorization**: Classifies issues by severity (error, warning, info) and type
+
+**Analysis Types:**
+
+- **Raw Print Statements**: Finds `print()` calls that should use `print_info()`, `print_success()`, etc.
+- **Missing Imports**: Detects Mocha color usage without proper imports
+- **Menu Context**: Identifies missing `current_menu` and `menu_context` parameters
+- **Menu Patterns**: Validates standardized key-based menu patterns
+- **Documentation**: Checks for theming documentation in markdown files
+
+**Usage:**
+
+```bash
+# Basic analysis
+python tools/check_mocha_theming.py
+
+# Save report to specific location
+python tools/check_mocha_theming.py --output reports/theming_report.md
+
+# Verbose output with detailed results
+python tools/check_mocha_theming.py --verbose
+
+# Through tools launcher
+python tools/launcher.py check_mocha_theming
+```
+
+**Output:**
+
+- **Console Summary**: Real-time analysis progress and summary statistics
+- **Detailed Report**: Comprehensive markdown report with file-by-file analysis
+- **Actionable Recommendations**: Specific suggestions for fixing theming issues
+- **Exit Codes**: Proper exit codes for CI/CD integration (1 for errors, 0 for success)
+
+**Integration:**
+
+- **Tools Launcher**: Fully integrated with the tools launcher for easy access
+- **CI/CD Ready**: Exit codes and comprehensive reporting for automated workflows
+- **Documentation**: Detailed usage instructions and best practices
+- **Error Handling**: Robust error handling with graceful fallbacks
+
+**Benefits:**
+
+- **🎨 Visual Consistency**: Ensures all CLI output follows the Catppuccin Mocha color scheme
+- **🔧 Code Quality**: Identifies and fixes theming inconsistencies across the codebase
+- **📚 Documentation**: Maintains consistent theming documentation and standards
+- **🚀 Development Efficiency**: Automated theming validation saves manual review time
+- **🛡️ Quality Assurance**: Prevents theming regressions and maintains user experience standards
+
 ## ⚙️ System & Settings
 
 - **📁 Set HQ/LQ Folder**: set HQ/LQ image pair folders to use throughout Dataset Forge
@@ -466,6 +532,7 @@ Dataset Forge includes several utility scripts in the `tools/` directory to assi
 - **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
 - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
 - **print_zsteg_env.py**: Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration. See [usage.md](usage.md#print_zsteg_envpy-zsteg-environment-check).
+- **check_mocha_theming.py**: Comprehensive Catppuccin Mocha theming consistency checker. Analyzes CLI menus, printing, console logging, and user-facing output for consistent color scheme usage. See [usage.md](usage.md#check_mocha_themingpy-theming-consistency-checker-new-august-2025) for full usage and options.
 
 For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
 

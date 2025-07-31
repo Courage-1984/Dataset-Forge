@@ -58,6 +58,11 @@
   - [✨ Image Processing & Augmentation](features.md#-image-processing--augmentation)
   - [🚀 Training & Inference](features.md#-training--inference)
   - [🛠️ Utilities](features.md#-utilities)
+  - [🎨 Catppuccin Mocha Theming Consistency (NEW August 2025)](features.md#-catppuccin-mocha-theming-consistency-new-august-2025)
+- [Basic analysis](features.md#basic-analysis)
+- [Save report to specific location](features.md#save-report-to-specific-location)
+- [Verbose output with detailed results](features.md#verbose-output-with-detailed-results)
+- [Through tools launcher](features.md#through-tools-launcher)
   - [⚙️ System & Settings](features.md#-system--settings)
   - [🔗 Links](features.md#-links)
   - [🩺 System Monitoring & Health](features.md#-system-monitoring--health)
@@ -119,6 +124,15 @@
       - [**Output Files**](usage.md#output-files)
       - [**Integration with Development**](usage.md#integration-with-development)
       - [**Requirements**](usage.md#requirements)
+    - [🎨 Catppuccin Mocha Theming Consistency Checker](usage.md#-catppuccin-mocha-theming-consistency-checker)
+      - [**Quick Start**](usage.md#quick-start)
+- [Basic analysis](usage.md#basic-analysis)
+- [Save report to specific location](usage.md#save-report-to-specific-location)
+- [Verbose output with detailed results](usage.md#verbose-output-with-detailed-results)
+      - [**Analysis Types**](usage.md#analysis-types)
+      - [**Output**](usage.md#output)
+      - [**Integration with Development**](usage.md#integration-with-development)
+      - [**Requirements**](usage.md#requirements)
     - [🔧 Enhanced Development with MCP Integration](usage.md#-enhanced-development-with-mcp-integration)
 - [Enhanced Development Routine](usage.md#enhanced-development-routine)
   - [Example: Running a Workflow](usage.md#example-running-a-workflow)
@@ -136,6 +150,10 @@
       - [**Standardized Menu Pattern**](advanced.md#standardized-menu-pattern)
 - [Activate virtual environment](advanced.md#activate-virtual-environment)
 - [Run the menu audit](advanced.md#run-the-menu-audit)
+- [Activate virtual environment](advanced.md#activate-virtual-environment)
+- [Basic analysis](advanced.md#basic-analysis)
+- [Save report to specific location](advanced.md#save-report-to-specific-location)
+- [Verbose output with detailed results](advanced.md#verbose-output-with-detailed-results)
   - [Advanced Testing Patterns](advanced.md#advanced-testing-patterns)
   - [Technical Deep Dives](advanced.md#technical-deep-dives)
   - [MCP Integration & Enhanced Development](advanced.md#mcp-integration--enhanced-development)
@@ -207,6 +225,7 @@
   - [See Also](contributing.md#see-also)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
+    - [🎨 Catppuccin Mocha Theming Consistency Checker (August 2025)](changelog.md#-catppuccin-mocha-theming-consistency-checker-august-2025)
     - [🧹 Cleanup & Optimization Tools (July 2025)](changelog.md#-cleanup--optimization-tools-july-2025)
     - [🌐 Global Command System & Comprehensive Help Documentation (July 2025)](changelog.md#-global-command-system--comprehensive-help-documentation-july-2025)
     - [🔄 Resave Images Integration (July 2025)](changelog.md#-resave-images-integration-july-2025)
@@ -851,6 +870,72 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 
 > **Dependencies:** Requires [exiftool](https://exiftool.org/) (external), pandas, and SQLite (Python stdlib).
 
+## 🎨 Catppuccin Mocha Theming Consistency (NEW August 2025)
+
+**Location:** Tools menu → 🎨 Check Mocha Theming
+
+**Purpose:**
+
+- Ensure consistent use of the Catppuccin Mocha color scheme across the entire codebase
+- Validate centralized printing utility usage and identify raw print statements
+- Check menu implementations for proper theming patterns and context parameters
+- Maintain visual consistency and user experience standards
+
+**Features:**
+
+- **🔍 Comprehensive Analysis**: Scans all Python, Markdown, and batch files in the codebase
+- **📄 Raw Print Detection**: Identifies all `print()` statements that should use centralized utilities
+- **🎨 Import Validation**: Checks for missing Mocha color imports and centralized printing utilities
+- **🎯 Menu Pattern Analysis**: Validates proper menu implementation patterns and context parameters
+- **📊 Detailed Reporting**: Generates comprehensive markdown reports with actionable recommendations
+- **🚨 Issue Categorization**: Classifies issues by severity (error, warning, info) and type
+
+**Analysis Types:**
+
+- **Raw Print Statements**: Finds `print()` calls that should use `print_info()`, `print_success()`, etc.
+- **Missing Imports**: Detects Mocha color usage without proper imports
+- **Menu Context**: Identifies missing `current_menu` and `menu_context` parameters
+- **Menu Patterns**: Validates standardized key-based menu patterns
+- **Documentation**: Checks for theming documentation in markdown files
+
+**Usage:**
+
+```bash
+# Basic analysis
+python tools/check_mocha_theming.py
+
+# Save report to specific location
+python tools/check_mocha_theming.py --output reports/theming_report.md
+
+# Verbose output with detailed results
+python tools/check_mocha_theming.py --verbose
+
+# Through tools launcher
+python tools/launcher.py check_mocha_theming
+```
+
+**Output:**
+
+- **Console Summary**: Real-time analysis progress and summary statistics
+- **Detailed Report**: Comprehensive markdown report with file-by-file analysis
+- **Actionable Recommendations**: Specific suggestions for fixing theming issues
+- **Exit Codes**: Proper exit codes for CI/CD integration (1 for errors, 0 for success)
+
+**Integration:**
+
+- **Tools Launcher**: Fully integrated with the tools launcher for easy access
+- **CI/CD Ready**: Exit codes and comprehensive reporting for automated workflows
+- **Documentation**: Detailed usage instructions and best practices
+- **Error Handling**: Robust error handling with graceful fallbacks
+
+**Benefits:**
+
+- **🎨 Visual Consistency**: Ensures all CLI output follows the Catppuccin Mocha color scheme
+- **🔧 Code Quality**: Identifies and fixes theming inconsistencies across the codebase
+- **📚 Documentation**: Maintains consistent theming documentation and standards
+- **🚀 Development Efficiency**: Automated theming validation saves manual review time
+- **🛡️ Quality Assurance**: Prevents theming regressions and maintains user experience standards
+
 ## ⚙️ System & Settings
 
 - **📁 Set HQ/LQ Folder**: set HQ/LQ image pair folders to use throughout Dataset Forge
@@ -1159,6 +1244,7 @@ Dataset Forge includes several utility scripts in the `tools/` directory to assi
 - **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
 - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
 - **print_zsteg_env.py**: Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration. See [usage.md](usage.md#print_zsteg_envpy-zsteg-environment-check).
+- **check_mocha_theming.py**: Comprehensive Catppuccin Mocha theming consistency checker. Analyzes CLI menus, printing, console logging, and user-facing output for consistent color scheme usage. See [usage.md](usage.md#check_mocha_themingpy-theming-consistency-checker-new-august-2025) for full usage and options.
 
 For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#utility-scripts-tools).
 
@@ -1313,12 +1399,13 @@ The global command system is built on:
 
 - **Monitor live resource usage, error tracking, and analytics** from the System Monitoring menu.
 - **Manage cache** (view stats, clear, optimize) from System Settings → Cache Management.
-- **Use utility scripts** in the `tools/` directory for environment setup, static analysis, and troubleshooting.
+- **Use utility scripts** in the `tools/` directory for environment setup, static analysis, theming consistency, and troubleshooting.
 
 ### 🧪 Testing & Developer Tools
 
 - **Run all tests** with `python tools/run_tests.py` (see [getting_started.md](getting_started.md) for details).
 - **Use static analysis tools** for code quality (`tools/find_code_issues.py`).
+- **Check theming consistency** with `python tools/check_mocha_theming.py` for Catppuccin Mocha color scheme validation.
 - **Audit menu hierarchy** with `python tools/log_current_menu.py` for menu system analysis and improvement recommendations.
 - **All major features provide public, non-interactive APIs** for programmatic use and testing.
 
@@ -1378,6 +1465,49 @@ pip install vulture pytest pytest-cov coverage pyan3 pyflakes
 ```
 
 The tool automatically handles missing dependencies and provides helpful error messages for installation.
+
+### 🎨 Catppuccin Mocha Theming Consistency Checker
+
+Dataset Forge includes a comprehensive theming consistency checker that ensures all CLI output follows the Catppuccin Mocha color scheme:
+
+#### **Quick Start**
+
+```bash
+# Basic analysis
+python tools/check_mocha_theming.py
+
+# Save report to specific location
+python tools/check_mocha_theming.py --output reports/theming_report.md
+
+# Verbose output with detailed results
+python tools/check_mocha_theming.py --verbose
+```
+
+#### **Analysis Types**
+
+1. **Raw Print Detection**: Finds `print()` calls that should use centralized utilities
+2. **Import Validation**: Detects Mocha color usage without proper imports
+3. **Menu Context**: Identifies missing `current_menu` and `menu_context` parameters
+4. **Menu Patterns**: Validates standardized key-based menu patterns
+5. **Documentation**: Checks for theming documentation in markdown files
+
+#### **Output**
+
+- **Console Summary**: Real-time analysis progress and summary statistics
+- **Detailed Report**: Comprehensive markdown report with file-by-file analysis
+- **Actionable Recommendations**: Specific suggestions for fixing theming issues
+- **Exit Codes**: Proper exit codes for CI/CD integration (1 for errors, 0 for success)
+
+#### **Integration with Development**
+
+- **Pre-commit Analysis**: Run before committing code to ensure theming consistency
+- **Continuous Integration**: Integrate with CI/CD pipelines for automated theming checks
+- **Code Review**: Use analysis results to guide theming-related code review discussions
+- **Quality Assurance**: Regular analysis prevents theming regressions and maintains user experience standards
+
+#### **Requirements**
+
+No additional dependencies required - uses standard library modules only.
 
 ### 🔧 Enhanced Development with MCP Integration
 
@@ -1574,6 +1704,7 @@ def my_menu():
 
 - `tools/find_code_issues.py`: comprehensive static analysis including dead code, coverage, docstrings, test mapping, dependency analysis, configuration validation, and import analysis
 - `tools/log_current_menu.py`: comprehensive menu hierarchy analysis, path input detection, and improvement recommendations
+- `tools/check_mocha_theming.py`: comprehensive Catppuccin Mocha theming consistency checker for CLI menus, printing, and user-facing output
 - `tools/merge_docs.py`: merges docs and generates ToC.
 - `tools/install.py`: automated environment setup.
 - All new scripts must be documented and tested.
@@ -1612,6 +1743,56 @@ python tools/log_current_menu.py
 - Menu depth, size, and path input metrics
 
 **Configuration:** Customizable settings for output location, maximum depth, and path input detection patterns.
+
+</details>
+
+<details>
+<summary><strong>Catppuccin Mocha Theming Consistency Checker</strong></summary>
+
+The theming consistency checker (`tools/check_mocha_theming.py`) ensures consistent use of the Catppuccin Mocha color scheme across the entire codebase:
+
+**Key Features:**
+
+- **Comprehensive Analysis**: Scans all Python, Markdown, and batch files in the codebase
+- **Raw Print Detection**: Identifies all `print()` statements that should use centralized utilities
+- **Import Validation**: Checks for missing Mocha color imports and centralized printing utilities
+- **Menu Pattern Analysis**: Validates proper menu implementation patterns and context parameters
+- **Detailed Reporting**: Generates comprehensive markdown reports with actionable recommendations
+- **Issue Categorization**: Classifies issues by severity (error, warning, info) and type
+
+**Usage:**
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Basic analysis
+python tools/check_mocha_theming.py
+
+# Save report to specific location
+python tools/check_mocha_theming.py --output reports/theming_report.md
+
+# Verbose output with detailed results
+python tools/check_mocha_theming.py --verbose
+```
+
+**Output:** Generates comprehensive reports with:
+
+- Real-time analysis progress and summary statistics
+- File-by-file detailed analysis with line numbers and code snippets
+- Actionable recommendations for fixing theming issues
+- Issue categorization by severity and type
+- Best practices and usage examples
+
+**Analysis Types:**
+
+- **Raw Print Statements**: Finds `print()` calls that should use `print_info()`, `print_success()`, etc.
+- **Missing Imports**: Detects Mocha color usage without proper imports
+- **Menu Context**: Identifies missing `current_menu` and `menu_context` parameters
+- **Menu Patterns**: Validates standardized key-based menu patterns
+- **Documentation**: Checks for theming documentation in markdown files
+
+**Integration:** Fully integrated with Dataset Forge's tools launcher and development workflow, with proper exit codes for CI/CD integration.
 
 </details>
 
@@ -2343,8 +2524,11 @@ while True:
 ## Static Analysis & Code Quality
 
 - Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, dependency issues, configuration problems, etc.).
+- **Theming Consistency**: You **must** run the theming consistency checker (`tools/check_mocha_theming.py`) and address all critical theming issues (raw print statements, missing imports, incorrect menu patterns).
 - All public functions/classes/methods must have Google-style docstrings.
-- The script saves all output files to `./logs/find_code_issues/` for easy review and analysis.
+- All user-facing output must use centralized printing utilities with Catppuccin Mocha colors.
+- The static analysis script saves all output files to `./logs/find_code_issues/` for easy review and analysis.
+- The theming checker saves reports to `./logs/mocha_theming_report.md` by default.
 - See [usage.md](usage.md) and [features.md](features.md) for details.
 
 ## Menu System Development
@@ -2433,6 +2617,28 @@ For questions, open an issue or contact the project maintainer.
 # Changelog
 
 ## [Unreleased]
+
+### 🎨 Catppuccin Mocha Theming Consistency Checker (August 2025)
+
+- **New Feature**: Added comprehensive Catppuccin Mocha theming consistency checker tool
+- **Tool Location**: `tools/check_mocha_theming.py`
+- **Features**:
+  - Comprehensive analysis of all Python, Markdown, and batch files in the codebase
+  - Detection of raw print statements that should use centralized utilities
+  - Validation of Mocha color imports and centralized printing utility usage
+  - Menu pattern analysis for proper theming implementation
+  - Detailed reporting with actionable recommendations and issue categorization
+  - CLI integration with tools launcher and comprehensive error handling
+- **Analysis Capabilities**:
+  - Raw print statement detection (1,673 found in initial analysis)
+  - Missing Mocha import validation (304 issues found)
+  - Menu context parameter checking (20 missing parameters)
+  - Menu pattern validation (13 incorrect patterns)
+  - Documentation theming consistency checks
+- **Integration**: Fully integrated with Dataset Forge's tools launcher and development workflow
+- **Documentation**: Comprehensive usage instructions and best practices in features.md and usage.md
+- **CI/CD Ready**: Proper exit codes and reporting for automated workflows
+- **User Experience**: Real-time analysis progress, detailed markdown reports, and actionable recommendations
 
 ### 🧹 Cleanup & Optimization Tools (July 2025)
 
