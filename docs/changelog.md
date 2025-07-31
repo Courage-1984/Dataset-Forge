@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+### 🔄 Resave Images Integration (July 2025)
+
+- **New Feature**: Added resave images functionality to Image Processing & Augmentation → Basic Transformations
+- **Format Support**: Convert images to PNG, JPEG, WebP, BMP, TIFF with optional grayscale conversion
+- **Parallel Processing**: Thread-based processing with `ThreadPoolExecutor` for optimal performance
+- **Memory Efficient**: Limited worker count and automatic memory cleanup to prevent memory issues
+- **Recursive Processing**: Support for processing subdirectories
+- **Unique Filenames**: Automatic unique filename generation to prevent overwriting
+- **Integration**: Fully integrated with Dataset Forge's monitoring, memory management, and progress tracking
+- **Testing**: Comprehensive test suite with 15 passing tests covering all functionality
+- **Documentation**: Updated features, usage, advanced, and architecture documentation
+
 ### 🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)
 
 - Replaced all legacy Umzi Dataset_Preprocessing logic with thin, testable wrappers around PepeDP.

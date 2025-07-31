@@ -11,6 +11,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
   - **align_images_actions.py**: Batch projective alignment of images using SIFT+FLANN (called from Dataset Management menu)
   - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
+  - **resave_images_actions.py**: Image format conversion and resaving with parallel processing
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dataset_forge/dpid/**: Multiple DPID (degradation) implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
 - **configs/**: Example and user configuration files

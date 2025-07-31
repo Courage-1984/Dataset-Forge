@@ -354,4 +354,53 @@ Best Tile Extraction Progress
 
 This pattern is used throughout Dataset Forge for all interactive workflows. See the Style Guide for more information.
 
+## 🔄 Basic Transformations
+
+### Resave Images
+
+**Location:** Image Processing & Augmentation → Basic Transformations → 🔄 Resave Images
+
+**Purpose:**
+
+- Convert images to different formats (PNG, JPEG, WebP, BMP, TIFF)
+- Optionally convert images to grayscale
+- Process images in parallel for efficiency
+- Support recursive processing of subdirectories
+
+**Workflow:**
+
+1. **Input Directory**: Select the folder containing images to process
+2. **Output Directory**: Choose where to save the resaved images
+3. **Output Format**: Select the desired output format (PNG, JPEG, WebP, BMP, TIFF)
+4. **Processing Options**:
+   - **Grayscale**: Convert images to grayscale (optional)
+   - **Recursive**: Process subdirectories (optional)
+5. **Confirmation**: Review settings and confirm processing
+
+**Features:**
+
+- **Multiple Output Formats**: Support for PNG, JPEG, WebP, BMP, TIFF
+- **Parallel Processing**: Uses thread-based processing for optimal performance
+- **Memory Efficient**: Limited worker count to prevent memory issues
+- **Unique Filenames**: Prevents overwriting with automatic unique filename generation
+- **Progress Tracking**: Shows real-time progress with descriptive messages
+- **Error Handling**: Robust error handling with detailed reporting
+
+**Use Cases:**
+
+- Convert image collections to a consistent format
+- Create grayscale versions of color images
+- Batch format conversion for dataset preparation
+- Optimize images for specific applications or workflows
+
+**Technical Details:**
+
+- Uses OpenCV for image reading and writing
+- Thread-based parallel processing for I/O efficiency
+- Automatic memory cleanup after processing
+- Comprehensive logging and error tracking
+- Integration with Dataset Forge's monitoring system
+
+### Other Basic Transformations
+
 [Back to Table of Contents](#table-of-contents)

@@ -51,6 +51,7 @@
   - [🛠️ Utility Scripts (tools/)](features.md#-utility-scripts-tools)
 - [🩺 Dataset Health Scoring (NEW July 2025)](features.md#-dataset-health-scoring-new-july-2025)
 - [🔊 Project Sounds & Audio Feedback](features.md#-project-sounds--audio-feedback)
+  - [🖥️ User Experience and CLI Features](features.md#-user-experience-and-cli-features)
 - [Usage Guide](usage.md)
   - [🚀 Quick Start](usage.md#-quick-start)
   - [🔊 Project Sounds & Audio Feedback](usage.md#-project-sounds--audio-feedback)
@@ -75,6 +76,10 @@
   - [install.py: Environment Setup Tool](usage.md#installpy-environment-setup-tool)
   - [print_zsteg_env.py: zsteg Environment Check](usage.md#printzstegenvpy-zsteg-environment-check)
   - [🩺 Using Dataset Health Scoring](usage.md#-using-dataset-health-scoring)
+  - [Example: Workflow Headings in Action](usage.md#example-workflow-headings-in-action)
+  - [🔄 Basic Transformations](usage.md#-basic-transformations)
+    - [Resave Images](usage.md#resave-images)
+    - [Other Basic Transformations](usage.md#other-basic-transformations)
 - [Advanced Features & Configuration](advanced.md)
   - [Advanced Configuration](advanced.md#advanced-configuration)
   - [Advanced Monitoring & Analytics](advanced.md#advanced-monitoring--analytics)
@@ -105,6 +110,7 @@
     - [**Best Practices**](advanced.md#best-practices)
     - [**Troubleshooting**](advanced.md#troubleshooting)
   - [Advanced: Modular Integration of Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)](advanced.md#advanced-modular-integration-of-umzis-datasetpreprocessing-pepedp-powered-july-2025)
+  - [Advanced: Resave Images Integration (July 2025)](advanced.md#advanced-resave-images-integration-july-2025)
   - [Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.](advanced.md#advanced-performance-optimization-suite-new-july-2025t-forge-implements-a-comprehensive-performance-optimization-suite-designed-for-maximum-efficiency-in-image-dataset-processing-this-suite-provides-gpu-acceleration-distributed-processing-intelligent-sample-prioritization-and-pipeline-compilation-capabilities)
     - [**Core Architecture**](advanced.md#core-architecture)
     - [**GPU Acceleration (dataset_forge/utils/gpu_acceleration.py)**](advanced.md#gpu-acceleration-datasetforgeutilsgpuaccelerationpy)
@@ -135,6 +141,7 @@
   - [🧪 Advanced Test Design Patterns (July 2025)](advanced.md#-advanced-test-design-patterns-july-2025)
   - [Align Images: Advanced Options (Planned)](advanced.md#align-images-advanced-options-planned)
   - [DPID Modular Integration (July 2025)](advanced.md#dpid-modular-integration-july-2025)
+    - [Menu/Workflow Patterns: Workflow Heading Pattern](advanced.md#menuworkflow-patterns-workflow-heading-pattern)
 - [Project Architecture](architecture.md)
   - [Directory Structure](architecture.md#directory-structure)
   - [Mermaid Architecture Diagram (Detailed)](architecture.md#mermaid-architecture-diagram-detailed)
@@ -145,6 +152,7 @@
     - [Umzi's Dataset_Preprocessing Integration (PepeDP-powered, July 2025)](architecture.md#umzis-datasetpreprocessing-integration-pepedp-powered-july-2025)
     - [Dataset Health Scoring Workflow](architecture.md#dataset-health-scoring-workflow)
   - [Menu Integration](architecture.md#menu-integration)
+  - [UI Layer and Workflow Patterns](architecture.md#ui-layer-and-workflow-patterns)
   - [Performance Optimization Suite](architecture.md#performance-optimization-suite)
 - [Troubleshooting](troubleshooting.md)
   - [Dependancy & Library Issues](troubleshooting.md#dependancy--library-issues)
@@ -162,6 +170,7 @@
     - [print_zsteg_env.py](troubleshooting.md#printzstegenvpy)
   - [Enhanced Caching System Issues (NEW July 2025)](troubleshooting.md#enhanced-caching-system-issues-new-july-2025)
   - [DPID & pepedpid Issues (NEW July 2025)](troubleshooting.md#dpid--pepedpid-issues-new-july-2025)
+  - [Missing Workflow Headings](troubleshooting.md#missing-workflow-headings)
 - [Dataset Forge Style Guide](style_guide.md)
   - [General Principles](style_guide.md#general-principles)
   - [Project Architecture](style_guide.md#project-architecture)
@@ -200,6 +209,15 @@
   - [New Menu Integration (NEW)](style_guide.md#new-menu-integration-new)
   - [Testing Patterns & Requirements (Updated July 2025)](style_guide.md#testing-patterns--requirements-updated-july-2025)
   - [Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)](style_guide.md#umzis-datasetpreprocessing-pepedp-powered-july-2025)
+  - [Workflow Heading Pattern for Interactive Workflows](style_guide.md#workflow-heading-pattern-for-interactive-workflows)
+    - [How to Implement](style_guide.md#how-to-implement)
+    - [Example](style_guide.md#example)
+- [Before input/output prompts](style_guide.md#before-inputoutput-prompts)
+- [... input prompts ...](style_guide.md#-input-prompts-)
+- [Before progress bar](style_guide.md#before-progress-bar)
+- [... run progress bar ...](style_guide.md#-run-progress-bar-)
+    - [Rationale](style_guide.md#rationale)
+    - [Enforcement Checklist](style_guide.md#enforcement-checklist)
 - [Contributing](contributing.md)
   - [How to Contribute](contributing.md#how-to-contribute)
   - [Development Guidelines](contributing.md#development-guidelines)
@@ -219,6 +237,7 @@
     - [How do I get help or report a bug?](faq.md#how-do-i-get-help-or-report-a-bug)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
+    - [🔄 Resave Images Integration (July 2025)](changelog.md#-resave-images-integration-july-2025)
     - [🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)](changelog.md#-pepedp-powered-umzis-datasetpreprocessing-integration-july-2025)
     - [🚀 Performance Optimization Suite (NEW July 2025)](changelog.md#-performance-optimization-suite-new-july-2025)
       - [**GPU Acceleration**](changelog.md#gpu-acceleration)
@@ -352,6 +371,10 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 2. Build resdet:
    ```sh
+   sudo apt update
+   sudo apt install build-essential
+   sudo apt install pkg-config
+   sudo apt install libfftw3-dev libpng-dev mjpegtools libmagickwand-dev
    cd path/to/resdet
    make clean
    ./configure
@@ -493,7 +516,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 
 ## ✨ Image Processing & Augmentation
 
-- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel
+- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel, **resave images**
 - **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
 - **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
 - **🚀 Augmentation**: List, create, edit or delete _recipes_ or run advanced augmentation pipelines (using recipes)
@@ -783,6 +806,10 @@ Dataset Forge uses four distinct sounds to provide immediate feedback for key ev
 - (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
 
 These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
+
+## 🖥️ User Experience and CLI Features
+
+- All interactive workflows and menu actions print clear, Mocha-styled headings before input/output prompts and before progress bars or long-running operations. This provides context and improves navigation. See the Style Guide for implementation details.
 
 ---
 
@@ -1128,6 +1155,70 @@ A comprehensive static analysis tool for maintainers and contributors.
 - Use the suggestions to address any issues before using the dataset for ML training.
 - The workflow is fully automated and robust to input errors.
 - All steps are covered by automated tests for reliability.
+
+## Example: Workflow Headings in Action
+
+When running a workflow, you will see clear headings before input prompts and before progress bars:
+
+```
+🧩 Best Tile Extraction (PepeDP) - Input/Output Selection
+Input folder: ...
+Output folder: ...
+...
+Best Tile Extraction Progress
+[progress bar]
+```
+
+This pattern is used throughout Dataset Forge for all interactive workflows. See the Style Guide for more information.
+
+## 🔄 Basic Transformations
+
+### Resave Images
+
+**Location:** Image Processing & Augmentation → Basic Transformations → 🔄 Resave Images
+
+**Purpose:**
+
+- Convert images to different formats (PNG, JPEG, WebP, BMP, TIFF)
+- Optionally convert images to grayscale
+- Process images in parallel for efficiency
+- Support recursive processing of subdirectories
+
+**Workflow:**
+
+1. **Input Directory**: Select the folder containing images to process
+2. **Output Directory**: Choose where to save the resaved images
+3. **Output Format**: Select the desired output format (PNG, JPEG, WebP, BMP, TIFF)
+4. **Processing Options**:
+   - **Grayscale**: Convert images to grayscale (optional)
+   - **Recursive**: Process subdirectories (optional)
+5. **Confirmation**: Review settings and confirm processing
+
+**Features:**
+
+- **Multiple Output Formats**: Support for PNG, JPEG, WebP, BMP, TIFF
+- **Parallel Processing**: Uses thread-based processing for optimal performance
+- **Memory Efficient**: Limited worker count to prevent memory issues
+- **Unique Filenames**: Prevents overwriting with automatic unique filename generation
+- **Progress Tracking**: Shows real-time progress with descriptive messages
+- **Error Handling**: Robust error handling with detailed reporting
+
+**Use Cases:**
+
+- Convert image collections to a consistent format
+- Create grayscale versions of color images
+- Batch format conversion for dataset preparation
+- Optimize images for specific applications or workflows
+
+**Technical Details:**
+
+- Uses OpenCV for image reading and writing
+- Thread-based parallel processing for I/O efficiency
+- Automatic memory cleanup after processing
+- Comprehensive logging and error tracking
+- Integration with Dataset Forge's monitoring system
+
+### Other Basic Transformations
 
 [Back to Table of Contents](#table-of-contents)
 
@@ -1500,6 +1591,34 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
 - This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability, testability, and robust documentation.
 
+## Advanced: Resave Images Integration (July 2025)
+
+The resave images functionality has been fully integrated into Dataset Forge as a modular, maintainable feature:
+
+- **Business Logic**: `dataset_forge/actions/resave_images_actions.py` contains the core processing functions with public APIs for testing
+- **Menu Integration**: Added to Image Processing & Augmentation → Basic Transformations menu using lazy imports
+- **Parallel Processing**: Uses thread-based processing with `ThreadPoolExecutor` for optimal performance and memory efficiency
+- **Memory Management**: Limited worker count and automatic memory cleanup to prevent memory issues
+- **Error Handling**: Robust error handling with comprehensive logging and user feedback
+- **Testing**: Fully covered by unit and integration tests using public APIs and monkeypatching
+
+**Technical Implementation:**
+
+- Uses OpenCV for image reading and writing with format-specific compression
+- Thread-based parallel processing to avoid heavy import overhead in worker processes
+- `functools.partial` for proper function pickling in parallel operations
+- Integration with Dataset Forge's monitoring, memory management, and progress tracking systems
+- Support for multiple output formats (PNG, JPEG, WebP, BMP, TIFF) with optional grayscale conversion
+- Recursive processing support for subdirectory workflows
+- Unique filename generation to prevent overwriting
+
+**Integration Patterns:**
+
+- Follows the robust menu loop pattern for reliability
+- Uses lazy imports for fast CLI responsiveness
+- Integrates with centralized utilities for printing, memory management, and error handling
+- Comprehensive test coverage with 15 passing tests covering all functionality
+
 ## Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.
 
 ### **Core Architecture**
@@ -1787,6 +1906,10 @@ All DPID implementations are modular, live in `dataset_forge/dpid/`, and are exp
 **Testing:**
 All DPID implementations (including Umzi's) are covered by robust, non-interactive tests using pytest and monkeypatching. Tests validate that output files are created for both single-folder and HQ/LQ workflows, and that the API is reliable and isolated from external dependencies.
 
+### Menu/Workflow Patterns: Workflow Heading Pattern
+
+All interactive workflows and menu actions must print a clear, Mocha-styled heading before input/output prompts and before progress bars or long-running operations. This is enforced for all new and refactored workflows. See the Style Guide for rationale, code examples, and enforcement checklist.
+
 ---
 
 
@@ -1804,6 +1927,7 @@ Dataset Forge is built with a modular, extensible architecture for maintainabili
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
   - **align_images_actions.py**: Batch projective alignment of images using SIFT+FLANN (called from Dataset Management menu)
   - **enhanced_metadata_actions.py**: Metadata extraction, editing, filtering, anonymization
+  - **resave_images_actions.py**: Image format conversion and resaving with parallel processing
 - **dataset_forge/utils/**: Reusable utilities (file ops, memory, parallelism, color, monitoring, etc.)
 - **dataset_forge/dpid/**: Multiple DPID (degradation) implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
 - **configs/**: Example and user configuration files
@@ -1969,6 +2093,10 @@ F -->|<70| I[❌ Unusable]
 ## Menu Integration
 
 - The Dataset Management menu now includes an '🧭 Align Images' option, which calls the align_images_workflow in actions/align_images_actions.py using the lazy import pattern.
+
+## UI Layer and Workflow Patterns
+
+All menu actions and interactive workflows must print clear, Mocha-styled headings before input/output prompts and before progress bars, as described in the Style Guide. This is a required part of the UI/UX contract for Dataset Forge.
 
 ---
 
@@ -2184,6 +2312,10 @@ For further help, see [usage.md](usage.md) or contact the project maintainer.
 - If you get errors running DPID workflows, ensure you are using the correct menu option and that your input folders contain valid images.
 - All DPID implementations (including Umzi's) are modular and covered by robust, non-interactive tests. If tests fail, check for monkeypatching or signature mismatches in your test environment.
 - For further help, see [usage.md](usage.md) or contact the project maintainer.
+
+## Missing Workflow Headings
+
+If you don’t see clear workflow headings before prompts and progress bars, the workflow may be outdated or not following project standards. Please update the workflow to match the Style Guide.
 
 ---
 
@@ -2501,6 +2633,47 @@ See [features.md](features.md#comprehensive-test-suite) and [advanced.md](advanc
 - All workflows must provide public, non-interactive APIs for robust, automated testing.
 - All new features must be documented in all relevant docs and README_full.md.
 
+## Workflow Heading Pattern for Interactive Workflows
+
+All interactive workflows and menu actions in Dataset Forge must print a clear, Mocha-styled heading:
+
+- **Before input/output prompts** (e.g., "Input/Output Selection")
+- **Before progress bars or long-running operations** (e.g., "Progress")
+
+### How to Implement
+
+- Use `print_header` or `print_section` from `dataset_forge.utils.printing`.
+- Use the Catppuccin Mocha color scheme (see `dataset_forge.utils.color.Mocha`).
+- The heading should clearly indicate the workflow and the stage (e.g., "🧩 Best Tile Extraction (PepeDP) - Input/Output Selection").
+
+### Example
+
+```python
+from dataset_forge.utils.printing import print_header, print_section
+from dataset_forge.utils.color import Mocha
+
+# Before input/output prompts
+print_header("🧩 Best Tile Extraction (PepeDP) - Input/Output Selection", color=Mocha.pink)
+# ... input prompts ...
+
+# Before progress bar
+print_section("Best Tile Extraction Progress", color=Mocha.pink)
+# ... run progress bar ...
+```
+
+### Rationale
+
+- Provides clear context for users at each stage of a workflow.
+- Improves navigation and user experience, especially in complex or multi-step workflows.
+- Ensures consistency across all CLI features and menus.
+
+### Enforcement Checklist
+
+- [ ] All new workflows print a heading before input/output prompts.
+- [ ] All new workflows print a heading before progress bars/long-running operations.
+- [ ] All headings use the Catppuccin Mocha color scheme and centralized printing utilities.
+- [ ] All menu actions and workflows are reviewed for this pattern before merging.
+
 ---
 
 
@@ -2648,6 +2821,18 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 # Changelog
 
 ## [Unreleased]
+
+### 🔄 Resave Images Integration (July 2025)
+
+- **New Feature**: Added resave images functionality to Image Processing & Augmentation → Basic Transformations
+- **Format Support**: Convert images to PNG, JPEG, WebP, BMP, TIFF with optional grayscale conversion
+- **Parallel Processing**: Thread-based processing with `ThreadPoolExecutor` for optimal performance
+- **Memory Efficient**: Limited worker count and automatic memory cleanup to prevent memory issues
+- **Recursive Processing**: Support for processing subdirectories
+- **Unique Filenames**: Automatic unique filename generation to prevent overwriting
+- **Integration**: Fully integrated with Dataset Forge's monitoring, memory management, and progress tracking
+- **Testing**: Comprehensive test suite with 15 passing tests covering all functionality
+- **Documentation**: Updated features, usage, advanced, and architecture documentation
 
 ### 🧩 PepeDP-powered Umzi's Dataset_Preprocessing Integration (July 2025)
 

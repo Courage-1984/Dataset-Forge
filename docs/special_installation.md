@@ -111,6 +111,10 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 2. Build resdet:
    ```sh
+   sudo apt update
+   sudo apt install build-essential
+   sudo apt install pkg-config
+   sudo apt install libfftw3-dev libpng-dev mjpegtools libmagickwand-dev
    cd path/to/resdet
    make clean
    ./configure

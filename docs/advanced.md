@@ -363,6 +363,34 @@ The original Dataset_Preprocessing_consolidated_script.py has been fully ported 
 - The codebase uses Google-style docstrings, type hints, and follows the modular architecture described in `docs/architecture.md`.
 - This integration demonstrates how to port monolithic scripts into the Dataset Forge ecosystem for maintainability, testability, and robust documentation.
 
+## Advanced: Resave Images Integration (July 2025)
+
+The resave images functionality has been fully integrated into Dataset Forge as a modular, maintainable feature:
+
+- **Business Logic**: `dataset_forge/actions/resave_images_actions.py` contains the core processing functions with public APIs for testing
+- **Menu Integration**: Added to Image Processing & Augmentation → Basic Transformations menu using lazy imports
+- **Parallel Processing**: Uses thread-based processing with `ThreadPoolExecutor` for optimal performance and memory efficiency
+- **Memory Management**: Limited worker count and automatic memory cleanup to prevent memory issues
+- **Error Handling**: Robust error handling with comprehensive logging and user feedback
+- **Testing**: Fully covered by unit and integration tests using public APIs and monkeypatching
+
+**Technical Implementation:**
+
+- Uses OpenCV for image reading and writing with format-specific compression
+- Thread-based parallel processing to avoid heavy import overhead in worker processes
+- `functools.partial` for proper function pickling in parallel operations
+- Integration with Dataset Forge's monitoring, memory management, and progress tracking systems
+- Support for multiple output formats (PNG, JPEG, WebP, BMP, TIFF) with optional grayscale conversion
+- Recursive processing support for subdirectory workflows
+- Unique filename generation to prevent overwriting
+
+**Integration Patterns:**
+
+- Follows the robust menu loop pattern for reliability
+- Uses lazy imports for fast CLI responsiveness
+- Integrates with centralized utilities for printing, memory management, and error handling
+- Comprehensive test coverage with 15 passing tests covering all functionality
+
 ## Advanced: Performance Optimization Suite (NEW July 2025t Forge implements a comprehensive performance optimization suite designed for maximum efficiency in image dataset processing. This suite provides GPU acceleration, distributed processing, intelligent sample prioritization, and pipeline compilation capabilities.
 
 ### **Core Architecture**

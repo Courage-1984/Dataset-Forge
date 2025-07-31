@@ -83,6 +83,7 @@ Please see [Features](docs/features.md).
    ```bash
    py -3.12 -m venv venv312
    venv312\Scripts\activate
+   python -m pip install --upgrade pip setuptools wheel
    # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
    pip install pepeline pepedpid
@@ -94,12 +95,14 @@ Please see [Features](docs/features.md).
 
 3. **Run the application:**
    ```bash
-   dataset-forge
+   ./run.bat
    # or
+   venv312\Scripts\activate
    py main.py
    # or
-   ./run.bat
+   dataset-forge
    ```
+   
 
 ---
 

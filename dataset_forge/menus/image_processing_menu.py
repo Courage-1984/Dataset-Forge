@@ -58,12 +58,18 @@ def basic_transformations_menu():
             ),
         ),
         "5": (
+            "🔄 Resave Images",
+            lazy_action(
+                "dataset_forge.actions.resave_images_actions", "resave_images_workflow"
+            ),
+        ),
+        "6": (
             "🧹 Remove Alpha Channel",
             lazy_action(
                 "dataset_forge.actions.transform_actions", "remove_alpha_channels_menu"
             ),
         ),
-        "6": (
+        "7": (
             "🔀 Shuffle Images",
             lazy_action(
                 "dataset_forge.actions.transform_actions", "shuffle_images_menu"
