@@ -33,6 +33,14 @@ TEST_COMMANDS = {
         f"call {VENV_ACTIVATE}",
         f"{PYTHON_EXE} -m pytest -s --maxfail=5 --disable-warnings -v tests/",
     ],
+    "4": [
+        f"call {VENV_ACTIVATE}",
+        f"{PYTHON_EXE} -m pytest --timeout=60 --maxfail=5 --disable-warnings -v tests/",
+    ],
+    "5": [
+        f"call {VENV_ACTIVATE}",
+        f"{PYTHON_EXE} -m pytest --full-trace --maxfail=5 --disable-warnings -v tests/",
+    ],
 }
 
 MENU = """
@@ -41,8 +49,10 @@ Select test run mode:
 1. Basic: venv312\\Scripts\\activate + pytest
 2. Recommended: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest --maxfail=5 --disable-warnings -v tests/
 3. Verbose: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest -s --maxfail=5 --disable-warnings -v tests/ (no output capture)
+4. Timeout: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest --timeout=60 --maxfail=5 --disable-warnings -v tests/
+5. Full Trace: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest --full-trace --maxfail=5 --disable-warnings -v tests/
 
-Enter 1, 2, or 3 (or q to quit): """
+Enter 1, 2, 3, 4, or 5 (or q to quit): """
 
 
 def print_info(msg: str):
@@ -73,7 +83,7 @@ def main():
         print_info("Exiting.")
         sys.exit(0)
     if choice not in TEST_COMMANDS:
-        print_error("Invalid option. Please enter 1, 2, or 3.")
+        print_error("Invalid option. Please enter 1, 2, 3, 4, or 5.")
         sys.exit(1)
     commands = TEST_COMMANDS[choice]
     run_commands(commands)

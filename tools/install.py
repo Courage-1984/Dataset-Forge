@@ -81,20 +81,54 @@ def install_torch():
     )
 
 
-def install_project():
+def upgrade_pip_setuptools_wheel():
     pip = get_venv_pip()
-    print_info("Installing Dataset Forge and all requirements...")
-    # Use cwd=PROJECT_ROOT so that pip install . works from project root
-    run([pip, "install", "."], cwd=PROJECT_ROOT)
+    print_info("Upgrading pip, setuptools, wheel in the virtual environment...")
+    run([pip, "install", "--upgrade", "pip", "setuptools", "wheel"])
+
+
+def install_pepeline_pepedpid():
+    pip = get_venv_pip()
+    print_info("Installing pepeline and pepedpid (required for DPID workflows)...")
+    run([pip, "install", "pepeline", "pepedpid"])
+
+
+def install_requirements():
+    pip = get_venv_pip()
+    req_path = os.path.join(PROJECT_ROOT, "requirements.txt")
+    print_info(f"Installing requirements from {req_path} ...")
+    run([pip, "install", "-r", req_path])
+
+
+def install_pepedp():
+    pip = get_venv_pip()
+    print_info("Installing pepedp (required for Umzi's Dataset Preprocessing)...")
+    run([pip, "install", "pepedp"])
+
+
+# Comment out or remove install_project()
+# def install_project():
+#     pip = get_venv_pip()
+#     print_info("Installing Dataset Forge and all requirements...")
+#     run([pip, "install", "."], cwd=PROJECT_ROOT)
 
 
 def main():
     check_python_version()
     create_venv()
+    upgrade_pip_setuptools_wheel()
     install_torch()
-    install_project()
-    print_success(
-        "Installation complete. To run, activate the venv and use: dataset-forge"
+    install_pepeline_pepedpid()
+    install_requirements()
+    install_pepedp()
+    print_success("Installation complete. Dataset Forge is ready to use!")
+    print_info("First run options:")
+    print_info("  1. ./run.bat")
+    print_info("  2. venv312\\Scripts\\activate && py main.py")
+    print_info("  3. dataset-forge (if installed as CLI entry point)")
+    print_info("")
+    print_info(
+        "See Special Installation Instructions (docs/special_installation.md) for details on extra dependencies and troubleshooting."
     )
     if os.name == "nt":
         print_info(
