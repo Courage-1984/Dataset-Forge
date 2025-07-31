@@ -57,6 +57,7 @@ def bhi_filtering_menu():
     try:
         run_bhi_filtering(
             input_path=input_folder,
+            output_folder=output_folder,
             thresholds={
                 "blockiness": blockiness_threshold,
                 "hyperiqa": hyperiqa_threshold,

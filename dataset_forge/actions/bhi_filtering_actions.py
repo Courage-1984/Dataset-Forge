@@ -9,7 +9,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
-from pepeline import read, ImgFormat
+from PIL import Image
+import cv2
+import numpy as np
 
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
@@ -30,9 +32,13 @@ class ImageDataset(Dataset):
             if os.path.isfile(item_path) and not item.startswith("_bhi_filtered"):
                 # Pre-validate that the file can be read
                 try:
-                    test_image = read(item_path, format=ImgFormat.F32)
-                    if test_image is not None and len(test_image.shape) == 3:
-                        self.image_files.append(item)
+                    # Use PIL to load and validate the image
+                    with Image.open(item_path) as img:
+                        img_array = (
+                            np.array(img.convert("RGB"), dtype=np.float32) / 255.0
+                        )
+                        if img_array is not None and len(img_array.shape) == 3:
+                            self.image_files.append(item)
                 except Exception as e:
                     print(f"Skipping {item} during initialization: {e}")
                     continue
@@ -45,7 +51,9 @@ class ImageDataset(Dataset):
         from dataset_forge.utils.memory_utils import to_device_safe
 
         img_path = os.path.join(self.image_dir, self.image_files[idx])
-        image = read(img_path, format=ImgFormat.F32)
+        # Use PIL to load the image
+        with Image.open(img_path) as img:
+            image = np.array(img.convert("RGB"), dtype=np.float32) / 255.0
         image = torch.tensor(image, dtype=torch.float32, device=self.device).permute(
             2, 0, 1
         )
@@ -796,12 +804,16 @@ def run_bhi_filtering(
 
     # Prepare move folders if needed
     if action == "move":
-        if not move_folder:
+        # Use output_folder if provided, otherwise use move_folder, otherwise create timestamped folder
+        if output_folder:
+            move_folder = output_folder
+        elif not move_folder:
             # Create a unique folder name to avoid conflicts
             import time
 
             timestamp = int(time.time())
             move_folder = os.path.join(hq_folder, f"_bhi_filtered_{timestamp}")
+
         os.makedirs(move_folder, exist_ok=True)
         if paired:
             lq_move_folder = os.path.join(lq_folder, f"_bhi_filtered_{timestamp}")

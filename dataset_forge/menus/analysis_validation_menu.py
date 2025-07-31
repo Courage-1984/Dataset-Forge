@@ -449,7 +449,10 @@ def analyze_properties_menu():
         "3": ("🔍 Find & Test HQ/LQ Scale", find_test_scale_workflow),
         "4": ("📏 Report Image Dimensions", report_dimensions_workflow),
         "5": ("🎯 Find Native Resolution", find_native_resolution_workflow),
-        "6": ("⭐ BHI Filtering Analysis", lazy_action(__name__, "bhi_filtering_menu")),
+        "6": (
+            "⭐ BHI Filtering Analysis",
+            lazy_action("dataset_forge.menus.bhi_filtering_menu", "bhi_filtering_menu"),
+        ),
         "0": ("⬅️  Back", None),
     }
     from dataset_forge.utils.printing import print_error
