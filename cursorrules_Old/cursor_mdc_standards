@@ -1,0 +1,103 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# .mdc Standards for Dataset Forge
+
+This document defines the required structure, conventions, and best practices for all `.mdc` rule files in the Dataset Forge project. All contributors must follow these standards to ensure consistency, clarity, and maintainability of rule documentation.
+
+## 1. YAML Frontmatter
+- Every `.mdc` file **must** begin with a YAML frontmatter block, enclosed in `---`.
+- Required fields:
+  - `name`: Human-readable title for the rule.
+  - `description`: Concise summary of the rule's purpose (ideally < 120 chars, "ACTION when TRIGGER to OUTCOME").
+  - `globs`: Array of file patterns the rule applies to. Use project-specific globs.
+  - `alwaysApply`: `true` for foundational rules, `false` or omit otherwise.
+  - `priority`: Integer (1=highest, 5=lowest) for conflict resolution (optional, but recommended).
+- Example:
+  ```yaml
+  ---
+  name: "Python Best Practices for Dataset Forge"
+  description: "Enforce Python best practices for clean, efficient, and idiomatic code generation in Dataset Forge"
+  globs: ["**/*.py"]
+  alwaysApply: true
+  priority: 1
+  ---
+  ```
+
+## 2. Content Structure
+- Start with a clear, descriptive heading (matching the `name` field).
+- Use concise, modular sections with clear headings (e.g., "Core Principles", "Best Practices", "Examples").
+- Use bullet points, numbered lists, and code blocks for clarity.
+- Include concrete, project-specific examples where possible.
+- For large rules, break into smaller, composable `.mdc` files by topic or module.
+
+## 3. Writing Style
+- Use clear, direct, and professional language.
+- Prefer action-oriented, imperative sentences ("Use", "Follow", "Document").
+- Avoid unnecessary jargon; explain project-specific terms.
+- Keep lines under 88 characters where possible (Black standard).
+- Use consistent terminology throughout all `.mdc` files.
+
+## 4. Code Examples
+- Use triple backticks and specify the language (e.g., ```python, ```yaml).
+- Prefer real, working code from the codebase or documentation.
+- Mark good/bad examples with comments if needed.
+- Keep examples concise and relevant to the rule.
+
+## 5. Scope and Specificity
+- Use precise `globs` to target the intended files or directories.
+- Project-wide rules go in `.cursor/rules/`; module-specific rules go in the relevant subdirectory.
+- Avoid duplicating rules; link to or reference other `.mdc` files if needed.
+
+## 6. Maintenance
+- Update `.mdc` files when project conventions, architecture, or workflows change.
+- Remove or archive obsolete rules.
+- When adding new features or modules, create new `.mdc` files as appropriate.
+- Review and refactor `.mdc` files regularly for clarity and accuracy.
+
+## 7. Documentation and Navigation
+- Reference related `.mdc` files or documentation at the end of each rule if relevant.
+- Use navigation links or section headers for long or complex rules.
+
+## 8. Example Template
+```yaml
+---
+name: "[Rule Name]"
+description: "[Short, action-oriented summary]"
+globs: ["[glob patterns]"]
+alwaysApply: [true|false]
+priority: [1-5]
+---
+
+# [Rule Name]
+
+## Purpose
+Briefly describe the purpose and scope of this rule.
+
+## Core Principles
+- Principle 1
+- Principle 2
+
+## Best Practices
+- Practice 1
+- Practice 2
+
+## Examples
+```python
+# Example code here
+```
+
+## Related Rules
+- [Link to related .mdc file]
+```
+
+## 9. Review Checklist
+- [ ] YAML frontmatter present and correct
+- [ ] Clear, modular headings and sections
+- [ ] Concise, actionable language
+- [ ] Project-specific globs and examples
+- [ ] Code blocks are properly formatted
+- [ ] No duplication with other rules
+- [ ] Up to date with current project standards

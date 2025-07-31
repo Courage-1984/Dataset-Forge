@@ -1,0 +1,258 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+---
+name:GitHub Setup for Dataset Forge"
+description: Follow GitHub setup guidelines for Dataset Forge Python project, including CI/CD and repository structure
+globs: [".github/**/*, "**/*.yml", **/setup.py", "**/requirements.txt", ".gitignore"]
+alwaysApply: false
+priority: 4
+---
+
+## Project Configuration
+
+### General Settings
+```json
+{general": [object Object]     coding_style: {    language": "Python",
+            use_strict": true,
+           indentation": "4 spaces",
+            max_line_length:88     comments[object Object]
+             style": # for single-line,  for multi-line,
+               require_comments": true
+            }
+        },
+        
+ naming_conventions: {      variables": "snake_case",
+          functions": "snake_case",
+            classes": "PascalCase",
+          interfaces": "PascalCase",
+         files": "snake_case"
+        },
+        
+       error_handling:[object Object]          prefer_try_catch": true,
+            log_errors": true
+        },
+        
+   testing: {        require_tests": true,
+            test_coverage": 80
+          test_types": ["unit, egration"]
+        },
+        
+      documentation: {       require_docs": true,
+          doc_tool": "docstrings",
+          style_guide": "Google Python Style Guide"
+        },
+        
+    security: {        require_https": true,
+            sanitize_inputs": true,
+            validate_inputs": true,
+         use_env_vars": true
+        },
+        
+     configuration_management: {          config_files": [".env"],
+           env_management":python-dotenv, secrets_management": "environment variables"
+        },
+        
+       code_review: {          require_reviews": true,
+          review_tool": "GitHub Pull Requests",
+            review_criteria:functionality,code quality", "security"]
+        },
+        
+        version_control: {          systemGit",
+        branching_strategy: Flow",
+         commit_message_format": Conventional Commits"
+        },
+        
+   logging: {         logging_tool: hon logging module",
+          log_levels:debug,info", warnror"],
+          log_retention_policy": "7 days"
+        },
+        
+      monitoring:[object Object]       monitoring_tool":Not specified",
+           metrics ["file processing time, ification accuracy", "error rate"]
+        },
+        
+  dependency_management: {          package_manager": pip",
+         versioning_strategy":Semantic Versioning"
+        },
+        
+      accessibility: {            standards: ["Not applicable"],
+          testing_tools": [Not applicable"]
+        },
+        
+    internationalization: [object Object]
+           i18n_tool:Not applicable",
+      supported_languages": ["English"],
+           default_language":English"
+        },
+        
+ ci_cd:[object Object]
+            ci_tool:GitHub Actions,
+         cd_tool":Not specified",
+          pipeline_configuration": .github/workflows/main.yml"
+        },
+        
+        code_formatting: {
+        formatter": "Black",
+            linting_tool": "Pylint",
+            rules": PEP 8project-specific rules"]
+        },
+        
+        architecture: {        patterns": ["Modular design"],
+          principles": ["Single Responsibility",DRY"]
+        }
+    },
+    
+   project_specific": {
+        use_framework:None",
+     styling:Not applicable",
+        testing_framework":pytest",
+        build_tool": "setuptools",
+        
+      deployment: {    environment":Local machine",
+            automation":Not specified",
+       strategy": Manual deployment"
+        },
+        
+       performance: {            benchmarking_tool":Not specified",
+            performance_goals":[object Object]
+              response_time": "< 5econds per file,
+                throughput":Not specified,
+                error_rate": <1         }
+        }
+    },
+    context: {
+        codebase_overview": "Python-based image dataset management tool using AI for content analysis and classification",
+     libraries:            PIL/Pillow", opencv-python, rch", "torchvision,transformers,           pandas", numpy",joblib", "pygame", questionary,tqdm", "pytest", 
+            logging",pytest-mock",dask", ray", "kornia,albumentations"
+        ],
+        
+       coding_practices:[object Object]          modularity": true,
+          DRY_principle": true,
+            performance_optimization": true,
+         lazy_imports": true,
+            memory_management:true
+        }
+    },
+    
+behavior: {     verbosity: {      level": 2,
+          range": 0,3        },
+        handle_incomplete_tasks": "Provide partial solution and explain limitations",
+   ask_for_clarification: true,  communication_tone":Professional and concise"
+    }
+}
+```
+
+## Dataset Forge Specific Requirements
+
+### Repository Structure
+```
+DatasetForge/
+├── .github/
+│   └── workflows/
+│       └── main.yml
+├── dataset_forge/
+│   ├── menus/
+│   ├── actions/
+│   ├── utils/
+│   └── dpid/
+├── tests/
+│   ├── test_utils/
+│   └── test_cli/
+├── docs/
+├── configs/
+├── tools/
+├── assets/
+├── requirements.txt
+├── setup.py
+├── main.py
+├── run.bat
+├── pytest.ini
+└── .gitignore
+```
+
+### Critical Files
+
+#### .gitignore
+- Virtual environments (venv/, venv312Python cache files (__pycache__/, *.pyc)
+- Build artifacts (build/, dist/)
+- Logs and temporary files (*.log, *.tmp)
+- Data directories (store/, results/, logs/)
+- IDE files (.idea/, .vscode/)
+
+#### setup.py
+- Package metadata and dependencies
+- Entry points for CLI commands
+- Python version requirements (>=3.8License and author information
+
+#### requirements.txt
+- Grouped by category (Core, Image Processing, ML, etc.)
+- Version constraints for stability
+- Optional dependencies clearly marked
+- Special installation notes (CUDA, VapourSynth, etc.)
+
+### CI/CD Configuration
+
+#### GitHub Actions Workflow
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: 38, 30.9, 3.131112]
+    
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run tests
+      run: |
+        python -m pytest tests/ --maxfail=5 --disable-warnings -v
+```
+
+### Documentation Structure
+- **README.md**: Concise landing page with quick start
+- **docs/**: Comprehensive documentation organized by topic
+- **docs/README_full.md**: Auto-generated comprehensive documentation
+- **docs/toc.md**: Auto-generated table of contents
+
+### Testing Strategy
+- **Unit Tests**: tests/test_utils/ for utility functions
+- **Integration Tests**: tests/test_cli/ for CLI workflows
+- **Test Coverage**: Aim for 80 coverage
+- **Test Organization**: Mirror source code structure
+
+### Code Quality Tools
+- **Static Analysis**: tools/find_code_issues/find_code_issues.py
+- **Type Checking**: mypy (when applicable)
+- **Code Formatting**: Black formatter
+- **Linting**: Pylint or flake8
+
+### Security Considerations
+- **Input Validation**: Sanitize all user inputs
+- **Path Traversal**: Prevent path traversal attacks
+- **Environment Variables**: Use for sensitive configuration
+- **Dependency Scanning**: Regular security updates
+
+### Performance Monitoring
+- **Memory Usage**: Track memory consumption
+- **Processing Time**: Monitor file processing performance
+- **Error Rates**: Track and analyze error patterns
+- **Resource Utilization**: Monitor CPU and GPU usage

@@ -1,0 +1,390 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Memory Management for Dataset Forge
+
+## Core Memory Management Principles
+
+### Centralized Memory Management
+- **ALWAYS** use centralized memory management utilities from `dataset_forge.utils.memory_utils`
+- **ALWAYS** clear memory after large operations
+- **ALWAYS** use context managers for memory-intensive operations
+- **ALWAYS** implement proper CUDA memory cleanup
+
+### Memory Management Import Pattern
+```python
+# Import centralized memory management
+from dataset_forge.utils.memory_utils import (
+    clear_memory,
+    clear_cuda_cache,
+    memory_context,
+    auto_cleanup,
+    to_device_safe,
+    safe_cuda_operation,
+    get_memory_manager,
+)
+```
+
+## Dataset Forge Memory Management Patterns
+
+### Basic Memory Cleanup
+```python
+def process_images(images):
+   rocess images with automatic memory cleanup.""    try:
+        # Process images
+        results = []
+        for image in images:
+            result = process_single_image(image)
+            results.append(result)
+        
+        return results
+    finally:
+        # Always cleanup memory
+        clear_memory()
+        clear_cuda_cache()
+```
+
+### Context Manager Pattern
+```python
+def process_large_dataset(images):
+  cess large dataset with memory context."ith memory_context("Large Dataset Processing, cleanup_on_exit=True):
+        # Process images in batches
+        for batch in chunk_images(images, batch_size=32):
+            process_batch(batch)
+            clear_memory()  # Clear after each batch
+```
+
+### Automatic Cleanup Decorator
+```python
+@auto_cleanup
+def process_images_with_decorator(images):
+   rocess images with automatic cleanup decorator."""
+    # Your processing code here
+    results = []
+    for image in images:
+        result = process_single_image(image)
+        results.append(result)
+    return results
+```
+
+### CUDA Memory Management
+```python
+def gpu_operation(tensor):
+    """Safe GPU operation with memory management.""    try:
+        # Move tensor to GPU safely
+        tensor = to_device_safe(tensor,cuda)
+        
+        # Perform GPU operation
+        result = perform_gpu_operation(tensor)
+        
+        return result
+    finally:
+        # Clear CUDA cache
+        clear_cuda_cache()
+```
+
+### Safe CUDA Operations
+```python
+def complex_gpu_operation(data):
+plex GPU operation with retry logic."""
+    def operation():
+        # GPU operation code
+        return process_on_gpu(data)
+    
+    # Use safe CUDA operation with retry logic
+    return safe_cuda_operation(
+        operation,
+        max_retries=3       retry_delay=1.0
+    )
+```
+
+## Memory Management Best Practices
+
+### Memory Monitoring
+```python
+def monitor_memory_usage():
+   nitor memory usage during operations.""  from dataset_forge.utils.memory_utils import get_memory_manager
+    
+    manager = get_memory_manager()
+    
+    # Get memory information
+    memory_info = manager.get_memory_info()
+    
+    # Print memory information
+    manager.print_memory_info(detailed=True)
+    
+    # Monitor specific operation
+    @manager.monitor_memory_usage("Image Processing)def process_images(images):
+        # Process images
+        pass
+```
+
+### Memory Optimization
+```python
+def optimize_for_large_operations():
+    ze memory settings for large operations.""  from dataset_forge.utils.memory_utils import get_memory_manager
+    
+    manager = get_memory_manager()
+    
+    # Get optimization recommendations
+    recommendations = manager.optimize_for_large_operations()
+    
+    # Apply recommendations
+    batch_size = recommendations.get("batch_size", 4
+    max_workers = recommendations.get(max_workers", 4)
+    use_gpu = recommendations.get("use_gpu", True)
+    
+    return batch_size, max_workers, use_gpu
+```
+
+### Tensor Operations
+```python
+def safe_tensor_operations():
+ tensor operations with memory management.""import torch
+    
+    # Safe tensor movement
+    tensor = torch.randn(1000, 1000tensor = to_device_safe(tensor, cuda")
+    
+    # Detach and clear gradients
+    tensor = detach_and_clear(tensor)
+    
+    # Context manager for tensor operations
+    with tensor_context(cuda, cleanup_on_exit=True):
+        result = tensor_operation(tensor)
+        return result
+```
+
+## Memory Management in Parallel Processing
+
+### Parallel Processing with Memory Management
+```python
+def parallel_processing_with_memory():
+    """Parallel processing with proper memory management.""  from dataset_forge.utils.parallel_utils import ParallelConfig, ProcessingType
+    from dataset_forge.utils.progress_utils import smart_map
+    
+    # Setup parallel processing with memory considerations
+    config = ParallelConfig(
+        max_workers=4,
+        processing_type=ProcessingType.THREAD,  # Prefer threads for I/O
+        use_gpu=True,
+        gpu_memory_fraction=0.8  # Use 80 of GPU memory
+    )
+    
+    # Process with memory management
+    results = smart_map(
+        process_single_item,
+        items,
+        desc="Processing with memory management",
+        max_workers=config.max_workers,
+        processing_type=ProcessingType.THREAD,
+    )
+    
+    # Clear memory after processing
+    clear_memory()
+    clear_cuda_cache()
+    
+    return results
+```
+
+### GPU Memory Fraction Management
+```python
+def setup_gpu_environment():
+    """Setup GPU environment with memory management.""import torch
+    
+    if torch.cuda.is_available():
+        # Set GPU memory fraction to prevent OOM
+        torch.cuda.set_per_process_memory_fraction(0.8)
+        
+        # Set device for current process
+        torch.cuda.set_device(0)
+        
+        # Clear cache after setup
+        clear_cuda_cache()
+```
+
+## Memory Management in Actions
+
+### Action-Level Memory Management
+```python
+@monitor_all(process_dataset", critical_on_error=True)
+def process_dataset(dataset_path: str):
+    ocess dataset with comprehensive memory management.""    try:
+        # Setup memory context
+        with memory_context("Dataset Processing, cleanup_on_exit=True):
+            # Load dataset
+            images = load_dataset(dataset_path)
+            
+            # Process in batches
+            batch_size = 32
+            for i in range(0, len(images), batch_size):
+                batch = images[i:i + batch_size]
+                process_batch(batch)
+                
+                # Clear memory after each batch
+                clear_memory()
+                clear_cuda_cache()
+                
+    except Exception as e:
+        # Ensure memory cleanup on error
+        clear_memory()
+        clear_cuda_cache()
+        raise
+```
+
+### Error Handling with Memory Management
+```python
+def robust_operation_with_memory():
+    "ust operation with memory cleanup on errors.""    try:
+        # Perform operation
+        result = perform_operation()
+        return result
+        
+    except torch.cuda.CudaError as e:
+        # Clear CUDA cache on CUDA errors
+        clear_cuda_cache()
+        print_error(f"CUDA error: {e}")
+        raise
+        
+    except MemoryError as e:
+        # Clear all memory on memory errors
+        clear_memory()
+        clear_cuda_cache()
+        print_error(f"Memory error: {e}")
+        raise
+        
+    except Exception as e:
+        # General cleanup on any error
+        clear_memory()
+        clear_cuda_cache()
+        print_error(fUnexpected error: {e}")
+        raise
+```
+
+## Memory Management Utilities
+
+### Memory Information Utilities
+```python
+def get_memory_statistics():
+    ""Get comprehensive memory statistics.""  from dataset_forge.utils.memory_utils import get_memory_manager
+    
+    manager = get_memory_manager()
+    
+    # Get memory info
+    memory_info = manager.get_memory_info()
+    
+    # Print formatted information
+    manager.print_memory_info(detailed=True)
+    
+    return memory_info
+```
+
+### Memory Context Utilities
+```python
+def memory_intensive_operation():
+    "ntensive operation with context management."ith memory_context("Intensive Operation, cleanup_on_exit=True):
+        # Perform memory-intensive operation
+        result = perform_intensive_operation()
+        
+        # Memory is automatically cleaned up on exit
+        return result
+```
+
+## Memory Management Configuration
+
+### Memory Manager Configuration
+```python
+def configure_memory_manager():
+    "ure memory manager settings.""  from dataset_forge.utils.memory_utils import get_memory_manager
+    
+    # Get memory manager instance
+    manager = get_memory_manager(enable_monitoring=True)
+    
+    # Configure CUDA environment variables
+    import os
+    os.environ.setdefault(CUDA_LAUNCH_BLOCKING", "1    os.environ.setdefault(CUDA_LAUNCH_TIMEOUT, )    return manager
+```
+
+### Memory Optimization Settings
+```python
+def get_memory_optimization_settings():emory optimization settings based on system.""  from dataset_forge.utils.memory_utils import get_memory_manager
+    
+    manager = get_memory_manager()
+    
+    # Get optimization recommendations
+    recommendations = manager.optimize_for_large_operations()
+    
+    # Extract settings
+    settings = {
+   batch_size: recommendations.get(batch_size",4  max_workers: recommendations.get("max_workers", 4,
+use_gpu: recommendations.get(use_gpu", True),
+   gpu_memory_fraction": 00.8 }
+    
+    return settings
+```
+
+## Memory Management in Testing
+
+### Test Memory Management
+```python
+def test_memory_cleanup():
+est memory cleanup functionality.
+    with patch('dataset_forge.utils.memory_utils.clear_memory) as mock_clear:
+        with patch('dataset_forge.utils.memory_utils.clear_cuda_cache') as mock_cuda:
+            # Perform operation
+            process_images(['test.jpg'], 'output/')
+            
+            # Verify memory cleanup was called
+            mock_clear.assert_called()
+            mock_cuda.assert_called()
+```
+
+### Memory Context Testing
+```python
+def test_memory_context():
+est memory context manager.
+    with patch('dataset_forge.utils.memory_utils.get_memory_manager) as mock_manager:
+        mock_manager.return_value.memory_context.return_value.__enter__.return_value = mock_manager.return_value
+        mock_manager.return_value.memory_context.return_value.__exit__.return_value = None
+        
+        with memory_context("Test Operation"):
+            # Test operation
+            pass
+        
+        # Verify context manager was used
+        mock_manager.return_value.memory_context.assert_called_once()
+```
+
+## Memory Management Documentation
+
+### Function Documentation
+```python
+def process_large_dataset(images: List[str]) -> List[str]:
+ 
+    Process large dataset with comprehensive memory management.
+    
+    This function uses centralized memory management to ensure proper
+    cleanup of CUDA and Python memory during processing.
+    
+    Args:
+        images: List of image paths to process
+        
+    Returns:
+        List of processed image paths
+        
+    Memory Management:
+        - Uses memory_context for automatic cleanup
+        - Clears memory after each batch
+        - Handles CUDA memory cleanup
+        - Provides error recovery with memory cleanup
+    "ith memory_context("Large Dataset Processing, cleanup_on_exit=True):
+        # Implementation here
+        pass
+```
+
+### Memory Management Notes
+- **Always document memory management in function docstrings**
+- **Explain memory cleanup strategies**
+- **Document memory requirements and limitations**
+- **Provide memory optimization recommendations**

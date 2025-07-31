@@ -1,0 +1,306 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+name: Pandas Data Manipulation for Dataset Forge"
+description: Guide efficient and correct Pandas data manipulation, compatible with Dataset Forge workflows
+globs: ["dataset_forge/**/*.py"]
+alwaysApply: false
+priority: 3
+---
+
+# Pandas Data Manipulation for Dataset Forge
+
+## Core Principles
+
+### Data Loading and Validation
+```python
+import pandas as pd
+from typing import List, Dict, Any, Optional
+from dataset_forge.utils.printing import print_info, print_error
+
+def load_dataset_metadata(file_path: str) -> pd.DataFrame:
+    "Load and validate dataset metadata from CSV file.
+    
+    Args:
+        file_path: Path to CSV metadata file
+        
+    Returns:
+        Validated DataFrame with metadata
+        
+    Raises:
+        FileNotFoundError: If file doesn't exist
+        ValueError: If data format is invalid   try:
+        df = pd.read_csv(file_path)
+        
+        # Validate required columns
+        required_columns = ['image_path', width, eight', 'file_size]
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
+            
+        # Validate data types
+        df[width]= pd.to_numeric(df[width], errors='coerce')
+        df['height]= pd.to_numeric(df[height], errors='coerce')
+        df[file_size]= pd.to_numeric(df['file_size], errors='coerce')
+        
+        # Remove rows with invalid data
+        df = df.dropna(subset=[width, eight', 'file_size])
+        
+        print_info(f"Loaded {len(df)} valid metadata records")
+        return df
+        
+    except FileNotFoundError:
+        print_error(fMetadata file not found: {file_path}")
+        raise
+    except Exception as e:
+        print_error(f"Error loading metadata: {e}")
+        raise
+```
+
+### Efficient Data Processing
+```python
+from dataset_forge.utils.memory_utils import memory_context
+from dataset_forge.utils.progress_utils import tqdm
+
+def process_large_dataframe(df: pd.DataFrame, chunk_size: int = 100 -> pd.DataFrame:
+  ss large DataFrame in chunks to manage memory usage.
+    
+    Args:
+        df: Input DataFrame
+        chunk_size: Number of rows to process at once
+        
+    Returns:
+        Processed DataFrame
+    "ith memory_context("Large DataFrame Processing"):
+        results = []
+        
+        # Process in chunks
+        for i in tqdm(range(0, len(df), chunk_size), desc=Processing chunks"):
+            chunk = df.iloc[i:i + chunk_size].copy()
+            
+            # Process chunk
+            processed_chunk = process_chunk(chunk)
+            results.append(processed_chunk)
+            
+        # Combine results
+        return pd.concat(results, ignore_index=True)
+```
+
+### Data Analysis and Filtering
+```python
+def analyze_image_metadata(df: pd.DataFrame) -> Dict[str, Any]:
+  yze image metadata and generate statistics.
+    
+    Args:
+        df: DataFrame with image metadata
+        
+    Returns:
+        Dictionary with analysis results
+    
+    analysis = {
+     total_images: len(df),
+       unique_formats': df['format'].nunique(),
+        size_distribution:[object Object]       min_width: df['width'].min(),
+           max_width: df['width'].max(),
+            mean_width': dfwidthean(),
+            min_height: dfheightmin(),
+            max_height: dfheightmax(),
+           mean_height: df[height].mean(),
+        },
+        file_size_stats:[object Object]       min_size': df['file_size'].min(),
+          max_size': df['file_size'].max(),
+           mean_size': df['file_size'].mean(),
+            total_size': df['file_size'].sum(),
+        }
+    }
+    
+    return analysis
+
+def filter_images_by_criteria(df: pd.DataFrame, 
+                            min_width: Optional[int] = None,
+                            min_height: Optional[int] = None,
+                            max_file_size: Optional[int] = None,
+                            formats: OptionalList[str]] = None) -> pd.DataFrame:
+  ilter images based on specified criteria.
+    
+    Args:
+        df: DataFrame with image metadata
+        min_width: Minimum image width
+        min_height: Minimum image height
+        max_file_size: Maximum file size in bytes
+        formats: List of allowed image formats
+        
+    Returns:
+        Filtered DataFrame
+  
+    filtered_df = df.copy()
+    
+    if min_width is not None:
+        filtered_df = filtered_df[filtered_df['width'] >= min_width]
+        
+    if min_height is not None:
+        filtered_df = filtered_df[filtered_df['height] >= min_height]
+        
+    if max_file_size is not None:
+        filtered_df = filtered_df[filtered_df['file_size'] <= max_file_size]
+        
+    if formats is not None:
+        filtered_df = filtered_df[filtered_df[format].isin(formats)]
+    
+    return filtered_df
+```
+
+### Data Export and Serialization
+```python
+import json
+from pathlib import Path
+
+def export_analysis_results(analysis: Dict[str, Any], output_path: str) -> None:
+    t analysis results to JSON file.
+    
+    Args:
+        analysis: Analysis results dictionary
+        output_path: Path to output JSON file try:
+        with open(output_path, 'w') as f:
+            json.dump(analysis, f, indent=2, default=str)
+        print_info(f"Analysis results exported to: {output_path}")
+    except Exception as e:
+        print_error(f"Error exporting results:[object Object]e})        raise
+
+def save_dataframe_summary(df: pd.DataFrame, output_path: str) -> None:
+    DataFrame summary statistics to CSV.
+    
+    Args:
+        df: DataFrame to summarize
+        output_path: Path to output CSV file    try:
+        # Generate summary statistics
+        summary = df.describe()
+        
+        # Add additional statistics
+        summary.loc['count_unique] = df.nunique()
+        summary.loc['missing_values'] = df.isnull().sum()
+        
+        # Save to CSV
+        summary.to_csv(output_path)
+        print_info(fDataFrame summary saved to: {output_path}")
+    except Exception as e:
+        print_error(f"Error saving summary: {e}")
+        raise
+```
+
+## Best Practices
+
+### Memory Management
+- **Chunk Processing**: Process large DataFrames in chunks
+- **Data Types**: Use appropriate data types to reduce memory usage
+- **Cleanup**: Remove unnecessary columns and rows early
+- **Context Managers**: Use memory_context for large operations
+
+### Performance Optimization
+- **Vectorized Operations**: Use pandas vectorized operations instead of loops
+- **Indexing**: Use proper indexing for fast lookups
+- **Caching**: Cache expensive computations
+- **Parallel Processing**: Use parallel processing for independent operations
+
+### Data Validation
+- **Type Checking**: Validate data types and ranges
+- **Missing Values**: Handle missing values appropriately
+- **Outliers**: Detect and handle outliers
+- **Consistency**: Ensure data consistency across columns
+
+### Error Handling
+- **Graceful Degradation**: Handle errors gracefully
+- **User Feedback**: Provide clear error messages
+- **Logging**: Log important operations and errors
+- **Recovery**: Provide recovery options when possible
+
+## Dataset Forge Integration
+
+### Centralized Utilities
+```python
+from dataset_forge.utils.printing import print_info, print_success, print_warning, print_error
+from dataset_forge.utils.memory_utils import memory_context, auto_cleanup
+from dataset_forge.utils.progress_utils import tqdm
+from dataset_forge.utils.history_log import log_operation
+```
+
+### Configuration Management
+```python
+from dataset_forge.menus.session_state import user_preferences
+
+# Get user preferences for data processing
+chunk_size = user_preferences.get(pandas_chunk_size,1000)
+max_memory_usage = user_preferences.get('max_memory_usage', 0.8)
+```
+
+### Testing Patterns
+```python
+import pytest
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from _pytest.fixtures import FixtureRequest
+
+def test_dataframe_processing():
+   taFrame processing functionality."""
+    # Create test data
+    test_data = [object Object]      image_path': ['img1.jpg', 'img2],
+      width': [192080],
+       height': [18020       file_size': [10240051200
+    }
+    df = pd.DataFrame(test_data)
+    
+    # Test processing
+    result = process_dataframe(df)
+    
+    # Assertions
+    assert len(result) == 2
+    assert 'processed' in result.columns
+```
+
+## Communication and Problem-Solving
+
+- **Clear Documentation**: Document data processing steps and decisions
+- **Performance Monitoring**: Track processing time and memory usage
+- **User Feedback**: Provide progress updates for long operations
+- **Error Recovery**: Suggest solutions for common data issues
+
+## Code Quality and Best Practices
+
+- **Type Annotations**: Use comprehensive type hints
+- **Error Handling**: Robust error handling with meaningful messages
+- **Logging**: Comprehensive logging for debugging
+- **Documentation**: Clear docstrings and usage examples
+
+## Semantic Naming and Abstractions
+
+- **Descriptive Names**: Use clear, descriptive variable and function names
+- **Consistent Patterns**: Follow established naming conventions
+- **Abstraction Levels**: Choose appropriate abstraction levels
+- **Domain Language**: Use domain-specific terminology
+
+## Platform Thinking
+
+- **Cross-Platform**: Ensure compatibility across different platforms
+- **Resource Awareness**: Be aware of system resources and limitations
+- **Scalability**: Design for scalability and growth
+- **Maintainability**: Focus on long-term maintainability
+
+## Response Format
+
+- **Clear Structure**: Organize responses with clear headings and sections
+- **Code Examples**: Include practical code examples
+- **Explanation**: Explain the reasoning behind data processing decisions
+- **Trade-offs**: Discuss benefits and potential drawbacks
+
+## Handling Uncertainty and Limitations
+
+- **Graceful Degradation**: Handle cases where data processing fails
+- **Fallback Strategies**: Provide fallback options for failed operations
+- **User Communication**: Clearly communicate limitations and alternatives
+- **Continuous Improvement**: Iterate and improve data processing strategies
+

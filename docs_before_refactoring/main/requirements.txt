@@ -1,0 +1,151 @@
+# =============================
+# Core Scientific Libraries
+# =============================
+numpy
+
+# =============================
+# Image Processing & I/O
+# =============================
+opencv-python
+Pillow
+imageio
+imagehash
+matplotlib
+seaborn
+
+# =============================
+# Machine Learning & Models
+# =============================
+torch
+torchvision
+# torchaudio
+lpips
+open-clip-torch
+timm
+transformers
+pyiqa
+spandrel
+spandrel_extra_arches
+chainner-ext
+
+# =============================
+# CLI, UI, and User Input
+# =============================
+questionary
+
+# =============================
+# Audio Feedback
+# =============================
+pygame
+# playsound
+# playsound2
+
+# =============================
+# Parallel Processing & Monitoring
+# =============================
+psutil
+joblib
+GPUtil
+
+# =============================
+# Distributed Processing (NEW)
+# =============================
+dask[complete]
+# dask-distributed
+dask[distributed]
+ray[default]
+
+# =============================
+# Pipeline Compilation (NEW)
+# =============================
+numba
+cython
+setuptools
+
+# =============================
+# GPU Acceleration (NEW)
+# =============================
+kornia
+albumentations
+
+# =============================
+# File, Path, and Directory Utilities
+# =============================
+python-magic==0.4.27
+python-magic-bin==0.4.14
+libmagic==1.0
+
+# =============================
+# Data Compression & Archiving
+# =============================
+ffmpeg
+
+# =============================
+# Jinja2 for Report Templates
+# =============================
+jinja2
+
+# =============================
+# Miscellaneous Utilities
+# =============================
+pyyaml
+importlib
+gdown
+
+# =============================
+# umzi
+# =============================
+# pepeline
+# pepedpid
+# pepedp
+
+# =============================
+# Deduplication & Similarity
+# =============================
+imagededup
+
+# =============================
+# Testing
+# =============================
+pytest
+pytest-timeout
+pytest-cov
+
+# =============================
+# find_code_issues.py:
+# =============================
+vulture
+coverage
+pyan3
+pyflakes
+
+# =============================
+# Optional/External Tools
+# =============================
+# getnative
+# ^ first install VapourSynth. See [Special Installation Instructions](docs/special_installation.md) for details.
+
+# resdet
+# ^ See [Special Installation Instructions](docs/special_installation.md) for details.
+
+# =============================
+# Enhanced Metadata Management
+# =============================
+# exiftool (external, required for full metadata extraction/editing)
+pandas
+
+# =============================
+# Align Images (imageAlignmentTool.py)
+# =============================
+argparse
+logging
+
+# =============================
+# Unsorted
+# =============================
+
+dataset-support
+tqdm
+python-hcl2
+colour-science
+

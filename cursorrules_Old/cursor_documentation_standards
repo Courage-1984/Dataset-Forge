@@ -1,0 +1,489 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Documentation Standards for Dataset Forge
+
+## Core Documentation Principles
+
+### Comprehensive Documentation
+- **ALWAYS** use Google-style docstrings for all public functions and classes
+- **ALWAYS** include type annotations and return types
+- **ALWAYS** document exceptions that may be raised
+- **ALWAYS** update README.md and docs/ when adding new features
+
+### Documentation Import Pattern
+```python
+# Import documentation utilities
+from typing import List, Optional, Dict, Any, Union, Tuple
+from pathlib import Path
+import os
+```
+
+## Google-Style Docstring Standards
+
+### Function Documentation
+```python
+def process_images(image_paths: List[str], output_dir: str) -> List[str]:
+       Process a list of images and save results to output directory.
+    
+    This function processes multiple images in parallel, applying transformations
+    and saving the results to the specified output directory. It includes
+    comprehensive error handling and memory management.
+    
+    Args:
+        image_paths: List of input image file paths to process
+        output_dir: Directory path where processed images will be saved
+        
+    Returns:
+        List of successfully processed image file paths
+        
+    Raises:
+        FileNotFoundError: If any input image file doesn't exist
+        PermissionError: If output directory is not writable
+        ValueError: If any image file is corrupted or unsupported format
+        MemoryError: If insufficient memory for processing
+        
+    Example:
+        >>> paths = ['img1.jpg', 'img2.png']
+        >>> results = process_images(paths, output/')
+        >>> print(f"Processed {len(results)} images")
+        
+    Note:
+        This function uses parallel processing for efficiency and includes
+        automatic memory cleanup after processing.
+    """
+    # Implementation here
+    pass
+```
+
+### Class Documentation
+```python
+class ImageProcessor:
+    """
+    A comprehensive image processing class with GPU acceleration support.
+    
+    This class provides high-level image processing capabilities including
+    transformations, filtering, and batch operations. It automatically
+    manages GPU memory and provides fallback to CPU when needed.
+    
+    Attributes:
+        device: The processing device ('cuda' or 'cpu')
+        batch_size: Number of images to process in each batch
+        memory_limit: Maximum memory usage in GB
+        
+    Example:
+        >>> processor = ImageProcessor(device=cuda, batch_size=32)
+        >>> results = processor.process_batch(image_paths)
+     
+    def __init__(self, device: str = auto, batch_size: int =32        Initialize the image processor.
+        
+        Args:
+            device: Processing device ('cuda,cpuauto')
+            batch_size: Number of images to process in each batch
+            
+        Raises:
+            ValueError: If device is not supported
+            RuntimeError: If CUDA is requested but not available
+     # Implementation here
+        pass
+```
+
+### Method Documentation
+```python
+def process_batch(self, image_paths: List[str]) -> List[str]:
+      Process a batch of images with GPU acceleration.
+    
+    This method processes multiple images in parallel using GPU acceleration
+    when available. It includes automatic memory management and error handling.
+    
+    Args:
+        image_paths: List of image file paths to process
+        
+    Returns:
+        List of processed image file paths
+        
+    Raises:
+        FileNotFoundError: If any image file doesn't exist
+        MemoryError: If GPU memory is insufficient
+        RuntimeError: If GPU operation fails
+        
+    Note:
+        Memory is automatically cleaned up after processing.
+    """
+    # Implementation here
+    pass
+```
+
+## Type Annotation Standards
+
+### Complete Type Annotations
+```python
+from typing import (
+    List, Dict, Optional, Union, Tuple, Any, Callable, TypeVar, Generic
+)
+from pathlib import Path
+import numpy as np
+import torch
+
+# Type variables for generic functions
+T = TypeVar('T')
+ImageType = Union[np.ndarray, torch.Tensor]
+
+def process_data(
+    data: ListT],
+    transform: Callable[[T], T],
+    batch_size: Optional[int] = None
+) -> List[T]:
+  Process data with optional batching.
+    
+    Args:
+        data: List of data items to process
+        transform: Function to apply to each item
+        batch_size: Optional batch size for processing
+        
+    Returns:
+        List of processed data items
+    """
+    # Implementation here
+    pass
+```
+
+### Complex Type Annotations
+```python
+def complex_processing(
+    images: List[Union[str, Path, np.ndarray]],
+    config: Dict[str, Any],
+    callback: Optional[Callable[[int, str], None]] = None
+) -> Tuple[List[str], Dict[str, Any]]:
+ 
+    Complex image processing with configuration and callbacks.
+    
+    Args:
+        images: List of images (paths or arrays)
+        config: Processing configuration dictionary
+        callback: Optional progress callback function
+        
+    Returns:
+        Tuple of (processed_paths, processing_stats)
+    """
+    # Implementation here
+    pass
+```
+
+## Documentation Structure
+
+### Module-Level Documentation
+```python
+""
+Image processing utilities for Dataset Forge.
+
+This module provides comprehensive image processing capabilities including:
+- Basic image operations (resize, crop, rotate)
+- Advanced transformations (filters, effects)
+- Batch processing with GPU acceleration
+- Memory management and optimization
+- Error handling and recovery
+
+Classes:
+    ImageProcessor: Main image processing class
+    BatchProcessor: Batch processing utilities
+    MemoryManager: Memory management utilities
+
+Functions:
+    process_images: Process multiple images
+    apply_transform: Apply transformation to single image
+    validate_image: Validate image file integrity
+
+Example:
+    >>> from dataset_forge.utils.image_ops import ImageProcessor
+    >>> processor = ImageProcessor()
+    >>> results = processor.process_batch(['img1.jpg', img2.png'])
+"""
+
+# Standard library imports
+import os
+import sys
+from typing import List, Optional
+
+# Third-party imports
+import numpy as np
+import torch
+from PIL import Image
+
+# Local imports
+from dataset_forge.utils.memory_utils import clear_memory
+from dataset_forge.utils.printing import print_info
+```
+
+### Package Documentation
+```pythonge - Comprehensive Image Dataset Management Tool
+
+A powerful Python CLI utility for managing, analyzing, and transforming
+image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs
+for super-resolution and related ML tasks.
+
+Features:
+    - Dataset Management: Organization, validation, and health scoring
+    - Analysis & Validation: Comprehensive dataset analysis and quality checks
+    - Transformations: Image transformations, augmentations, and alignments
+    - DPID Implementations: Multiple degradation process implementations
+    - CBIR & Deduplication: Content-based image retrieval and duplicate detection
+    - Performance Optimization: GPU acceleration and distributed processing
+    - System Monitoring: Resource monitoring and analytics
+
+Architecture:
+    - Modular design with clear separation of concerns
+    - Lazy imports for fast CLI responsiveness
+    - Centralized utilities for memory, parallel processing, and error handling
+    - Comprehensive test suite with pytest
+
+Usage:
+    python main.py
+
+For detailed documentation, see docs/ directory.
+
+
+__version__ = 100uthor__ = "Dataset Forge Team"
+__email__ = "support@datasetforge.com"
+```
+
+## README and Documentation Maintenance
+
+### README.md Structure
+```markdown
+# Dataset Forge
+
+[![Build Status](mdc:https:/img.shields.io/github/workflow/status/user/dataset-forge/CI?label=build)](https://github.com/user/dataset-forge/actions)
+[![License](mdc:https:/img.shields.io/badge/license-CC--BY--SA--40-blue)](LICENSE)
+[![Python](mdc:https:/img.shields.io/badge/python-30.12B-blue.svg)](https://python.org)
+
+A comprehensive Python CLI utility for managing, analyzing, and transforming image datasets.
+
+## Quick Start
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python main.py
+```
+
+## Features
+
+- **Dataset Management**: Organization, validation, and health scoring
+- **Analysis & Validation**: Comprehensive dataset analysis
+- **Transformations**: Image transformations and augmentations
+- **Performance Optimization**: GPU acceleration and distributed processing
+
+## Documentation
+
+- [Features](mdc:docs/features.md) - Comprehensive feature list
+- Usage Guide](docs/usage.md) - Step-by-step usage instructions
+- [Advanced Usage](mdc:docs/advanced.md) - Advanced features and configuration
+- [Architecture](mdc:docs/architecture.md) - Project structure and design
+- [Contributing](mdc:docs/contributing.md) - How to contribute
+
+## License
+
+This project is licensed under the Creative Commons Attribution-ShareAlike4ernational License.
+```
+
+### Documentation File Structure
+```
+docs/
+├── README.md              # Documentation overview
+├── features.md            # Comprehensive feature list
+├── usage.md               # Usage guide and workflows
+├── advanced.md            # Advanced features and configuration
+├── architecture.md        # Project structure and design
+├── style_guide.md         # Coding standards and conventions
+├── troubleshooting.md     # Common issues and solutions
+├── contributing.md        # Contribution guidelines
+├── changelog.md           # Version history and changes
+├── faq.md                 # Frequently asked questions
+├── license.md             # License information
+├── toc.md                 # Table of contents
+└── README_full.md         # Auto-generated comprehensive documentation
+```
+
+## Documentation Content Standards
+
+### Feature Documentation
+```markdown
+## 🎯 Feature Name
+
+Brief description of the feature and its purpose.
+
+### Usage
+
+```python
+from dataset_forge.actions.feature_actions import feature_function
+
+# Basic usage
+result = feature_function(input_path, output_path)
+
+# Advanced usage with options
+result = feature_function(
+    input_path=input_path,
+    output_path=output_path,
+    option1=value1,
+    option2=value2
+)
+```
+
+### Parameters
+
+- `input_path` (str): Path to input file or directory
+- `output_path` (str): Path for output results
+- `option1 (type, optional): Description of option1
+- `option2 (type, optional): Description of option2
+
+### Returns
+
+- `result` (type): Description of return value
+
+### Examples
+
+#### Basic Example
+```python
+# Process a single file
+result = feature_function("input.jpg", "output.jpg")
+```
+
+#### Advanced Example
+```python
+# Process with custom options
+result = feature_function(
+    input.jpg,   output.jpg",
+    option1custom_value",
+    option2=True
+)
+```
+
+### Error Handling
+
+The function handles the following error conditions:
+- File not found errors
+- Permission errors
+- Memory errors
+- Invalid input errors
+
+### Performance Notes
+
+- Processing time scales linearly with input size
+- GPU acceleration available when CUDA is present
+- Memory usage is optimized for large datasets
+```
+
+### Code Example Documentation
+```python
+def documented_example():
+   Example function with comprehensive documentation.
+    
+    This function demonstrates proper documentation practices including
+    type annotations, detailed descriptions, and usage examples.
+    
+    Args:
+        param1: Description of first parameter
+        param2: Description of second parameter with default
+        
+    Returns:
+        Description of return value
+        
+    Raises:
+        ValueError: When parameters are invalid
+        RuntimeError: When operation fails
+        
+    Example:
+        Basic usage:
+        >>> result = documented_example("value1")
+        >>> print(result)
+       processed_value1 
+        Advanced usage:
+        >>> result = documented_example("value1",value2")
+        >>> print(result)
+       processed_value1_value2'
+        
+    Note:
+        This function includes automatic error handling and logging.
+        Memory is cleaned up automatically after processing.
+    """
+    # Implementation here
+    pass
+```
+
+## Documentation Maintenance
+
+### Documentation Update Checklist
+- [ ] **Update function docstrings** when functionality changes
+- ] **Update README.md** when adding new features
+- [ ] **Update relevant docs/ files** for feature changes
+- ] **Update README_full.md** using merge_docs.py
+- [ ] **Update toc.md** for navigation changes
+- ] **Update changelog.md** for version changes
+- [ ] **Test documentation examples** for accuracy
+- [ ] **Check for broken links** in documentation
+
+### Documentation Automation
+```python
+# Auto-generate comprehensive documentation
+def update_documentation(): all documentation files."""
+    # Update README_full.md
+    subprocess.run(["python",tools/merge_docs.py"])
+    
+    # Update table of contents
+    subprocess.run(["python,tools/update_toc.py"])
+    
+    # Validate documentation
+    subprocess.run(["python,tools/validate_docs.py"])
+```
+
+### Documentation Validation
+```python
+def validate_documentation():
+    """Validate documentation completeness and accuracy." Check for missing docstrings
+    missing_docstrings = find_missing_docstrings()
+    
+    # Check for broken links
+    broken_links = find_broken_links()
+    
+    # Check for outdated examples
+    outdated_examples = find_outdated_examples()
+    
+    # Report issues
+    if missing_docstrings or broken_links or outdated_examples:
+        print_warning("Documentation issues found:)     print_warning(f"- Missing docstrings: {len(missing_docstrings)})     print_warning(f-Broken links:[object Object]len(broken_links)})     print_warning(f"- Outdated examples: {len(outdated_examples)}")
+        return False
+    
+    print_success("Documentation validation passed)
+    return True
+```
+
+## Documentation Best Practices
+
+### Writing Clear Documentation
+- **Use clear, concise language** - Avoid jargon and technical terms when possible
+- **Provide concrete examples** - Show real usage scenarios
+- **Include error handling** - Document what happens when things go wrong
+- **Explain the "why"** - Don't just describe what, explain why
+- **Keep examples up to date** - Ensure code examples work with current version
+
+### Documentation Style Guidelines
+- **Use consistent formatting** - Follow established patterns
+- **Include navigation links** - Help users find related information
+- **Use appropriate headings** - Organize content logically
+- **Include cross-references** - Link to related documentation
+- **Maintain version information** - Keep track of when documentation was last updated
+
+### Documentation Quality Checklist
+- [ ] **Complete coverage** - All public APIs documented
+- [ ] **Accurate information** - Documentation matches implementation
+- [ ] **Clear examples** - Examples are complete and work
+- [ ] **Error documentation** - All possible errors documented
+-*Performance notes** - Performance characteristics documented
+- ] **Dependencies** - Required dependencies documented
+- [ ] **Configuration** - Configuration options documented
+- [ ] **Troubleshooting** - Common issues and solutions documented

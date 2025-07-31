@@ -1,0 +1,523 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+name: Parallel Processing for Dataset Forge
+description: "Enforce centralized parallel processing patterns using smart_map, image_map, and ProcessingType for optimal performance in Dataset Forge
+globs: ["**/*.py"]
+alwaysApply: true
+priority:2arallel Processing for Dataset Forge
+
+## Core Parallel Processing Principles
+
+### Centralized Parallel Processing
+- **ALWAYS** use centralized parallel processing utilities from `dataset_forge.utils.progress_utils`
+- **ALWAYS** use `smart_map` for automatic optimization
+- **ALWAYS** use `image_map` for image-specific operations
+- **ALWAYS** configure processing type based on operation characteristics
+
+### Parallel Processing Import Pattern
+```python
+# Import centralized parallel processing
+from dataset_forge.utils.progress_utils import (
+    smart_map,
+    image_map,
+    process_map,
+    thread_map,
+)
+from dataset_forge.utils.parallel_utils import (
+    ParallelConfig,
+    ProcessingType,
+    parallel_map,
+    parallel_image_processing,
+)
+```
+
+## Dataset Forge Parallel Processing Patterns
+
+### Smart Map Pattern
+```python
+def process_items_with_smart_map(items):
+   rocess items with automatic optimization."results = smart_map(
+        process_single_item,
+        items,
+        desc="Processing items",
+        max_workers=4,
+        processing_type=ProcessingType.AUTO,
+    )
+    return results
+```
+
+### Image Map Pattern
+```python
+def process_images_with_image_map(image_paths):
+   rocess images with specialized optimization."results = image_map(
+        process_single_image,
+        image_paths,
+        desc=Processing images",
+        max_workers=4,
+    )
+    return results
+```
+
+### Parallel Configuration Pattern
+```python
+def setup_parallel_processing():
+   etup parallel processing configuration.config = ParallelConfig(
+        max_workers=4,
+        processing_type=ProcessingType.THREAD,  # I/O bound task
+        use_gpu=True,
+        gpu_memory_fraction=0.8        chunk_size=1,
+    )
+    return config
+```
+
+## Processing Type Selection
+
+### Processing Type Guidelines
+```python
+# CPU-bound operations (heavy computation)
+ProcessingType.PROCESS
+
+# I/O-bound operations (file operations, network)
+ProcessingType.THREAD
+
+# Image processing (GPU operations)
+ProcessingType.THREAD  # Prefer threads to avoid GPU memory issues
+
+# Automatic selection based on function characteristics
+ProcessingType.AUTO
+```
+
+### Processing Type Examples
+```python
+# File I/O operations
+results = smart_map(
+    process_file,
+    file_paths,
+    desc="Processing files",
+    processing_type=ProcessingType.THREAD,
+)
+
+# CPU-intensive operations
+results = smart_map(
+    compute_heavy_task,
+    data_items,
+    desc="Computing",
+    processing_type=ProcessingType.PROCESS,
+)
+
+# Image processing with GPU
+results = image_map(
+    process_image_with_gpu,
+    image_paths,
+    desc="GPU image processing,
+    max_workers=2,  # Limit workers for GPU operations
+)
+```
+
+## Parallel Processing in Actions
+
+### Action-Level Parallel Processing
+```python
+@monitor_all(process_dataset", critical_on_error=True)
+def process_dataset(dataset_path: str):
+   rocess dataset with parallel processing."    # Get image files
+    image_files = [f for f in os.listdir(dataset_path) if is_image_file(f)]
+    image_paths = [os.path.join(dataset_path, f) for f in image_files]
+    
+    # Setup parallel processing configuration
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,  # I/O bound task
+        use_gpu=False,  # No GPU needed for basic processing
+        chunk_size=parallel_config.get(chunk_size,1,
+    )
+    
+    # Process images in parallel
+    results = image_map(
+        process_single_image,
+        image_paths,
+        desc="Processing dataset",
+        max_workers=config.max_workers,
+    )
+    
+    # Count results
+    successful = sum(1 for result in results if result)
+    failed = len(results) - successful
+    
+    print(f"Processing complete: {successful}/{len(image_files)} successful")
+    return results
+```
+
+### HQ/LQ Pair Processing
+```python
+def process_hq_lq_pairs(hq_folder: str, lq_folder: str):
+   rocess HQ/LQ pairs with parallel processing."    # Get matching files
+    hq_files = [f for f in os.listdir(hq_folder) if is_image_file(f)]
+    lq_files = [f for f in os.listdir(lq_folder) if is_image_file(f)]
+    matching_files = sorted(set(hq_files) & set(lq_files))
+    
+    # Prepare pairs
+    pairs = []
+    for filename in matching_files:
+        hq_path = os.path.join(hq_folder, filename)
+        lq_path = os.path.join(lq_folder, filename)
+        pairs.append((hq_path, lq_path, filename))
+    
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,  # I/O bound task
+        use_gpu=False,
+    )
+    
+    # Process pairs in parallel
+    results = smart_map(
+        lambda pair: process_single_pair(*pair),
+        pairs,
+        desc="Processing HQ/LQ pairs",
+        max_workers=config.max_workers,
+        processing_type=ProcessingType.THREAD,
+    )
+    
+    return results
+```
+
+## Advanced Parallel Processing Patterns
+
+### Batch Processing
+```python
+def batch_process_items(items, batch_size: int = 32):
+   rocess items in batches with parallel processing."    # Create batches
+    batches = []
+    for i in range(0, len(items), batch_size):
+        batch = items[i:i + batch_size]
+        batches.append(batch)
+    
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+    
+    # Process batches in parallel
+    results = smart_map(
+        process_batch,
+        batches,
+        desc="Processing batches",
+        max_workers=config.max_workers,
+        processing_type=ProcessingType.THREAD,
+    )
+    
+    # Flatten results
+    all_results = []
+    for batch_result in results:
+        all_results.extend(batch_result)
+    
+    return all_results
+```
+
+### Multi-GPU Processing
+```python
+def multi_gpu_processing(image_paths):
+   rocess images across multiple GPUs.   # Setup multi-GPU configuration
+    config = ParallelConfig(
+        max_workers=torch.cuda.device_count(),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=True,
+        gpu_memory_fraction=00.8,
+    )
+    
+    # Process with GPU distribution
+    results = image_map(
+        process_image_with_gpu,
+        image_paths,
+        desc="Multi-GPU processing",
+        max_workers=config.max_workers,
+    )
+    
+    return results
+```
+
+### Conditional Parallel Processing
+```python
+def conditional_parallel_processing(items, threshold: int = 100):
+   rocess items conditionally based on count.   if len(items) < threshold:
+        # Sequential processing for small datasets
+        results = []
+        for item in items:
+            result = process_single_item(item)
+            results.append(result)
+        return results
+    else:
+        # Parallel processing for large datasets
+        config = ParallelConfig(
+            max_workers=parallel_config.get("max_workers"),
+            processing_type=ProcessingType.THREAD,
+            use_gpu=False,
+        )
+        
+        return smart_map(
+            process_single_item,
+            items,
+            desc="Parallel processing,
+            max_workers=config.max_workers,
+            processing_type=ProcessingType.THREAD,
+        )
+```
+
+## Parallel Processing with Memory Management
+
+### Memory-Aware Parallel Processing
+```python
+def memory_aware_parallel_processing(items):
+   arallel processing with memory management."    from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+    
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=True,
+        gpu_memory_fraction=00.8    )
+    
+    try:
+        # Process items in parallel
+        results = smart_map(
+            process_single_item,
+            items,
+            desc="Memory-aware processing,
+            max_workers=config.max_workers,
+            processing_type=ProcessingType.THREAD,
+        )
+        
+        return results
+        
+    finally:
+        # Cleanup memory after processing
+        clear_memory()
+        clear_cuda_cache()
+```
+
+### Batch Processing with Memory Management
+```python
+def batch_processing_with_memory(items, batch_size: int = 32):
+   atch processing with memory cleanup."    from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+    
+    results = []
+    
+    # Process in batches
+    for i in range(0, len(items), batch_size):
+        batch = items[i:i + batch_size]
+        
+        # Process batch in parallel
+        batch_results = smart_map(
+            process_single_item,
+            batch,
+            desc=f"Processing batch [object Object]i//batch_size + 1},
+            max_workers=parallel_config.get("max_workers"),
+            processing_type=ProcessingType.THREAD,
+        )
+        
+        results.extend(batch_results)
+        
+        # Clear memory after each batch
+        clear_memory()
+        clear_cuda_cache()
+    
+    return results
+```
+
+## Parallel Processing Configuration
+
+### Session State Configuration
+```python
+def get_parallel_config():
+   et parallel processing configuration from session state."    from dataset_forge.menus.session_state import parallel_config
+    
+    return {
+    max_workers: parallel_config.get("max_workers,4  chunk_size: parallel_config.get(chunk_size", 1,
+use_gpu: parallel_config.get(use_gpu", True),
+   gpu_memory_fraction: parallel_config.get("gpu_memory_fraction",08}
+```
+
+### Dynamic Configuration
+```python
+def dynamic_parallel_config(items, operation_type: str):
+   namic parallel processing configuration."    # Base configuration
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+    
+    # Adjust based on operation type
+    if operation_type ==gpu_intensive":
+        config.use_gpu = True
+        config.max_workers = min(config.max_workers, 2)  # Limit GPU workers
+        config.gpu_memory_fraction = 0.8
+    elif operation_type == "io_intensive":
+        config.processing_type = ProcessingType.THREAD
+        config.max_workers = min(config.max_workers, 8# More workers for I/O
+    elif operation_type ==cpu_intensive":
+        config.processing_type = ProcessingType.PROCESS
+        config.max_workers = min(config.max_workers, 4)  # Limit CPU workers
+    
+    # Adjust based on item count
+    if len(items) < 10        config.max_workers = 1  # Sequential for small datasets
+    
+    return config
+```
+
+## Error Handling in Parallel Processing
+
+### Robust Parallel Processing
+```python
+def robust_parallel_processing(items):
+   ust parallel processing with error handling."    def safe_process_item(item):
+       y process a single item with error handling."""
+        try:
+            return process_single_item(item)
+        except Exception as e:
+            print_error(f"Error processing item {item}: {e}")
+            return None
+    
+    # Process with error handling
+    results = smart_map(
+        safe_process_item,
+        items,
+        desc=Robust processing",
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+    )
+    
+    # Filter out failed items
+    successful_results = [r for r in results if r is not None]
+    failed_count = len(results) - len(successful_results)
+    
+    if failed_count > 0     print_warning(fFailed to process {failed_count} items) return successful_results
+```
+
+### Parallel Processing with Retry Logic
+```python
+def parallel_processing_with_retry(items, max_retries: int = 3):
+   arallel processing with retry logic."    def process_with_retry(item):
+     Process item with retry logic."""
+        for attempt in range(max_retries):
+            try:
+                return process_single_item(item)
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    print_error(fFailed to process {item} after {max_retries} attempts: {e}")
+                    return None
+                else:
+                    print_warning(fRetry [object Object]attempt + 1}/{max_retries} for {item}")
+                    time.sleep(1)  # Brief delay before retry
+    
+    # Process with retry logic
+    results = smart_map(
+        process_with_retry,
+        items,
+        desc="Processing with retry",
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+    )
+    
+    return results
+```
+
+## Parallel Processing Performance
+
+### Performance Monitoring
+```python
+def monitor_parallel_performance(func, items, desc: str =Processing"):
+   onitor parallel processing performance."    import time
+    
+    start_time = time.time()
+    
+    # Process items
+    results = smart_map(
+        func,
+        items,
+        desc=desc,
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+    )
+    
+    end_time = time.time()
+    duration = end_time - start_time
+    
+    print_info(f"Parallel processing completed in {duration:0.2econds")
+    print_info(f"Average time per item: {duration/len(items):.4f} seconds)    return results
+```
+
+### Performance Optimization
+```python
+def optimize_parallel_performance(items, operation_type: str):
+   timize parallel processing performance."    # Determine optimal configuration
+    if operation_type == "io_bound":
+        # I/O bound: more workers, threads
+        config = ParallelConfig(
+            max_workers=min(len(items), 8),
+            processing_type=ProcessingType.THREAD,
+            use_gpu=False,
+        )
+    elif operation_type == "cpu_bound":
+        # CPU bound: fewer workers, processes
+        config = ParallelConfig(
+            max_workers=min(len(items), 4),
+            processing_type=ProcessingType.PROCESS,
+            use_gpu=False,
+        )
+    elif operation_type == "gpu_bound":
+        # GPU bound: limited workers, threads
+        config = ParallelConfig(
+            max_workers=min(len(items), 2),
+            processing_type=ProcessingType.THREAD,
+            use_gpu=True,
+            gpu_memory_fraction=0.8        )
+    
+    # Process with optimized configuration
+    return smart_map(
+        process_single_item,
+        items,
+        desc="Optimized processing",
+        max_workers=config.max_workers,
+        processing_type=config.processing_type,
+    )
+```
+
+## Parallel Processing Documentation
+
+### Function Documentation
+```python
+def process_dataset_parallel(dataset_path: str) -> List[str]:
+ 
+    Process dataset using parallel processing for optimal performance.
+    
+    This function uses centralized parallel processing utilities to efficiently
+    process large datasets while managing memory and system resources.
+    
+    Args:
+        dataset_path: Path to the dataset directory
+        
+    Returns:
+        List of processed file paths
+        
+    Parallel Processing:
+        - Uses smart_map for automatic optimization
+        - Configures processing type based on operation characteristics
+        - Manages memory cleanup during processing
+        - Provides error handling and retry logic
+    "    # Implementation here
+    pass
+```
+
+### Parallel Processing Notes
+- **Always document parallel processing configuration in function docstrings**
+- **Explain processing type selection rationale**
+- **Document memory management integration**
+- **Provide performance optimization recommendations**

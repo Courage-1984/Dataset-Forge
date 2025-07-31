@@ -1,0 +1,449 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Error Handling for Dataset Forge
+
+## Core Error Handling Principles
+
+### Centralized Error Handling
+- **ALWAYS** use centralized error handling utilities from `dataset_forge.utils.printing`
+- **ALWAYS** log operations using `dataset_forge.utils.history_log`
+- **ALWAYS** trigger error sounds for user-facing errors via `print_error`
+- **ALWAYS** provide meaningful error messages and recovery options
+
+### Error Handling Import Pattern
+```python
+# Import centralized error handling
+from dataset_forge.utils.printing import (
+    print_error,
+    print_warning,
+    print_info,
+    print_success,
+)
+from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.audio_utils import play_error_sound
+```
+
+## Dataset Forge Error Handling Patterns
+
+### Basic Error Handling
+```python
+def process_images(image_paths: List[str]) -> List[str]:
+   rocess images with comprehensive error handling.results = []
+    
+    for image_path in image_paths:
+        try:
+            result = process_single_image(image_path)
+            results.append(result)
+            
+        except FileNotFoundError as e:
+            print_error(f"Image file not found: {image_path})
+            log_operation("process_images", f"Failed: File not found - {image_path}")
+            continue
+            
+        except PermissionError as e:
+            print_error(fPermission denied accessing: {image_path})
+            log_operation("process_images", f"Failed: Permission denied - {image_path}")
+            continue
+            
+        except Exception as e:
+            print_error(f"Unexpected error processing {image_path}: {e})
+            log_operation("process_images", f"Failed: Unexpected error - {image_path} - {e}")
+            continue
+    
+    return results
+```
+
+### Robust Operation Pattern
+```python
+def robust_operation():
+   ust operation with comprehensive error handling."    try:
+        # Operation code
+        result = perform_operation()
+        
+        # Log successful operation
+        log_operation("operation_name", "Operation completed successfully")
+        
+        return result
+        
+    except FileNotFoundError as e:
+        print_error(fFile not found: {e}")
+        log_operation("operation_name", f"Failed: File not found - {e}")
+        return None
+        
+    except PermissionError as e:
+        print_error(fPermission denied: {e}")
+        log_operation("operation_name", f"Failed: Permission denied - {e}")
+        return None
+        
+    except MemoryError as e:
+        print_error(f"Memory error: {e}")
+        log_operation("operation_name", f"Failed: Memory error - {e})    # Clear memory and retry
+        clear_memory()
+        clear_cuda_cache()
+        return None
+        
+    except Exception as e:
+        print_error(fUnexpected error: {e}")
+        log_operation("operation_name", f"Failed: Unexpected error - {e}")
+        return None
+```
+
+### Error Handling with Recovery
+```python
+def operation_with_recovery():
+   peration with error recovery and retry logic.    max_retries = 3
+    
+    for attempt in range(max_retries):
+        try:
+            result = perform_operation()
+            log_operation("operation_name", "Operation completed successfully")
+            return result
+            
+        except FileNotFoundError as e:
+            print_error(f"File not found (attempt [object Object]attempt + 1/{max_retries}): {e}")
+            if attempt == max_retries - 1               log_operation("operation_name", fFailed after {max_retries} attempts: File not found)            return None
+            time.sleep(1)  # Brief delay before retry
+            
+        except Exception as e:
+            print_error(f"Unexpected error (attempt [object Object]attempt + 1/{max_retries}): {e}")
+            if attempt == max_retries - 1               log_operation("operation_name", fFailed after {max_retries} attempts: {e})            return None
+            time.sleep(1)
+```
+
+## Error Handling in Actions
+
+### Action-Level Error Handling
+```python
+@monitor_all(process_dataset", critical_on_error=True)
+def process_dataset(dataset_path: str):
+   rocess dataset with comprehensive error handling."    try:
+        # Validate input
+        if not os.path.exists(dataset_path):
+            print_error(fDataset path does not exist: {dataset_path})
+            log_operation(process_dataset", f"Failed: Path not found - {dataset_path}")
+            return None
+        
+        # Get image files
+        try:
+            image_files = [f for f in os.listdir(dataset_path) if is_image_file(f)]
+        except PermissionError as e:
+            print_error(fPermission denied accessing dataset: {dataset_path})
+            log_operation(process_dataset", f"Failed: Permission denied - {dataset_path}")
+            return None
+        
+        if not image_files:
+            print_warning(f"No image files found in: {dataset_path})
+            log_operation(process_dataset", f"Warning: No images found - {dataset_path}")
+            return []
+        
+        # Process images
+        results = []
+        for image_file in image_files:
+            try:
+                image_path = os.path.join(dataset_path, image_file)
+                result = process_single_image(image_path)
+                results.append(result)
+                
+            except Exception as e:
+                print_error(f"Error processing {image_file}: {e})               log_operation(process_dataset", f"Failed: {image_file} - {e})          continue
+        
+        # Log completion
+        successful = len(results)
+        total = len(image_files)
+        log_operation(process_dataset", f"Completed: {successful}/{total} images processed")
+        
+        return results
+        
+    except Exception as e:
+        print_error(f"Unexpected error in process_dataset: {e}")
+        log_operation(process_dataset", f"Failed: Unexpected error - {e}")
+        return None
+```
+
+### Menu Error Handling
+```python
+def menu_action_with_error_handling():
+   enu action with robust error handling."    try:
+        # Get user input
+        user_input = get_user_input()
+        
+        # Validate input
+        if not validate_input(user_input):
+            print_error("Invalid input provided")
+            return
+        
+        # Perform action
+        result = perform_action(user_input)
+        
+        if result:
+            print_success("Operation completed successfully)
+            log_operation("menu_action", "Completed successfully")
+        else:
+            print_warning("Operation completed with warnings)
+            log_operation("menu_action, eted with warnings")
+            
+    except KeyboardInterrupt:
+        print_info("\nOperation cancelled by user")
+        log_operation("menu_action", Cancelled by user")
+        
+    except EOFError:
+        print_info("\nOperation cancelled")
+        log_operation("menu_action", "Cancelled")
+        
+    except Exception as e:
+        print_error(fUnexpected error: {e}")
+        log_operation("menu_action", f"Failed: {e}")
+```
+
+## Specific Error Types
+
+### File System Errors
+```python
+def handle_file_system_errors():
+   andle file system related errors."    try:
+        # File operations
+        with open(file_path, 'r') as f:
+            data = f.read()
+            
+    except FileNotFoundError as e:
+        print_error(fFile not found: {file_path}")
+        print_info("Please check the file path and try again")
+        log_operation("file_operation", f"Failed: File not found - {file_path}")
+        
+    except PermissionError as e:
+        print_error(fPermission denied: {file_path}")
+        print_info(Please check file permissions or run as administrator")
+        log_operation("file_operation", f"Failed: Permission denied - {file_path}")
+        
+    except IsADirectoryError as e:
+        print_error(fExpected file but found directory: {file_path}")
+        log_operation("file_operation", f"Failed: Is directory - {file_path}")
+        
+    except OSError as e:
+        print_error(f"Operating system error: {e}")
+        log_operation("file_operation", f"Failed: OS error - {e})
+```
+
+### Memory and CUDA Errors
+```python
+def handle_memory_errors():
+   andle memory and CUDA related errors."    try:
+        # Memory-intensive operation
+        result = perform_memory_intensive_operation()
+        
+    except MemoryError as e:
+        print_error(f"Memory error: {e}")
+        print_info("Clearing memory and retrying...")
+        
+        # Clear memory
+        clear_memory()
+        clear_cuda_cache()
+        
+        # Retry with smaller batch
+        result = perform_memory_intensive_operation(batch_size=1)
+        
+    except torch.cuda.CudaError as e:
+        print_error(f"CUDA error: {e}")
+        print_info("Clearing CUDA cache and retrying...")
+        
+        # Clear CUDA cache
+        clear_cuda_cache()
+        
+        # Retry on CPU if possible
+        result = perform_operation_on_cpu()
+        
+    except RuntimeError as e:
+        if out of memory" in str(e).lower():
+            print_error(fGPU out of memory: {e}")
+            print_info("Clearing GPU memory and retrying...")
+            
+            clear_cuda_cache()
+            result = perform_operation_with_smaller_batch()
+        else:
+            raise
+```
+
+### Network and External Dependencies
+```python
+def handle_external_dependencies():
+   andle network and external dependency errors."    try:
+        # Network operation
+        result = download_file(url)
+        
+    except requests.ConnectionError as e:
+        print_error(fConnection error: {e}")
+        print_info(Please check your internet connection")
+        log_operation("download", f"Failed: Connection error - {e}")
+        
+    except requests.Timeout as e:
+        print_error(f"Request timeout: {e}")
+        print_info("The server is taking too long to respond")
+        log_operation("download", fFailed: Timeout - {e}")
+        
+    except requests.HTTPError as e:
+        print_error(f"HTTP error: {e}")
+        print_info("The server returned an error")
+        log_operation("download", f"Failed: HTTP error - {e}")
+        
+    except ImportError as e:
+        print_error(f"Missing dependency: {e}")
+        print_info("Please install required dependencies")
+        log_operation("operation", f"Failed: Missing dependency - {e}")
+```
+
+## Error Logging and Monitoring
+
+### Comprehensive Logging
+```python
+def comprehensive_error_logging():
+   omprehensive error logging with context."    operation_name =process_images start_time = time.time()
+    
+    try:
+        # Log operation start
+        log_operation(operation_name, Operation started")
+        
+        # Perform operation
+        result = perform_operation()
+        
+        # Log success
+        duration = time.time() - start_time
+        log_operation(operation_name, f"Completed successfully in {duration:.2f}s")
+        
+        return result
+        
+    except Exception as e:
+        # Log detailed error information
+        duration = time.time() - start_time
+        error_info = {
+            error_type": type(e).__name__,
+          error_message": str(e),
+     duration": duration,
+           timestamp": time.time(),
+        }
+        
+        log_operation(operation_name, f"Failed after {duration:0.2s: {error_info}")
+        print_error(fOperation failed: {e}")
+        
+        return None
+```
+
+### Error Monitoring and Analytics
+```python
+def monitor_errors():
+   onitor errors and provide analytics."    from dataset_forge.utils.monitoring import track_errors
+    
+    @track_errors
+    def monitored_operation():
+        # Operation code
+        pass
+    
+    # Track specific error types
+    try:
+        result = monitored_operation()
+    except FileNotFoundError as e:
+        # This error will be tracked automatically
+        raise
+```
+
+## Error Recovery Strategies
+
+### Graceful Degradation
+```python
+def graceful_degradation():
+   raceful degradation when features are unavailable."    try:
+        # Try GPU operation
+        result = perform_gpu_operation()
+        
+    except (torch.cuda.CudaError, RuntimeError) as e:
+        print_warning("GPU operation failed, falling back to CPU")
+        log_operation(gpu_operation", fFell back to CPU: {e}")
+        
+        try:
+            # Fallback to CPU
+            result = perform_cpu_operation()
+        except Exception as e:
+            print_error(fCPU fallback also failed: {e})
+            log_operation(cpu_operation", f"Failed: {e}")
+            return None
+    
+    return result
+```
+
+### Retry with Exponential Backoff
+```python
+def retry_with_backoff():
+   etry operation with exponential backoff.    max_retries = 3
+    base_delay = 1.0
+    
+    for attempt in range(max_retries):
+        try:
+            result = perform_operation()
+            return result
+            
+        except Exception as e:
+            if attempt == max_retries - 1             print_error(f"Operation failed after {max_retries} attempts: {e})               log_operation(retry_operation", fFailed after {max_retries} attempts: {e})             raise
+            
+            # Exponential backoff
+            delay = base_delay * (2 ** attempt)
+            print_warning(f"Attempt {attempt + 1} failed, retrying in {delay}s...")
+            time.sleep(delay)
+```
+
+## Error Handling Best Practices
+
+### Error Message Guidelines
+```python
+def good_error_messages():
+   xamples of good error messages."    # Bad error message
+    print_error(f"Error: {e}")  # Too generic
+    
+    # Good error message
+    print_error(fFailed to process image {image_path}: File is corrupted")
+    print_info("Please check the image file and try again")
+    
+    # Better error message with context
+    print_error(fFailed to process image {image_path}")
+    print_info(f"Error: {e}")
+    print_info("This usually means the image file is corrupted or in an unsupported format")
+    print_info("Please check the file and try again")
+```
+
+### Error Handling Documentation
+```python
+def well_documented_error_handling():
+   ell-documented error handling example."    def process_images(image_paths: List[str]) -> List[str]:
+ 
+        Process a list of images with comprehensive error handling.
+        
+        Args:
+            image_paths: List of image file paths to process
+            
+        Returns:
+            List of successfully processed image paths
+            
+        Raises:
+            FileNotFoundError: If any image file doesn't exist
+            PermissionError: If access to any image file is denied
+            ValueError: If any image file is corrupted or unsupported
+            
+        Error Handling:
+            - Continues processing other images if one fails
+            - Logs all errors for debugging
+            - Provides user-friendly error messages
+            - Cleans up resources on errors
+     # Implementation here
+        pass
+```
+
+### Error Handling Checklist
+- [ ] **Catch specific exceptions** before general ones
+- [ ] **Log all errors** with context and timestamps
+- vide user-friendly messages** with recovery suggestions
+- [ ] **Clean up resources** on errors (memory, files, connections)
+- [ ] **Continue processing** when possible (don't fail fast on non-critical errors)
+- [ ] **Document error conditions** in function docstrings
+- [ ] **Test error scenarios** in unit tests
+- [ ] **Monitor error rates** in production

@@ -1,0 +1,979 @@
+# Dataset Forge - Cursor Rules
+# Comprehensive coding guidelines for the Dataset Forge project
+
+# CRITICAL: ALWAYS activate virtual environment before testing
+# ALWAYS run: venv312\Scripts\activate before testing your new additions
+# This ensures all dependencies are available and the correct Python environment is used
+
+# CRITICAL: ALWAYS look up documentation for packages, modules or software added to this project
+
+# CRITICAL: Every time you add a new function or feature etc. and espescially menu item you shoud always make a point of it to update README.md appropriately, but this should only be done on conformation receieved from the user (me).
+
+# ============================================================================
+# PROJECT OVERVIEW & ARCHITECTURE
+# ============================================================================
+
+# Dataset Forge is a comprehensive Python CLI utility for managing, analyzing, and transforming
+# image datasets—especially High-Quality (HQ) and Low-Quality (LQ) pairs for super-resolution
+# and related ML tasks. It features a beautiful Catppuccin Mocha-themed interface, deep validation,
+# and 40+ powerful operations organized in an intuitive hierarchical menu system.
+
+# ARCHITECTURE PATTERNS:
+# - Modular design with clear separation of concerns
+# - menus/ (UI layer) - Thin UI layers for user interaction
+# - actions/ (Business logic) - Core business logic grouped by domain
+# - utils/ (Utilities) - Reusable helper modules
+# - dpid/ (DPID implementations) - Multiple DPID implementations
+# - LAZY IMPORTS: All menus and submenus use lazy imports for actions and submenus, via the lazy_action() helper, to maximize CLI speed and minimize memory usage.
+
+# ============================================================================
+# CODING STANDARDS & CONVENTIONS
+# ============================================================================
+
+# Python Version: 3.8+ (use modern Python features)
+# Code Style: PEP 8 compliant with 4-space indentation
+# Line Length: 88 characters (Black formatter standard)
+# Docstrings: Google-style docstrings for all public functions and classes
+# Type Hints: Use type hints for all function parameters and return values
+#
+# LAZY IMPORT PATTERN: All menu and submenu actions must use the lazy import pattern for fast CLI responsiveness. Use the lazy_action() helper to defer heavy imports until the user selects a menu option. See dataset_forge/menus/main_menu.py for the pattern and docs/advanced.md for rationale.
+
+# ============================================================================
+# IMPORT ORGANIZATION & DEPENDENCIES
+# ============================================================================
+
+# Import order (enforced):
+# 1. Standard library imports
+# 2. Third-party imports
+# 3. Local imports (dataset_forge.*)
+# 4. Relative imports (if within same module)
+
+# Always use absolute imports for dataset_forge modules:
+# ✅ CORRECT: from dataset_forge.utils.memory_utils import clear_memory
+# ❌ WRONG: from ..utils.memory_utils import clear_memory
+
+# ============================================================================
+# MEMORY MANAGEMENT PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized memory management for CUDA and Python memory:
+# - Import: from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
+# - Use context managers: with memory_context("Operation Name"):
+# - Use decorators: @auto_cleanup, @monitor_memory_usage
+# - Clear memory after large operations: clear_memory()
+
+# Memory management examples:
+# ```python
+# from dataset_forge.utils.memory_utils import (
+#     clear_memory, memory_context, auto_cleanup, to_device_safe
+# )
+#
+# @auto_cleanup
+# def process_images(images):
+#     with memory_context("Image Processing"):
+#         # Your code here
+#         pass
+#
+# # Safe tensor operations
+# tensor = to_device_safe(tensor, "cuda")
+# ```
+
+# ============================================================================
+# PARALLEL PROCESSING PATTERNS
+# ============================================================================
+
+# ALWAYS use the centralized parallel processing system:
+# - Import: from dataset_forge.utils.parallel_utils import parallel_map, ProcessingType
+# - Use smart_map() for automatic optimization
+# - Use image_map() for image-specific operations
+# - Use batch_map() for memory-efficient processing
+
+# Parallel processing examples:
+# ```python
+# from dataset_forge.utils.progress_utils import smart_map, image_map
+# from dataset_forge.utils.parallel_utils import ProcessingType
+#
+# # Automatic optimization
+# results = smart_map(process_function, items, desc="Processing")
+#
+# # Image-specific processing
+# results = image_map(process_image, image_paths, desc="Processing Images")
+#
+# # Batch processing for large datasets
+# results = batch_map(process_batch, items, batch_size=32, desc="Processing")
+# ```
+
+# ============================================================================
+# PROGRESS TRACKING & USER FEEDBACK
+# ============================================================================
+
+# ALWAYS use the centralized progress tracking system:
+# - Import: from dataset_forge.utils.progress_utils import tqdm
+# - Use AudioTqdm for automatic audio notifications
+# - Include descriptive progress messages
+# - Show progress for all long-running operations
+
+# Progress tracking examples:
+# ```python
+# from dataset_forge.utils.progress_utils import tqdm
+#
+# for item in tqdm(items, desc="Processing items"):
+#     # Process item
+#     pass
+# ```
+
+# ============================================================================
+# COLOR SCHEME & UI PATTERNS
+# ============================================================================
+
+# ALWAYS use the Catppuccin Mocha color scheme:
+# - Import: from dataset_forge.utils.color import Mocha
+# - Use centralized printing functions: print_info, print_success, print_warning, print_error
+# - Use print_header() and print_section() for menu organization
+
+# Color usage examples:
+# ```python
+# from dataset_forge.utils.printing import print_info, print_success, print_warning, print_error
+# from dataset_forge.utils.color import Mocha
+#
+# print_success("Operation completed successfully")
+# print_warning("Warning: Low memory detected")
+# print_error("Error: File not found")
+# print_info("Processing 1000 images...")
+# ```
+
+# ============================================================================
+# MENU SYSTEM PATTERNS
+# ============================================================================
+
+# ALWAYS follow the hierarchical menu structure:
+# - Main menu has 7 categories (Dataset Management, Analysis & Validation, etc.)
+# - Use show_menu() from dataset_forge.utils.menu
+# - Include descriptive menu options with emojis
+# - Handle KeyboardInterrupt and EOFError gracefully
+
+# Menu structure example:
+# ```python
+# from dataset_forge.utils.menu import show_menu
+# from dataset_forge.utils.color import Mocha
+#
+# def my_menu():
+#     options = {
+#         "1": ("📂 Option 1", function1),
+#         "2": ("🔍 Option 2", function2),
+#         "0": ("🚪 Exit", None),
+#     }
+#
+#     while True:
+#         try:
+#             action = show_menu("Menu Title", options, Mocha.lavender)
+#             if action is None:
+#                 break
+#             action()
+#         except (KeyboardInterrupt, EOFError):
+#             print_info("\nExiting...")
+#             break
+# ```
+
+# ============================================================================
+# MENU TIMING & PROFILING INTEGRATION (ADDED JULY 2025)
+# ============================================================================
+# - All menus and submenus must use the centralized timing utility:
+#     from dataset_forge.utils.monitoring import time_and_record_menu_load
+# - Use time_and_record_menu_load to wrap all menu and submenu loads for timing and analytics.
+# - All menu and submenu actions must use the lazy import pattern (lazy_action, lazy_menu) for fast CLI responsiveness.
+# - Timing prints must use the Catppuccin Mocha color scheme and the centralized printing utilities.
+# - Do not print raw analytics logs to the console; only user-facing timing prints are allowed.
+# - "Back" and "Exit" options must not trigger timing prints or errors.
+# - All new timing/profiling features must be documented in README.md, docs/features.md, docs/usage.md, docs/advanced.md, docs/architecture.md, docs/style_guide.md, docs/troubleshooting.md, docs/README_full.md, and docs/toc.md.
+# - Whenever you update these features or documentation, update README_full.md and toc.md to keep documentation in sync.
+# ============================================================================
+
+# ============================================================================
+# ROBUST MENU LOOP PATTERN (ADDED JULY 2025)
+# ============================================================================
+# - All menus and submenus must use the robust menu loop pattern:
+#     - Get the user's choice (key) from show_menu
+#     - Look up the action in the options dictionary
+#     - Call the action if callable
+# - This is required for reliability and maintainability
+# - Always use the Catppuccin Mocha color scheme for menu headers and prompts
+# - Integrate timing/profiling as described in the relevant sections
+# - All new documentation, feature explanations, and guides should be added to the appropriate file in docs/
+# - Whenever you update these features or documentation, update README_full.md and toc.md to keep documentation in sync
+# ============================================================================
+
+# ============================================================================
+# INPUT HANDLING PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized input utilities:
+# - Import: from dataset_forge.utils.input_utils import get_path_with_history, get_folder_path
+# - Support path history and favorites
+# - Handle HQ/LQ folder selection from settings
+# - Provide intelligent defaults and validation
+
+# Input handling examples:
+# ```python
+# from dataset_forge.utils.input_utils import get_path_with_history, get_folder_path
+#
+# # Get path with history support
+# path = get_path_with_history("Enter folder path:")
+#
+# # Get folder with validation
+# folder = get_folder_path("Select folder:")
+# ```
+
+# ============================================================================
+# FILE OPERATIONS PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized file utilities:
+# - Import: from dataset_forge.utils.file_utils import is_image_file, get_unique_filename
+# - Support multiple image formats: .jpg, .jpeg, .png, .gif, .bmp, .ico, .tiff, .webp
+# - Handle file operations safely (copy, move, inplace)
+# - Create unique filenames to prevent conflicts
+
+# File operation examples:
+# ```python
+# from dataset_forge.utils.file_utils import is_image_file, get_unique_filename
+#
+# if is_image_file(filename):
+#     unique_name = get_unique_filename(dest_dir, filename)
+# ```
+
+# ============================================================================
+# IMAGE PROCESSING PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized image utilities:
+# - Import: from dataset_forge.utils.image_ops import get_image_size
+# - Support multiple image formats and modes
+# - Handle alpha channels properly
+# - Use PIL for image operations, OpenCV for advanced processing
+
+# Image processing examples:
+# ```python
+# from dataset_forge.utils.image_ops import get_image_size
+# from PIL import Image
+#
+# width, height = get_image_size(image_path)
+# with Image.open(image_path) as img:
+#     # Process image
+#     pass
+# ```
+
+# ============================================================================
+# LOGGING & ERROR HANDLING
+# ============================================================================
+
+# ALWAYS use centralized logging:
+# - Import: from dataset_forge.utils.history_log import log_operation
+# - Log all major operations with timestamps
+# - Use try-except blocks with meaningful error messages
+# - Provide graceful degradation for non-critical errors
+# - All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
+
+# Logging examples:
+# ```python
+# from dataset_forge.utils.history_log import log_operation
+#
+# try:
+#     # Operation code
+#     log_operation("operation_name", "Operation details")
+# except Exception as e:
+#     print_error(f"Error during operation: {e}")
+#     log_operation("operation_name", f"Failed: {e}")
+# ```
+
+# ============================================================================
+# SESSION STATE & CONFIGURATION
+# ============================================================================
+
+# ALWAYS use centralized session state:
+# - Import: from dataset_forge.menus.session_state import parallel_config, user_preferences
+# - Store user preferences and settings
+# - Maintain parallel processing configuration
+# - Cache expensive operation results
+
+# Session state examples:
+# ```python
+# from dataset_forge.menus.session_state import parallel_config, user_preferences
+#
+# # Use parallel processing settings
+# max_workers = parallel_config.get("max_workers", 4)
+#
+# # Use user preferences
+# play_audio = user_preferences.get("play_audio", True)
+# ```
+
+# ============================================================================
+# DPID (DEGRADATION PROCESS FOR IMAGE DOWNSCALING) PATTERNS
+# ============================================================================
+
+# ALWAYS use centralized DPID utilities:
+# - Import: from dataset_forge.utils.dpid_phhofm import process_image, downscale_folder
+# - Support multiple DPID implementations (BasicSR, OpenMMLab, Phhofm)
+# - Handle HQ/LQ pair processing
+# - Use parallel processing for efficiency
+
+# DPID examples:
+# ```python
+# from dataset_forge.utils.dpid_phhofm import process_image, downscale_folder
+#
+# # Process single image
+# success = process_image(input_path, output_path, scale)
+#
+# # Process folder
+# processed, skipped, failed = downscale_folder(
+#     input_folder, output_folder, scale, threads=4
+# )
+# ```
+
+# ============================================================================
+# AUDIO & USER FEEDBACK
+# ============================================================================
+
+# ALWAYS use centralized audio utilities:
+# - Import: from dataset_forge.utils.audio_utils import play_done_sound
+# - Play completion sounds for long operations
+# - Respect user audio preferences
+# - Provide visual feedback with progress bars
+# - All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
+
+# Audio examples:
+# ```python
+# from dataset_forge.utils.audio_utils import play_done_sound
+#
+# # Play completion sound
+# play_done_sound()
+# ```
+
+# ============================================================================
+# TESTING & VALIDATION PATTERNS
+# ============================================================================
+
+# ALWAYS include comprehensive validation:
+# - Validate input paths and file existence
+# - Check image format compatibility
+# - Verify HQ/LQ pair alignment
+# - Provide detailed error messages
+
+# Validation examples:
+# ```python
+# import os
+# from dataset_forge.utils.file_utils import is_image_file
+#
+# # Validate input
+# if not os.path.exists(input_path):
+#     print_error(f"Input path does not exist: {input_path}")
+#     return
+#
+# # Validate image files
+# if not is_image_file(filename):
+#     print_warning(f"Skipping non-image file: {filename}")
+#     continue
+# ```
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION PATTERNS (NEW JULY 2025)
+# ============================================================================
+
+# ALWAYS use the centralized performance optimization utilities for maximum efficiency:
+
+# GPU ACCELERATION:
+# - Import: from dataset_forge.utils.gpu_acceleration import GPUImageProcessor, gpu_brightness_contrast, gpu_image_analysis
+# - Use GPU-accelerated operations for image preprocessing, transformations, and analysis
+# - Automatic device detection and memory management
+# - Cached operations with TTL and compression
+# - Batch processing support for large datasets
+
+# GPU acceleration examples:
+# ```python
+# from dataset_forge.utils.gpu_acceleration import gpu_brightness_contrast, gpu_image_analysis
+#
+# # GPU-accelerated image transformations
+# result = gpu_brightness_contrast(image, brightness=10.2, contrast=1.1)
+#
+# # GPU-accelerated image analysis
+# analysis = gpu_image_analysis(image)
+#
+# # Batch processing
+# processor = GPUImageProcessor()
+# results = processor.gpu_batch_transform(images, transform_config)
+# ```
+
+# DISTRIBUTED PROCESSING:
+# - Import: from dataset_forge.utils.distributed_processing import distributed_map, start_distributed_processing
+# - Support for single-machine multi-GPU and multi-machine distributed processing
+# - Automatic resource detection and optimization
+# - Dask and Ray integration with fallback to local processing
+# - Progress tracking and error handling
+
+# Distributed processing examples:
+# ```python
+# from dataset_forge.utils.distributed_processing import distributed_map, start_distributed_processing
+#
+# # Start distributed processing
+# start_distributed_processing()
+#
+# # Process items with distributed computing
+# results = distributed_map(process_function, items, desc="Processing)
+#
+# # Multi-GPU processing
+# from dataset_forge.utils.distributed_processing import multi_gpu_map
+# results = multi_gpu_map(process_function, items, desc="Multi-GPU Processing)
+# ```
+
+# SAMPLE PRIORITIZATION:
+# - Import: from dataset_forge.utils.sample_prioritization import prioritize_samples, QualityAnalyzer
+# - Quality-based sample prioritization using advanced image analysis
+# - Configurable quality and complexity metrics
+# - Adaptive batch creation based on priority scores
+# - Extensible analysis framework
+
+# Sample prioritization examples:
+# ```python
+# from dataset_forge.utils.sample_prioritization import prioritize_samples, PrioritizationStrategy
+#
+# # Prioritize samples by quality
+# prioritized = prioritize_samples(image_paths, strategy=PrioritizationStrategy.QUALITY_SCORE)
+#
+# # Analyze image quality
+# analyzer = QualityAnalyzer()
+# quality_metrics = analyzer.analyze_quality(image_path)
+# ```
+
+# PIPELINE COMPILATION:
+# - Import: from dataset_forge.utils.pipeline_compilation import compile_function, auto_compile
+# - JIT compilation using Numba, Cython, and PyTorch JIT
+# - Auto-detection of optimal compilation strategy
+# - Decorator-based compilation with fallback support
+# - Performance monitoring and optimization
+
+# Pipeline compilation examples:
+# ```python
+# from dataset_forge.utils.pipeline_compilation import compile_function, auto_compile, CompilationType
+#
+# # Manual compilation
+# compiled_func = compile_function(original_func)
+# result = compiled_func(data)
+#
+# # Auto-compilation decorator
+# @auto_compile(CompilationType.AUTO)
+# def process_data(data):
+#     return complex_processing(data)
+# ```
+
+# PERFORMANCE OPTIMIZATION MENU:
+# - All performance optimization features are accessible from the main menu
+# - Centralized UI for GPU acceleration, distributed processing, sample prioritization, and pipeline compilation
+# - Performance analytics and monitoring
+# - Global optimization settings and configuration
+
+# INTEGRATION PATTERNS:
+# - Combine multiple optimization strategies for maximum performance
+# - Use GPU acceleration for image processing bottlenecks
+# - Use distributed processing for large-scale operations
+# - Use sample prioritization for quality-first processing
+# - Use pipeline compilation for performance-critical code paths
+# - Monitor performance and adjust strategies based on system resources
+
+# All performance optimization features must be documented in README.md, docs/features.md, docs/usage.md,
+# docs/advanced.md, docs/architecture.md, docs/changelog.md, docs/style_guide.md, docs/troubleshooting.md,
+# docs/README_full.md, and docs/toc.md.
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION
+# ============================================================================
+
+# ALWAYS optimize for performance:
+# - Use parallel processing for I/O and CPU operations
+# - Implement batch processing for large datasets
+# - Use memory-efficient operations
+# - Cache expensive computations
+# - Use GPU acceleration for image processing bottlenecks
+# - Use distributed processing for large-scale operations
+# - Use sample prioritization for quality-first processing
+# - Use pipeline compilation for performance-critical code paths
+
+# Performance examples:
+# ```python
+# # Use batch processing for large datasets
+# batch_size = min(32, len(items))
+# for i in range(0, len(items), batch_size):
+#     batch = items[i:i + batch_size]
+#     process_batch(batch)
+#
+# # Use GPU acceleration
+# from dataset_forge.utils.gpu_acceleration import gpu_brightness_contrast
+# result = gpu_brightness_contrast(image, brightness=10.1, contrast=1.0)
+#
+# # Use distributed processing
+# from dataset_forge.utils.distributed_processing import distributed_map
+# results = distributed_map(process_function, items, desc="Processing")
+#
+# # Use sample prioritization
+# from dataset_forge.utils.sample_prioritization import prioritize_samples
+# prioritized = prioritize_samples(image_paths)
+#
+# # Use pipeline compilation
+# from dataset_forge.utils.pipeline_compilation import compile_function
+# compiled_func = compile_function(original_func)
+# result = compiled_func(data)
+# ```
+
+# ============================================================================
+# ERROR HANDLING & RECOVERY
+# ============================================================================
+
+# ALWAYS implement robust error handling:
+# - Catch specific exceptions (FileNotFoundError, PermissionError, etc.)
+# - Provide recovery options when possible
+# - Log errors for debugging
+# - Continue processing when individual items fail
+
+# Error handling examples:
+# ```python
+# try:
+#     # Operation code
+#     pass
+# except FileNotFoundError as e:
+#     print_error(f"File not found: {e}")
+#     continue
+# except PermissionError as e:
+#     print_error(f"Permission denied: {e}")
+#     continue
+# except Exception as e:
+#     print_error(f"Unexpected error: {e}")
+#     log_operation("error", f"Unexpected error: {e}")
+# ```
+
+# ============================================================================
+# DOCUMENTATION REQUIREMENTS
+# ============================================================================
+
+# ALWAYS include comprehensive documentation:
+# - Google-style docstrings for all public functions
+# - Include parameter types and return values
+# - Document exceptions that may be raised
+# - Provide usage examples in docstrings
+
+# Documentation example:
+# ```python
+# def process_images(image_paths: List[str], output_dir: str) -> List[str]:
+#     """
+#     Process a list of images and save results to output directory.
+#
+#     Args:
+#         image_paths: List of input image file paths
+#         output_dir: Directory to save processed images
+#
+#     Returns:
+#         List of output image file paths
+#
+#     Raises:
+#         FileNotFoundError: If input files don't exist
+#         PermissionError: If output directory is not writable
+#
+#     Example:
+#         >>> paths = process_images(['img1.jpg', 'img2.png'], 'output/')
+#         >>> print(f"Processed {len(paths)} images")
+#     """
+# ```
+
+# ============================================================================
+# SECURITY CONSIDERATIONS
+# ============================================================================
+
+# ALWAYS follow security best practices:
+# - Validate all user inputs
+# - Sanitize file paths to prevent path traversal
+# - Use safe file operations
+# - Handle sensitive data appropriately
+
+# Security examples:
+# ```python
+# import os
+#
+# # Validate and sanitize paths
+# def safe_path(path: str) -> str:
+#     return os.path.abspath(os.path.expanduser(path))
+#
+# # Validate file extensions
+# def is_safe_file(filename: str) -> bool:
+#     return filename.lower().endswith(('.jpg', '.png', '.jpeg'))
+# ```
+
+# ============================================================================
+# DEPENDENCY MANAGEMENT
+# ============================================================================
+
+# ALWAYS manage dependencies properly:
+# - Add new dependencies to requirements.txt
+# - Use version constraints for stability
+# - Document optional dependencies
+# - Test with minimal dependency sets
+
+# Dependency examples:
+# ```python
+# # In requirements.txt
+# numpy<2
+# opencv-python
+# Pillow
+# torch
+#
+# # Optional dependencies
+# # pygame  # For audio playback
+# # ffmpeg  # For video processing
+# ```
+
+# ============================================================================
+# GIT IGNORE PATTERNS
+# ============================================================================
+
+## The following lines are gitignore patterns, not Python code. They are commented out to avoid linter errors.
+# venv/
+# .venv/
+# env/
+# ENV/
+# __pycache__/
+# *.pyc
+# *.pyo
+# *.pyd
+# dataset_forge/__pycache__/
+# dataset_forge/actions/__pycache__/
+# dataset_forge/menus/__pycache__/
+# dataset_forge/utils/__pycache__/
+# .DS_Store
+# Thumbs.db
+# *.swp
+# *.swo
+# *.log
+# *.tmp
+# *.bak
+# configs/
+# !configs/_example_config.json
+# !configs/_example_user_profile.json
+# !configs/_example_community_links.json
+# build/
+# dist/
+# *.egg-info/
+# *.ipynb
+# .idea/
+# .vscode/
+
+# ============================================================================
+# FINAL REMINDERS
+# ============================================================================
+
+# 1. ALWAYS activate virtual environment: venv312\Scripts\activate
+# 2. ALWAYS use centralized utilities from dataset_forge.utils
+# 3. ALWAYS include proper error handling and logging
+# 4. ALWAYS use the Catppuccin Mocha color scheme
+# 5. ALWAYS follow the modular architecture patterns
+# 6. ALWAYS implement parallel processing for performance
+# 7. ALWAYS manage memory properly, especially for CUDA operations
+# 8. ALWAYS provide user-friendly feedback and progress tracking
+# 9. ALWAYS document your code with Google-style docstrings
+# 10. ALWAYS test your changes thoroughly before committing
+# 11. All user-facing errors must trigger the error sound (error.mp3) via the centralized print_error utility.
+
+# Remember: Dataset Forge is a professional-grade tool used by ML researchers
+# and data scientists. Maintain high code quality and user experience standards.
+
+# ============================================================================
+# DOCUMENTATION STRUCTURE & MAINTENANCE (UPDATED JULY 2025)
+# ============================================================================
+
+# The documentation for Dataset Forge is organized as follows:
+#
+# - The main README.md in the root is a concise landing page. It contains:
+#     - Project overview, logo, tagline
+#     - Quick Start (installation, setup, run)
+#     - Table of Contents (links to docs/ files)
+#     - Key features (short list)
+#     - About, License, and a note on documentation maintenance
+#     - Badges (build, license, etc.)
+#
+# - All detailed documentation is in the ./docs/ folder as separate markdown files:
+#     - docs/features.md           # User-facing feature list and workflows (concise)
+#     - docs/special_installation.md # Special installation instructions and dependency order
+#     - docs/usage.md              # Usage guide, step-by-step workflows (concise)
+#     - docs/advanced.md           # Advanced features, configuration, developer patterns
+#     - docs/architecture.md       # High-level project structure and modularity
+#     - docs/style_guide.md        # Coding standards, architecture, and best practices for contributors
+#     - docs/troubleshooting.md    # Actionable solutions for common issues
+#     - docs/contributing.md       # How to contribute, code style, PR process
+#     - docs/faq.md                # Frequently asked questions (stub if empty)
+#     - docs/changelog.md          # Changelog (stub if empty)
+#     - docs/license.md            # License summary and link to LICENSE file
+#
+# - Each docs/ file must include navigation links at the top for easy movement between docs and back to the main README.md.
+#
+# - All new documentation, feature explanations, and guides must be added to the appropriate file in docs/.
+#
+# - The main README.md must remain concise and up-to-date, with links to the detailed docs.
+#
+# - When adding new features, update both the relevant docs/ file(s) and, if appropriate, the main README.md Table of Contents.
+#
+# - For major changes, update docs/changelog.md.
+#
+# - For new documentation sections, create a new markdown file in docs/ and add it to the Table of Contents in README.md and docs/toc.md.
+#
+# - Always keep navigation links at the top of each docs/ file for user-friendliness.
+#
+# - After any change to docs/ or README.md, you MUST regenerate docs/README_full.md and docs/toc.md using merge_docs.py to keep the comprehensive documentation and Table of Contents in sync.
+#
+# - Avoid duplication: if a pattern or rationale is explained in one file, link to it from others instead of repeating.
+#
+# - See the main README.md and docs/contributing.md for further documentation and contribution guidelines.
+# ============================================================================
+
+# ============================================================================
+# MONITORING, ANALYTICS & ERROR TRACKING (NEW JULY 2025)
+# ============================================================================
+
+# ALWAYS use centralized monitoring and analytics utilities:
+# - Import: from dataset_forge.utils.monitoring import monitor_performance, track_errors, register_background_task, health_check
+# - Decorate all user-facing and long-running functions in actions/ with @monitor_performance and @track_errors
+# - Register all subprocesses/threads with register_background_task for background task management
+# - Use health_check() for RAM, disk, CUDA, and permissions validation
+# - Ensure persistent logging of analytics and errors to ./logs/
+# - Trigger notifications (sound/visual) for critical errors
+# - Integrate memory and CUDA cleanup on exit/errors for all tracked processes/threads
+# - All monitoring and analytics features must be accessible from the System Monitoring menu
+
+# Monitoring, analytics, and error tracking must be documented in README.md, docs/features.md, docs/advanced.md, docs/usage.md, docs/architecture.md, docs/changelog.md, and docs/style_guide.md.
+
+# ============================================================================
+# README_full.md MAINTENANCE RULE (ADDED JULY 2025)
+# ============================================================================
+# The file docs/README_full.md is a comprehensive, auto-generated documentation file.
+# Whenever you update any documentation in README.md or docs/*.md, you MUST update docs/README_full.md as well using merge_docs.py.
+# This ensures that README_full.md always contains the latest, merged content from all documentation sources.
+# ============================================================================
+
+# ============================================================================
+# TOC MAINTENANCE RULE (UPDATED JULY 2025)
+# ============================================================================
+# The file docs/toc.md is an auto-generated Table of Contents for all documentation.
+# Whenever documentation files or major sections change, you MUST update docs/toc.md to reflect the new structure and navigation using merge_docs.py.
+# This ensures the Table of Contents is always accurate and up-to-date for users and contributors.
+# ============================================================================
+
+# =============================
+# NEW INTEGRATIONS & DOCS MAINTENANCE (JULY 2025)
+# =============================
+# - requirements.txt is now grouped and commented by category for clarity.
+# - VapourSynth must be installed before getnative is installed or used (see requirements.txt, README.md, docs/).
+# - All documentation files (README.md, docs/*.md, README_full.md) and install scripts (./tools/install.py, run.bat) have been updated to:
+#     - Warn about CUDA/torch install order
+#     - Warn about VapourSynth/getnative install order
+#     - Show dependency matrix and grouped requirements
+#     - Document new install and run scripts
+# - Whenever you update these notes, also update docs/README_full.md and docs/toc.md to keep documentation in sync.
+
+# ============================================================================
+# CBIR (CONTENT-BASED IMAGE RETRIEVAL) FOR DUPLICATES (ADDED JULY 2025)
+# ============================================================================
+# - All CBIR functionality is implemented in dataset_forge/menus/cbir_menu.py (UI) and dataset_forge/actions/cbir_actions.py (business logic).
+# - CBIR uses deep learning embeddings (CLIP, ResNet, VGG) for semantic duplicate detection.
+# - Supports feature extraction, similarity search, ANN indexing, grouping, and batch actions (find, remove, move, copy).
+# - Follows modular design, robust menu loop, lazy import, memory management, and parallel processing patterns.
+# - All CBIR features must be documented in README.md, docs/features.md, docs/usage.md, docs/advanced.md, docs/architecture.md, docs/changelog.md, docs/style_guide.md, docs/troubleshooting.md, docs/README_full.md, and docs/toc.md.
+# - When updating CBIR, update all relevant documentation and .cursorrules accordingly.
+
+# ============================================================================
+# TEST SUITE MAINTENANCE & DOCUMENTATION (UPDATED JULY 2025)
+# ============================================================================
+# - All new features and bugfixes must include appropriate unit and/or integration tests.
+# - All features must provide public, non-interactive APIs for programmatic access and testing.
+# - Tests must use monkeypatching and dummy objects to isolate logic and avoid external dependencies.
+# - Multiprocessing tests must use module-level worker functions for pickling compatibility.
+# - Tests must be robust, isolated, and cross-platform (Windows, Linux).
+# - Mark expected failures (XFAIL) and document them in the test and docs.
+# - For CI, ensure pytest runs on every push/PR.
+# - All changes to the test suite must be documented in README.md, docs/README_full.md, docs/usage.md, docs/features.md, docs/advanced.md, docs/architecture.md, docs/style_guide.md, docs/troubleshooting.md, docs/changelog.md, and docs/toc.md.
+# - Tests must cover core business logic, utilities, and integration flows.
+# - See this session for examples of robust test design and maintenance.
+# ============================================================================
+
+# DPID Modularity (NEW JULY 2025)
+# - All DPID logic must use the new modular structure: from dataset_forge.dpid.phhofm_dpid import ..., etc.
+# - Do NOT import DPID logic from dataset_forge.utils.dpid_phhofm or legacy locations.
+# - All DPID implementations (including Umzi's DPID/pepedpid) must be modular, testable, and covered by robust, non-interactive tests using pytest and monkeypatching.
+# - All new DPID methods must be documented in all relevant docs and README_full.md.
+
+# Robust Menu Loop Pattern (UPDATED JULY 2025)
+# - All menus and submenus must use the robust menu loop pattern:
+#     - Get the user's choice (key) from show_menu.
+#     - Look up the action in the options dictionary.
+#     - Call the action if callable, with debug/error handling.
+# - Add debug prints and exception handling to menu actions for easier debugging.
+
+# Workflow Prompt Handling (NEW JULY 2025)
+# - All user-facing workflows (not menu loops) are responsible for their own 'Press Enter to return to the menu...' prompt.
+# - Menu loops must NOT include this prompt.
+
+# Centralized Printing & Style (UPDATED JULY 2025)
+# - All output, prompts, and progress must use the centralized printing utilities:
+#     - print_header, print_section, print_info, print_success, print_error, print_prompt
+# - All user-facing code must use the Catppuccin Mocha color scheme.
+# - No raw print statements in user-facing code.
+
+# Exception Handling & Debug Prints (NEW JULY 2025)
+# - Add exception handling and debug prints to menu actions and workflows to catch and diagnose errors.
+
+# Documentation Maintenance (REMINDER)
+# - All changes to menu patterns, DPID logic, or CLI style must be reflected in docs/ and README_full.md using merge_docs.py.
+
+# ============================================================================
+# STATIC ANALYSIS & CODE QUALITY (ADDED JULY 2025)
+# ============================================================================
+# - All contributors MUST run tools/find_code_issues/find_code_issues.py before submitting a PR.
+# - All actionable issues (dead code, untested code, missing docstrings, test/code mapping, etc.) must be addressed before merging.
+# - All public functions/classes/methods MUST have Google-style docstrings. This is enforced by the static analysis script.
+# - The script overwrites its output files (find_code_issues.log, find_code_issues_report.txt, find_code_issues_view.txt) in tools/find_code_issues/ on each run.
+# - See docs/usage.md and docs/features.md for details.
+# ============================================================================
+
+# ============================================================================
+# ENHANCED CACHING SYSTEM (UPDATED JULY 2025)
+# ============================================================================
+# - All contributors must use the centralized caching utilities in dataset_forge.utils.cache_utils.
+# - Use @in_memory_cache for lightweight, frequently-called, session-only results with TTL and compression.
+# - Use @disk_cache for expensive, large, or cross-session results with integrity checks.
+# - Use @model_cache for expensive AI model loading operations with CUDA memory management.
+# - Use @smart_cache for automatic selection of optimal caching strategy based on function characteristics.
+# - Always document cache usage in function docstrings with TTL, compression, and strategy rationale.
+# - Disk cache is stored in store/cache/ and must be ignored by git (see .gitignore).
+# - Users can access comprehensive cache management from System Settings → Cache Management.
+# - Cache management includes: statistics, clearing, validation, repair, warmup, export, and optimization.
+# - All caching features must be covered by robust unit and integration tests.
+# - See docs/features.md and docs/advanced.md for comprehensive technical details and best practices.
+# - The enhanced caching system includes: AdvancedLRUCache class, comprehensive disk caching, model caching,
+#   smart cache auto-detection, cache management menu, statistics tracking, integrity checks, and maintenance tools.
+# ============================================================================
+
+# ============================================================================
+# UMZI'S DATASET_PREPROCESSING INTEGRATION (ADDED JULY 2025)
+# ============================================================================
+# - The full Dataset_Preprocessing_consolidated_script.py has been ported into modular actions (dataset_forge/actions/umzi_dataset_preprocessing_actions.py) and a menu (dataset_forge/menus/umzi_dataset_preprocessing_menu.py).
+# - The menu is accessible as "🧩 Umzi's Dataset_Preprocessing" from the main menu.
+# - All workflows (Best Tile Extraction, Video Frame Extraction, Image Deduplication, IQA Filtering, Embedding Extraction) are fully interactive, use centralized input/printing/memory/progress, and follow project UI/coding standards.
+# - All business logic is testable and covered by robust unit and CLI integration tests (see tests/test_utils/test_umzi_dataset_preprocessing.py and tests/test_cli/test_umzi_menu.py).
+# - All documentation (features, usage, advanced, architecture, changelog, toc, README_full) must be updated when this integration changes.
+# - All new features, bugfixes, or refactors for this integration must include appropriate tests and documentation updates.
+# - See docs/advanced.md for details on the porting and modularization process.
+# ============================================================================
+
+# ============================================================================
+# INTERACTIVE WORKFLOW PATTERN (UPDATED JULY 2025)
+# ============================================================================
+# - All interactive workflows (including Sanitize Images) must prompt for each major step within the workflow, not the menu.
+# - Steganography checks must prompt for steghide and zsteg individually, and the summary must report both.
+# - A visually distinct summary box must always be shown at the end, including zsteg results file path if produced.
+# - Menu header must be reprinted after returning to the workflow menu.
+# - All output must use centralized, Mocha-styled printing utilities and emoji-rich prompts.
+# - No duplicate prompts, debug prints, or raw print statements are allowed.
+# - This is now the standard for all interactive workflows.
+# - Documentation must be updated accordingly after such changes.
+# ============================================================================
+
+# ============================================================================
+# MERMAID DIAGRAMS & BADGES (ADDED JULY 2025)
+# ============================================================================
+# - All architecture diagrams in documentation must use Mermaid code blocks in Markdown.
+# - No Python package is required for Mermaid diagrams; they are rendered by supported Markdown viewers (e.g., GitHub, VSCode with Mermaid extension).
+# - When adding or updating features/modules, update the relevant Mermaid diagrams in README.md and docs/architecture.md.
+# - The README.md must include standard badges (build, license, Python version, issues, stars, last commit, etc.).
+# - The meaning of badges should be documented in the README and referenced in docs/features.md and docs/usage.md.
+# ============================================================================
+
+# ============================================================================
+# ENHANCED METADATA MANAGEMENT (ADDED JULY 2025)
+# ============================================================================
+# - All new menu items and features (including Enhanced Metadata Management) must be documented in all relevant docs and README_full.md.
+# - Enhanced Metadata Management menu and features must be maintained, tested, and documented.
+# - exiftool, pandas, and SQLite are required for full metadata support; document their usage and troubleshooting.
+# - All user-facing errors must trigger error sound and be logged.
+# - All new features must include robust error handling, memory management, and user feedback.
+# - See docs/features.md, docs/usage.md, docs/advanced.md, docs/architecture.md, docs/style_guide.md, docs/changelog.md, docs/troubleshooting.md, docs/README_full.md, and docs/toc.md for documentation requirements.
+# ============================================================================
+
+# ============================================================================
+# ALIGN IMAGES FEATURE (ADDED JULY 2025)
+# ============================================================================
+# - The '🧭 Align Images (Batch Projective Alignment)' feature is implemented in dataset_forge/actions/align_images_actions.py and integrated into the Dataset Management menu.
+# - The workflow supports both flat and recursive (subfolder) batch processing, robust error handling, and modular, testable design.
+# - All new menu items (including Align Images) must be documented in all relevant docs and README_full.md.
+# - All new features must include robust, non-interactive tests using the public API and feature-rich dummy images for SIFT keypoint detection.
+# - All menu actions must use the robust menu loop and lazy import pattern.
+# - See docs/features.md, docs/usage.md, docs/advanced.md, docs/architecture.md, docs/changelog.md, docs/README_full.md, and docs/toc.md for documentation requirements.
+# ============================================================================
+
+# =========================================================================
+# TOOLS/ SCRIPTS DOCUMENTATION & MAINTENANCE (ADDED JULY 2025)
+# =========================================================================
+# - All user-facing scripts in tools/ must be documented in docs/features.md and docs/usage.md.
+# - Documentation must include: purpose, CLI usage, options/flags, example commands, output files, and troubleshooting.
+# - Troubleshooting for each script must be included in docs/troubleshooting.md.
+# - Developer/maintenance notes for complex tools must be included in docs/advanced.md.
+# - Documentation for tools/ scripts must be kept up to date whenever scripts are added or changed.
+# - Add navigation links and cross-references as needed for user-friendliness.
+# =========================================================================
+
+# ============================================================================
+# DATASET HEALTH SCORING (ADDED JULY 2025)
+# ============================================================================
+# - The 🩺 Dataset Health Scoring' workflow is implemented in dataset_forge/actions/dataset_health_scoring_actions.py (business logic) and dataset_forge/menus/dataset_health_scoring_menu.py (UI layer).
+# - Integrated as a menu option under Dataset Management using the lazy import and robust menu loop patterns.
+# - Supports both single-folder and HQ/LQ parent folder modes.
+# - Modular, weighted checks: validation, unreadable files, format consistency, quality, aspect ratio, file size, consistency, compliance.
+# - Provides a detailed scoring breakdown and actionable suggestions for improvement.
+# - Extensible: add new checks by extending the actions module and updating the step list/weights.
+# - Fully covered by unit and CLI integration tests (see tests/test_utils/test_dataset_health_scoring.py and tests/test_cli/test_dataset_health_scoring_menu.py).
+# - All documentation (features, usage, advanced, architecture, changelog, toc, README_full) must be updated when this workflow changes.
+# - See docs/features.md, docs/usage.md, docs/architecture.md, docs/changelog.md, docs/toc.md, and docs/README_full.md for details.
+# ============================================================================
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION SUITE (NEW JULY 2025)
+# ============================================================================
+# - All performance optimization features are implemented in dataset_forge/utils/ with modular design:
+#     - dataset_forge/utils/gpu_acceleration.py: GPU-accelerated image processing
+#     - dataset_forge/utils/distributed_processing.py: Distributed computing with Dask/Ray
+#     - dataset_forge/utils/sample_prioritization.py: Quality-based sample prioritization
+#     - dataset_forge/utils/pipeline_compilation.py: JIT compilation with Numba/Cython/PyTorch
+# - The Performance Optimization menu is in dataset_forge/menus/performance_optimization_menu.py
+# - All features follow modular design, robust menu loop, lazy import, memory management, and parallel processing patterns
+# - Comprehensive test suite in tests/test_utils/test_performance_optimization.py covering all optimization features
+# - Integration tests for end-to-end workflows, performance benchmarks, and memory management checks
+# - Error handling and edge case testing with robust fallbacks
+# - All performance optimization features must be documented in README.md, docs/features.md, docs/usage.md,
+#   docs/advanced.md, docs/architecture.md, docs/changelog.md, docs/style_guide.md, docs/troubleshooting.md,
+#   docs/README_full.md, and docs/toc.md
+# - When updating performance optimization features, update all relevant documentation and .cursorrules accordingly
+# - See docs/features.md and docs/advanced.md for comprehensive technical details and best practices
+# ============================================================================
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION TESTING & MAINTENANCE (NEW JULY 2025)
+# ============================================================================
+# - All performance optimization features must include comprehensive unit and integration tests
+# - Tests must cover GPU acceleration, distributed processing, sample prioritization, and pipeline compilation
+# - Performance benchmarks must be robust and handle edge cases (GPU overhead, small operations, compilation time)
+# - Tests must use monkeypatching and dummy objects to isolate logic and avoid external dependencies
+# - Distributed processing tests must handle local fallback and error aggregation scenarios
+# - GPU acceleration tests must handle device availability and memory management
+# - Sample prioritization tests must validate quality analysis and prioritization strategies
+# - Pipeline compilation tests must handle compilation failures and fallback scenarios
+# - All tests must be robust, isolated, and cross-platform (Windows, Linux)
+# - Mark expected failures (XFAIL) and document them in the test and docs
+# - For CI, ensure pytest runs on every push/PR with performance optimization tests
+# - All changes to performance optimization features must be documented in all relevant docs and README_full.md
+# - Performance optimization features must include robust error handling, memory management, and user feedback
+# - Monitor performance metrics and optimize based on real-world usage patterns
+# - Regular performance benchmarking and optimization based on user feedback and system capabilities
+# ============================================================================

@@ -104,10 +104,9 @@ rules/
 .mdc
 *.mdc
 
-docs_before_refactoring/
-docs_misc_old/
 
-menu_system/
-
-cursorrules_Old/
+# cursorrules_Old/
+# docs_before_refactoring/
+# docs_misc_old/
+# menu_system/
 
