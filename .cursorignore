@@ -1,0 +1,65 @@
+# =============================
+# Python Virtual Environments
+# =============================
+venv/
+venv312/
+.venv/
+env/
+ENV/
+
+# =============================
+# Python Bytecode and Caches
+# =============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.mypy_cache/
+.pylint.d/
+.pytest_cache/
+
+# =============================
+# Data, Results, and Store
+# =============================
+store/
+
+# =============================
+# Explicitly Allow Important Files/Directories
+# =============================
+!tools/
+!tools/find_code_issues.log
+!tools/find_code_issues/
+
+!tests/
+
+!.cursorignore
+!.cursorrules
+!.cursor/
+!rules/
+!.mdc
+!*.mdc
+
+!configs/
+!docs/
+!*.md
+!*.py
+!*bat
+!*txt
+!*ini
+!*json
+
+!results/
+!logs/
+!test_datasets/
+!OpenModelDB/
+
+!.path_history
+
+!cursorrules_Old/
+!docs_before_refactoring/
+!docs_misc_old/
+!menu_system/
+
+.git/
+git/
+

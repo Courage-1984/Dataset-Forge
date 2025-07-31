@@ -97,13 +97,13 @@ Icon?
 tools/find_code_issues.log
 tools/find_code_issues/
 
-.cursorignore
-.cursorrules
-.cursor/
-rules/
-.mdc
-*.mdc
-
+# .cursorignore
+# .cursorrules
+# .cursor/
+# rules/
+# .mdc
+# *.mdc
+mcp.json
 
 cursorrules_Old/
 docs_before_refactoring/
