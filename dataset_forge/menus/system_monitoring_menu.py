@@ -21,6 +21,9 @@ from dataset_forge.utils.printing import print_success
 # Import monitoring utilities (stubs for now)
 from dataset_forge.utils import monitoring
 
+# Import cleanup menu
+from dataset_forge.menus.cleanup_menu import cleanup_menu
+
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
@@ -170,14 +173,19 @@ def system_monitoring_menu():
         ),
         "6": ("⏱️  View Menu Load Times", show_menu_load_times),
         "7": ("🧹 Clear All Caches (Disk & In-Memory)", clear_caches),
+        "8": ("🧹 Cleanup & Optimization", cleanup_menu),
         "0": ("⬅️  Back to Main Menu", None),
     }
     # Define menu context for help system
     menu_context = {
         "Purpose": "Monitor system resources, performance, and health",
-        "Total Options": "7 monitoring operations",
-        "Navigation": "Use numbers 1-7 to select, 0 to go back",
-        "Key Features": "Resource monitoring, performance analytics, error tracking, health checks",
+        "Total Options": "8 monitoring operations",
+        "Navigation": "Use numbers 1-8 to select, 0 to go back",
+        "Key Features": [
+            "Resource monitoring, performance analytics, error tracking, health checks",
+            "Background task management, menu load timing analysis",
+            "Cache management and comprehensive cleanup operations"
+        ],
     }
 
     while True:

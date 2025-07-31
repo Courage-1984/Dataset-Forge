@@ -178,6 +178,25 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 - **🩺 Run Health Checks**: Automated checks for RAM, disk, CUDA, Python version, and permissions, with CLI output and recommendations
 - **🧵 Manage Background Tasks**: Registry of all subprocesses/threads, with CLI controls for pause/resume/kill and session-only persistence
 - **⏱️ View Menu Load Times**: View the menu load times
+- **🧹 Cleanup & Optimization**: Comprehensive cleanup tools for cache folders, system caches, and memory management
+
+### **Cleanup & Optimization Features**
+
+The cleanup menu provides comprehensive project maintenance tools:
+
+- **🧹 Remove .pytest_cache folders**: Recursively removes all pytest test cache folders from the project
+- **🧹 Remove **pycache** folders**: Recursively removes all Python bytecode cache folders from the project
+- **🧹 Remove All Cache Folders**: Removes both .pytest_cache and **pycache** folders in one operation
+- **🧹 Comprehensive System Cleanup**: Full system cleanup including cache folders, disk cache, in-memory cache, GPU memory, and system memory
+- **📊 Analyze Cache Usage**: View cache usage statistics, folder sizes, and cleanup recommendations
+
+**Benefits:**
+
+- **🗂️ Project Cleanup**: Remove unnecessary cache files that accumulate over time
+- **💾 Space Recovery**: Free up disk space by removing large cache folders
+- **⚡ Performance**: Clean caches can improve system performance
+- **🔍 Analysis**: Understand cache usage patterns and optimize storage
+- **🛡️ Safe Operations**: Comprehensive error handling and permission checking
 
 ## 🚀 Performance Optimization (NEW July 2025)
 

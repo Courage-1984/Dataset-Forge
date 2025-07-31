@@ -6,6 +6,22 @@
 
 ## [Unreleased]
 
+### 🧹 Cleanup & Optimization Tools (July 2025)
+
+- **New Feature**: Added comprehensive cleanup and optimization tools to System Monitoring & Health menu
+- **Cleanup Actions**:
+  - `dataset_forge/actions/cleanup_actions.py` - Core cleanup functionality
+  - `dataset_forge/menus/cleanup_menu.py` - Cleanup menu interface
+- **Features**:
+  - Recursive removal of `.pytest_cache` folders
+  - Recursive removal of `__pycache__` folders
+  - Comprehensive system cleanup (cache folders + system caches + memory)
+  - Cache usage analysis with size reporting and recommendations
+- **Integration**: Fully integrated with Dataset Forge's monitoring, memory management, and progress tracking
+- **Testing**: Comprehensive test suite with 15 passing tests covering all functionality
+- **Documentation**: Updated features.md with detailed cleanup functionality documentation
+- **User Experience**: Catppuccin Mocha color scheme, progress tracking, and comprehensive error handling
+
 ### 🌐 Global Command System & Comprehensive Help Documentation (July 2025)
 
 - **New Feature**: Implemented global help and quit commands across all menus and sub-menus
