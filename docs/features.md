@@ -2,6 +2,86 @@
 
 # Features (tl;dr)
 
+> **UI/UX Note:**  
+> All CLI output in Dataset Forge uses the Catppuccin Mocha color scheme for a consistent, visually appealing experience. All prompts, menus, and progress bars are styled using the centralized color utilities.
+
+- Modular CLI for image dataset management, curation, and analysis
+- Powerful HQ/LQ pair workflows for SISR and super-resolution
+- Advanced validation, deduplication, and quality scoring
+- Rich augmentation, transformation, and batch processing
+- GPU acceleration and distributed processing support
+- Integration with popular external tools (WTP, traiNNer-redux, getnative, resdet, etc.)
+- Robust reporting, health scoring, and system monitoring
+- Comprehensive test suite and static analysis tools
+- [See Usage Guide](usage.md) for examples and workflows
+
+---
+
+# Feature Overview
+
+## ⚙️ Core & Configuration
+
+- External tool integration (WTP Dataset Destroyer, traiNNer-redux, getnative, resdet, etc.)
+- Model management: list, select, download, and run upscaling with trained models
+- Multi-format config support (JSON, YAML, HCL)
+- User profiles, favorites, presets, and quick access paths
+
+## 📂 Dataset Management
+
+- Multiscale dataset generation, video frame extraction, image tiling
+- Combine, split, shuffle, and randomize datasets
+- HQ/LQ pair management: manual/fuzzy pairing, scale correction, alignment
+- Visual and hash-based deduplication, CBIR (semantic duplicate detection)
+- Batch renaming, orientation sorting, size filtering
+
+## 🔍 Analysis & Validation
+
+- Progressive validation suite for datasets and HQ/LQ pairs
+- Automated quality scoring (NIQE, HyperIQA, IC9600, etc.)
+- Corruption, misalignment, and outlier detection
+- HTML/Markdown reporting with plots and sample images
+
+## ✨ Image Processing & Augmentation
+
+- Downsampling, cropping, flipping, rotating, shuffling, resaving
+- Brightness, contrast, hue, saturation, HDR/SDR, grayscale
+- Degradations: blur, noise, pixelate, dithering, sharpen, banding, etc.
+- Advanced augmentation pipelines and recipe management
+- Metadata scrubbing, ICC profile conversion, sketch/line art extraction
+
+## 🚀 Performance & Optimization
+
+- GPU-accelerated preprocessing and batch operations
+- Distributed processing (Dask, Ray), multi-GPU support
+- JIT compilation for performance-critical code
+- Real-time analytics and auto-optimization
+
+## 🛠️ Utilities
+
+- Image/gif comparison creation, compression, and sanitization
+- Enhanced directory tree visualization
+- Batch metadata extraction, editing, filtering, and anonymization
+- System monitoring: live resource usage, error summaries, health checks
+
+## 🧪 Testing & Developer Tools
+
+- Comprehensive pytest suite for all features
+- Static analysis tools for code quality and maintainability
+- Utility scripts for environment setup, testing, and documentation merging
+
+---
+
+<details>
+<summary><strong>Full Feature List (click to expand)</strong></summary>
+
+# Features (tl;dr)
+
+- Modular CLI tool for image dataset management, curation, and analysis
+- Powerful HQ/LQ pair workflows for SISR and super-resolution
+- Advanced validation, deduplication, and quality scoring tools
+- Rich augmentation, transformation, and batch processing features
+- Integrates with popular external tools and supports GPU acceleration
+
 # Features (main menus)
 
 ## ⚙️ Core & Configuration

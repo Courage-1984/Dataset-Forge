@@ -1,3 +1,6 @@
+# This script merges all documentation files in docs/ into a single README_full.md and generates a hierarchical Table of Contents (toc.md).
+# To add new documentation files, update DOC_ORDER below and ensure navigation links are consistent.
+
 import os
 import sys
 import re
@@ -11,24 +14,25 @@ TOC_FILE = os.path.join(DOCS_DIR, "toc.md")
 
 # Order of files to merge (edit as needed)
 DOC_ORDER = [
-    "special_installation.md",
-    "features.md",
-    "usage.md",
-    "advanced.md",
-    "architecture.md",
-    "troubleshooting.md",
-    "style_guide.md",
-    "contributing.md",
-    "faq.md",
-    "changelog.md",
-    "license.md",
+    "README.md",  # Project landing page
+    "index.md",  # Documentation home
+    "getting_started.md",  # Install & setup
+    "special_installation.md",  # Special installation instructions
+    "features.md",  # Features overview
+    "usage.md",  # Usage guide
+    "advanced.md",  # Advanced features
+    "architecture.md",  # Project architecture
+    "troubleshooting.md",  # Troubleshooting & FAQ
+    "style_guide.md",  # Coding & style guide
+    "contributing.md",  # Contributing guide
+    "changelog.md",  # Changelog
+    "license.md",  # License
 ]
-
 
 NAV_LINKS = (
     "[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | "
     "[Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | "
-    "[Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)\n"
+    "[Style Guide](style_guide.md) | [Contributing](contributing.md) | [Changelog](changelog.md) | [ToC](toc.md)\n"
 )
 
 

@@ -263,3 +263,4 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 ---
 
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
+

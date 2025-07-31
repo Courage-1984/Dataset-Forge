@@ -2,197 +2,103 @@
 
 # Troubleshooting
 
-This guide provides solutions to common issues in Dataset Forge. For advanced usage and developer troubleshooting, see [advanced.md](advanced.md).
+> **Who is this for?**  
+> This guide is for anyone encountering errors, installation problems, or unexpected behavior in Dataset Forge.
 
 ---
 
-## Dependancy & Library Issues
+## Installation & Environment Issues
 
-**Problem:** Import errors or menu options not working.
-
-- Please see: [Special Installation Instructions](troubleshooting.md)
-
-## Menu Timing & Profiling Issues
-
-**Problem:** Timing prints do not appear after loading a menu or submenu.
-
-- Ensure you are running the latest version of Dataset Forge.
-- Check that the menu or submenu uses the `time_and_record_menu_load` utility.
-- "Back" and "Exit" options do not trigger timing prints.
-
-## Menu Loop Issues
-
-**Problem:** Errors occur when navigating menus (e.g., `TypeError: 'str' object is not callable`).
-
-- All menu loops should check if the action is callable before calling it.
-- Update your menu code to follow the robust menu loop pattern (see [style_guide.md](style_guide.md)).
-
-**Problem:** Menu redraws repeatedly or submenus do not appear.
-
-- Ensure the menu loop uses the robust pattern:
-  - Get the user's choice (key) from `show_menu`.
-  - Look up the action in the options dictionary.
-  - Call the action if callable.
-
-## Other Issues
-
-- For monitoring/analytics issues, check the logs in the ./logs/ directory.
-- If tests fail, ensure your environment matches the requirements and all dependencies are installed.
-
-## Test Failures
-
-- If you encounter a failing test, check for function signature mismatches, especially with parallel utilities that pass extra kwargs (e.g., play_audio).
-- Ensure all monkeypatches and fixtures match the expected types and return values.
+- **Python version too low:** Upgrade to Python 3.12+.
+- **CUDA/torch install fails:** Check your CUDA version and use the correct index URL for torch.
+- **pip install fails:** Check your internet connection and permissions. Try running as administrator.
+- **python-magic errors on Windows:** Copy required DLLs to `C:/Windows/System32/`. See [Special Installation Instructions](special_installation.md).
+- **VapourSynth/getnative:** Install VapourSynth before getnative. See [Special Installation Instructions](special_installation.md).
 
 ---
 
-## 🧪 Test Suite Troubleshooting (July 2025)
+## Common CLI & Workflow Issues
 
-- **Monkeypatch signature mismatch:** Ensure dummy functions/classes accept all arguments used in the real code (e.g., `color=None`, `**kwargs`).
-- **Multiprocessing pickling errors:** Worker functions must be defined at module level, not nested inside other functions.
-- **XFAIL tests:** Some tests (e.g., ignore patterns in directory tree) are marked XFAIL by design; see docs for details.
-
-See [Style Guide](style_guide.md#testing-patterns) and [features.md](features.md#comprehensive-test-suite).
-
----
-
-## Static Analysis Tool Issues
-
-**Problem:** The static analysis script (`tools/find_code_issues/find_code_issues.py`) fails to run, or you get unexpected results.
-
-- Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-- If you get import errors, check your virtual environment and Python version.
-- If the script reports no files found, check your directory structure and that the codebase is present.
-- The script overwrites its output files in `tools/find_code_issues/` on each run.
-- Review the log file (`find_code_issues.log`) for detailed error messages.
+- **Import errors or menu options not working:** Ensure all dependencies are installed. See [Special Installation Instructions](special_installation.md).
+- **Menu redraws or submenus not appearing:** Update your menu code to follow the robust menu loop pattern (see [style_guide.md](style_guide.md)).
+- **Timing prints missing:** Ensure you are running the latest version and using the correct utilities.
+- **Missing workflow headings:** Update the workflow to match the Style Guide.
 
 ---
 
-## Metadata Management Issues (NEW July 2025)
+## Test Suite & Developer Tools
 
-**Problem:** exiftool not found or not working.
-
-- Ensure exiftool is installed and in your system PATH. Download from https://exiftool.org/.
-- On Windows, you may need to rename exiftool(-k).exe to exiftool.exe and add its folder to PATH.
-- Restart your terminal after installation.
-
-**Problem:** pandas or SQLite errors when extracting/filtering metadata.
-
-- Ensure pandas is installed: `pip install pandas`
-- SQLite is included with Python, but ensure your Python is not missing standard libraries.
-- Check your CSV/SQLite file for corruption or incomplete extraction.
-
-**Problem:** Metadata extraction returns empty or incomplete results.
-
-- Some image formats may not contain metadata, or may be corrupted.
-- Try running exiftool manually on a sample file to debug.
-- Check file permissions and ensure files are not locked by another process.
+- **Test failures:** Check for function signature mismatches, especially with parallel utilities. Ensure all monkeypatches and fixtures match expected types.
+- **Static analysis tool fails:** Ensure all dependencies are installed. Check your virtual environment and directory structure.
+- **Utility scripts not working:** Check dependencies, permissions, and environment variables.
 
 ---
 
-## Utility Scripts (tools/) Troubleshooting
+## Metadata & Caching Issues
 
-### find_code_issues.py
-
-- **Problem:** Script fails to run, or you get unexpected results.
-  - Ensure all dependencies are installed: `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
-  - If you get import errors, check your virtual environment and Python version.
-  - If the script reports no files found, check your directory structure and that the codebase is present.
-  - The script overwrites its output files in `tools/find_code_issues/` on each run.
-  - Review the log file (`find_code_issues.log`) for detailed error messages.
-
-### merge_docs.py
-
-- **Problem:** Documentation files are missing or not merged.
-  - Ensure all documentation files exist and are readable.
-  - If you see missing file warnings, check the `DOC_ORDER` list in the script.
-  - If output files are not updated, check file permissions in the docs/ directory.
-
-### install.py
-
-- **Problem:** Python version is too low.
-  - Upgrade to Python 3.12+.
-- **Problem:** CUDA-enabled torch fails to install.
-  - Check your CUDA version and use the correct index URL for torch.
-- **Problem:** pip install fails.
-  - Check your internet connection and permissions.
-  - Try running the command as administrator or with sudo (Linux/Mac).
-
-### print_zsteg_env.py
-
-- **Problem:** `zsteg` is not found.
-  - Ensure `zsteg` is installed and in your PATH.
-  - On Windows, you may need to restart your terminal after adding to PATH.
-- **Problem:** PATH is not updated.
-  - Double-check your environment variable settings and restart your terminal.
+- **exiftool not found:** Ensure exiftool is installed and in your PATH. Restart your terminal after installation.
+- **pandas/SQLite errors:** Ensure pandas is installed and your Python includes standard libraries.
+- **Cache misses or high memory usage:** Check TTL and maxsize settings. Use cache statistics to analyze performance. Clear caches if needed.
 
 ---
 
+## DPID & External Tools
+
+- **pepedpid ImportError:** Ensure pepedpid is installed in the correct environment.
+- **DPID workflow errors:** Check input folders for valid images and use the correct menu option.
+
 ---
 
-## Enhanced Caching System Issues (NEW July 2025)
+## FAQ
 
-**Problem:** Cache misses or unexpected cache behavior.
+See below for frequently asked questions. For more, visit the [Discussion Board](https://github.com/Courage-1984/Dataset-Forge/discussions).
 
-- Check TTL settings: cached data may have expired
-- Verify cache size limits: in-memory cache may have evicted entries
-- Use cache statistics to analyze hit rates and performance
-- Clear and rebuild cache if corruption is suspected
+<details>
+<summary><strong>Frequently Asked Questions (FAQ)</strong></summary>
 
-**Problem:** High memory usage from caching.
+- **What is Dataset Forge?**  
+  Modular Python CLI tool for managing, analyzing, and transforming image datasets, with a focus on HQ/LQ pairs for super-resolution and ML workflows.
 
-- Monitor cache statistics for memory usage
-- Reduce maxsize limits for in-memory caches
-- Use TTL to prevent memory leaks
-- Clear caches when memory pressure is high
-- Enable compression for large objects
+- **What platforms are supported?**  
+  Windows (primary), Linux/macOS (not yet tested).
 
-**Problem:** Disk cache corruption or missing files.
+- **What Python version is required?**  
+  Python 3.12+ is recommended.
 
-- Use cache validation tools to detect corruption
-- Run cache repair to fix corrupted entries
-- Check disk space availability
-- Verify file permissions in cache directory
+- **How do I install Dataset Forge and its dependencies?**  
+  See the [Quick Start](../README.md#-quick-start) and [Special Installation Instructions](special_installation.md).
 
-**Problem:** Cache management menu not accessible.
+- **Why do I need to install VapourSynth before getnative?**  
+  getnative depends on VapourSynth. See [Special Installation Instructions](special_installation.md).
 
-- Ensure you're accessing from System Settings → Cache Management
-- Check that cache_management_menu.py is properly integrated
-- Verify lazy import pattern is working correctly
+- **How do I fix python-magic errors on Windows?**  
+  Copy required DLLs to `C:/Windows/System32/`. See [Special Installation Instructions](special_installation.md).
 
-**Problem:** Model cache issues with CUDA memory.
+- **How do I run the test suite?**  
+  Activate the virtual environment and run `pytest`. See [usage.md](usage.md).
 
-- Model cache includes automatic CUDA memory management
-- Clear model cache if GPU memory issues occur
-- Monitor CUDA memory usage during model operations
-- Use appropriate TTL for model caching
+- **How do I use the monitoring and analytics features?**  
+  Access the System Monitoring menu from the CLI. See [features.md](features.md).
 
-**Problem:** Smart cache auto-detection not working.
+- **What should I do if I get CUDA or GPU errors?**  
+  Ensure your CUDA/cuDNN versions match your PyTorch install. Lower batch size or use CPU fallback if needed.
 
-- Check function names for keywords: "model", "load", "embedding" for model cache
-- Check function names for keywords: "extract", "compute", "process" for disk cache
-- Verify cache_dir parameter is passed correctly for disk cache
-- Use explicit cache type if auto-detection fails
+- **What if a menu or feature is missing or crashes?**  
+  Make sure you are running the latest version. Check the logs in the `./logs/` directory.
 
-**Debug Tools:**
+- **How do I get help or report a bug?**  
+  Open an issue on GitHub or contact the project maintainer.
 
-- Use cache statistics to analyze performance
-- Export cache data for offline analysis
-- Run cache validation and repair tools
-- Monitor cache hit rates and memory usage
+</details>
 
-For further help, see [usage.md](usage.md) or contact the project maintainer.
+---
 
-## DPID & pepedpid Issues (NEW July 2025)
+## See Also
 
-**Problem:** ImportError or menu option for Umzi's DPID (pepedpid) not working.
+- [Getting Started](getting_started.md)
+- [Special Installation Instructions](special_installation.md)
+- [Usage Guide](usage.md)
+- [Features](features.md)
+- [Style Guide](style_guide.md)
 
-- Ensure pepedpid is installed: `pip install pepedpid`
-- If you get ImportError, check your virtual environment and that pepedpid is installed in the correct environment.
-- If you get errors running DPID workflows, ensure you are using the correct menu option and that your input folders contain valid images.
-- All DPID implementations (including Umzi's) are modular and covered by robust, non-interactive tests. If tests fail, check for monkeypatching or signature mismatches in your test environment.
-- For further help, see [usage.md](usage.md) or contact the project maintainer.
-
-## Missing Workflow Headings
-
-If you don’t see clear workflow headings before prompts and progress bars, the workflow may be outdated or not following project standards. Please update the workflow to match the Style Guide.
+If your question is not answered here, check the [usage guide](usage.md), [troubleshooting guide](troubleshooting.md), or open an issue.

@@ -127,16 +127,22 @@ def test_process_single_image_corrupted_file(tmp_path):
 @patch("dataset_forge.actions.resave_images_actions.ThreadPoolExecutor")
 def test_resave_images_success(mock_executor):
     """Test successful resave images operation."""
+    from concurrent.futures import Future
+
     # Create mock executor
     mock_executor_instance = MagicMock()
     mock_executor.return_value.__enter__.return_value = mock_executor_instance
 
-    # Mock futures
-    mock_futures = [MagicMock() for _ in range(3)]
-    for future in mock_futures:
-        future.result.return_value = True
+    # Helper to create a completed Future
+    def make_future(result):
+        f = Future()
+        f.set_result(result)
+        return f
 
-    mock_executor_instance.submit.side_effect = mock_futures
+    # Mock submit to return a completed Future for each call
+    mock_executor_instance.submit.side_effect = lambda *args, **kwargs: make_future(
+        True
+    )
 
     # Create test data
     input_dir = "/test/input"
@@ -177,14 +183,21 @@ def test_resave_images_success(mock_executor):
 @patch("dataset_forge.actions.resave_images_actions.ThreadPoolExecutor")
 def test_resave_images_with_failures(mock_executor):
     """Test resaving with some failures."""
+    from concurrent.futures import Future
+
     # Create mock executor
     mock_executor_instance = MagicMock()
     mock_executor.return_value.__enter__.return_value = mock_executor_instance
 
-    # Mock futures - return the actual results directly
-    mock_futures = [True, False, True]  # 2 success, 1 failure
+    # Prepare results for each submit call
+    results = [True, False, True]  # 2 success, 1 failure
 
-    mock_executor_instance.submit.side_effect = mock_futures
+    def submit_side_effect(*args, **kwargs):
+        f = Future()
+        f.set_result(results.pop(0))
+        return f
+
+    mock_executor_instance.submit.side_effect = submit_side_effect
 
     # Create test data
     input_dir = "/test/input"
