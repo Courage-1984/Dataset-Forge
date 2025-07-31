@@ -67,6 +67,7 @@
 
 - Comprehensive pytest suite for all features
 - Static analysis tools for code quality and maintainability
+- **Menu Auditing Tool**: Comprehensive menu hierarchy analysis and improvement recommendations
 - Utility scripts for environment setup, testing, and documentation merging
 
 ---

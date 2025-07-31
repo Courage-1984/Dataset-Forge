@@ -98,10 +98,34 @@ flowchart TD
 
 - **Menus:** All CLI and user interaction logic. Each menu is modular and uses a robust loop pattern.
 - **Actions:** All business logic and core dataset/image operations. Each action is testable and exposed via public APIs.
-- **Utils:** Shared utilities for memory, parallelism, color, monitoring, file ops, and more.
-- **DPID:** Multiple modular degradation implementations for HQ/LQ workflows.
-- **Tools:** Developer and user utilities for static analysis, documentation, environment setup, and troubleshooting.
-- **Tests:** Comprehensive unit and integration tests for all features and workflows.
+- **Utils:** Shared utilities for file operations, memory management, parallelism, color schemes, and monitoring.
+- **DPID:** Multiple degradation process implementations for HQ/LQ pair generation.
+
+## Menu System Architecture
+
+Dataset Forge uses a standardized menu system with the following characteristics:
+
+### Menu Structure
+
+- **Hierarchical Organization**: Menus are organized in a tree structure with clear parent-child relationships
+- **Standardized Pattern**: All menus follow the key-based pattern documented in `.cursorrules`
+- **Lazy Loading**: Menu functions are loaded on-demand for fast CLI responsiveness
+- **Global Commands**: All menus support help, quit, and navigation commands
+
+### Menu Auditing
+
+The menu system includes comprehensive auditing capabilities:
+
+- **Automatic Discovery**: The menu auditing tool (`tools/log_current_menu.py`) automatically discovers all menu files
+- **Path Input Detection**: Identifies menus requiring user input to prevent infinite exploration
+- **Analysis Depth**: Configurable exploration depth (default: 4 levels)
+- **Reporting**: Generates detailed analysis reports with statistics and recommendations
+
+### Menu Files Location
+
+- **Primary Location**: `dataset_forge/menus/` - Contains all menu implementation files
+- **Analysis Output**: `menu_system/` - Contains generated menu analysis reports
+- **Configuration**: Menu behavior is controlled by settings in the auditing tool
 
 ---
 

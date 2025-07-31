@@ -60,9 +60,45 @@
 <summary><strong>Static Analysis & Utility Scripts</strong></summary>
 
 - `tools/find_code_issues/find_code_issues.py`: dead code, coverage, docstrings, test mapping, etc.
+- `tools/log_current_menu.py`: comprehensive menu hierarchy analysis, path input detection, and improvement recommendations
 - `tools/merge_docs.py`: merges docs and generates ToC.
 - `tools/install.py`: automated environment setup.
 - All new scripts must be documented and tested.
+
+</details>
+
+<details>
+<summary><strong>Menu Auditing Tool</strong></summary>
+
+The menu auditing tool (`tools/log_current_menu.py`) provides comprehensive analysis of Dataset Forge's menu hierarchy:
+
+**Key Features:**
+
+- **Recursive Exploration**: Automatically discovers and explores all menus and submenus (up to 4 levels deep)
+- **Path Input Detection**: Identifies menus requiring user path input using regex patterns
+- **AST-Based Analysis**: Uses Python's Abstract Syntax Tree for accurate code parsing with regex fallback
+- **Function Resolution**: Handles complex menu function references including `lazy_menu()` calls
+- **Comprehensive Reporting**: Generates detailed markdown reports with statistics and recommendations
+
+**Usage:**
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Run the menu audit
+python tools/log_current_menu.py
+```
+
+**Output:** Generates `menu_system/current_menu.md` with:
+
+- Executive summary and statistics
+- Hierarchical menu tree structure
+- Detailed analysis of each menu
+- Actionable recommendations for improvement
+- Menu depth, size, and path input metrics
+
+**Configuration:** Customizable settings for output location, maximum depth, and path input detection patterns.
 
 </details>
 

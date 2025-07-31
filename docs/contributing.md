@@ -60,6 +60,28 @@
 - The script overwrites its output files in `tools/find_code_issues/` on each run.
 - See [usage.md](usage.md) and [features.md](features.md) for details.
 
+## Menu System Development
+
+- **Menu Auditing**: Use the menu auditing tool (`tools/log_current_menu.py`) to analyze menu hierarchy and identify improvement opportunities.
+- **Menu Pattern Compliance**: All menus must follow the standardized key-based pattern documented in `.cursorrules`.
+- **Menu Testing**: Ensure new menus are testable and follow the established patterns for help/quit functionality.
+- **Menu Documentation**: Update menu documentation when adding new menus or changing menu structure.
+
+### Menu Auditing Workflow
+
+1. **Before Making Changes**: Run `python tools/log_current_menu.py` to understand the current menu structure
+2. **After Adding Menus**: Re-run the audit to verify the new menu integrates properly
+3. **Review Recommendations**: Check the generated report for suggestions on menu organization
+4. **Monitor Statistics**: Track menu depth, size, and path input points over time
+
+### Menu Auditing Features
+
+- **Automatic Discovery**: Finds all menu files in `dataset_forge/menus/`
+- **Path Input Detection**: Identifies menus requiring user input to prevent infinite loops
+- **AST-Based Analysis**: Uses Python's Abstract Syntax Tree for accurate code parsing
+- **Comprehensive Reporting**: Generates detailed analysis with statistics and recommendations
+- **Configurable Depth**: Set maximum exploration depth (default: 4 levels)
+
 ---
 
 ## See Also

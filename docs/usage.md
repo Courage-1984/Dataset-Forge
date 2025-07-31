@@ -73,6 +73,7 @@ Enter your choice:
 
 - **Run all tests** with `python tools/run_tests.py` (see [getting_started.md](getting_started.md) for details).
 - **Use static analysis tools** for code quality (`tools/find_code_issues/find_code_issues.py`).
+- **Audit menu hierarchy** with `python tools/log_current_menu.py` for menu system analysis and improvement recommendations.
 - **All major features provide public, non-interactive APIs** for programmatic use and testing.
 
 ---

@@ -35,6 +35,10 @@
         {
             "name": "ONNX Model Zoo",
             "url": "https://github.com/onnx/models"
+        },
+        {
+            "name": "Upscale Hub",
+            "url": "https://github.com/Sirosky/Upscale-Hub"
         }
     ],
     "Datasets": {
@@ -86,6 +90,10 @@
             {
                 "name": "Google Dataset Search",
                 "url": "https://datasetsearch.research.google.com/"
+            },
+            {
+                "name": "BHI Filtering (Hugging Face)",
+                "url": "https://huggingface.co/blog/Phips/bhi-filtering"
             }
         ]
     },
@@ -110,6 +118,10 @@
             {
                 "name": "Phhofm's sisr",
                 "url": "https://github.com/Phhofm/sisr"
+            },
+            {
+                "name": "Kim2091's Video Destroyer",
+                "url": "https://github.com/Kim2091/video-destroyer"
             }
         ],
         "Annotation & Labeling": [
@@ -151,8 +163,16 @@
             "url": "https://github.com/the-database/traiNNer-redux"
         },
         {
+            "name": "traiNNer-redux Documentation",
+            "url": "https://trainner-redux.readthedocs.io/en/latest/"
+        },
+        {
             "name": "chaiNNer",
             "url": "https://github.com/chaiNNer-org/chaiNNer"
+        },
+        {
+            "name": "spandrel (chaiNNer backend)",
+            "url": "https://github.com/chaiNNer-org/spandrel"
         },
         {
             "name": "the-database's img-ab",
@@ -191,6 +211,18 @@
         {
             "name": "Stanford CS231n: Convolutional Neural Networks for Visual Recognition",
             "url": "http://cs231n.stanford.edu/"
+        },
+        {
+            "name": "Google Deep Learning Tuning Playbook",
+            "url": "https://developers.google.com/machine-learning/guides/deep-learning-tuning-playbook"
+        },
+        {
+            "name": "Real-ESRGAN Training Guide",
+            "url": "https://github.com/xinntao/Real-ESRGAN/blob/master/docs/Training.md#step-1-optional-generate-multi-scale-images"
+        },
+        {
+            "name": "umzi2's PepeDP Wiki",
+            "url": "https://github.com/umzi2/PepeDP/wiki"
         }
     ],
     "Benchmarks & Leaderboards": [
@@ -225,8 +257,20 @@
             "url": "https://github.com/Upscale-Community/upscale-resources"
         },
         {
+            "name": "Upscale Hub Wiki",
+            "url": "https://github.com/Sirosky/Upscale-Hub/wiki"
+        },
+        {
             "name": "Awesome-Super-Resolution",
             "url": "https://github.com/ChaofWang/Awesome-Super-Resolution"
+        },
+        {
+            "name": "Awesome Super Resolution (oneTaken)",
+            "url": "https://github.com/oneTaken/Awesome-SuperResolution"
+        },
+        {
+            "name": "Image Super Resolution Guide (MIVRC)",
+            "url": "https://github.com/MIVRC/Image-Super-Resolution-Guide"
         },
         {
             "name": "Awesome Deep learning papers and other resources",

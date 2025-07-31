@@ -30,6 +30,7 @@
 
 - **Test failures:** Check for function signature mismatches, especially with parallel utilities. Ensure all monkeypatches and fixtures match expected types.
 - **Static analysis tool fails:** Ensure all dependencies are installed. Check your virtual environment and directory structure.
+- **Menu auditing tool issues:** Check that menu functions end with `_menu` and are in `dataset_forge/menus/`. Import errors for complex function references are normal.
 - **Utility scripts not working:** Check dependencies, permissions, and environment variables.
 
 ---
@@ -85,6 +86,9 @@ See below for frequently asked questions. For more, visit the [Discussion Board]
 
 - **What if a menu or feature is missing or crashes?**  
   Make sure you are running the latest version. Check the logs in the `./logs/` directory.
+
+- **How do I analyze the menu system structure?**  
+  Use the menu auditing tool: `python tools/log_current_menu.py`. It generates a comprehensive report at `menu_system/current_menu.md`.
 
 - **How do I get help or report a bug?**  
   Open an issue on GitHub or contact the project maintainer.
