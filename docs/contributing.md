@@ -55,9 +55,9 @@
 
 ## Static Analysis & Code Quality
 
-- Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, etc.).
+- Before submitting a PR, you **must** run the static analysis tool (`tools/find_code_issues.py`) and address all actionable issues (dead code, untested code, missing docstrings, dependency issues, configuration problems, etc.).
 - All public functions/classes/methods must have Google-style docstrings.
-- The script overwrites its output files in `tools/find_code_issues/` on each run.
+- The script saves all output files to `./logs/find_code_issues/` for easy review and analysis.
 - See [usage.md](usage.md) and [features.md](features.md) for details.
 
 ## Menu System Development

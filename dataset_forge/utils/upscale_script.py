@@ -17,7 +17,7 @@ try:
     import spandrel
     import spandrel_extra_arches
 
-spandrel_extra_arches.install()
+    spandrel_extra_arches.install()
 except ImportError:
     spandrel = None
 

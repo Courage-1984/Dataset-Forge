@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 """
-find_code_issues.py - Static analysis tool for Dataset Forge
+find_code_issues.py - Comprehensive static analysis tool for Dataset Forge
 
 Finds:
 - Unused functions/methods/classes (dead code)
 - Untested code (missing test coverage)
 - Functions/methods/classes defined but never called
 - Test files without corresponding code, and vice versa
-- (Extensible: add more static analysis as needed)
+- Missing docstrings in public functions/classes/methods
+- Unused dependencies in requirements.txt
+- Configuration file issues
+- Import/usage analysis across all directories
+- Code quality issues
 
 Usage:
     python tools/find_code_issues.py [options]
@@ -19,6 +23,9 @@ Options:
     --pyflakes        Run pyflakes for unused imports/variables
     --test-mapping    Check test/code correspondence
     --ast             AST: Find defined but never called functions/classes
+    --docstrings      Check for missing docstrings
+    --dependencies    Analyze unused dependencies
+    --configs         Analyze configuration files
     --all             Run all analyses (default)
     --view            View detailed results for each analysis after run
     -h, --help        Show help
@@ -33,17 +40,26 @@ import subprocess
 import argparse
 import tempfile
 import ast
+import json
+import re
 from pathlib import Path
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, List, Set, Tuple
+from collections import defaultdict
 
 # --- CONFIG ---
 CODE_DIR = "dataset_forge"
 TESTS_DIR = "tests"
-LOG_DIR = "tools/find_code_issues"
+CONFIGS_DIR = "configs"
+TOOLS_DIR = "tools"
+LOG_DIR = "logs/find_code_issues"
 LOG_FILE = os.path.join(LOG_DIR, "find_code_issues.log")
 VIEW_FILE = os.path.join(LOG_DIR, "find_code_issues_view.txt")
 REPORT_FILE = os.path.join(LOG_DIR, "find_code_issues_report.txt")
+DEPENDENCIES_FILE = os.path.join(LOG_DIR, "dependencies_analysis.txt")
+
+# Directories to analyze
+ANALYSIS_DIRS = [CODE_DIR, TESTS_DIR, CONFIGS_DIR, TOOLS_DIR]
 
 
 # --- LOGGING ---
@@ -75,6 +91,12 @@ def write_report_output(content: str):
         f.write(content)
 
 
+def write_dependencies_output(content: str):
+    ensure_log_dir()
+    with open(DEPENDENCIES_FILE, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
 # --- UTILS ---
 def print_header(msg: str):
     print(f"\n{'='*60}\n{msg}\n{'='*60}")
@@ -93,7 +115,29 @@ def run_cmd(cmd, capture=True):
 
 
 def find_py_files(directory):
+    """Find all Python files in directory recursively."""
+    if not os.path.exists(directory):
+        return []
     return [str(p) for p in Path(directory).rglob("*.py") if p.is_file()]
+
+
+def find_json_files(directory):
+    """Find all JSON files in directory recursively."""
+    if not os.path.exists(directory):
+        return []
+    return [str(p) for p in Path(directory).rglob("*.json") if p.is_file()]
+
+
+def find_all_files(directory, extensions=None):
+    """Find all files with given extensions in directory recursively."""
+    if not os.path.exists(directory):
+        return []
+    if extensions is None:
+        extensions = [".py", ".json", ".txt", ".md", ".yaml", ".yml"]
+    files = []
+    for ext in extensions:
+        files.extend([str(p) for p in Path(directory).rglob(f"*{ext}") if p.is_file()])
+    return files
 
 
 # --- ANALYSIS STORAGE ---
@@ -105,7 +149,10 @@ class AnalysisResults:
         self.pyflakes: Optional[str] = None
         self.test_mapping: Optional[str] = None
         self.ast: Optional[str] = None
-        self.docstrings: Optional[str] = None  # <-- Add for docstring analysis
+        self.docstrings: Optional[str] = None
+        self.dependencies: Optional[str] = None
+        self.configs: Optional[str] = None
+        self.import_analysis: Optional[str] = None
         self.issues = []  # List of actionable issues
 
 
@@ -116,17 +163,27 @@ results = AnalysisResults()
 def run_vulture(verbose=False):
     if not verbose:
         print("Running: VULTURE (dead code analysis)...")
-    cmd = f"vulture {CODE_DIR}/"
-    output = run_cmd(cmd)
-    results.vulture = output or "No output from vulture."
+
+    # Run vulture on all analysis directories
+    all_output = []
+    for directory in ANALYSIS_DIRS:
+        if os.path.exists(directory):
+            cmd = f"vulture {directory}/"
+            output = run_cmd(cmd)
+            if output:
+                all_output.append(f"--- {directory.upper()} ---\n{output}")
+
+    results.vulture = "\n".join(all_output) or "No output from vulture."
+
     # Actionable: parse for unused code
     unused = []
-    for line in (output or "").splitlines():
+    for line in (results.vulture or "").splitlines():
         if line.strip() and ("unused" in line or ":" in line):
             unused.append(line)
     if unused:
         results.issues.append(
-            f"[VULTURE] Unused code detected (dead code):\n" + "\n".join(unused)
+            f"[VULTURE] Unused code detected (dead code):\n"
+            + "\n".join(unused[:20])  # Limit to first 20
         )
 
 
@@ -137,17 +194,21 @@ def run_coverage(verbose=False):
     cov_file = ".coverage"
     if os.path.exists(cov_file):
         os.remove(cov_file)
-    cmd = f"pytest --cov={CODE_DIR} {TESTS_DIR}/ --cov-report=term-missing"
+
+    # Run coverage on dataset_forge directory
+    cmd = f"pytest --cov={CODE_DIR} {TESTS_DIR}/ --cov-report=term-missing --cov-report=html:logs/find_code_issues/coverage_html"
     output = run_cmd(cmd)
     results.coverage = output or "No output from pytest-cov."
+
     # Actionable: parse for missing coverage
     missing = []
     for line in (output or "").splitlines():
-        if "Missed" in line or "100%" not in line and "%" in line:
+        if "Missed" in line or ("100%" not in line and "%" in line):
             missing.append(line)
     if missing:
         results.issues.append(
-            f"[COVERAGE] Untested code detected:\n" + "\n".join(missing)
+            f"[COVERAGE] Untested code detected:\n"
+            + "\n".join(missing[:10])  # Limit to first 10
         )
 
 
@@ -155,21 +216,30 @@ def run_coverage(verbose=False):
 def run_pyan3(verbose=False):
     if not verbose:
         print("Running: PYAN3 (call graph analysis)...")
-    py_files = find_py_files(CODE_DIR)
-    if not py_files:
-        results.pyan3 = "No Python files found in code directory."
+
+    # Get all Python files from all directories
+    all_py_files = []
+    for directory in ANALYSIS_DIRS:
+        all_py_files.extend(find_py_files(directory))
+
+    if not all_py_files:
+        results.pyan3 = "No Python files found in analysis directories."
         return
+
     with tempfile.NamedTemporaryFile("w+t", delete=False) as tmp:
-        tmp.write("\n".join(py_files))
+        tmp.write("\n".join(all_py_files))
         tmp_path = tmp.name
+
     cmd = f"pyan3 @{tmp_path} --uses --no-defines --colored --grouped --dot"
     output = run_cmd(cmd)
     results.pyan3 = output or "No output from pyan3."
+
     # Actionable: suggest user to visualize DOT output for orphaned nodes
     if output:
         results.issues.append(
             "[PYAN3] Review the DOT call graph for orphaned (never-called) functions/classes."
         )
+
     os.unlink(tmp_path)
 
 
@@ -177,10 +247,14 @@ def run_pyan3(verbose=False):
 def run_pyflakes(verbose=False):
     if not verbose:
         print("Running: PYFLAKES (unused imports/variables)...")
-    py_files = find_py_files(CODE_DIR)
+
+    all_py_files = []
+    for directory in ANALYSIS_DIRS:
+        all_py_files.extend(find_py_files(directory))
+
     unused = []
     output_accum = []
-    for f in py_files:
+    for f in all_py_files:
         output = run_cmd(f"pyflakes {f}")
         if output:
             output_accum.append(f"{f}:\n{output}")
@@ -190,10 +264,12 @@ def run_pyflakes(verbose=False):
                     or "assigned to but never used" in line
                 ):
                     unused.append(f"{f}: {line}")
+
     results.pyflakes = "\n".join(output_accum) or "No output from pyflakes."
     if unused:
         results.issues.append(
-            f"[PYFLAKES] Unused imports/variables detected:\n" + "\n".join(unused)
+            f"[PYFLAKES] Unused imports/variables detected:\n"
+            + "\n".join(unused[:20])  # Limit to first 20
         )
 
 
@@ -201,7 +277,11 @@ def run_pyflakes(verbose=False):
 def test_code_mapping(verbose=False):
     if not verbose:
         print("Running: TEST/CODE MAPPING (test/code correspondence)...")
+
+    # Get all Python files from dataset_forge
     code_files = set([Path(f).stem for f in find_py_files(CODE_DIR)])
+
+    # Get all test files from tests directory
     test_files = set(
         [
             Path(f).stem.replace("test_", "")
@@ -209,12 +289,15 @@ def test_code_mapping(verbose=False):
             if Path(f).name.startswith("test_")
         ]
     )
+
     missing_tests = code_files - test_files
     orphan_tests = test_files - code_files
+
     results.test_mapping = (
         f"Code files with NO corresponding test: {sorted(missing_tests)}\n"
         f"Test files with NO corresponding code: {sorted(orphan_tests)}"
     )
+
     if missing_tests:
         results.issues.append(
             f"[TEST MAPPING] Code files with NO corresponding test: {sorted(missing_tests)}"
@@ -229,15 +312,22 @@ def test_code_mapping(verbose=False):
 def ast_defined_but_never_called(verbose=False):
     if not verbose:
         print("Running: AST (defined but never called)...")
+
     defined = set()
     called = set()
-    for f in find_py_files(CODE_DIR):
+
+    all_py_files = []
+    for directory in ANALYSIS_DIRS:
+        all_py_files.extend(find_py_files(directory))
+
+    for f in all_py_files:
         with open(f, "r", encoding="utf-8") as file:
             try:
                 tree = ast.parse(file.read(), filename=f)
             except Exception as e:
                 log(f"[!] Could not parse {f}: {e}")
                 continue
+
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
                     defined.add(node.name)
@@ -248,6 +338,7 @@ def ast_defined_but_never_called(verbose=False):
                         called.add(node.func.id)
                     elif isinstance(node.func, ast.Attribute):
                         called.add(node.func.attr)
+
     never_called = defined - called
     results.ast = f"Functions/classes defined but never called: {sorted(never_called)}"
     if never_called:
@@ -260,19 +351,26 @@ def ast_defined_but_never_called(verbose=False):
 def check_missing_docstrings(verbose=False):
     if not verbose:
         print("Running: DOCSTRING CHECK (missing docstrings)...")
+
     missing = []
-    for f in find_py_files(CODE_DIR):
+    all_py_files = []
+    for directory in ANALYSIS_DIRS:
+        all_py_files.extend(find_py_files(directory))
+
+    for f in all_py_files:
         with open(f, "r", encoding="utf-8") as file:
             try:
                 tree = ast.parse(file.read(), filename=f)
             except Exception as e:
                 log(f"[!] Could not parse {f}: {e}")
                 continue
+
             # Build parent map
             parent_map = {}
             for node in ast.walk(tree):
                 for child in ast.iter_child_nodes(node):
                     parent_map[child] = node
+
             for node in ast.walk(tree):
                 # Only check public (non-underscore) functions/classes/methods
                 if isinstance(
@@ -292,6 +390,7 @@ def check_missing_docstrings(verbose=False):
                             missing.append(f"{f}: class {name} (missing docstring)")
                         else:
                             missing.append(f"{f}: function {name} (missing docstring)")
+
     results.docstrings = (
         "\n".join(missing)
         if missing
@@ -300,7 +399,221 @@ def check_missing_docstrings(verbose=False):
     if missing:
         results.issues.append(
             f"[DOCSTRINGS] Missing docstrings detected in public functions/classes/methods:\n"
-            + "\n".join(missing)
+            + "\n".join(missing[:20])  # Limit to first 20
+        )
+
+
+# --- 8. DEPENDENCIES: Analyze unused dependencies ---
+def analyze_dependencies(verbose=False):
+    if not verbose:
+        print("Running: DEPENDENCIES (analyze unused dependencies)...")
+
+    # Read requirements.txt
+    requirements_file = "requirements.txt"
+    if not os.path.exists(requirements_file):
+        results.dependencies = "requirements.txt not found."
+        return
+
+    with open(requirements_file, "r", encoding="utf-8") as f:
+        requirements_content = f.read()
+
+    # Extract package names from requirements.txt
+    required_packages = set()
+    for line in requirements_content.splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and not line.startswith("="):
+            # Extract package name (before any version specifiers)
+            package = (
+                line.split("==")[0]
+                .split(">=")[0]
+                .split("<=")[0]
+                .split("~=")[0]
+                .split("[")[0]
+                .strip()
+            )
+            if package:
+                required_packages.add(package.lower())
+
+    # Find all import statements in the codebase
+    imported_packages = set()
+    all_py_files = []
+    for directory in ANALYSIS_DIRS:
+        all_py_files.extend(find_py_files(directory))
+
+    for f in all_py_files:
+        with open(f, "r", encoding="utf-8") as file:
+            try:
+                tree = ast.parse(file.read(), filename=f)
+            except Exception as e:
+                log(f"[!] Could not parse {f}: {e}")
+                continue
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        imported_packages.add(alias.name.split(".")[0].lower())
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        imported_packages.add(node.module.split(".")[0].lower())
+
+    # Find unused packages
+    unused_packages = required_packages - imported_packages
+    missing_packages = imported_packages - required_packages
+
+    # Special handling for packages that might be used indirectly
+    indirect_usage = {
+        "pytest",
+        "pytest-cov",
+        "coverage",
+        "vulture",
+        "pyan3",
+        "pyflakes",
+        "setuptools",
+        "wheel",
+        "pip",
+    }
+    unused_packages = unused_packages - indirect_usage
+
+    results.dependencies = (
+        f"Required packages: {sorted(required_packages)}\n"
+        f"Imported packages: {sorted(imported_packages)}\n"
+        f"Potentially unused packages: {sorted(unused_packages)}\n"
+        f"Imported but not in requirements: {sorted(missing_packages)}"
+    )
+
+    if unused_packages:
+        results.issues.append(
+            f"[DEPENDENCIES] Potentially unused packages in requirements.txt: {sorted(unused_packages)}"
+        )
+    if missing_packages:
+        results.issues.append(
+            f"[DEPENDENCIES] Packages imported but not in requirements.txt: {sorted(missing_packages)}"
+        )
+
+
+# --- 9. CONFIGS: Analyze configuration files ---
+def analyze_configs(verbose=False):
+    if not verbose:
+        print("Running: CONFIGS (analyze configuration files)...")
+
+    config_issues = []
+    config_files = find_json_files(CONFIGS_DIR)
+
+    for config_file in config_files:
+        try:
+            with open(config_file, "r", encoding="utf-8") as f:
+                config_data = json.load(f)
+
+            # Basic validation - accept both dict and list (for augmentation recipes)
+            if not isinstance(config_data, (dict, list)):
+                config_issues.append(f"{config_file}: Root is not a dictionary or list")
+                continue
+
+            # Check for common issues
+            if not config_data:
+                config_issues.append(f"{config_file}: Empty configuration")
+
+            # Check for required fields in specific config types
+            if "example" in config_file.lower():
+                # Example configs should have some content
+                if len(config_data) < 2:
+                    config_issues.append(
+                        f"{config_file}: Example config seems too minimal"
+                    )
+
+        except json.JSONDecodeError as e:
+            config_issues.append(f"{config_file}: Invalid JSON - {e}")
+        except Exception as e:
+            config_issues.append(f"{config_file}: Error reading file - {e}")
+
+    # Check for missing config files
+    expected_configs = [
+        "_example_config.json",
+        "_example_user_profile.json",
+        "_example_community_links.json",
+    ]
+
+    missing_configs = []
+    for expected in expected_configs:
+        if not os.path.exists(os.path.join(CONFIGS_DIR, expected)):
+            missing_configs.append(expected)
+
+    if missing_configs:
+        config_issues.append(f"Missing expected config files: {missing_configs}")
+
+    results.configs = (
+        "\n".join(config_issues)
+        if config_issues
+        else "All configuration files are valid."
+    )
+
+    if config_issues:
+        results.issues.append(
+            f"[CONFIGS] Configuration file issues detected:\n"
+            + "\n".join(config_issues)
+        )
+
+
+# --- 10. IMPORT ANALYSIS: Cross-directory import analysis ---
+def analyze_imports(verbose=False):
+    if not verbose:
+        print("Running: IMPORT ANALYSIS (cross-directory import analysis)...")
+
+    import_map = defaultdict(set)
+    all_py_files = []
+    for directory in ANALYSIS_DIRS:
+        all_py_files.extend(find_py_files(directory))
+
+    for f in all_py_files:
+        with open(f, "r", encoding="utf-8") as file:
+            try:
+                tree = ast.parse(file.read(), filename=f)
+            except Exception as e:
+                log(f"[!] Could not parse {f}: {e}")
+                continue
+
+            file_imports = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        file_imports.add(alias.name)
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        file_imports.add(node.module)
+
+            if file_imports:
+                import_map[f] = file_imports
+
+    # Analyze for potential issues
+    issues = []
+
+    # Check for circular imports
+    for file1, imports1 in import_map.items():
+        for file2, imports2 in import_map.items():
+            if file1 != file2:
+                file1_module = Path(file1).stem
+                file2_module = Path(file2).stem
+                if file1_module in imports2 and file2_module in imports1:
+                    issues.append(f"Potential circular import: {file1} <-> {file2}")
+
+    # Check for unused imports
+    for file_path, imports in import_map.items():
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            for imp in imports:
+                if imp not in content.replace(f"import {imp}", "").replace(
+                    f"from {imp}", ""
+                ):
+                    issues.append(f"{file_path}: Potentially unused import '{imp}'")
+
+    results.import_analysis = (
+        "\n".join(issues) if issues else "No import issues detected."
+    )
+
+    if issues:
+        results.issues.append(
+            f"[IMPORTS] Import analysis issues detected:\n"
+            + "\n".join(issues[:10])  # Limit to first 10
         )
 
 
@@ -308,16 +621,21 @@ def check_missing_docstrings(verbose=False):
 def generate_report():
     report_lines = []
     report_lines.append("=" * 60)
-    report_lines.append("[FULL REPORT] Actionable Insights and Issues")
+    report_lines.append("[COMPREHENSIVE REPORT] Actionable Insights and Issues")
     report_lines.append("=" * 60)
+
     if not results.issues:
         report_lines.append("No major issues detected. Your codebase looks clean!\n")
     else:
         for issue in results.issues:
             report_lines.append(f"- {issue}\n")
+
     report_lines.append("\n[Summary]")
     report_lines.append(
-        "- See tools/find_code_issues/find_code_issues.log for full verbose output of all analyses."
+        "- See logs/find_code_issues/find_code_issues.log for full verbose output of all analyses."
+    )
+    report_lines.append(
+        "- See logs/find_code_issues/dependencies_analysis.txt for detailed dependency analysis."
     )
     report_lines.append(
         "- Review the above actionable issues and address them as appropriate."
@@ -340,7 +658,14 @@ def generate_report():
     report_lines.append(
         "- For missing docstrings, add Google-style docstrings to all public functions/classes/methods."
     )
+    report_lines.append(
+        "- For dependencies, review unused packages and add missing ones to requirements.txt."
+    )
+    report_lines.append(
+        "- For configs, ensure all configuration files are valid and complete."
+    )
     report_lines.append("\n[Done] Review the above output for actionable issues.\n")
+
     report = "\n".join(report_lines)
     print("\n" + report)
     write_report_output(report)
@@ -352,6 +677,7 @@ def view_detailed_results():
     view_lines.append("=" * 60)
     view_lines.append("[DETAILED RESULTS]")
     view_lines.append("=" * 60)
+
     for name, value in [
         ("VULTURE", results.vulture),
         ("COVERAGE", results.coverage),
@@ -359,19 +685,27 @@ def view_detailed_results():
         ("PYFLAKES", results.pyflakes),
         ("TEST MAPPING", results.test_mapping),
         ("AST", results.ast),
-        ("DOCSTRINGS", results.docstrings),  # <-- Add docstring results
+        ("DOCSTRINGS", results.docstrings),
+        ("DEPENDENCIES", results.dependencies),
+        ("CONFIGS", results.configs),
+        ("IMPORT ANALYSIS", results.import_analysis),
     ]:
         view_lines.append(f"\n--- {name} ---\n")
         view_lines.append(value or "No output.")
+
     view = "\n".join(view_lines)
     print("\n" + view)
     write_view_output(view)
+
+    # Write dependencies analysis to separate file
+    if results.dependencies:
+        write_dependencies_output(results.dependencies)
 
 
 # --- MAIN CLI ---
 def main():
     parser = argparse.ArgumentParser(
-        description="Find code issues (dead code, untested code, etc.)"
+        description="Comprehensive code analysis for Dataset Forge"
     )
     parser.add_argument(
         "--vulture", action="store_true", help="Run vulture for dead code"
@@ -400,6 +734,16 @@ def main():
         action="store_true",
         help="Check for missing docstrings in public functions/classes/methods",
     )
+    parser.add_argument(
+        "--dependencies",
+        action="store_true",
+        help="Analyze unused dependencies in requirements.txt",
+    )
+    parser.add_argument(
+        "--configs",
+        action="store_true",
+        help="Analyze configuration files",
+    )
     parser.add_argument("--all", action="store_true", help="Run all analyses (default)")
     parser.add_argument(
         "--view",
@@ -409,7 +753,7 @@ def main():
     args = parser.parse_args()
 
     clear_log()
-    print_header("[find_code_issues.py] Static Analysis Starting...")
+    print_header("[find_code_issues.py] Comprehensive Static Analysis Starting...")
 
     if not any(
         [
@@ -420,6 +764,8 @@ def main():
             args.test_mapping,
             args.ast,
             args.docstrings,
+            args.dependencies,
+            args.configs,
             args.all,
         ]
     ):
@@ -439,6 +785,12 @@ def main():
         ast_defined_but_never_called()
     if args.all or args.docstrings:
         check_missing_docstrings()
+    if args.all or args.dependencies:
+        analyze_dependencies()
+    if args.all or args.configs:
+        analyze_configs()
+    if args.all:
+        analyze_imports()
 
     generate_report()
 

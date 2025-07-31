@@ -85,9 +85,66 @@ The global command system is built on:
 ### 🧪 Testing & Developer Tools
 
 - **Run all tests** with `python tools/run_tests.py` (see [getting_started.md](getting_started.md) for details).
-- **Use static analysis tools** for code quality (`tools/find_code_issues/find_code_issues.py`).
+- **Use static analysis tools** for code quality (`tools/find_code_issues.py`).
 - **Audit menu hierarchy** with `python tools/log_current_menu.py` for menu system analysis and improvement recommendations.
 - **All major features provide public, non-interactive APIs** for programmatic use and testing.
+
+### 🔍 Static Analysis Tool
+
+Dataset Forge includes a comprehensive static analysis tool that provides deep insights into code quality and maintainability:
+
+#### **Quick Start**
+
+```bash
+# Run comprehensive analysis (all checks)
+python tools/find_code_issues.py
+
+# Run specific analysis types
+python tools/find_code_issues.py --dependencies --configs
+python tools/find_code_issues.py --vulture --pyflakes
+python tools/find_code_issues.py --coverage --test-mapping
+
+# View detailed results
+python tools/find_code_issues.py --all --view
+```
+
+#### **Analysis Types**
+
+1. **Dead Code Detection** (`--vulture`): Finds unused functions, methods, classes, and variables
+2. **Test Coverage** (`--coverage`): Identifies untested code and generates coverage reports
+3. **Call Graph Analysis** (`--callgraph`): Analyzes function/class relationships using pyan3
+4. **Code Quality** (`--pyflakes`): Detects unused imports, variables, and syntax issues
+5. **Test Mapping** (`--test-mapping`): Maps test files to source code and identifies gaps
+6. **AST Analysis** (`--ast`): Custom analysis for defined but never called functions/classes
+7. **Documentation** (`--docstrings`): Identifies missing docstrings in public APIs
+8. **Dependencies** (`--dependencies`): Analyzes package usage vs. requirements.txt
+9. **Configs** (`--configs`): Validates configuration files and structure
+10. **Import Analysis** (automatic): Detects circular imports and unused imports
+
+#### **Output Files**
+
+All results are saved to `./logs/find_code_issues/`:
+
+- `find_code_issues.log` - Full verbose output of all analyses
+- `find_code_issues_view.txt` - Detailed results for each analysis type
+- `find_code_issues_report.txt` - Actionable insights and issues summary
+- `dependencies_analysis.txt` - Detailed dependency analysis results
+- `coverage_html/` - HTML coverage reports (when coverage analysis is run)
+
+#### **Integration with Development**
+
+- **Pre-commit Analysis**: Run before committing code to catch issues early
+- **Continuous Integration**: Integrate with CI/CD pipelines for automated quality checks
+- **Code Review**: Use analysis results to guide code review discussions
+- **Maintenance**: Regular analysis helps maintain code quality and identify technical debt
+
+#### **Requirements**
+
+```bash
+pip install vulture pytest pytest-cov coverage pyan3 pyflakes
+```
+
+The tool automatically handles missing dependencies and provides helpful error messages for installation.
 
 ### 🔧 Enhanced Development with MCP Integration
 

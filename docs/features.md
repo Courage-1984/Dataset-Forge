@@ -334,6 +334,85 @@ This script provides a menu to select the test mode, or you can pass an option (
 
 See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-patterns) for details.
 
+## 🔍 Comprehensive Static Analysis Tool (Updated July 2025)
+
+Dataset Forge includes a powerful, comprehensive static analysis tool that provides deep insights into code quality, maintainability, and potential issues across the entire codebase.
+
+### **Enhanced Analysis Capabilities**
+
+The `find_code_issues.py` tool now provides comprehensive analysis across all project directories:
+
+- **📁 Multi-Directory Analysis**: Analyzes `./dataset_forge/`, `./tests/`, `./configs/`, and `./tools/`
+- **🔍 Dead Code Detection**: Finds unused functions, methods, classes, and variables
+- **📊 Test Coverage Analysis**: Identifies untested code and missing test coverage
+- **🧪 Test/Code Mapping**: Maps test files to source code and identifies orphaned tests
+- **📝 Documentation Analysis**: Checks for missing docstrings in public functions/classes/methods
+- **📦 Dependency Analysis**: Analyzes `requirements.txt` for unused packages and missing dependencies
+- **⚙️ Configuration Validation**: Validates JSON configuration files for syntax and structure
+- **🔄 Import Analysis**: Detects circular imports and unused import statements
+- **📈 Call Graph Analysis**: Generates call graphs for function/class relationship analysis
+
+### **Advanced Features**
+
+- **🎯 Actionable Insights**: Provides specific, actionable recommendations for code improvement
+- **📊 Comprehensive Reporting**: Generates detailed reports with categorized issues and suggestions
+- **🔧 Multiple Analysis Tools**: Integrates vulture, pytest-cov, pyan3, pyflakes, and custom AST analysis
+- **📁 Organized Output**: All results saved to `./logs/find_code_issues/` for easy review
+- **⚡ Performance Optimized**: Efficient analysis with progress tracking and error handling
+
+### **Usage**
+
+```bash
+# Run comprehensive analysis (all checks)
+python tools/find_code_issues.py
+
+# Run specific analysis types
+python tools/find_code_issues.py --dependencies --configs
+python tools/find_code_issues.py --vulture --pyflakes
+python tools/find_code_issues.py --coverage --test-mapping
+
+# View detailed results
+python tools/find_code_issues.py --all --view
+```
+
+### **Output Files**
+
+All analysis results are saved to `./logs/find_code_issues/`:
+
+- `find_code_issues.log` - Full verbose output of all analyses
+- `find_code_issues_view.txt` - Detailed results for each analysis type
+- `find_code_issues_report.txt` - Actionable insights and issues summary
+- `dependencies_analysis.txt` - Detailed dependency analysis results
+- `coverage_html/` - HTML coverage reports (when coverage analysis is run)
+
+### **Analysis Types**
+
+1. **Vulture (Dead Code)**: Finds unused code, functions, and variables
+2. **Coverage**: Identifies untested code and generates coverage reports
+3. **Pyan3 (Call Graph)**: Analyzes function/class relationships and dependencies
+4. **Pyflakes**: Detects unused imports, variables, and syntax issues
+5. **Test Mapping**: Maps test files to source code and identifies gaps
+6. **AST Analysis**: Custom analysis for defined but never called functions/classes
+7. **Docstring Check**: Identifies missing documentation in public APIs
+8. **Dependencies**: Analyzes package usage vs. requirements.txt
+9. **Configs**: Validates configuration files and structure
+10. **Import Analysis**: Detects circular imports and unused imports
+
+### **Integration with Development Workflow**
+
+- **Pre-commit Analysis**: Run before committing code to catch issues early
+- **Continuous Integration**: Integrate with CI/CD pipelines for automated quality checks
+- **Code Review**: Use analysis results to guide code review discussions
+- **Maintenance**: Regular analysis helps maintain code quality and identify technical debt
+
+### **Requirements**
+
+```bash
+pip install vulture pytest pytest-cov coverage pyan3 pyflakes
+```
+
+The tool automatically handles missing dependencies and provides helpful error messages for installation.
+
 ## Testing & Validation
 
 - Dataset Forge includes a comprehensive, cross-platform test suite using pytest.
@@ -348,33 +427,42 @@ See [Usage Guide](usage.md#testing) and [Style Guide](style_guide.md#testing-pat
 
 > **Documentation Convention:** When adding new features or modules, update the architecture diagrams (Mermaid) in README.md and docs/architecture.md as needed. Use standard badges in the README and document their meaning in the docs.
 
-- **Static Analysis Tool:** Located at `tools/find_code_issues/find_code_issues.py`.
-- **Checks:**
+- **Comprehensive Static Analysis Tool:** Located at `tools/find_code_issues.py`.
+- **Enhanced Analysis Capabilities:**
+  - Multi-directory analysis (`./dataset_forge/`, `./tests/`, `./configs/`, `./tools/`)
   - Unused (dead) code, functions, classes, and methods
   - Untested code (missing test coverage)
   - Functions/classes defined but never called
   - Test/code mapping (tests without code, code without tests)
   - Missing docstrings in public functions/classes/methods
-  - Unused imports/variables, and more
+  - Unused imports/variables
+  - Dependency analysis (unused packages, missing dependencies)
+  - Configuration file validation
+  - Import analysis (circular imports, unused imports)
+  - Call graph analysis for function/class relationships
 - **How to run:**
   ```sh
-  python tools/find_code_issues/find_code_issues.py [options]
+  python tools/find_code_issues.py [options]
   # Run with no options to perform all checks
+  # Use --dependencies --configs for dependency and config analysis
+  # Use --all --view for comprehensive analysis with detailed results
   ```
 - **Output:**
-  - Overwrites files in `tools/find_code_issues/` on each run:
-    - `find_code_issues.log` (raw output)
+  - All results saved to `./logs/find_code_issues/`:
+    - `find_code_issues.log` (full verbose output)
     - `find_code_issues_report.txt` (actionable summary)
     - `find_code_issues_view.txt` (detailed results)
+    - `dependencies_analysis.txt` (dependency analysis results)
+    - `coverage_html/` (HTML coverage reports)
 - **Requirements:**
-  - `
+  - `pip install vulture pytest pytest-cov coverage pyan3 pyflakes`
 
 ## 🛠️ Utility Scripts (tools/)
 
 Dataset Forge includes several utility scripts in the `tools/` directory to assist with development, documentation, and environment setup. These scripts are user-facing and documented in detail in [usage.md](usage.md#utility-scripts-tools).
 
 - **run_tests.py**: Flexible test runner for the test suite. Lets you choose between basic, recommended, and verbose pytest runs via menu or CLI argument. See [usage.md](usage.md#run_testspy-flexible-test-runner-new-july-2025) for usage and options.
-- **find_code_issues.py**: Comprehensive static analysis tool for code quality and maintainability. Checks for dead code, untested code, missing docstrings, test/code mapping, and more. See [usage.md](usage.md#find_code_issuespy-static-analysis-tool) for full usage and options.
+- **find_code_issues.py**: Comprehensive static analysis tool for code quality and maintainability. Analyzes all project directories (`./dataset_forge/`, `./tests/`, `./configs/`, `./tools/`) for dead code, untested code, missing docstrings, test/code mapping, dependency analysis, configuration validation, and import analysis. See [usage.md](usage.md#find_code_issuespy-static-analysis-tool) for full usage and options.
 - **merge_docs.py**: Merges all documentation files in `docs/` into a single `README_full.md` and generates a hierarchical Table of Contents (`toc.md`). Keeps documentation in sync. See [usage.md](usage.md#merge_docspy-documentation-merging-tool).
 - **install.py**: Automated environment setup script. Creates a virtual environment, installs CUDA-enabled torch, and installs all project requirements. See [usage.md](usage.md#installpy-environment-setup-tool).
 - **print_zsteg_env.py**: Prints the current PATH and the location of the `zsteg` binary for troubleshooting steganography tool integration. See [usage.md](usage.md#print_zsteg_envpy-zsteg-environment-check).

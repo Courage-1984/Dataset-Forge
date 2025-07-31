@@ -132,7 +132,7 @@ def my_menu():
 <details>
 <summary><strong>Static Analysis & Utility Scripts</strong></summary>
 
-- `tools/find_code_issues/find_code_issues.py`: dead code, coverage, docstrings, test mapping, etc.
+- `tools/find_code_issues.py`: comprehensive static analysis including dead code, coverage, docstrings, test mapping, dependency analysis, configuration validation, and import analysis
 - `tools/log_current_menu.py`: comprehensive menu hierarchy analysis, path input detection, and improvement recommendations
 - `tools/merge_docs.py`: merges docs and generates ToC.
 - `tools/install.py`: automated environment setup.

@@ -1,6 +1,6 @@
 @echo off
 REM Activate the virtual environment
-call venv312\Scripts\activate.bat
+call venv312\Scripts\activate
 
 REM Run Dataset Forge via CLI entry point (preferred)
 @REM dataset-forge

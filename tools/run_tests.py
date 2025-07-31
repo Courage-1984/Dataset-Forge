@@ -6,9 +6,9 @@ Usage:
     python tools/run_tests.py [option]
 
 Options:
-    1   Basic: venv312\Scripts\activate + pytest
-    2   Recommended: venv312\Scripts\activate + venv312\Scripts\python -m pytest --maxfail=5 --disable-warnings -v tests/
-    3   Verbose: venv312\Scripts\activate + venv312\Scripts\python -m pytest -s --maxfail=5 --disable-warnings -v tests/
+    1   Basic: venv312\\Scripts\\activate + pytest
+    2   Recommended: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest --maxfail=5 --disable-warnings -v tests/
+    3   Verbose: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest -s --maxfail=5 --disable-warnings -v tests/
 
 If no option is given, a menu will be shown.
 
