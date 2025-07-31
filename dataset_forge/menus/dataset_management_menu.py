@@ -303,14 +303,15 @@ def clean_organize_menu():
         "0": ("⬅️  Back", None),
     }
     while True:
-        action = show_menu(
+        choice = show_menu(
             "🧹 Clean & Organize",
             options,
             header_color=Mocha.sapphire,
             char="-",
         )
-        if action is None or action == "0":
+        if choice is None or choice == "0":
             break
+        action = options[choice][1]
         if callable(action):
             action()
 

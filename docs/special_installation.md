@@ -28,7 +28,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ---
 
-## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)
+## 2. VapourSynth & getnative
+
+> (for [getnative](https://github.com/Infiziert90/getnative) functionality/native resolution detection)
 
 **VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
@@ -38,9 +40,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 2. Open a terminal and run:
 
 ```bat
-py vsrepo.py install descale
-py vsrepo.py install ffms2
-py vsrepo.py install lsmas
+python vsrepo.py install descale
+python vsrepo.py install ffms2
+python vsrepo.py install lsmas
 ```
 
 3. Activate your virtual environment:
@@ -100,7 +102,9 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 4. Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
+## 4. Using resdet for Native Resolution Detection
+
+> Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
 
 ### Method 1: Windows (WSL - Recommended for CLI Integration)
 
@@ -171,7 +175,9 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 5. Advanced Metadata Operations (for [exiftool](https://exiftool.org/) integration)
+## 5. Advanced Metadata Operations with ExifTool
+
+> (for [exiftool](https://exiftool.org/) integration)
 
 ### Method 1: Windows
 
@@ -200,6 +206,59 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+---
+
+## 6. Metadata Strip + Lossless png compression with Oxipng
+
+> (for [Oxipng](https://github.com/oxipng/oxipng) integration)
+> essential for 'Sanitise Image Workflow'
+
+### Method 1: Windows
+
+1. Download oxipng.exe:
+
+   https://github.com/oxipng/oxipng/releases
+
+2. Download the appropriate archive (e.g., `oxipng-9.1.5-x86_64-pc-windows-msvc.zip`).
+
+3. Extract the contents.
+
+4. Add `oxipng.exe` to a folder in your PATH, or add its folder to your PATH.
+
+---
+
+## 7. Steganography Integration for zsteg and Steghide
+
+> (for [zsteg](https://github.com/zed-0xff/zsteg) & [Steghide](https://steghide.sourceforge.net/) integration)
+> optional for 'Sanitise Image Workflow'
+
+### zsteg installation (Windows)
+
+1. Install Ruby (via RubyInstaller for Windows)
+
+* Go to: [https://rubyinstaller.org/](https://rubyinstaller.org/)
+* Download the **latest Ruby+Devkit** version (e.g. `Ruby 3.3.0 with Devkit`).
+* Run the installer.
+* On the final screen, check **"Add Ruby executables to your PATH"**.
+* Also allow it to **install MSYS2 and development tools** when prompted.
+
+2. Restart PowerShell/Terminal/Console/CLI
+
+3. Install `zsteg`
+   ```sh
+   gem install zsteg
+   ```
+
+### steghide installation (Windows)
+
+1. Download Steghide
+
+   [Steghide Windows package](http://prdownloads.sourceforge.net/steghide/steghide-0.5.1-win32.zip?download)
+
+2. Extract the contents (`steghide` folder).
+
+3. Add `steghide` folder path to your PATH.
 
 ---
 

@@ -9,16 +9,21 @@
 
 - [Special Installation Instructions](special_installation.md)
   - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
-  - [2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)](special_installation.md#2-vapoursynth--getnativehttpsgithubcominfiziert90getnative-for-getnative-functionalitynative-resolution-detection)
+  - [2. VapourSynth & getnative](special_installation.md#2-vapoursynth--getnative)
   - [3. python-magic (for `Enhanced Directory Tree`)](special_installation.md#3-python-magic-for-enhanced-directory-tree)
-  - [4. Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection](special_installation.md#4-installing-and-using-resdethttpsgithubcom0x09resdet-for-native-resolution-detection)
+  - [4. Using resdet for Native Resolution Detection](special_installation.md#4-using-resdet-for-native-resolution-detection)
     - [Method 1: Windows (WSL - Recommended for CLI Integration)](special_installation.md#method-1-windows-wsl---recommended-for-cli-integration)
     - [Method 2: Windows (MSYS2 MINGW64 Shell)](special_installation.md#method-2-windows-msys2-mingw64-shell)
     - [Method 3: Windows (Windows pre-build binary)](special_installation.md#method-3-windows-windows-pre-build-binary)
     - [Usage in Dataset Forge](special_installation.md#usage-in-dataset-forge)
-  - [5. Advanced Metadata Operations (for [exiftool](https://exiftool.org/) integration)](special_installation.md#5-advanced-metadata-operations-for-exiftoolhttpsexiftoolorg-integration)
+  - [5. Advanced Metadata Operations with ExifTool](special_installation.md#5-advanced-metadata-operations-with-exiftool)
     - [Method 1: Windows](special_installation.md#method-1-windows)
     - [Method 2: Windows (Chocolatey)](special_installation.md#method-2-windows-chocolatey)
+  - [6. Metadata Strip + Lossless png compression with Oxipng](special_installation.md#6-metadata-strip--lossless-png-compression-with-oxipng)
+    - [Method 1: Windows](special_installation.md#method-1-windows)
+  - [7. Steganography Integration for zsteg and Steghide](special_installation.md#7-steganography-integration-for-zsteg-and-steghide)
+    - [zsteg installation (Windows)](special_installation.md#zsteg-installation-windows)
+    - [steghide installation (Windows)](special_installation.md#steghide-installation-windows)
 - [Features (tl;dr)](features.md)
 - [Features (main menus)](features.md#features-main-menus)
   - [⚙️ Core & Configuration](features.md#-core--configuration)
@@ -288,7 +293,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ---
 
-## 2. VapourSynth & [getnative](https://github.com/Infiziert90/getnative) (for getnative functionality/native resolution detection)
+## 2. VapourSynth & getnative
+
+> (for [getnative](https://github.com/Infiziert90/getnative) functionality/native resolution detection)
 
 **VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
@@ -298,9 +305,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 2. Open a terminal and run:
 
 ```bat
-py vsrepo.py install descale
-py vsrepo.py install ffms2
-py vsrepo.py install lsmas
+python vsrepo.py install descale
+python vsrepo.py install ffms2
+python vsrepo.py install lsmas
 ```
 
 3. Activate your virtual environment:
@@ -360,7 +367,9 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 4. Installing and Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
+## 4. Using resdet for Native Resolution Detection
+
+> Using [resdet](https://github.com/0x09/resdet) for Native Resolution Detection
 
 ### Method 1: Windows (WSL - Recommended for CLI Integration)
 
@@ -431,7 +440,9 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 5. Advanced Metadata Operations (for [exiftool](https://exiftool.org/) integration)
+## 5. Advanced Metadata Operations with ExifTool
+
+> (for [exiftool](https://exiftool.org/) integration)
 
 ### Method 1: Windows
 
@@ -460,6 +471,59 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```
 
 3. Add `exiftool.exe` to a folder in your PATH, or add its folder to your PATH.
+
+---
+
+## 6. Metadata Strip + Lossless png compression with Oxipng
+
+> (for [Oxipng](https://github.com/oxipng/oxipng) integration)
+> essential for 'Sanitise Image Workflow'
+
+### Method 1: Windows
+
+1. Download oxipng.exe:
+
+   https://github.com/oxipng/oxipng/releases
+
+2. Download the appropriate archive (e.g., `oxipng-9.1.5-x86_64-pc-windows-msvc.zip`).
+
+3. Extract the contents.
+
+4. Add `oxipng.exe` to a folder in your PATH, or add its folder to your PATH.
+
+---
+
+## 7. Steganography Integration for zsteg and Steghide
+
+> (for [zsteg](https://github.com/zed-0xff/zsteg) & [Steghide](https://steghide.sourceforge.net/) integration)
+> optional for 'Sanitise Image Workflow'
+
+### zsteg installation (Windows)
+
+1. Install Ruby (via RubyInstaller for Windows)
+
+* Go to: [https://rubyinstaller.org/](https://rubyinstaller.org/)
+* Download the **latest Ruby+Devkit** version (e.g. `Ruby 3.3.0 with Devkit`).
+* Run the installer.
+* On the final screen, check **"Add Ruby executables to your PATH"**.
+* Also allow it to **install MSYS2 and development tools** when prompted.
+
+2. Restart PowerShell/Terminal/Console/CLI
+
+3. Install `zsteg`
+   ```sh
+   gem install zsteg
+   ```
+
+### steghide installation (Windows)
+
+1. Download Steghide
+
+   [Steghide Windows package](http://prdownloads.sourceforge.net/steghide/steghide-0.5.1-win32.zip?download)
+
+2. Extract the contents (`steghide` folder).
+
+3. Add `steghide` folder path to your PATH.
 
 ---
 
@@ -516,7 +580,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 
 ## ✨ Image Processing & Augmentation
 
-- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel, **resave images**
+- **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel, **resave images (with lossless options and quality control)**
 - **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
 - **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
 - **🚀 Augmentation**: List, create, edit or delete _recipes_ or run advanced augmentation pipelines (using recipes)
@@ -1197,11 +1261,21 @@ This pattern is used throughout Dataset Forge for all interactive workflows. See
 **Features:**
 
 - **Multiple Output Formats**: Support for PNG, JPEG, WebP, BMP, TIFF
+- **Lossless Options**: Choose between lossless and lossy compression for supported formats
+- **Quality Control**: Adjustable quality settings for JPEG and WebP formats (1-100)
 - **Parallel Processing**: Uses thread-based processing for optimal performance
 - **Memory Efficient**: Limited worker count to prevent memory issues
 - **Unique Filenames**: Prevents overwriting with automatic unique filename generation
 - **Progress Tracking**: Shows real-time progress with descriptive messages
 - **Error Handling**: Robust error handling with detailed reporting
+
+**Compression Options:**
+
+- **PNG**: Lossless compression with configurable compression level
+- **JPEG**: Always lossy with adjustable quality (1-100)
+- **WebP**: Choice between lossless and lossy with quality control
+- **BMP**: Always lossless, no compression
+- **TIFF**: Choice between lossless (LZW) and lossy (JPEG) compression
 
 **Use Cases:**
 
@@ -1209,6 +1283,8 @@ This pattern is used throughout Dataset Forge for all interactive workflows. See
 - Create grayscale versions of color images
 - Batch format conversion for dataset preparation
 - Optimize images for specific applications or workflows
+- Preserve image quality with lossless compression
+- Reduce file sizes with lossy compression for web/email
 
 **Technical Details:**
 
