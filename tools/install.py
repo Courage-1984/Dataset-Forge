@@ -87,10 +87,10 @@ def upgrade_pip_setuptools_wheel():
     run([python, "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
 
 
-def install_pepeline_pepedpid():
-    pip = get_venv_pip()
-    print_info("Installing pepeline and pepedpid (required for DPID workflows)...")
-    run([pip, "install", "pepeline", "pepedpid"])
+# def install_pepeline_pepedpid():
+#     pip = get_venv_pip()
+#     print_info("Installing pepeline and pepedpid (required for DPID workflows)...")
+#     run([pip, "install", "pepeline", "pepedpid"])
 
 
 def install_requirements():
@@ -100,10 +100,10 @@ def install_requirements():
     run([pip, "install", "-r", req_path])
 
 
-def install_pepedp():
-    pip = get_venv_pip()
-    print_info("Installing pepedp (required for Umzi's Dataset Preprocessing)...")
-    run([pip, "install", "pepedp"])
+# def install_pepedp():
+#     pip = get_venv_pip()
+#     print_info("Installing pepedp (required for Umzi's Dataset Preprocessing)...")
+#     run([pip, "install", "pepedp"])
 
 
 # Comment out or remove install_project()
@@ -118,9 +118,9 @@ def main():
     create_venv()
     upgrade_pip_setuptools_wheel()
     install_torch()
-    install_pepeline_pepedpid()
+    # install_pepeline_pepedpid()
     install_requirements()
-    install_pepedp()
+    # install_pepedp()
     print_success("Installation complete. Dataset Forge is ready to use!")
     print_info("First run options:")
     print_info("  1. ./run.bat")
