@@ -104,10 +104,10 @@ rules/
 .mdc
 *.mdc
 
-
-doc_backup/
+docs_before_refactoring/
+docs_misc_old/
 
 menu_system/
-current_menu_system.md
-proposed_menu_restructure.md
+
+cursorrules_Old/
 

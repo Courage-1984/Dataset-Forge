@@ -40,6 +40,7 @@ cd Dataset-Forge
 - [Troubleshooting](docs/troubleshooting.md)
 - [Contributing](docs/contributing.md)
 - [Development Standards](.cursorrules) - Menu system patterns and coding standards
+- [MCP Integration Guide](docs/mcp_integration_guide.md) - Enhanced development with AI assistance
 - [Full Documentation Index](docs/index.md)
 
 ---
