@@ -30,7 +30,7 @@ It streamlines dataset curation, analysis, transformation, and validation with a
 git clone https://github.com/Courage-1984/Dataset-Forge.git
 cd Dataset-Forge
 ```
-# See [Getting Started](docs/getting_started.md) for full instructions
+- See [Getting Started](docs/getting_started.md) for full instructions
 
 ---
 

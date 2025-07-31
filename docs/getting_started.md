@@ -58,8 +58,9 @@ dataset-forge
 - On Windows, `python-magic` requires extra DLLs.
 - You must install VapourSynth before using [getnative](https://github.com/Infiziert90/getnative).
 - You must compile/build [resdet](https://github.com/0x09/resdet) before using it.
+- AND MORE;;;
 
-See [Special Installation Instructions](special_installation.md) for details.
+- See [Special Installation Instructions](special_installation.md) for further details.
 
 ---
 
