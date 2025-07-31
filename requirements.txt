@@ -74,6 +74,7 @@ albumentations
 python-magic==0.4.27
 python-magic-bin==0.4.14
 libmagic==1.0
+# ^^ see [Special Installation Instructions](docs/special_installation.md) for details
 
 # =============================
 # Data Compression & Archiving
@@ -98,6 +99,7 @@ gdown
 # pepeline
 # pepedpid
 # pepedp
+# ^^ see [Special Installation Instructions](docs/special_installation.md) for details
 
 # =============================
 # Deduplication & Similarity
@@ -131,8 +133,9 @@ pyflakes
 # =============================
 # Enhanced Metadata Management
 # =============================
-# exiftool (external, required for full metadata extraction/editing)
 pandas
+# exiftool (external, required for full metadata extraction/editing)
+# ^^ see [Special Installation Instructions](docs/special_installation.md) for details
 
 # =============================
 # Align Images (imageAlignmentTool.py)

@@ -82,9 +82,9 @@ def install_torch():
 
 
 def upgrade_pip_setuptools_wheel():
-    pip = get_venv_pip()
+    python = get_venv_python()
     print_info("Upgrading pip, setuptools, wheel in the virtual environment...")
-    run([pip, "install", "--upgrade", "pip", "setuptools", "wheel"])
+    run([python, "-m", "pip", "install", "--upgrade", "pip", "setuptools", "wheel"])
 
 
 def install_pepeline_pepedpid():

@@ -39,6 +39,7 @@ except ImportError:
 from logging.handlers import RotatingFileHandler
 
 LOG_PATH = os.path.join("logs", "monitoring.log")
+os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 
 # Set up logging with rotation
 logger = logging.getLogger("monitoring")
