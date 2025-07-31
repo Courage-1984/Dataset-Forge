@@ -59,9 +59,17 @@ def cache_management_menu():
         "0": ("🚪 Back to Main Menu", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage and optimize caching system for improved performance",
+        "Total Options": "4 cache management operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        "Key Features": "Cache statistics, clearing, maintenance, warmup",
+    }
+
     while True:
         try:
-            key = show_menu("Cache Management", options, Mocha.lavender)
+            key = show_menu("Cache Management", options, Mocha.lavender, current_menu="Cache Management", menu_context=menu_context)
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -133,9 +141,16 @@ def clear_caches_menu():
         "0": ("🚪 Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Clear different types of caches to free up resources",
+        "Options": "4 cache clearing operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+    }
+
     while True:
         try:
-            key = show_menu("Clear Caches", options, Mocha.lavender)
+            key = show_menu("Clear Caches", options, Mocha.lavender, current_menu="Clear Caches", menu_context=menu_context)
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -355,9 +370,16 @@ def cache_maintenance_menu():
         "0": ("🚪 Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Maintain and optimize cache system performance",
+        "Options": "3 maintenance operations",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+    }
+
     while True:
         try:
-            key = show_menu("Cache Maintenance", options, Mocha.lavender)
+            key = show_menu("Cache Maintenance", options, Mocha.lavender, current_menu="Cache Maintenance", menu_context=menu_context)
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -519,9 +541,16 @@ def cache_warmup_menu():
         "0": ("🚪 Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Warm up caches for improved performance",
+        "Options": "3 warmup operations",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+    }
+
     while True:
         try:
-            key = show_menu("Cache Warmup", options, Mocha.lavender)
+            key = show_menu("Cache Warmup", options, Mocha.lavender, current_menu="Cache Warmup", menu_context=menu_context)
             if key is None or key == "0":
                 break
             action = options[key][1]

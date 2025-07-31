@@ -87,7 +87,14 @@ def search_filter_menu(models):
             "5": ("🧩 Advanced/Combined Filter", lambda: filter_advanced(models)),
             "0": ("⬅️  Back", None),
         }
-        key = show_menu("Search/Filter Models", options, Mocha.lavender)
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Search and filter models by various criteria",
+            "Options": "5 filter operations",
+            "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        }
+
+        key = show_menu("Search/Filter Models", options, Mocha.lavender, current_menu="Search/Filter Models", menu_context=menu_context)
         if key is None or key == "0":
             return
         options[key][1]()
@@ -174,8 +181,15 @@ def list_models_menu(models):
         str(i + 1): (models[name]["name"], name) for i, name in enumerate(model_names)
     }
     options["0"] = ("Back", None)
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Select a model from the filtered list",
+        "Options": f"{len(model_names)} models available",
+        "Navigation": "Use numbers 1-{len(model_names)} to select, 0 to go back",
+    }
+
     while True:
-        key = show_menu("Select a Model", options, Mocha.lavender)
+        key = show_menu("Select a Model", options, Mocha.lavender, current_menu="Select a Model", menu_context=menu_context)
         if key is None or key == "0":
             return
         model_key = options[key][1]
@@ -224,8 +238,15 @@ def list_downloaded_models_menu(models):
             label = f"Unknown/Unregistered Model: {f}"
         options[str(i + 1)] = (label, f)
     options["0"] = ("Back", None)
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Select a downloaded model file for testing or management",
+        "Options": f"{len(model_files)} model files available",
+        "Navigation": "Use numbers 1-{len(model_files)} to select, 0 to go back",
+    }
+
     while True:
-        key = show_menu("Select a Downloaded Model File", options, Mocha.lavender)
+        key = show_menu("Select a Downloaded Model File", options, Mocha.lavender, current_menu="Select a Downloaded Model File", menu_context=menu_context)
         if key is None or key == "0":
             return
         selected_file = options[key][1]
@@ -264,8 +285,15 @@ def downloaded_model_menu(filename, model_info):
             lambda: test_unknown_model(model_path),
         )
     options["0"] = ("Back", None)
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": f"Manage downloaded model: {filename}",
+        "Options": f"{len(options)-1} operations available",
+        "Navigation": "Use numbers 1-{len(options)-1} to select, 0 to go back",
+    }
+
     while True:
-        key = show_menu(f"Downloaded Model: {filename}", options, Mocha.lavender)
+        key = show_menu(f"Downloaded Model: {filename}", options, Mocha.lavender, current_menu="Downloaded Model", menu_context=menu_context)
         if key is None or key == "0":
             return
         options[key][1]()
@@ -350,8 +378,15 @@ def model_details_menu(models, model_key):
         ),
         "0": ("Back", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": f"Manage model: {details['name']}",
+        "Options": "3 operations available",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+    }
+
     while True:
-        key = show_menu(f"Model: {details['name']}", options, Mocha.lavender)
+        key = show_menu(f"Model: {details['name']}", options, Mocha.lavender, current_menu="Model Details", menu_context=menu_context)
         if key is None or key == "0":
             return
         options[key][1]()

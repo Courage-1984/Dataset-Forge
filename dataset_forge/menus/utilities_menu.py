@@ -88,12 +88,22 @@ def utilities_menu():
         ),
         "0": ("⬅️  Back to Main Menu", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Access various utility functions and tools",
+        "Total Options": "8 utility categories",
+        "Navigation": "Use numbers 1-8 to select, 0 to go back",
+        "Key Features": "Path management, file operations, directory trees, filtering",
+    }
+
     while True:
         key = show_menu(
             "🛠️  Utilities",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Utilities",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":

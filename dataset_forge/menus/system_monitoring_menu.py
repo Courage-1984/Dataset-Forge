@@ -172,9 +172,17 @@ def system_monitoring_menu():
         "7": ("🧹 Clear All Caches (Disk & In-Memory)", clear_caches),
         "0": ("⬅️  Back to Main Menu", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Monitor system resources, performance, and health",
+        "Total Options": "7 monitoring operations",
+        "Navigation": "Use numbers 1-7 to select, 0 to go back",
+        "Key Features": "Resource monitoring, performance analytics, error tracking, health checks",
+    }
+
     while True:
         try:
-            key = show_menu("🩺 System Monitoring & Health", options, Mocha.lavender)
+            key = show_menu("🩺 System Monitoring & Health", options, Mocha.lavender, current_menu="System Monitoring & Health", menu_context=menu_context)
             if key is None or key == "0":
                 return
             action = options[key][1]

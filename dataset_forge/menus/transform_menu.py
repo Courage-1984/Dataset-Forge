@@ -59,12 +59,22 @@ def transform_menu():
         "7": ("Apply Custom Transformations", transform_dataset),
         "0": ("Back to Main Menu", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Apply various transformations to images and datasets",
+        "Total Options": "7 transformation types",
+        "Navigation": "Use numbers 1-7 to select, 0 to go back",
+        "Key Features": "Downsampling, HDR conversion, color adjustments, grayscale conversion",
+    }
+
     while True:
         key = show_menu(
             "Transform Menu",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Transform Menu",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             return

@@ -53,12 +53,22 @@ def comparison_menu():
         "3": ("Compare Folder Contents", compare_folders_menu),
         "0": ("Back to Main Menu", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Create visual comparisons between HQ and LQ images",
+        "Total Options": "3 comparison types",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+        "Key Features": "Side-by-side comparisons, GIF animations, folder content comparison",
+    }
+
     while True:
         key = show_menu(
             "Comparison Menu",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Comparison Menu",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             return

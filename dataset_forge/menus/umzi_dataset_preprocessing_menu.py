@@ -36,12 +36,22 @@ def umzi_dataset_preprocessing_menu():
         ),
         "0": ("⬅️  Back to Main Menu", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Advanced dataset preprocessing tools from PepeDP",
+        "Total Options": "4 preprocessing operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        "Key Features": "Tile extraction, video frame extraction, duplicate detection, IQA filtering",
+    }
+
     while True:
         key = show_menu(
             "🐸 Umzi's Dataset Preprocessing (PepeDP)",
             options,
             header_color=Mocha.lavender,
             char="-",
+            current_menu="Umzi's Dataset Preprocessing",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break

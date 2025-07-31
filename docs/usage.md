@@ -17,29 +17,42 @@
 
 ## Global Commands & Menu Navigation
 
-Dataset Forge supports global commands for a seamless CLI experience:
+Dataset Forge supports comprehensive global commands for a seamless CLI experience:
+
+### **Available Global Commands**
 
 - **help, h, ?** — Show context-aware help for the current menu, including navigation tips and available options.
 - **quit, exit, q** — Instantly exit Dataset Forge from any menu, with full memory and resource cleanup.
 - **0** — Go back to the previous menu (as before).
 - **Ctrl+C** — Emergency exit with cleanup.
 
-**User Experience:**
+### **User Experience Features**
 
-- After using `help`, the menu is automatically redrawn for clarity.
-- All prompts and help screens use the Catppuccin Mocha color scheme.
-- No raw print statements—output is always styled and consistent.
-- Tests for CLI output are fully non-interactive.
+- **Context-Aware Help**: Each menu provides specific help information with purpose, options, navigation instructions, key features, and helpful tips
+- **Automatic Menu Redraw**: After using `help`, the menu is automatically redrawn for clarity
+- **Consistent Styling**: All prompts and help screens use the Catppuccin Mocha color scheme
+- **Memory Management**: Automatic cleanup on quit with proper resource management
+- **Error Handling**: Graceful handling of edge cases and invalid inputs
+- **Comprehensive Testing**: 71 tests covering all global command functionality
 
-**Example:**
+### **Example Usage**
 
 ```
 Enter your choice: help
-# ...help screen appears...
+# ...context-aware help screen appears with menu-specific information...
 Press Enter to continue...
-# Menu is redrawn
-Enter your choice:
+# Menu is automatically redrawn
+Enter your choice: quit
+# Dataset Forge exits with full cleanup
 ```
+
+### **Technical Implementation**
+
+The global command system is built on:
+- **Core Files**: `dataset_forge/utils/menu.py` and `dataset_forge/utils/help_system.py`
+- **Menu Integration**: All menus include `current_menu` and `menu_context` parameters
+- **Help Documentation**: Comprehensive help content in `menu_system/comprehensive_help_menu.md` (31,665 bytes)
+- **Testing Coverage**: Unit tests, integration tests, and edge case testing for all functionality
 
 ---
 
@@ -75,6 +88,26 @@ Enter your choice:
 - **Use static analysis tools** for code quality (`tools/find_code_issues/find_code_issues.py`).
 - **Audit menu hierarchy** with `python tools/log_current_menu.py` for menu system analysis and improvement recommendations.
 - **All major features provide public, non-interactive APIs** for programmatic use and testing.
+
+### 🔧 Enhanced Development with MCP Integration
+
+Dataset Forge is configured with three MCP (Model Context Protocol) servers for enhanced development:
+
+- **Filesystem MCP**: Direct access to codebase and datasets for navigation and analysis
+- **Brave Search MCP**: Privacy-focused web research for ML techniques and tools
+- **Firecrawl MCP**: Web scraping for documentation and resource extraction
+
+**Development Workflow:**
+```bash
+# Enhanced Development Routine
+1. Use Filesystem MCP to navigate and analyze codebase
+2. Use Brave Search to research new ML techniques and tools
+3. Use Firecrawl to extract relevant documentation and resources
+4. Implement improvements based on research findings
+5. Update documentation with new insights and techniques
+```
+
+See [Advanced Features](advanced.md) for detailed MCP integration information and technical implementation examples.
 
 ---
 

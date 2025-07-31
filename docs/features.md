@@ -21,10 +21,12 @@
 
 ## ⚙️ Core & Configuration
 
+- **🌐 Global Command System**: Context-aware help (`help`, `h`, `?`) and instant quit (`quit`, `exit`, `q`) from any menu
 - External tool integration (WTP Dataset Destroyer, traiNNer-redux, getnative, resdet, etc.)
 - Model management: list, select, download, and run upscaling with trained models
 - Multi-format config support (JSON, YAML, HCL)
 - User profiles, favorites, presets, and quick access paths
+- **📚 Comprehensive Help System**: Menu-specific help documentation with navigation tips and feature descriptions
 
 ## 📂 Dataset Management
 
@@ -68,6 +70,7 @@
 - Comprehensive pytest suite for all features
 - Static analysis tools for code quality and maintainability
 - **Menu Auditing Tool**: Comprehensive menu hierarchy analysis and improvement recommendations
+- **🌐 Global Command Testing**: Comprehensive test suite with 71 tests covering all global command functionality, including unit tests, integration tests, and edge case testing
 - Utility scripts for environment setup, testing, and documentation merging
 
 ---
@@ -89,6 +92,9 @@
 
 - **🔧 External tool integration**: [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer), [traiNNer-redux](https://github.com/the-database/traiNNer-redux), [getnative](https://github.com/Infiziert90/getnative), [resdet](https://github.com/0x09/resdet), [Oxipng](https://github.com/oxipng/oxipng), [Steghide](https://steghide.sourceforge.net/), [zsteg](https://github.com/zed-0xff/zsteg), [umzi's Dataset_Preprocessing](https://github.com/umzi2/Dataset_Preprocessing), []()
 - **📦 Model management**: List, select, download and run upscaling with trained models (also [OpenModelDB](https://openmodeldb.info/) integration)
+- **🌐 Global Command System**: Context-aware help (`help`, `h`, `?`) and instant quit (`quit`, `exit`, `q`) from any menu
+- **📚 Comprehensive Help System**: Menu-specific help documentation with navigation tips and feature descriptions
+- **🧪 Global Command Testing**: Comprehensive test suite with 71 tests covering all global command functionality
 - **✅ Validation tools**: Validate HQ/LQ pairs and validation datasets from config
 - **👤 User profiles**: Save favorites, presets, links and quick access paths
 - **⚙️ Multi-format config support**: JSON, YAML, HCL

@@ -30,8 +30,8 @@ Dataset Forge is a modular Python CLI tool for managing, analyzing, and transfor
   _Release history and notable changes_
 - [License](license.md)  
   _Project license details_
-- [MCP Integration Guide](mcp_integration_guide.md)  
-  _Enhanced development with Model Context Protocol servers_
+- [Advanced Features](advanced.md)  
+  _MCP integration, global command system, and enhanced development workflows_
 
 ---
 

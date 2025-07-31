@@ -44,9 +44,32 @@ def lazy_action(module_path, func_name):
 
 
 def analysis_menu():
+    """Main analysis menu for dataset analysis and validation."""
+    from dataset_forge.actions import analysis_actions
+    from dataset_forge.actions import alpha_actions
+    from dataset_forge.menus import bhi_filtering_menu
+
+    def require_hq_lq(func):
+        def wrapper(*args, **kwargs):
+            hq_folder = get_folder_path("📁 Enter HQ folder path: ")
+            lq_folder = get_folder_path(
+                "📁 Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
+            )
+            return func(hq_folder, lq_folder, *args, **kwargs)
+
+        return wrapper
+
+    def lazy_action(module_path, func_name):
+        def _action(*args, **kwargs):
+            module = importlib.import_module(module_path)
+            func = getattr(module, func_name)
+            return func(*args, **kwargs)
+
+        return _action
+
     options = {
         "1": (
-            "Progressive Dataset Validation (All Checks)",
+            "📊 Progressive Dataset Validation",
             require_hq_lq(
                 lazy_action(
                     "dataset_forge.actions.analysis_actions",
@@ -136,12 +159,23 @@ def analysis_menu():
         ),
         "0": ("Back to Main Menu", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Analyze dataset quality and validate image pairs",
+        "Total Options": "13 analysis operations",
+        "Navigation": "Use numbers 1-13 to select, 0 to go back",
+        "Key Features": "Dataset validation, quality assessment, corruption detection, pair analysis",
+    }
+
     while True:
         key = show_menu(
             "Analysis Menu",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Analysis Menu",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break

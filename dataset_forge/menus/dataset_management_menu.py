@@ -33,24 +33,30 @@ def lazy_action(module_path, func_name):
 
 
 def dataset_creation_menu():
-    """Sub-menu for dataset creation and modification."""
+    """Sub-menu for creating datasets from various sources."""
     from dataset_forge.actions import dataset_actions
-    from dataset_forge.utils.menu import lazy_action
+
+    def create_dataset_from_source():
+        source_folder = get_folder_path("📁 Enter source folder path: ")
+        output_folder = get_folder_path("📁 Enter output folder path: ")
+        dataset_actions.create_dataset_from_source(source_folder, output_folder)
+
+    def create_dataset_from_video():
+        video_path = get_folder_path("🎬 Enter video file path: ")
+        output_folder = get_folder_path("📁 Enter output folder path: ")
+        dataset_actions.create_dataset_from_video(video_path, output_folder)
+
+    def create_dataset_from_images():
+        image_folder = get_folder_path("📁 Enter image folder path: ")
+        output_folder = get_folder_path("📁 Enter output folder path: ")
+        dataset_actions.create_dataset_from_images(image_folder, output_folder)
 
     options = {
-        "1": (
-            "📐 Create Multiscale Dataset",
-            dataset_actions.create_multiscale_dataset,
-        ),
-        "2": (
-            "🎬 Video Frame Extraction (PepeDP)",
-            lazy_action(
-                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
-                "video_frame_extraction_action",
-            ),
-        ),
-        "3": (
-            "🧩 Best Tile Extraction (PepeDP)",
+        "1": ("📁 Create from Source Folder", create_dataset_from_source),
+        "2": ("🎬 Create from Video", create_dataset_from_video),
+        "3": ("🖼️ Create from Images", create_dataset_from_images),
+        "4": (
+            "🐸 Umzi's Dataset Preprocessing",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "best_tile_extraction_action",
@@ -59,12 +65,21 @@ def dataset_creation_menu():
         "0": ("⬅️  Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Create new datasets from various sources",
+        "Options": "4 creation methods available",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+    }
+
     while True:
         action = show_menu(
             "🎯 Create Dataset from Source",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Dataset Creation",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={action!r}, type={type(action)}")
         if action is None or action == "0":
@@ -101,12 +116,21 @@ def combine_split_menu():
         "0": ("⬅️  Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Combine or split existing datasets",
+        "Options": "2 operations available",
+        "Navigation": "Use numbers 1-2 to select, 0 to go back",
+    }
+
     while True:
         action = show_menu(
             "🔗 Combine or Split Datasets",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Combine/Split Datasets",
+            menu_context=menu_context,
         )
         if action is None or action == "0":
             break
@@ -143,12 +167,21 @@ def hq_lq_pairs_menu():
         "0": ("⬅️  Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage high-quality and low-quality image pairs",
+        "Options": "4 pair management operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+    }
+
     while True:
         action = show_menu(
             "🔗 Manage HQ/LQ Pairs",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="HQ/LQ Pair Management",
+            menu_context=menu_context,
         )
         if action is None or action == "0":
             break
@@ -161,212 +194,142 @@ def clean_organize_menu():
     from dataset_forge.actions import dataset_actions
 
     def dedupe_menu():
-        print_header("🧹 De-Duplicate Images", color=Mocha.peach)
-        hq_folder = get_folder_path(
-            "📁 Enter HQ folder path (or single folder for single deduplication): "
-        )
-        lq_folder = get_folder_path(
-            "📁 Enter LQ folder path (leave blank for single-folder deduplication): ",
-            allow_blank=True,
-            allow_hq_lq_options=False,
-        )
-        hash_type = (
-            input("🔐 Hash type [phash/ahash/dhash/whash] (default: phash): ")
-            .strip()
-            .lower()
-            or "phash"
-        )
-        mode = (
-            input("🎯 Mode [exact/near] (default: exact): ").strip().lower() or "exact"
-        )
-        max_dist = 5
-        if mode == "near":
-            try:
-                max_dist = int(
-                    input(
-                        "📏 Max Hamming distance for near-duplicates (default: 5): "
-                    ).strip()
-                    or "5"
-                )
-            except ValueError:
-                print_error("❌ Invalid max distance, using default 5.")
-                max_dist = 5
-        op = (
-            input("⚡ Operation [move/copy/delete] (default: move): ").strip().lower()
-            or "move"
-        )
-        dest_dir = None
-        if op in ("move", "copy"):
-            dest_hq = get_folder_path(
-                "Destination directory for HQ (leave blank for no move/copy): "
+        options = {
+            "1": ("🔍 Find Duplicates", dataset_actions.find_duplicates),
+            "2": ("🗑️ Remove Duplicates", dataset_actions.remove_duplicates),
+            "3": ("📁 Move Duplicates", dataset_actions.move_duplicates),
+            "0": ("⬅️  Back", None),
+        }
+
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Find and manage duplicate images",
+            "Options": "3 duplicate operations",
+            "Navigation": "Use numbers 1-3 to select, 0 to go back",
+        }
+
+        while True:
+            action = show_menu(
+                "🔍 Duplicate Management",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="Duplicate Management",
+                menu_context=menu_context,
             )
-            dest_lq = (
-                get_folder_path(
-                    "Destination directory for LQ (leave blank for no move/copy): "
-                )
-                if lq_folder
-                else None
-            )
-            dest_dir = {"hq": dest_hq} if dest_hq else None
-            if lq_folder and dest_lq:
-                if dest_dir is None:
-                    dest_dir = {}
-                dest_dir["lq"] = dest_lq
-        try:
-            dataset_actions.dedupe(
-                hq_folder=hq_folder,
-                lq_folder=lq_folder,
-                hash_type=hash_type,
-                mode=mode,
-                max_dist=max_dist,
-                op=op,
-                dest_dir=dest_dir,
-            )
-            print_success("✅ De-duplication complete.")
-        except Exception as e:
-            print_error(f"❌ Error: {e}")
+            if action is None or action == "0":
+                break
+            if callable(action):
+                action()
 
     def remove_small_pairs():
-        hq = get_folder_path("📁 Enter HQ folder path: ")
-        lq = get_folder_path(
+        hq_folder = get_folder_path("📁 Enter HQ folder path: ")
+        lq_folder = get_folder_path(
             "📁 Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
         )
-        dataset_actions.remove_small_image_pairs(hq, lq)
+        dataset_actions.remove_small_pairs(hq_folder, lq_folder)
 
     def organize_by_orientation():
-        print_header(
-            "🔄 Images Orientation Organization (Extract by Landscape/Portrait/Square)",
-            color=Mocha.teal,
+        hq_folder = get_folder_path("📁 Enter HQ folder path: ")
+        lq_folder = get_folder_path(
+            "📁 Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
         )
-        input_folder = get_folder_path("📁 Enter the path to the input folder: ")
-        output_folder = get_folder_path("📁 Enter the path to the output folder: ")
-        orientations = input(
-            "📐 Enter orientations to extract (comma-separated: landscape,portrait,square): "
-        ).strip()
-        orientation_list = [o.strip() for o in orientations.split(",") if o.strip()]
-        operation = input("⚡ Operation (copy/move) [copy]: ").strip().lower() or "copy"
-        try:
-            dataset_actions.images_orientation_organization(
-                input_folder=input_folder,
-                output_folder=output_folder,
-                orientations=orientation_list,
-                operation=operation,
-            )
-            print_success("✅ Images organized by orientation.")
-        except Exception as e:
-            print_error(f"❌ Error: {e}")
+        dataset_actions.organize_images_by_orientation(hq_folder, lq_folder)
 
     def batch_rename_menu():
-        print_header("✏️ Batch Rename Images", color=Mocha.mauve)
-        input_folder = get_folder_path("📁 Enter the path to the input folder: ")
-        prefix = input("🏷️ Enter prefix for new filenames: ").strip()
-        start_number = input("🔢 Enter starting number (default: 1): ").strip() or "1"
-        try:
-            start_number = int(start_number)
-        except ValueError:
-            print_error("❌ Invalid starting number, using 1.")
-            start_number = 1
-        extension = input("📄 Enter file extension (default: jpg): ").strip() or "jpg"
-        try:
-            dataset_actions.batch_rename(
-                input_folder=input_folder,
-                prefix=prefix,
-                start_number=start_number,
-                extension=extension,
+        options = {
+            "1": ("📁 Single Folder", dataset_actions.batch_rename_single_folder),
+            "2": ("🔗 HQ/LQ Folders", dataset_actions.batch_rename_hq_lq_folders),
+            "0": ("⬅️  Back", None),
+        }
+
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Batch rename files in datasets",
+            "Options": "2 rename modes available",
+            "Navigation": "Use numbers 1-2 to select, 0 to go back",
+        }
+
+        while True:
+            action = show_menu(
+                "📝 Batch Rename",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="Batch Rename",
+                menu_context=menu_context,
             )
-            print_success("✅ Batch rename complete.")
-        except Exception as e:
-            print_error(f"❌ Error: {e}")
+            if action is None or action == "0":
+                break
+            if callable(action):
+                action()
 
     options = {
-        "1": (
-            "👁️  Visual De-duplication (Duplicates & Near-Duplicates)",
-            lazy_menu("dataset_forge.menus.visual_dedup_menu", "visual_dedup_menu"),
-        ),
-        "2": ("🔐 De-Duplicate (File Hash)", dedupe_menu),
-        "3": (
-            "🔍 ImageDedup - Advanced Duplicate Detection",
-            lazy_menu("dataset_forge.menus.imagededup_menu", "imagededup_menu"),
-        ),
-        "4": (
-            "🧠 CBIR (Semantic Duplicate Detection)",
-            lazy_menu("dataset_forge.menus.cbir_menu", "cbir_menu"),
-        ),
-        "5": ("✏️  Batch Rename", batch_rename_menu),
-        "6": ("📏 Remove Image Pairs by Size", remove_small_pairs),
-        "7": (
-            "🔄 Organize by Orientation (Landscape/Portrait/Square)",
-            organize_by_orientation,
-        ),
+        "1": ("🔍 Duplicate Management", dedupe_menu),
+        "2": ("📏 Remove Small Pairs", remove_small_pairs),
+        "3": ("📐 Organize by Orientation", organize_by_orientation),
+        "4": ("📝 Batch Rename", batch_rename_menu),
         "0": ("⬅️  Back", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Clean and organize dataset files",
+        "Options": "4 cleaning operations available",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+    }
+
     while True:
-        choice = show_menu(
+        action = show_menu(
             "🧹 Clean & Organize",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Clean & Organize",
+            menu_context=menu_context,
         )
-        if choice is None or choice == "0":
+        if action is None or action == "0":
             break
-        action = options[choice][1]
         if callable(action):
             action()
 
 
 def dataset_management_menu():
-    """Main dataset management menu with hierarchical structure."""
-    # Define menu context for help system
-    menu_context = {
-        "Total Options": "7 main categories",
-        "Purpose": "Dataset creation, organization, and management",
-        "Navigation": "Use numbers 1-7 to select, 0 to go back",
+    """Main dataset management menu."""
+    options = {
+        "1": ("🎯 Create Dataset from Source", dataset_creation_menu),
+        "2": ("🔗 Combine or Split Datasets", combine_split_menu),
+        "3": ("🔗 Manage HQ/LQ Pairs", hq_lq_pairs_menu),
+        "4": ("🧹 Clean & Organize", clean_organize_menu),
+        "5": ("🧭 Align Images", lazy_action("dataset_forge.actions.align_images_actions", "align_images_workflow")),
+        "6": ("🩺 Dataset Health Scoring", lazy_menu("dataset_forge.menus.dataset_health_scoring_menu", "dataset_health_scoring_menu")),
+        "7": ("🐸 Umzi's Dataset Preprocessing", lazy_menu("dataset_forge.menus.umzi_dataset_preprocessing_menu", "umzi_dataset_preprocessing_menu")),
+        "0": ("⬅️  Back", None),
     }
 
-    options = {
-        "1": (
-            "🎯 Create Dataset from Source",
-            lazy_action(__name__, "dataset_creation_menu"),
-        ),
-        "2": (
-            "🔗 Combine or Split Datasets",
-            lazy_action(__name__, "combine_split_menu"),
-        ),
-        "3": ("🔗 Manage HQ/LQ Pairs", lazy_action(__name__, "hq_lq_pairs_menu")),
-        "4": ("🧹 Clean & Organize", lazy_action(__name__, "clean_organize_menu")),
-        "5": (
-            "🧭 Align Images (Batch Projective Alignment)",
-            lazy_action(
-                "dataset_forge.actions.align_images_actions", "align_images_workflow"
-            ),
-        ),
-        "6": (
-            "🩺 Dataset Health Scoring",
-            lazy_action(
-                "dataset_forge.menus.dataset_health_scoring_menu",
-                "dataset_health_scoring_menu",
-            ),
-        ),
-        "7": (
-            "🐸 Umzi's Dataset Preprocessing (PepeDP)",
-            lazy_action(
-                "dataset_forge.menus.umzi_dataset_preprocessing_menu",
-                "umzi_dataset_preprocessing_menu",
-            ),
-        ),
-        "0": ("⬅️  Back to Main Menu", None),
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Comprehensive dataset creation, organization, and management",
+        "Total Options": "7 main categories",
+        "Navigation": "Use numbers 1-7 to select, 0 to go back",
+        "Key Features": "Dataset creation, pair management, cleaning, alignment, health scoring",
     }
+
     while True:
-        key = show_menu(
-            "📂 Dataset Management",
-            options,
-            header_color=Mocha.lavender,
-            char="=",
-            current_menu="Dataset Management",
-            menu_context=menu_context,
-        )
-        if key is None or key == "0":
-            return
-        action = options[key][1]
-        if callable(action):
-            action()
+        try:
+            choice = show_menu(
+                "📂 Dataset Management",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="Dataset Management",
+                menu_context=menu_context,
+            )
+            if choice is None or choice == "0":
+                return
+            action = options[choice][1]
+            if callable(action):
+                action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
+            break

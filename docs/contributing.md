@@ -67,6 +67,44 @@
 - **Menu Testing**: Ensure new menus are testable and follow the established patterns for help/quit functionality.
 - **Menu Documentation**: Update menu documentation when adding new menus or changing menu structure.
 
+### Global Command System Development
+
+- **Global Commands**: All menus must support `help`, `h`, `?` for context-aware help and `quit`, `exit`, `q` for instant quit
+- **Menu Context**: Define comprehensive `menu_context` dictionaries for each menu with purpose, options, navigation, key features, and tips
+- **Testing**: Global command functionality must be covered by unit and integration tests
+- **Documentation**: Update help documentation when adding new menus or changing menu structure
+
+### MCP Integration Development
+
+Dataset Forge is configured with three MCP (Model Context Protocol) servers for enhanced development:
+
+#### **Available MCP Servers**
+- **Filesystem MCP**: Direct access to codebase and datasets for navigation and analysis
+- **Brave Search MCP**: Privacy-focused web research for ML techniques and tools
+- **Firecrawl MCP**: Web scraping for documentation and resource extraction
+
+#### **Development Workflow with MCP**
+```bash
+# Enhanced Development Routine
+1. Use Filesystem MCP to navigate and analyze codebase
+2. Use Brave Search to research new ML techniques and tools
+3. Use Firecrawl to extract relevant documentation and resources
+4. Implement improvements based on research findings
+5. Update documentation with new insights and techniques
+```
+
+#### **Research Integration**
+- **Automated Research**: Use MCP servers to automatically research new SISR techniques and tools
+- **Documentation Extraction**: Extract and analyze documentation from external sources
+- **Community Research**: Research community feedback and competitor features
+- **Implementation Planning**: Use research findings to plan new features and improvements
+
+#### **Code Quality Enhancement**
+- **Pattern Analysis**: Use Filesystem MCP to analyze code patterns and consistency
+- **Documentation Coverage**: Use MCP servers to identify missing documentation topics
+- **Feature Research**: Research new features and tools for potential integration
+- **Performance Analysis**: Analyze performance benchmarks and optimization techniques
+
 ### Menu Auditing Workflow
 
 1. **Before Making Changes**: Run `python tools/log_current_menu.py` to understand the current menu structure

@@ -143,8 +143,15 @@ def personal_links_menu():
     }
     options["A"] = ("Add New Link", "add")
     options["0"] = ("Back", None)
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage personal links and bookmarks",
+        "Options": f"{len(links_data)} personal links available",
+        "Navigation": "Use numbers 1-{len(links_data)} to select, A to add, 0 to go back",
+    }
+
     while True:
-        key = show_menu("Personal Links", options, header_color=Mocha.lavender)
+        key = show_menu("Personal Links", options, header_color=Mocha.lavender, current_menu="Personal Links", menu_context=menu_context)
         if key is None or key == "0":
             break
         if key == "A":
@@ -171,8 +178,16 @@ def links_menu():
     options = links_menu.__menu_options__
     from dataset_forge.utils.printing import print_error
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Access community and personal links",
+        "Total Options": "2 link categories",
+        "Navigation": "Use numbers 1-2 to select, 0 to go back",
+        "Key Features": "Community links, personal link management",
+    }
+
     while True:
-        key = show_menu("🔗 Links", options, header_color=Mocha.lavender)
+        key = show_menu("🔗 Links", options, header_color=Mocha.lavender, current_menu="Links", menu_context=menu_context)
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break

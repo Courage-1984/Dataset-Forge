@@ -6,6 +6,31 @@
 
 ## [Unreleased]
 
+### 🌐 Global Command System & Comprehensive Help Documentation (July 2025)
+
+- **New Feature**: Implemented global help and quit commands across all menus and sub-menus
+- **Global Commands**:
+  - `help`, `h`, `?` - Show context-aware help for current menu
+  - `quit`, `exit`, `q` - Exit Dataset Forge completely with cleanup
+  - `0` - Go back to previous menu (existing)
+  - `Ctrl+C` - Emergency exit with cleanup (existing)
+- **Context-Aware Help**: Menu-specific help information with navigation tips and feature descriptions
+- **Memory Management**: Automatic cleanup on quit with proper resource management
+- **User Experience**:
+  - Case-insensitive commands for better usability
+  - Menu redraw after help for clarity
+  - Consistent Catppuccin Mocha color scheme across all help screens
+  - No raw print statements - all output is styled and consistent
+- **Comprehensive Documentation**: Created `menu_system/comprehensive_help_menu.md` (31,665 bytes) with detailed help for all menus
+- **Testing**: Comprehensive test suite with 71 tests covering all global command functionality
+  - Unit tests for command handling and help system
+  - Integration tests for menu context and CLI interactions
+  - Edge case testing for invalid inputs and error handling
+- **Menu Updates**: Updated all menu files to include `current_menu` and `menu_context` parameters
+- **Enhanced Error Handling**: Graceful handling of `None` and non-string inputs in global commands
+- **Documentation Integration**: Global command system implementation details integrated into advanced.md, usage.md, and contributing.md
+- **MCP Integration Documentation**: MCP server integration details and development workflows integrated into advanced.md and contributing.md
+
 ### 🔄 Resave Images Integration (July 2025)
 
 - **New Feature**: Added resave images functionality to Image Processing & Augmentation → Basic Transformations

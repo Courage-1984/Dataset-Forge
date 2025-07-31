@@ -24,12 +24,21 @@ def user_profile_submenu():
         "0": ("⬅️  Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage user profile settings and preferences",
+        "Options": "3 profile operations",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+    }
+
     while True:
         key = show_menu(
             "👤 User Profile",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="User Profile",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             return
@@ -53,12 +62,21 @@ def memory_management_submenu():
         "0": ("⬅️  Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage system memory and optimization",
+        "Options": "3 memory operations",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+    }
+
     while True:
         key = show_menu(
             "🧠 Memory Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Memory Management",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break
@@ -118,12 +136,21 @@ def cache_management_submenu():
         "0": ("⬅️  Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage cache settings and performance",
+        "Options": "4 cache operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+    }
+
     while True:
         key = show_menu(
             "⚡ Cache Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Cache Management",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break
@@ -147,12 +174,22 @@ def system_settings_menu():
         "8": ("🔄 Reset Settings", reset_settings),
         "0": ("⬅️  Back to Main Menu", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Configure system settings and preferences",
+        "Total Options": "8 settings categories",
+        "Navigation": "Use numbers 1-8 to select, 0 to go back",
+        "Key Features": "Folder paths, user profiles, memory management, cache settings",
+    }
+
     while True:
         key = show_menu(
             "⚙️  System & Settings",
             options,
             header_color=Mocha.lavender,
             char="=",
+            current_menu="System & Settings",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             return

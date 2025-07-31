@@ -62,8 +62,16 @@ def performance_optimization_menu():
             "0": ("🚪 Back to Main Menu", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Optimize processing performance and resource utilization",
+            "Total Options": "6 optimization categories",
+            "Navigation": "Use numbers 1-6 to select, 0 to go back",
+            "Key Features": "GPU acceleration, distributed processing, sample prioritization, pipeline compilation",
+        }
+
         try:
-            key = show_menu("Performance Optimization", options, Mocha.lavender)
+            key = show_menu("Performance Optimization", options, Mocha.lavender, current_menu="Performance Optimization", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]
@@ -94,8 +102,15 @@ def gpu_acceleration_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Configure and test GPU acceleration for image processing",
+            "Options": "4 GPU operations available",
+            "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        }
+
         try:
-            key = show_menu("GPU Acceleration", options, Mocha.sky)
+            key = show_menu("GPU Acceleration", options, Mocha.sky, current_menu="GPU Acceleration", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]
@@ -127,8 +142,15 @@ def distributed_processing_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Configure and manage distributed processing clusters",
+            "Options": "5 distributed processing operations",
+            "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        }
+
         try:
-            key = show_menu("Distributed Processing", options, Mocha.sky)
+            key = show_menu("Distributed Processing", options, Mocha.sky, current_menu="Distributed Processing", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]
@@ -155,8 +177,15 @@ def sample_prioritization_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Configure sample prioritization for optimized processing order",
+            "Options": "4 prioritization operations",
+            "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        }
+
         try:
-            key = show_menu("Sample Prioritization", options, Mocha.sky)
+            key = show_menu("Sample Prioritization", options, Mocha.sky, current_menu="Sample Prioritization", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]
@@ -189,8 +218,15 @@ def pipeline_compilation_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Configure and test pipeline compilation for performance optimization",
+            "Options": "4 compilation operations",
+            "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        }
+
         try:
-            key = show_menu("Pipeline Compilation", options, Mocha.sky)
+            key = show_menu("Pipeline Compilation", options, Mocha.sky, current_menu="Pipeline Compilation", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]
@@ -219,8 +255,15 @@ def performance_analytics_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Monitor and analyze performance metrics across optimization features",
+            "Options": "5 analytics operations",
+            "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        }
+
         try:
-            key = show_menu("Performance Analytics", options, Mocha.sky)
+            key = show_menu("Performance Analytics", options, Mocha.sky, current_menu="Performance Analytics", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]
@@ -247,8 +290,15 @@ def optimization_settings_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Configure global optimization settings and preferences",
+            "Options": "5 settings operations",
+            "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        }
+
         try:
-            key = show_menu("Optimization Settings", options, Mocha.sky)
+            key = show_menu("Optimization Settings", options, Mocha.sky, current_menu="Optimization Settings", menu_context=menu_context)
             if key is None:
                 break
             action = options[key][1]

@@ -38,51 +38,50 @@ def lazy_action(module_path, func_name):
 
 
 def basic_transformations_menu():
-    from dataset_forge.actions.transform_actions import (
-        crop_image_menu,
-        flip_image_menu,
-        rotate_image_menu,
-    )
-    from dataset_forge.utils.menu import show_menu
-    from dataset_forge.utils.color import Mocha
-    from dataset_forge.utils.printing import print_error
+    """Sub-menu for basic image transformations."""
+    from dataset_forge.actions import transform_actions
 
     options = {
-        "1": ("✂️  Crop Image", crop_image_menu),
-        "2": ("↔️  Flip Image", flip_image_menu),
-        "3": ("🔄 Rotate Image", rotate_image_menu),
+        "1": (
+            "🔄 Resize Images",
+            lazy_action("dataset_forge.actions.transform_actions", "resize_images_menu"),
+        ),
+        "2": (
+            "✂️ Crop Images",
+            lazy_action("dataset_forge.actions.transform_actions", "crop_images_menu"),
+        ),
+        "3": (
+            "🔄 Rotate Images",
+            lazy_action("dataset_forge.actions.transform_actions", "rotate_images_menu"),
+        ),
         "4": (
-            "⬇️  Downsample Images",
-            lazy_action(
-                "dataset_forge.actions.transform_actions", "downsample_images_menu"
-            ),
+            "🔄 Flip Images",
+            lazy_action("dataset_forge.actions.transform_actions", "flip_images_menu"),
         ),
         "5": (
-            "🔄 Resave Images",
-            lazy_action(
-                "dataset_forge.actions.resave_images_actions", "resave_images_workflow"
-            ),
-        ),
-        "6": (
-            "🧹 Remove Alpha Channel",
-            lazy_action(
-                "dataset_forge.actions.transform_actions", "remove_alpha_channels_menu"
-            ),
-        ),
-        "7": (
-            "🔀 Shuffle Images",
+            "🔄 Shuffle Images",
             lazy_action(
                 "dataset_forge.actions.transform_actions", "shuffle_images_menu"
             ),
         ),
         "0": ("⬅️  Back", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Apply basic geometric transformations to images",
+        "Options": "5 transformation types available",
+        "Navigation": "Use numbers 1-5 to select, 0 to go back",
+    }
+
     while True:
         key = show_menu(
             "🔄 Basic Transformations",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Basic Transformations",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
@@ -105,6 +104,7 @@ def not_implemented_menu():
 
 
 def colour_tone_levels_menu():
+    """Sub-menu for color, tone, and level adjustments."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.actions.transform_actions import (
@@ -142,12 +142,22 @@ def colour_tone_levels_menu():
         "6": ("⚫️ Convert to Grayscale", grayscale_conversion_menu),
         "0": ("⬅️  Back", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Adjust color, tone, and level properties of images",
+        "Options": "6 adjustment types available",
+        "Navigation": "Use numbers 1-6 to select, 0 to go back",
+    }
+
     while True:
         key = show_menu(
             "🎨 Colour, Tone & Levels Adjustments",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Color & Tone Adjustments",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break
@@ -158,6 +168,7 @@ def colour_tone_levels_menu():
 
 
 def metadata_menu():
+    """Sub-menu for metadata operations."""
     from dataset_forge.actions.metadata_actions import (
         exif_scrubber_menu,
         icc_to_srgb_menu,
@@ -174,116 +185,74 @@ def metadata_menu():
         ),
         "0": ("⬅️  Back", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage image metadata and color profiles",
+        "Options": "2 metadata operations available",
+        "Navigation": "Use numbers 1-2 to select, 0 to go back",
+    }
+
     while True:
         key = show_menu(
-            "📋 EXIF & ICC Profile Management",
+            "📋 Metadata Operations",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Metadata Operations",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
         if callable(action):
             action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
 
 def augmentation_submenu():
+    """Sub-menu for image augmentation."""
+    from dataset_forge.menus.augmentation_menu import augmentation_menu
+
     augmentation_menu()
 
 
 def extract_sketches_menu():
-    from dataset_forge.actions.sketch_extraction_actions import (
-        extract_sketches_workflow,
-    )
-    from dataset_forge.utils.input_utils import get_path_with_history
-    from dataset_forge.utils.printing import (
-        print_info,
-        print_error,
-        print_header,
-        print_section,
-    )
-    from dataset_forge.utils.color import Mocha
+    """Sub-menu for sketch extraction."""
+    from dataset_forge.actions.sketch_extraction_actions import extract_sketches_menu
 
-    print_header(
-        "✏️  Find & extract sketches/drawings/line art - Input/Output Selection",
-        color=Mocha.mauve,
-    )
-    print_info("Choose input mode:")
-    print_info("  1. 📂 HQ/LQ paired folders")
-    print_info("  2. 📁 Single folder")
-    print_info("  0. ❌ Cancel")
-    choice = input("🎯 Select mode: ").strip()
-    if choice == "1":
-        hq_folder = get_path_with_history("📁 Enter HQ folder path:")
-        lq_folder = get_path_with_history("📁 Enter LQ folder path:")
-        if not hq_folder or not lq_folder:
-            print_error("❌ Both HQ and LQ paths are required.")
-            return
-        try:
-            confidence = float(
-                input("🎯 Confidence threshold (default 0.5): ").strip() or "0.5"
-            )
-        except Exception:
-            confidence = 0.5
-        print_section("Sketch Extraction Progress", color=Mocha.mauve)
-        extract_sketches_workflow(
-            hq_folder=hq_folder, lq_folder=lq_folder, confidence_threshold=confidence
-        )
-    elif choice == "2":
-        folder = get_path_with_history("📁 Enter folder path:")
-        if not folder:
-            print_error("❌ Folder path is required.")
-            return
-        try:
-            confidence = float(
-                input("🎯 Confidence threshold (default 0.5): ").strip() or "0.5"
-            )
-        except Exception:
-            confidence = 0.5
-        print_section("Sketch Extraction Progress", color=Mocha.mauve)
-        extract_sketches_workflow(single_folder=folder, confidence_threshold=confidence)
-    elif choice == "0":
-        print_info("❌ Operation cancelled.")
-        return
-    else:
-        print_error("❌ Invalid choice. Operation cancelled.")
-        return
+    extract_sketches_menu()
 
 
 def image_processing_menu():
-    from dataset_forge.utils.menu import show_menu
-    from dataset_forge.utils.color import Mocha
-
+    """Main image processing menu."""
     options = {
         "1": ("🔄 Basic Transformations", basic_transformations_menu),
-        "2": ("🎨 Colour, Tone & Levels Adjustments", colour_tone_levels_menu),
-        "3": ("🧪 Degradations", degradations_menu),
-        "4": (
-            "🚀 Augmentation",
-            lazy_action("dataset_forge.menus.augmentation_menu", "augmentation_menu"),
-        ),
-        "5": (
-            "📋 Metadata",
-            lazy_action("dataset_forge.menus.metadata_menu", "metadata_menu"),
-        ),
-        "6": (
-            "✏️  Find & extract sketches/drawings/line art",
-            extract_sketches_menu,
-        ),
-        "0": ("⬅️  Back to Main Menu", None),
+        "2": ("🎨 Colour, Tone & Levels", colour_tone_levels_menu),
+        "3": ("📋 Metadata Operations", metadata_menu),
+        "4": ("✨ Augmentation", augmentation_submenu),
+        "5": ("✏️ Extract Sketches", extract_sketches_menu),
+        "0": ("⬅️  Back", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Transform, enhance, and augment images for ML training",
+        "Total Options": "5 processing categories",
+        "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        "Key Features": "Geometric transformations, color adjustments, metadata management, augmentation",
+    }
+
     while True:
         key = show_menu(
             "✨ Image Processing & Augmentation",
             options,
             header_color=Mocha.sapphire,
-            char="=",
+            char="-",
+            current_menu="Image Processing & Augmentation",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
-            return
-        action = options[key][1]
+            break
+        action = options.get(key, (None, None))[1]
         if callable(action):
             action()

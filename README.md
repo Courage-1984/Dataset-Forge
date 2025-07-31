@@ -18,6 +18,8 @@ It streamlines dataset curation, analysis, transformation, and validation with a
 - Process, augment, and transform images
 - Modular, CLI-first, and highly extensible
 - Robust parallel and GPU-accelerated processing
+- **🌐 Global Command System**: Context-aware help and instant quit from any menu
+- **📚 Comprehensive Help**: Menu-specific documentation and navigation assistance
 - [See all features](docs/features.md)
 
 ---

@@ -25,7 +25,14 @@ def compress_menu():
         "2": ("Single folder", "single"),
         "0": ("Cancel", None),
     }
-    mode = show_menu("Select Input Mode", mode_options, header_color=Mocha.sapphire)
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Select input mode for image compression",
+        "Options": "2 input modes available",
+        "Navigation": "Use numbers 1-2 to select, 0 to cancel",
+    }
+
+    mode = show_menu("Select Input Mode", mode_options, header_color=Mocha.sapphire, current_menu="Select Input Mode", menu_context=menu_context)
     if mode is None:
         print_info("Cancelled.")
         return
@@ -44,7 +51,14 @@ def compress_menu():
         "3": ("WebP (modern, lossy/lossless)", "webp"),
         "0": ("Cancel", None),
     }
-    fmt = show_menu("Select Output Format", fmt_options, header_color=Mocha.sapphire)
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Select output format for compressed images",
+        "Options": "3 format options available",
+        "Navigation": "Use numbers 1-3 to select, 0 to cancel",
+    }
+
+    fmt = show_menu("Select Output Format", fmt_options, header_color=Mocha.sapphire, current_menu="Select Output Format", menu_context=menu_context)
     if fmt is None:
         print_info("Cancelled.")
         return

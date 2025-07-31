@@ -1,9 +1,11 @@
 # This script merges all documentation files in docs/ into a single README_full.md and generates a hierarchical Table of Contents (toc.md).
+# It also copies the .cursorrules file to .cursor/rules/ directory for Cursor IDE integration.
 # To add new documentation files, update DOC_ORDER below and ensure navigation links are consistent.
 
 import os
 import sys
 import re
+import shutil
 
 # Always resolve docs/ relative to the project root (parent of this script)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -11,6 +13,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir))
 DOCS_DIR = os.path.join(PROJECT_ROOT, "docs")
 OUTPUT_FILE = os.path.join(DOCS_DIR, "README_full.md")
 TOC_FILE = os.path.join(DOCS_DIR, "toc.md")
+CURSORRULES_SOURCE = os.path.join(PROJECT_ROOT, ".cursorrules")
+CURSORRULES_DEST = os.path.join(PROJECT_ROOT, ".cursor", "rules", ".cursorrules")
 
 # Order of files to merge (edit as needed)
 DOC_ORDER = [
@@ -92,6 +96,24 @@ def strip_nav_links(content):
     return content
 
 
+def copy_cursorrules():
+    """Copy .cursorrules to .cursor/rules/ directory."""
+    if not os.path.exists(CURSORRULES_SOURCE):
+        print(f"Warning: {CURSORRULES_SOURCE} not found, skipping cursorrules copy.")
+        return False
+    
+    # Ensure the destination directory exists
+    os.makedirs(os.path.dirname(CURSORRULES_DEST), exist_ok=True)
+    
+    try:
+        shutil.copy2(CURSORRULES_SOURCE, CURSORRULES_DEST)
+        print(f"✅ .cursorrules copied to {CURSORRULES_DEST}")
+        return True
+    except Exception as e:
+        print(f"❌ Error copying .cursorrules: {e}")
+        return False
+
+
 def main():
     merged = []
     toc = build_toc()
@@ -119,6 +141,9 @@ def main():
 
     with open(TOC_FILE, "w", encoding="utf-8") as f:
         f.write(toc)
+
+    # Copy .cursorrules to .cursor/rules/
+    copy_cursorrules()
 
     print(f"README_full.md and toc.md updated with hierarchical ToC.")
 

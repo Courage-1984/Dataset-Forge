@@ -48,8 +48,22 @@ def history_log_menu():
     options = history_log_menu.__menu_options__
     from dataset_forge.utils.printing import print_error
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "View and manage change/history logs",
+        "Total Options": "2 log operations",
+        "Navigation": "Use numbers 1-2 to select, 0 to go back",
+        "Key Features": "View recent logs, select specific logs",
+    }
+
     while True:
-        key = show_menu("Change/History Log Menu", options, header_color=Mocha.lavender)
+        key = show_menu(
+            "Change/History Log Menu",
+            options,
+            header_color=Mocha.lavender,
+            current_menu="History Log Menu",
+            menu_context=menu_context,
+        )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break

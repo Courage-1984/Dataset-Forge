@@ -77,12 +77,22 @@ def user_profile_menu():
     from dataset_forge.utils.printing import print_error
 
     options = user_profile_menu.__menu_options__
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage user profiles and preferences",
+        "Total Options": "4 profile operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        "Key Features": "Profile management, favorites, paths, settings",
+    }
+
     while True:
         key = show_menu(
             "User Profile Management",
             options,
             header_color=Mocha.mauve,
             char="=",
+            current_menu="User Profile Management",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None:

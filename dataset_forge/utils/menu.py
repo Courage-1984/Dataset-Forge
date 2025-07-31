@@ -47,6 +47,10 @@ def handle_global_command(
     Returns:
         True if command was handled as a global command, False otherwise
     """
+    # Handle None or empty commands gracefully
+    if command is None or not isinstance(command, str):
+        return False
+    
     command_lower = command.lower().strip()
 
     if command_lower in ["help", "h", "?"]:

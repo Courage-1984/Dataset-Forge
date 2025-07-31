@@ -167,8 +167,16 @@ def degradations_menu():
         ),
         "0": ("⬅️  Back", None),
     }
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Apply various image degradations for training data generation",
+        "Total Options": "22 degradation types",
+        "Navigation": "Use numbers 1-22 to select, 0 to go back",
+        "Key Features": "Noise, blur, compression, geometric distortions, color modifications",
+    }
+
     while True:
-        key = show_menu("🧪 Degradations", options, header_color=Mocha.yellow)
+        key = show_menu("🧪 Degradations", options, header_color=Mocha.yellow, current_menu="Degradations", menu_context=menu_context)
         if key is None or key == "0":
             return
         action = options[key][1]

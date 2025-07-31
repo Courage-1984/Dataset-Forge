@@ -53,9 +53,17 @@ def resave_images_menu():
         "0": ("🚪 Back", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Resave images with different formats and options",
+        "Total Options": "4 resave operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        "Key Features": "Interactive resave, single folder, recursive, grayscale conversion",
+    }
+
     while True:
         try:
-            key = show_menu("🔄 Resave Images", options, Mocha.lavender)
+            key = show_menu("🔄 Resave Images", options, Mocha.lavender, current_menu="Resave Images", menu_context=menu_context)
             if key is None or key == "0":
                 return
             action = options[key][1]
