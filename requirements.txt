@@ -96,10 +96,9 @@ gdown
 # =============================
 # umzi
 # =============================
-# pepeline
-# pepedpid
-# pepedp
-# ^^ see [Special Installation Instructions](docs/special_installation.md) for details
+pepeline
+pepedpid
+pepedp
 
 # =============================
 # Deduplication & Similarity

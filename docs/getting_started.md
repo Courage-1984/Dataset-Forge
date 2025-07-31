@@ -34,9 +34,7 @@ This guide will help you install and launch Dataset Forge for the first time.
    python -m pip install --upgrade pip setuptools wheel
    # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-   pip install pepeline pepedpid
    pip install -r requirements.txt
-   pip install pepedp
    ```
    > **Note:** For other CUDA versions, see [PyTorch Get Started](https://pytorch.org/get-started/locally/).
 
