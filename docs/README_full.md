@@ -84,6 +84,9 @@
   - [🖥️ User Experience and CLI Features](features.md#-user-experience-and-cli-features)
 - [Usage Guide](usage.md)
   - [Quick Reference](usage.md#quick-reference)
+  - [Global Commands & Menu Navigation](usage.md#global-commands--menu-navigation)
+- [...help screen appears...](usage.md#help-screen-appears)
+- [Menu is redrawn](usage.md#menu-is-redrawn)
   - [Main Workflows](usage.md#main-workflows)
     - [📂 Dataset Management](usage.md#-dataset-management)
     - [🔍 Analysis & Validation](usage.md#-analysis--validation)
@@ -91,6 +94,7 @@
     - [🩺 Monitoring & Utilities](usage.md#-monitoring--utilities)
     - [🧪 Testing & Developer Tools](usage.md#-testing--developer-tools)
   - [Example: Running a Workflow](usage.md#example-running-a-workflow)
+- [or](usage.md#or)
   - [Tips & Best Practices](usage.md#tips--best-practices)
   - [See Also](usage.md#see-also)
 - [Advanced Features & Configuration](advanced.md)
@@ -1062,6 +1066,34 @@ These sounds help you know instantly when an operation finishes, fails, or the a
 
 ---
 
+## Global Commands & Menu Navigation
+
+Dataset Forge supports global commands for a seamless CLI experience:
+
+- **help, h, ?** — Show context-aware help for the current menu, including navigation tips and available options.
+- **quit, exit, q** — Instantly exit Dataset Forge from any menu, with full memory and resource cleanup.
+- **0** — Go back to the previous menu (as before).
+- **Ctrl+C** — Emergency exit with cleanup.
+
+**User Experience:**
+
+- After using `help`, the menu is automatically redrawn for clarity.
+- All prompts and help screens use the Catppuccin Mocha color scheme.
+- No raw print statements—output is always styled and consistent.
+- Tests for CLI output are fully non-interactive.
+
+**Example:**
+
+```
+Enter your choice: help
+# ...help screen appears...
+Press Enter to continue...
+# Menu is redrawn
+Enter your choice:
+```
+
+---
+
 ## Main Workflows
 
 ### 📂 Dataset Management
@@ -1098,10 +1130,10 @@ These sounds help you know instantly when an operation finishes, fails, or the a
 
 ## Example: Running a Workflow
 
-   ```bash
-   dataset-forge
-   # or
-   py main.py
+```bash
+dataset-forge
+# or
+py main.py
 ```
 
 - Select a menu option (e.g., Dataset Management, Analysis & Validation).

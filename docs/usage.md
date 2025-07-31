@@ -15,6 +15,34 @@
 
 ---
 
+## Global Commands & Menu Navigation
+
+Dataset Forge supports global commands for a seamless CLI experience:
+
+- **help, h, ?** — Show context-aware help for the current menu, including navigation tips and available options.
+- **quit, exit, q** — Instantly exit Dataset Forge from any menu, with full memory and resource cleanup.
+- **0** — Go back to the previous menu (as before).
+- **Ctrl+C** — Emergency exit with cleanup.
+
+**User Experience:**
+
+- After using `help`, the menu is automatically redrawn for clarity.
+- All prompts and help screens use the Catppuccin Mocha color scheme.
+- No raw print statements—output is always styled and consistent.
+- Tests for CLI output are fully non-interactive.
+
+**Example:**
+
+```
+Enter your choice: help
+# ...help screen appears...
+Press Enter to continue...
+# Menu is redrawn
+Enter your choice:
+```
+
+---
+
 ## Main Workflows
 
 ### 📂 Dataset Management
@@ -51,10 +79,10 @@
 
 ## Example: Running a Workflow
 
-   ```bash
-   dataset-forge
-   # or
-   py main.py
+```bash
+dataset-forge
+# or
+py main.py
 ```
 
 - Select a menu option (e.g., Dataset Management, Analysis & Validation).

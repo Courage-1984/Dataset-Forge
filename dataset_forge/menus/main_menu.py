@@ -22,6 +22,14 @@ def lazy_menu(module_name: str, func_name: str):
 def main_menu():
     # Play startup sound once per session
     play_startup_sound(block=False)
+
+    # Define menu context for help system
+    menu_context = {
+        "Total Options": "10 main categories",
+        "Purpose": "Main navigation hub",
+        "Navigation": "Use numbers 1-10 to select, 0 to exit",
+    }
+
     while True:
         try:
             options = {
@@ -95,6 +103,8 @@ def main_menu():
                 "🎨 Dataset Forge - Main Menu 🎨",
                 options,
                 Mocha.lavender,
+                current_menu="Main Menu",
+                menu_context=menu_context,
             )
             if choice is None or choice == "0":
                 return

@@ -318,6 +318,13 @@ def clean_organize_menu():
 
 def dataset_management_menu():
     """Main dataset management menu with hierarchical structure."""
+    # Define menu context for help system
+    menu_context = {
+        "Total Options": "7 main categories",
+        "Purpose": "Dataset creation, organization, and management",
+        "Navigation": "Use numbers 1-7 to select, 0 to go back",
+    }
+
     options = {
         "1": (
             "🎯 Create Dataset from Source",
@@ -357,6 +364,8 @@ def dataset_management_menu():
             options,
             header_color=Mocha.lavender,
             char="=",
+            current_menu="Dataset Management",
+            menu_context=menu_context,
         )
         if choice is None or choice == "0":
             return
