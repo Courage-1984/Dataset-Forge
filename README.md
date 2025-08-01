@@ -1,6 +1,6 @@
-# Dataset Forge
+<h1 align="center">Dataset Forge</h1>
 
----
+<!-- --- -->
 
 <!-- <h3 align="center">
   Dataset Forge
