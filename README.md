@@ -7,14 +7,16 @@
 </h3> -->
 
 <p align="center">
-  <img src="https://pomf2.lain.la/f/pb3y4ea.png" width="400" alt="Dataset Forge Thumbnail NEW 2"/>
+  <img src="./assets/thumb2.png" width="400" alt="Dataset Forge Thumbnail NEW 2"/>
+  <!-- <img src="https://pomf2.lain.la/f/pb3y4ea.png" width="400" alt="Dataset Forge Thumbnail NEW 2"/> -->
   <!-- <img src="https://pomf2.lain.la/f/63pyttv.png" width="400" alt="Dataset Forge Thumbnail NEW 1"/> -->
   <!-- <img src="https://pomf2.lain.la/f/2ulflln.png" width="300" alt="Dataset Forge Thumbnail OLD"/> -->
     <!-- <img src="https://files.catbox.moe/9jaag6.png" width="300" alt="Dataset Forge Thumbnail Backup OLD"/> -->
 </p>
 
 <div align="center">
-  <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="400" alt="Separator"/>
+  <img src="./assets/separator.png" width="400" alt="Separator local"/>
+  <!-- <img src="https://pomf2.lain.la/f/oyxcxpr.png" width="400" alt="Separator og"/> -->
     <!-- <img src="https://files.catbox.moe/0fyb8o.png" width="600" alt="Separator Backup"/> -->
 </div>
 
