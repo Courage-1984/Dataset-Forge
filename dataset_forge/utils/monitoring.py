@@ -244,7 +244,7 @@ class ErrorTracker:
     Logs errors, triggers sound on critical errors, provides summary.
     """
 
-    def __init__(self, error_sound_path: str = "assets/error.mp3"):
+    def __init__(self, error_sound_path: str = "assets/error.wav"):
         self.error_sound_path = error_sound_path
         self.errors = []  # List of dicts: {type, message, critical, timestamp}
 

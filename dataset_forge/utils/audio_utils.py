@@ -71,8 +71,7 @@ class AudioPlayer:
                             frequency=44100, size=-16, channels=2, buffer=1024
                         )
                         self._pygame_initialized = True
-                    except Exception as e:
-                        print(f"Pygame mixer initialization failed: {e}")
+                    except Exception:
                         self._pygame_initialized = False
 
     def play_audio(self, block=False):
@@ -87,8 +86,7 @@ class AudioPlayer:
             return
 
         if not self.audio_file_path.exists():
-            print(f"Warning: Audio file not found at {self.audio_file_path}")
-            return
+            return  # Silently return if audio file not found
 
         if block:
             self._play_audio_sync()
@@ -112,16 +110,16 @@ class AudioPlayer:
             try:
                 winsound.PlaySound(audio_path, winsound.SND_FILENAME)
                 return
-            except Exception as e:
-                print(f"Winsound failed: {e}")
+            except Exception:
+                pass  # Silently fail and try next method
 
         # Try playsound (good for various formats, but may have issues with some MP3s)
         if PLAYSOUND_AVAILABLE:
             try:
                 playsound(audio_path, block=True)
                 return
-            except Exception as e:
-                print(f"Playsound failed: {e}")
+            except Exception:
+                pass  # Silently fail and try next method
 
         # Try pydub (good for various formats)
         if PYDUB_AVAILABLE:
@@ -129,8 +127,8 @@ class AudioPlayer:
                 audio = AudioSegment.from_file(audio_path)
                 play(audio)
                 return
-            except Exception as e:
-                print(f"Pydub failed: {e}")
+            except Exception:
+                pass  # Silently fail and try next method
 
         # Try pygame (cross-platform) - with thread safety
         if PYGAME_AVAILABLE:
@@ -147,25 +145,22 @@ class AudioPlayer:
                         timeout = 3.0  # 3 second timeout for audio files
                         while pygame.mixer.music.get_busy():
                             if time.time() - start_time > timeout:
-                                print("Audio playback timeout, stopping...")
                                 pygame.mixer.music.stop()
                                 break
                             pygame.time.wait(100)  # Check every 100ms
                         return
-            except Exception as e:
-                print(f"Pygame audio failed: {e}")
+            except Exception:
+                pass  # Silently fail and try next method
 
         # Try system-specific commands with timeout
         try:
             self._play_with_system_command(system)
             return
-        except Exception as e:
-            print(f"System command failed: {e}")
+        except Exception:
+            pass  # Silently fail
 
-        # If all else fails, just print a message
-        print(
-            "Audio playback not available. Consider installing playsound: pip install playsound"
-        )
+        # If all else fails, audio is not available (silent failure)
+        pass
 
     def _play_with_system_command(self, system):
         """Play audio using system-specific commands."""
@@ -247,7 +242,9 @@ def play_error_sound(block=False):
 
     player = get_audio_player()
     # Override the audio file path for error sound
-    error_audio_path = Path(__file__).parent.parent.parent / "assets" / "audio" / "error.mp3"
+    error_audio_path = (
+        Path(__file__).parent.parent.parent / "assets" / "audio" / "error.mp3"
+    )
     if error_audio_path.exists():
         temp_player = AudioPlayer(error_audio_path)
         temp_player.play_audio(block=block)
@@ -269,7 +266,9 @@ def play_startup_sound(block=False):
 
     player = get_audio_player()
     # Override the audio file path for startup sound
-    startup_audio_path = Path(__file__).parent.parent.parent / "assets" / "audio" / "startup.mp3"
+    startup_audio_path = (
+        Path(__file__).parent.parent.parent / "assets" / "audio" / "startup.wav"
+    )
     if startup_audio_path.exists():
         temp_player = AudioPlayer(startup_audio_path)
         temp_player.play_audio(block=block)
@@ -292,7 +291,7 @@ def play_shutdown_sound(block=False):
     player = get_audio_player()
     # Override the audio file path for shutdown sound
     shutdown_audio_path = (
-        Path(__file__).parent.parent.parent / "assets" / "audio" / "shutdown.mp3"
+        Path(__file__).parent.parent.parent / "assets" / "audio" / "shutdown.wav"
     )
     if shutdown_audio_path.exists():
         temp_player = AudioPlayer(shutdown_audio_path)
