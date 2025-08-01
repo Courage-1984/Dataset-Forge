@@ -1,10 +1,8 @@
 # ─── Text file normalization ───
 * text=auto             # Normalize LF/CRLF on all text files
-
 # ─── Enforce line endings for scripts ─
 *.py   text eol=lf      # Python scripts use LF
 *.sh   text eol=lf      # Shell scripts use LF
-
 # ─── Treat specific files as binary ─
 *.png  binary
 *.PNG  binary
@@ -17,44 +15,35 @@
 *.pt    binary
 *.npz   binary
 *.npy   binary
-
 # No diff on large JSON data dumps
 *.json diff=none
-
 # ─── Merge/Diff Behavior ───
 *.lock      merge=ours
 *.json      diff=none
 *.csv       diff=none
 *.tsv       diff=none
-
 # ─── GitHub Linguist Overrides ───
-
 # Don't count Jupyter notebooks as JSON, count them correctly
 *.ipynb linguist-language=Jupyter\ Notebook
-
 # Mark documentation folders as documentation, not source
 docs/** linguist-documentation
 examples/** linguist-documentation
 notebooks/** linguist-documentation
-
 # Explicitly classify config/markup languages
 *.yml linguist-language=YAML
 *.yaml linguist-language=YAML
 *.toml linguist-language=TOML
 *.ini linguist-language=INI
 *.cfg linguist-language=INI
-
 # Ignore data folders from language stats
 data/** linguist-vendored
 datasets/** linguist-vendored
 output/** linguist-generated
 checkpoints/** linguist-generated
-
 # Mark scripts and command-line interfaces
 scripts/** linguist-language=Python
 bin/** linguist-language=Shell
-
 # Custom overrides (optional)
 *.md linguist-language=Markdown
 *.txt linguist-language=Text
-
+*.zip filter=lfs diff=lfs merge=lfs -text
