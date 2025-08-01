@@ -90,7 +90,7 @@ def process_images(image_paths: List[str], output_dir: str) -> List[str]:
 ## Menu & Workflow Patterns
 
 - Use hierarchical menu structure and `show_menu()` from `dataset_forge.utils.menu`.
-- Include emojis in menu options.
+- Include emojis in menu options with context-aware validation.
 - Use the robust menu loop pattern (see code example below).
 - All interactive workflows must print a clear, Mocha-styled heading before input/output prompts and progress bars using the centralized printing utilities and Mocha colors.
 
@@ -121,6 +121,7 @@ while True:
 - Log all major operations with timestamps.
 - Use try-except with meaningful error messages.
 - All user-facing errors must trigger the error sound via the centralized print_error utility.
+- Use centralized emoji utilities for safe emoji handling: `from dataset_forge.utils.emoji_utils import normalize_unicode, sanitize_emoji, is_valid_emoji`
 
 ---
 
@@ -155,6 +156,66 @@ while True:
 
 ---
 
+## Emoji System Guidelines
+
+### Emoji Usage in Menus and UI
+
+- **Always validate emojis** before using them in user-facing text
+- **Use context-aware validation** for appropriate emoji selection in different contexts
+- **Include emojis in menu options** for better user experience and readability
+- **Use smart emoji suggestions** for contextually appropriate emoji selection
+- **Validate menu emojis** during development using the emoji usage checker
+
+### Emoji Best Practices
+
+```python
+from dataset_forge.utils.emoji_utils import (
+    suggest_appropriate_emojis,
+    validate_emoji_appropriateness,
+    get_emoji_description_from_mapping
+)
+
+# Good: Context-appropriate emojis
+def create_menu_options():
+    success_emojis = suggest_appropriate_emojis("success completion")
+    error_emojis = suggest_appropriate_emojis("error problem")
+    
+    return {
+        "1": (f"{success_emojis[0]} Process Complete", process_complete_action),
+        "2": (f"{error_emojis[0]} Error Report", error_report_action),
+        "0": ("🚪 Exit", None),
+    }
+
+# Good: Context-aware validation
+def validate_menu_emojis(menu_options):
+    for key, (description, action) in menu_options.items():
+        emojis = extract_emojis(description)
+        for emoji in emojis:
+            validation = validate_emoji_appropriateness(emoji, "menu interface")
+            if validation['warnings']:
+                print(f"Warning: Menu option {key} has inappropriate emoji")
+
+# Avoid: Too many emojis or inappropriate context
+bad_menu = {
+    "1": ("🎉 🍕 🎊 Process Complete! 🎈 🎪", process_action),  # Too many emojis
+    "2": ("😀 😍 😊 😄 😁 😆 😅 😂 😇 😉 Error Report", error_action),  # All same category
+}
+```
+
+### Emoji Accessibility
+
+- **Provide emoji descriptions** for accessibility when needed
+- **Use consistent emoji categories** across related menus
+- **Test emoji display** on different platforms and terminals
+- **Handle Unicode encoding issues** gracefully with fallbacks
+
+### Emoji Performance
+
+- **Use caching** for repeated emoji operations
+- **Lazy load emoji mapping** only when needed
+- **Monitor emoji usage patterns** for insights and recommendations
+- **Use the emoji usage checker** before submitting PRs
+
 ## Final Reminders
 
 1. **Always activate the virtual environment**: `venv312\Scripts\activate`
@@ -168,6 +229,7 @@ while True:
 9. **Always document your code with Google-style docstrings**
 10. **Always test your changes thoroughly before committing**
 11. **Always update documentation after adding new features or menus**
+12. **Always validate emojis and use context-aware emoji selection**
 
 ---
 

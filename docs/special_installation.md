@@ -440,5 +440,58 @@ gem install ocran
 ---
 
 
+
+
+
+
+
+## 9. Special mass implementation of above^^
+
+> shortcut that implements multiple special installations from above
+
+*might, might not work*
+
+### Step 1: Windows binary dump
+
+1. Extract the following folder from `assets/_win_binary_dump.zip`:
+
+   - `_win_binary_dump`
+
+2. Add the path to the `_win_binary_dump` folder path to your PATH.
+
+**this includes**:
+```txt
+exiftool.exe
+ffmpeg.exe
+ffplay.exe
+ffprobe.exe
+getnative.exe
+oxipng.exe
+resdet.exe
+steghide.exe
+zsteg.exe
+```
+
+### Step 2: Windows dll dump
+
+1. Extract the following folder from `assets/_win_dll_dump.zip`:
+
+   - `_win_dll_dump`
+
+2. Add the path to the `_win_dll_dump` folder path to your PATH.
+
+**this includes ddl's for**:
+```txt
+VapourSynth's plugins
+python-magic's dll's & .mgc magicfile
+```
+
+### Step 3: Test the implementations
+
+1. lorem ipsum
+
+---
+
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
+
 

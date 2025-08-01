@@ -13,6 +13,7 @@ from .printing import (
 from .color import Mocha
 from .audio_utils import play_error_sound
 from .help_system import HelpSystem
+# Lazy imports for emoji utilities to avoid circular dependencies
 
 
 def show_global_help(
@@ -111,48 +112,75 @@ def show_menu(
     current_menu: str = "Menu",
     menu_context: Optional[Dict[str, Any]] = None,
 ):
-    """Enhanced menu display with global command support.
+    """Display a menu with options and handle user input with emoji validation.
 
     Args:
         title: Menu title
-        options: Dictionary of menu options
+        options: Dictionary of options with (description, action) tuples
         header_color: Color for the header
-        char: Character for header decoration
-        current_menu: Name of the current menu for help context
-        menu_context: Optional context information for help
+        char: Character to use for header decoration
+        current_menu: Name of the current menu for help system
+        menu_context: Optional context information for help system
+
+    Returns:
+        The selected option key or None if cancelled
     """
-    redraw_menu = True
+    # Lazy import emoji utilities to avoid circular dependencies
+    try:
+        from .emoji_utils import validate_menu_emojis, normalize_unicode, sanitize_emoji
+        
+        # Validate emojis in menu options
+        emoji_issues = validate_menu_emojis(options)
+        if emoji_issues["invalid"]:
+            print_warning(f"⚠️  Found {len(emoji_issues['invalid'])} invalid emojis in menu options")
+        
+        # Normalize and sanitize the title
+        safe_title = sanitize_emoji(normalize_unicode(title))
+    except ImportError:
+        # Fallback if emoji utilities are not available
+        safe_title = title
+    
+    # Print header
+    print_header(safe_title, char, header_color)
+    print()
+
+    # Display options with emoji safety
+    for key, (description, action) in options.items():
+        try:
+            # Normalize and sanitize the description
+            safe_description = sanitize_emoji(normalize_unicode(description))
+        except (NameError, ImportError):
+            # Fallback if emoji utilities are not available
+            safe_description = description
+        print(f"{key}. {safe_description}")
+
+    print()
+
+    # Get user input
     while True:
-        if redraw_menu:
-            print_header(title, char=char, color=header_color)
-            # Display menu options
-            for key, value in options.items():
-                if key.lower() == "0":
-                    print(
-                        f"\033[38;2;249;226;175m[ {key} ]  \033[38;2;205;214;244m{value[0]}\033[0m"
-                    )
-                else:
-                    print(
-                        f"\033[38;2;137;180;250m[ {key} ]  \033[38;2;205;214;244m{value[0]}\033[0m"
-                    )
-            # Show global command hint on first display or after help
-            print(
-                f"\n{Mocha.lavender}💡 Tip: Type 'help' for global commands, 'quit' to exit{Mocha.reset}"
-            )
-            redraw_menu = False
-        print_prompt("\nEnter your choice: ")
-        choice = input().strip()
-        # Handle global commands first
-        if handle_global_command(choice, current_menu, menu_context, pause=True):
-            redraw_menu = True
-            continue
-        # Handle regular menu options
-        if choice in options:
-            return choice
-        else:
-            print_error("Invalid choice. Please try again.")
-            play_error_sound()
-            redraw_menu = False
+        try:
+            print_prompt("Enter your choice: ")
+            choice = input().strip()
+
+            # Handle global commands
+            if handle_global_command(choice, current_menu, menu_context):
+                return None
+
+            # Check if choice is valid
+            if choice in options:
+                return choice
+            elif choice == "0" and "0" in options:
+                return "0"
+            else:
+                print_error(f"Invalid choice: {choice}")
+                print_info("Please enter a valid option number.")
+
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
+            return None
+        except Exception as e:
+            print_error(f"Error reading input: {e}")
+            return None
 
 
 def lazy_action(module_name: str, func_name: str):

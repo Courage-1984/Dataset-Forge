@@ -118,7 +118,27 @@ Suggestions:
     - `dataset_forge/utils/gpu_acceleration.py` - Fixed RGB/grayscale conversion and added size field
   - **Testing**: All 306 tests now passing (298 passed, 7 skipped, 1 xfailed)
   - **Result**: Complete test suite stability restored
-- [ ] **title**: lorem_ipsum
+
+
+
+
+
+- [ ] **dedicated de dupe menu**
+- [ ] **global search functionality**
+- [ ] **validate code that's from other repos**
+- [ ] **path sanitization**
+- [ ] **improve: test_datasets**
+- [ ] **implement: Dataset Versioning**
+- [ ] **improve unit and integration tests**
+- [ ] **onboarding**
+- [x] **create .exe & dll dump**
+- [ ] **title**
+- [ ] **title**
+- [ ] **title**
+- [ ] **title**
+
+
+- [ ] **lazy imports**: ensure lazy imports everywhere to speed up cli
 - [ ] **title**: lorem_ipsum
 - [ ] **title**: lorem_ipsum
 - [ ] **title**: lorem_ipsum

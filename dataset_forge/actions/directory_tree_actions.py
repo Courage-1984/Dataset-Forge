@@ -1,151 +1,133 @@
 """
-Enhanced Directory Tree Generator for Dataset Forge.
+Enhanced Directory Tree Generator
 
 This module provides advanced directory tree generation with emoji categorization,
-file type detection, and integration with Dataset Forge's architecture.
+file type detection, and comprehensive statistics. It includes features like:
+
+- Automatic file type detection using magic numbers
+- Emoji categorization for different file types
+- File size and modification time tracking
+- Comprehensive statistics and reporting
+- Multiple output formats (console, markdown, JSON)
+- Configurable depth and ignore patterns
+- Memory-efficient processing for large directories
 """
 
 import os
-import pathlib
-from typing import Optional, Dict, List, Tuple, Any
-from datetime import datetime
+import re
 import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Any
+from datetime import datetime
 
-# Import Dataset Forge utilities
-from dataset_forge.utils.printing import (
-    print_info,
-    print_success,
-    print_warning,
-    print_error,
-    print_header,
+# Import emoji utilities for better emoji handling
+from ..utils.emoji_utils import (
+    normalize_unicode,
+    sanitize_emoji,
+    is_valid_emoji,
+    extract_emojis,
+    categorize_emoji
 )
-from dataset_forge.utils.memory_utils import (
-    memory_context,
-    auto_cleanup,
-    clear_memory,
-    clear_cuda_cache,
-)
-from dataset_forge.utils.file_utils import is_image_file
-from dataset_forge.utils.color import Mocha
-from dataset_forge.utils.monitoring import monitor_all, task_registry
-from dataset_forge.utils.audio_utils import play_done_sound
+from ..utils.memory_utils import auto_cleanup
+from ..utils.printing import print_info, print_success, print_warning, print_error
 
-# Try to import magic, but provide fallback
+# Try to import magic for better file type detection
 try:
     import magic
-
     MAGIC_AVAILABLE = True
 except ImportError:
-    magic = None
     MAGIC_AVAILABLE = False
+    magic = None
+    print_warning("⚠️  python-magic not available. Using extension-based file type detection.")
+
+
+def is_image_file(filename: str) -> bool:
+    """Check if a file is an image based on its extension."""
+    image_extensions = {
+        '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif',
+        '.webp', '.svg', '.ico', '.raw', '.cr2', '.nef', '.arw'
+    }
+    return Path(filename).suffix.lower() in image_extensions
 
 
 class EnhancedDirectoryTreeGenerator:
-    """
-    Enhanced directory tree generator with advanced features.
-
-    Features:
-    - Emoji categorization for different file types
-    - Advanced file type detection using python-magic (with fallback)
-    - Dataset Forge integration (memory management, progress tracking)
-    - Multiple output formats (console, markdown, JSON)
-    - Statistics and analysis
-    - Customizable ignore patterns
-    - File size and metadata information
-    """
+    """Enhanced directory tree generator with emoji categorization and file type detection."""
 
     def __init__(self):
-        """Initialize the directory tree generator with enhanced categories."""
+        """Initialize the directory tree generator with emoji-safe categories."""
         # Enhanced categories with more specific emojis
         self.categories = {
             "directory": "📁",
             "image": "🖼️",
-            "image_hq": "🖼️✨",  # High-quality images
-            "image_lq": "🖼️📉",  # Low-quality images
-            "audio": "🎵",
+            "image_hq": "🎨",
+            "image_lq": "🖼️",
             "video": "🎬",
+            "audio": "🎵",
             "document": "📄",
-            "document_pdf": "📄📋",
-            "executable": "⚙️",
-            "archive": "📦",
-            "code": "📝",
+            "document_pdf": "📕",
             "code_python": "🐍",
             "code_js": "📜",
             "code_html": "🌐",
-            "data": "📊",
-            "data_json": "📊🔧",
-            "data_csv": "📊📈",
-            "web": "🌐",
-            "3d": "💠",
-            "font": "🔤",
-            "model": "🤖",  # ML models
-            "config": "⚙️📋",  # Configuration files
-            "log": "📋📝",  # Log files
+            "data_json": "📊",
+            "data_csv": "📈",
+            "model": "🤖",
+            "config": "⚙️",
+            "log": "📝",
             "backup": "💾",
             "temp": "🗑️",
-            "other": "📄",
+            "archive": "📦",
+            "font": "🔤",
+            "other": "📄"
         }
-
-        # File type mappings for enhanced detection
+        
+        # MIME type to category mapping
         self.file_type_mappings = {
-            # Images
-            "image/jpeg": "image",
-            "image/png": "image",
-            "image/gif": "image",
-            "image/webp": "image",
-            "image/bmp": "image",
-            "image/tiff": "image",
-            "image/svg+xml": "image",
-            # Audio
-            "audio/mpeg": "audio",
-            "audio/wav": "audio",
-            "audio/flac": "audio",
-            "audio/ogg": "audio",
-            "audio/aac": "audio",
-            # Video
-            "video/mp4": "video",
-            "video/avi": "video",
-            "video/mov": "video",
-            "video/wmv": "video",
-            "video/flv": "video",
-            "video/webm": "video",
-            # Documents
-            "application/pdf": "document_pdf",
-            "text/plain": "document",
-            "text/markdown": "document",
-            "application/msword": "document",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "document",
-            # Archives
-            "application/zip": "archive",
-            "application/x-rar-compressed": "archive",
-            "application/x-tar": "archive",
-            "application/gzip": "archive",
-            "application/x-7z-compressed": "archive",
-            # Code
-            "text/x-python": "code_python",
-            "text/javascript": "code_js",
-            "text/html": "code_html",
-            "text/css": "code",
-            "text/xml": "code",
-            "application/json": "data_json",
-            "text/csv": "data_csv",
-            # Models and ML
-            "application/octet-stream": "model",  # Often used for model files
-        }
-
-        # Statistics tracking
-        self.stats = {
-            "total_files": 0,
-            "total_dirs": 0,
-            "total_size": 0,
-            "file_types": {},
-            "largest_files": [],
-            "recent_files": [],
+            'image/jpeg': 'image',
+            'image/png': 'image',
+            'image/gif': 'image',
+            'image/bmp': 'image',
+            'image/tiff': 'image',
+            'image/webp': 'image',
+            'image/svg+xml': 'image',
+            'video/mp4': 'video',
+            'video/avi': 'video',
+            'video/mov': 'video',
+            'video/wmv': 'video',
+            'video/flv': 'video',
+            'video/webm': 'video',
+            'audio/mpeg': 'audio',
+            'audio/wav': 'audio',
+            'audio/flac': 'audio',
+            'audio/ogg': 'audio',
+            'audio/aac': 'audio',
+            'application/pdf': 'document_pdf',
+            'text/plain': 'document',
+            'text/html': 'code_html',
+            'text/css': 'code_html',
+            'application/javascript': 'code_js',
+            'text/javascript': 'code_js',
+            'application/json': 'data_json',
+            'text/csv': 'data_csv',
+            'application/x-python-code': 'code_python',
+            'text/x-python': 'code_python',
+            'application/x-yaml': 'config',
+            'text/yaml': 'config',
+            'text/xml': 'config',
+            'application/xml': 'config',
+            'application/zip': 'archive',
+            'application/x-rar': 'archive',
+            'application/x-tar': 'archive',
+            'application/gzip': 'archive',
+            'application/x-7z-compressed': 'archive',
+            'font/ttf': 'font',
+            'font/otf': 'font',
+            'font/woff': 'font',
+            'font/woff2': 'font',
         }
 
     def get_file_emoji(self, file_path: str) -> str:
         """
-        Get the appropriate emoji for a file based on its type.
+        Get the appropriate emoji for a file based on its type with emoji validation.
 
         Args:
             file_path: Path to the file
@@ -162,35 +144,35 @@ class EnhancedDirectoryTreeGenerator:
 
             # Check for specific file extensions first
             if filename.endswith((".py", ".pyc", ".pyo")):
-                return self.categories["code_python"]
+                emoji = self.categories["code_python"]
             elif filename.endswith((".js", ".jsx")):
-                return self.categories["code_js"]
+                emoji = self.categories["code_js"]
             elif filename.endswith((".html", ".htm")):
-                return self.categories["code_html"]
+                emoji = self.categories["code_html"]
             elif filename.endswith((".json")):
-                return self.categories["data_json"]
+                emoji = self.categories["data_json"]
             elif filename.endswith((".csv")):
-                return self.categories["data_csv"]
+                emoji = self.categories["data_csv"]
             elif filename.endswith((".pth", ".safetensors", ".onnx", ".pb")):
-                return self.categories["model"]
+                emoji = self.categories["model"]
             elif filename.endswith((".yml", ".yaml", ".ini", ".cfg", ".conf")):
-                return self.categories["config"]
+                emoji = self.categories["config"]
             elif filename.endswith((".log")):
-                return self.categories["log"]
+                emoji = self.categories["log"]
             elif filename.endswith((".bak", ".backup")):
-                return self.categories["backup"]
+                emoji = self.categories["backup"]
             elif filename.endswith((".tmp", ".temp")):
-                return self.categories["temp"]
+                emoji = self.categories["temp"]
             elif filename.endswith((".pdf")):
-                return self.categories["document_pdf"]
+                emoji = self.categories["document_pdf"]
             elif filename.endswith((".zip", ".rar", ".tar", ".gz", ".7z")):
-                return self.categories["archive"]
+                emoji = self.categories["archive"]
             elif filename.endswith((".mp3", ".wav", ".flac", ".ogg", ".aac")):
-                return self.categories["audio"]
+                emoji = self.categories["audio"]
             elif filename.endswith((".mp4", ".avi", ".mov", ".wmv", ".flv", ".webm")):
-                return self.categories["video"]
+                emoji = self.categories["video"]
             elif filename.endswith((".ttf", ".otf", ".woff", ".woff2")):
-                return self.categories["font"]
+                emoji = self.categories["font"]
             elif is_image_file(filename):
                 # Check if it's HQ or LQ based on size or naming convention
                 try:
@@ -198,13 +180,15 @@ class EnhancedDirectoryTreeGenerator:
                     if os.path.exists(file_path) and os.access(file_path, os.R_OK):
                         file_size = os.path.getsize(file_path)
                         if file_size > 1024 * 1024:  # > 1MB
-                            return self.categories["image_hq"]
+                            emoji = self.categories["image_hq"]
                         else:
-                            return self.categories["image_lq"]
+                            emoji = self.categories["image_lq"]
                     else:
-                        return self.categories["image"]
+                        emoji = self.categories["image"]
                 except (OSError, PermissionError, FileNotFoundError):
-                    return self.categories["image"]
+                    emoji = self.categories["image"]
+            else:
+                emoji = self.categories["other"]
 
             # Use magic if available for more accurate detection
             if MAGIC_AVAILABLE and magic:
@@ -215,29 +199,33 @@ class EnhancedDirectoryTreeGenerator:
                         # Check if it's a known type
                         if mime_type in self.file_type_mappings:
                             category = self.file_type_mappings[mime_type]
-                            return self.categories.get(
+                            emoji = self.categories.get(
                                 category, self.categories["other"]
                             )
 
                         # Fallback to MIME type detection
-                        if mime_type.startswith("image"):
-                            return self.categories["image"]
+                        elif mime_type.startswith("image"):
+                            emoji = self.categories["image"]
                         elif mime_type.startswith("audio"):
-                            return self.categories["audio"]
+                            emoji = self.categories["audio"]
                         elif mime_type.startswith("video"):
-                            return self.categories["video"]
+                            emoji = self.categories["video"]
                         elif mime_type.startswith("text"):
-                            return self.categories["document"]
+                            emoji = self.categories["document"]
                         elif mime_type.startswith("application"):
-                            return self.categories["other"]
+                            emoji = self.categories["other"]
                 except Exception:
                     pass  # Silently fall back to extension-based detection
 
-            # Final fallback
-            return self.categories["other"]
+            # Validate and sanitize the emoji
+            if is_valid_emoji(emoji):
+                return emoji
+            else:
+                # Fallback to a safe emoji
+                return "📄"
 
         except Exception:
-            # Ultimate fallback - return a safe default
+            # Final fallback
             return self.categories["other"]
 
     def get_file_info(self, file_path: str) -> Dict[str, Any]:

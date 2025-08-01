@@ -99,6 +99,12 @@ importlib
 gdown
 
 # =============================
+# Emoji & Unicode Handling
+# =============================
+emoji>=2.8.0
+demoji>=1.1.0
+
+# =============================
 # umzi
 # =============================
 pepeline
@@ -155,4 +161,6 @@ dataset-support
 tqdm
 python-hcl2
 colour-science
+
+
 
