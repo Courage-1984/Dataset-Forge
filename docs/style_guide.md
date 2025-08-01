@@ -179,7 +179,7 @@ from dataset_forge.utils.emoji_utils import (
 def create_menu_options():
     success_emojis = suggest_appropriate_emojis("success completion")
     error_emojis = suggest_appropriate_emojis("error problem")
-    
+
     return {
         "1": (f"{success_emojis[0]} Process Complete", process_complete_action),
         "2": (f"{error_emojis[0]} Error Report", error_report_action),
@@ -216,6 +216,91 @@ bad_menu = {
 - **Monitor emoji usage patterns** for insights and recommendations
 - **Use the emoji usage checker** before submitting PRs
 
+## MCP Integration Requirements (MANDATORY)
+
+### MCP Tool Usage Priority
+
+When implementing solutions, **ALWAYS** use MCP tools in this priority order:
+
+1. **Brave Search Tools** (Primary Research)
+
+   - Use `mcp_brave-search_brave_web_search` for general web research, latest libraries, best practices
+   - Use `mcp_brave-search_brave_news_search` for recent developments and updates
+   - Use `mcp_brave-search_brave_local_search` for location-specific information
+   - Use `mcp_brave-search_brave_video_search` for tutorials and demonstrations
+   - Use `mcp_brave-search_brave_image_search` for visual references
+
+2. **Firecrawl Tools** (Deep Web Scraping)
+
+   - Use `mcp_firecrawl_firecrawl_search` for comprehensive web search with content extraction
+   - Use `mcp_firecrawl_firecrawl_scrape` for detailed content extraction from specific URLs
+   - Use `mcp_firecrawl_firecrawl_map` for discovering website structure
+   - Use `mcp_firecrawl_firecrawl_extract` for structured data extraction
+   - Use `mcp_firecrawl_firecrawl_deep_research` for complex research questions
+
+3. **Filesystem Tools** (Project Analysis)
+
+   - Use `mcp_filesystem_read_text_file` to read and analyze project files
+   - Use `mcp_filesystem_list_directory` to understand project structure
+   - Use `mcp_filesystem_search_files` to find specific files or patterns
+   - Use `mcp_filesystem_get_file_info` for detailed file metadata analysis
+   - Use `mcp_filesystem_directory_tree` for comprehensive project structure visualization
+
+4. **GitHub Integration Tools** (Code Examples)
+   - Use `mcp_gitmcp-docs_fetch_generic_documentation` for GitHub repository documentation
+   - Use `mcp_gitmcp-docs_search_generic_code` for finding code examples in repositories
+   - Use `mcp_gitmcp-docs_search_generic_documentation` for documentation searches
+   - Use `mcp_gitmcp-docs_match_common_libs_owner_repo_mapping` for library-to-repo mapping
+
+### MCP Tool Usage Patterns
+
+#### Before Implementing Any Solution:
+
+1. **Research Phase**: Use Brave Search to find latest libraries, best practices, and solutions
+2. **Deep Dive**: Use Firecrawl to extract detailed content from relevant sources
+3. **Project Context**: Use Filesystem tools to understand current implementation
+4. **Code Examples**: Use GitHub tools to find relevant code examples and patterns
+
+#### When Debugging Issues:
+
+1. **Error Research**: Use Brave Search to find solutions for specific error messages
+2. **Documentation**: Use Firecrawl to extract troubleshooting guides
+3. **Project Analysis**: Use Filesystem tools to examine current code and configuration
+4. **Community Solutions**: Use GitHub tools to find similar issues and solutions
+
+#### When Adding New Features:
+
+1. **Best Practices**: Use Brave Search to find current best practices and patterns
+2. **Implementation Guides**: Use Firecrawl to extract detailed implementation tutorials
+3. **Project Integration**: Use Filesystem tools to understand how to integrate with existing code
+4. **Reference Implementations**: Use GitHub tools to find similar feature implementations
+
+### MCP Integration Requirements
+
+- **ALWAYS** use at least 2-3 MCP tools before implementing any solution
+- **ALWAYS** document MCP findings and rationale for chosen solutions
+- **ALWAYS** use MCP tools to validate assumptions about current best practices
+- **ALWAYS** use MCP tools to find the most recent and relevant information
+- **ALWAYS** use MCP tools to understand existing codebase patterns before making changes
+- **ALWAYS** use MCP tools to find appropriate solutions based on project context
+
+### MCP Tool Usage Examples
+
+```python
+# Example workflow for adding a new feature:
+# 1. Research current best practices
+mcp_brave-search_brave_web_search("latest Python image processing libraries 2024")
+
+# 2. Find specific implementation details
+mcp_firecrawl_firecrawl_search("Python PIL Pillow image processing best practices")
+
+# 3. Understand current project structure
+mcp_filesystem_list_directory("dataset_forge/utils")
+
+# 4. Find relevant code examples
+mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
+```
+
 ## Final Reminders
 
 1. **Always activate the virtual environment**: `venv312\Scripts\activate`
@@ -230,6 +315,7 @@ bad_menu = {
 10. **Always test your changes thoroughly before committing**
 11. **Always update documentation after adding new features or menus**
 12. **Always validate emojis and use context-aware emoji selection**
+13. **Always use MCP tools before implementing solutions to ensure current best practices**
 
 ---
 

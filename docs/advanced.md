@@ -29,6 +29,7 @@
 - Quality-based sample prioritization and adaptive batching.
 - **CLI Optimization**: Comprehensive lazy import system for 50-60% faster startup times.
 - **🎨 Emoji System Optimization**: Caching, lazy loading, and memory management for optimal emoji performance.
+- **🔗 MCP Integration**: Comprehensive Model Context Protocol integration for enhanced development workflow and research capabilities.
 
 <details>
 <summary><strong>Technical Implementation: Caching System</strong></summary>
@@ -54,20 +55,24 @@
 Dataset Forge implements a comprehensive lazy import system to significantly speed up CLI startup times:
 
 **Performance Improvements:**
+
 - **Before Optimization**: ~3-5 seconds startup time, heavy imports loaded at startup
 - **After Optimization**: ~1.5-2 seconds startup time (50-60% improvement), lazy imports loaded only when needed
 
 **Core Components:**
+
 - **LazyImport Class**: Wrapper for deferring heavy library imports
 - **Pre-defined Lazy Imports**: torch, cv2, numpy, PIL, matplotlib, pandas, transformers, etc.
 - **Performance Monitoring**: Import timing analysis and monitoring decorators
 
 **Implementation Patterns:**
+
 - **Module-Level**: Replace direct imports with lazy imports
 - **Function-Level**: Import heavy libraries only when functions are called
 - **Class-Level**: Lazy loading in class properties
 
 **Usage Examples:**
+
 ```python
 # Instead of: import torch, cv2, numpy as np
 from dataset_forge.utils.lazy_imports import (
@@ -90,14 +95,71 @@ def critical_function():
 ```
 
 **Optimization Strategies:**
+
 - **Import Timing Analysis**: Monitor and optimize slow imports (>1s)
 - **CLI Startup Optimization**: Lazy menu loading, deferred heavy imports
 - **Memory Management**: Lazy memory allocation with automatic cleanup
 
 **Best Practices:**
+
 - Use lazy imports for heavy libraries (PyTorch, OpenCV, matplotlib, transformers)
 - Don't use lazy imports for core utilities or frequently used libraries
 - Monitor import performance and optimize based on usage patterns
+
+</details>
+
+<details>
+<summary><strong>Technical Implementation: MCP Integration & Development Workflow</strong></summary>
+
+Dataset Forge implements comprehensive MCP (Model Context Protocol) integration to enhance development workflow and research capabilities:
+
+**MCP Tools Available:**
+
+1. **Brave Search Tools** - Primary research for latest libraries, best practices, and solutions
+2. **Firecrawl Tools** - Deep web scraping for documentation and content extraction
+3. **Filesystem Tools** - Project analysis and file management
+4. **GitHub Integration Tools** - Code examples and repository documentation
+
+**Development Workflow Enhancement:**
+
+- **Research Phase**: Use Brave Search to find latest libraries, best practices, and solutions
+- **Deep Dive**: Use Firecrawl to extract detailed content from relevant sources
+- **Project Context**: Use Filesystem tools to understand current implementation
+- **Code Examples**: Use GitHub tools to find relevant code examples and patterns
+
+**Usage Patterns:**
+
+```python
+# Before Implementing Any Solution:
+# 1. Research current best practices
+mcp_brave-search_brave_web_search("latest Python image processing libraries 2024")
+
+# 2. Find specific implementation details
+mcp_firecrawl_firecrawl_search("Python PIL Pillow image processing best practices")
+
+# 3. Understand current project structure
+mcp_filesystem_list_directory("dataset_forge/utils")
+
+# 4. Find relevant code examples
+mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
+```
+
+**Integration Requirements:**
+
+- **ALWAYS** use at least 2-3 MCP tools before implementing any solution
+- **ALWAYS** document MCP findings and rationale for chosen solutions
+- **ALWAYS** use MCP tools to validate assumptions about current best practices
+- **ALWAYS** use MCP tools to find the most recent and relevant information
+- **ALWAYS** use MCP tools to understand existing codebase patterns before making changes
+- **ALWAYS** use MCP tools to find appropriate solutions based on project context
+
+**Benefits:**
+
+- Enhanced research capabilities for latest ML techniques and tools
+- Automated documentation extraction and analysis
+- Improved code quality through pattern analysis and best practices research
+- Faster development through comprehensive tool integration
+- Better decision-making through data-driven research and analysis
 
 See `docs/cli_optimization.md` for comprehensive details and advanced usage patterns.
 
@@ -109,6 +171,7 @@ See `docs/cli_optimization.md` for comprehensive details and advanced usage patt
 Dataset Forge implements a comprehensive emoji handling system with 3,655+ emoji mappings, context-aware validation, and smart suggestions:
 
 **Core Features:**
+
 - **3,655+ Emoji Mappings**: Complete mapping with short descriptions from Unicode emoji-test.txt
 - **Context-Aware Validation**: Validate emoji appropriateness for professional, technical, casual, and educational contexts
 - **Smart Emoji Suggestions**: Get contextually appropriate emoji suggestions based on context and categories
@@ -120,6 +183,7 @@ Dataset Forge implements a comprehensive emoji handling system with 3,655+ emoji
 - **Performance Optimization**: Caching and lazy loading for optimal performance
 
 **Implementation Patterns:**
+
 - **EmojiHandler Class**: Main emoji handling class with all core functionality
 - **Lazy Loading**: Emoji mapping loaded only when needed
 - **Caching System**: Validation cache, description cache, category cache
@@ -127,6 +191,7 @@ Dataset Forge implements a comprehensive emoji handling system with 3,655+ emoji
 - **Error Resilience**: Graceful fallbacks for all failure scenarios
 
 **Usage Examples:**
+
 ```python
 from dataset_forge.utils.emoji_utils import (
     get_emoji_description_from_mapping,
@@ -155,12 +220,14 @@ analysis = analyze_emoji_usage("😀 😍 🎉 Great job! 🚀 💯 Keep up the 
 ```
 
 **Performance Considerations:**
+
 - **Memory Usage**: ~2MB for emoji mapping, ~500KB disk space for JSON file
 - **Caching**: Automatic caching of validation results, descriptions, and categories
 - **Lazy Loading**: Mapping loaded only when first accessed
 - **Error Handling**: Comprehensive error handling with graceful fallbacks
 
 **Best Practices:**
+
 - Always validate emojis before using them in user-facing text
 - Use Unicode normalization for consistent text handling
 - Provide fallbacks for systems that don't support emojis
@@ -202,10 +269,11 @@ Dataset Forge features a comprehensive global command system that provides conte
 #### **Menu Context Structure**
 
 Each menu defines a comprehensive context dictionary:
+
 ```python
 menu_context = {
     "Purpose": "Clear description of menu functionality",
-    "Options": "Number and types of available options", 
+    "Options": "Number and types of available options",
     "Navigation": "How to navigate the menu",
     "Key Features": ["Feature 1", "Feature 2"],
     "Tips": ["Helpful tips for using the menu"],
@@ -217,6 +285,7 @@ menu_context = {
 #### **Standardized Menu Pattern**
 
 All menus follow the standardized key-based pattern with global command support:
+
 ```python
 def my_menu():
     """Menu implementation with global command support."""
@@ -225,7 +294,7 @@ def my_menu():
         "2": ("Option 2", function2),
         "0": ("🚪 Exit", None),
     }
-    
+
     menu_context = {
         "Purpose": "Menu purpose description",
         "Options": "Number of options available",
@@ -233,12 +302,12 @@ def my_menu():
         "Key Features": ["Feature 1", "Feature 2"],
         "Tips": ["Tip 1", "Tip 2"],
     }
-    
+
     while True:
         try:
             key = show_menu(
-                "Menu Title", 
-                options, 
+                "Menu Title",
+                options,
                 Mocha.lavender,
                 current_menu="Menu Name",
                 menu_context=menu_context
@@ -401,12 +470,13 @@ Dataset Forge is configured with three powerful MCP (Model Context Protocol) ser
 The project includes three MCP servers for enhanced development:
 
 - **Filesystem MCP**: Direct access to codebase and datasets
-- **Brave Search MCP**: Privacy-focused web research for ML techniques  
+- **Brave Search MCP**: Privacy-focused web research for ML techniques
 - **Firecrawl MCP**: Web scraping for documentation and resource extraction
 
 ### **Development Workflow Enhancements**
 
 #### **Code Analysis Workflow**
+
 ```bash
 # Daily Development Routine
 1. Use Filesystem MCP to navigate codebase
@@ -417,6 +487,7 @@ The project includes three MCP servers for enhanced development:
 ```
 
 #### **Research Integration Workflow**
+
 ```bash
 # Weekly Research Routine
 1. Search for new SISR papers and techniques
@@ -429,21 +500,25 @@ The project includes three MCP servers for enhanced development:
 ### **Proposed Improvements**
 
 #### **Enhanced Documentation System**
+
 - Add "Research Corner" section with latest ML findings
 - Include links to relevant papers and datasets
 - Provide integration guides for new tools
 
 #### **Automated Research Updates**
+
 - Create research automation system using MCP servers
 - Automatically update research database with new findings
 - Generate summary reports for new techniques
 
 #### **Enhanced Dataset Discovery**
+
 - Implement dataset discovery features using MCP servers
 - Search for new datasets and extract compatibility information
 - Generate compatibility reports for new datasets
 
 #### **Community Integration Hub**
+
 - Create community features section with user-submitted dataset reviews
 - Add performance benchmarks and real-world usage statistics
 - Implement tool integration requests and voting system
@@ -451,6 +526,7 @@ The project includes three MCP servers for enhanced development:
 ### **Technical Implementation**
 
 #### **MCP Integration Class Example**
+
 ```python
 class MCPIntegration:
     """Integration class for MCP servers in Dataset Forge."""
@@ -478,6 +554,7 @@ class MCPIntegration:
 ```
 
 #### **Automated Research Pipeline**
+
 ```python
 def automated_research_pipeline():
     """Automated research pipeline using MCP servers."""
@@ -485,7 +562,7 @@ def automated_research_pipeline():
     # Define research topics
     topics = [
         "SISR techniques 2024",
-        "image dataset management", 
+        "image dataset management",
         "GPU acceleration image processing",
         "distributed image processing"
     ]

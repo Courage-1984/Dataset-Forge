@@ -178,6 +178,11 @@
 - [Instead of: import torch, cv2, numpy as np](advanced.md#instead-of-import-torch-cv2-numpy-as-np)
 - [Function-level lazy imports](advanced.md#function-level-lazy-imports)
 - [Performance monitoring](advanced.md#performance-monitoring)
+- [Before Implementing Any Solution:](advanced.md#before-implementing-any-solution)
+- [1. Research current best practices](advanced.md#1-research-current-best-practices)
+- [2. Find specific implementation details](advanced.md#2-find-specific-implementation-details)
+- [3. Understand current project structure](advanced.md#3-understand-current-project-structure)
+- [4. Find relevant code examples](advanced.md#4-find-relevant-code-examples)
 - [Basic emoji operations](advanced.md#basic-emoji-operations)
 - [Enhanced features](advanced.md#enhanced-features)
   - [Developer Patterns & Extending](advanced.md#developer-patterns--extending)
@@ -265,6 +270,19 @@
 - [Avoid: Too many emojis or inappropriate context](style_guide.md#avoid-too-many-emojis-or-inappropriate-context)
     - [Emoji Accessibility](style_guide.md#emoji-accessibility)
     - [Emoji Performance](style_guide.md#emoji-performance)
+  - [MCP Integration Requirements (MANDATORY)](style_guide.md#mcp-integration-requirements-mandatory)
+    - [MCP Tool Usage Priority](style_guide.md#mcp-tool-usage-priority)
+    - [MCP Tool Usage Patterns](style_guide.md#mcp-tool-usage-patterns)
+      - [Before Implementing Any Solution:](style_guide.md#before-implementing-any-solution)
+      - [When Debugging Issues:](style_guide.md#when-debugging-issues)
+      - [When Adding New Features:](style_guide.md#when-adding-new-features)
+    - [MCP Integration Requirements](style_guide.md#mcp-integration-requirements)
+    - [MCP Tool Usage Examples](style_guide.md#mcp-tool-usage-examples)
+- [Example workflow for adding a new feature:](style_guide.md#example-workflow-for-adding-a-new-feature)
+- [1. Research current best practices](style_guide.md#1-research-current-best-practices)
+- [2. Find specific implementation details](style_guide.md#2-find-specific-implementation-details)
+- [3. Understand current project structure](style_guide.md#3-understand-current-project-structure)
+- [4. Find relevant code examples](style_guide.md#4-find-relevant-code-examples)
   - [Final Reminders](style_guide.md#final-reminders)
   - [See Also](style_guide.md#see-also)
 - [Contributing](contributing.md)
@@ -274,10 +292,19 @@
   - [Static Analysis & Code Quality](contributing.md#static-analysis--code-quality)
   - [Menu System Development](contributing.md#menu-system-development)
     - [Global Command System Development](contributing.md#global-command-system-development)
-    - [MCP Integration Development](contributing.md#mcp-integration-development)
+    - [MCP Integration Development (MANDATORY)](contributing.md#mcp-integration-development-mandatory)
       - [**Available MCP Servers**](contributing.md#available-mcp-servers)
-      - [**Development Workflow with MCP**](contributing.md#development-workflow-with-mcp)
-- [Enhanced Development Routine](contributing.md#enhanced-development-routine)
+      - [**MCP Tool Usage Patterns (MANDATORY)**](contributing.md#mcp-tool-usage-patterns-mandatory)
+        - [Before Implementing Any Solution:](contributing.md#before-implementing-any-solution)
+        - [When Debugging Issues:](contributing.md#when-debugging-issues)
+        - [When Adding New Features:](contributing.md#when-adding-new-features)
+      - [**MCP Integration Requirements**](contributing.md#mcp-integration-requirements)
+      - [**MCP Tool Usage Examples**](contributing.md#mcp-tool-usage-examples)
+- [Example workflow for adding a new feature:](contributing.md#example-workflow-for-adding-a-new-feature)
+- [1. Research current best practices](contributing.md#1-research-current-best-practices)
+- [2. Find specific implementation details](contributing.md#2-find-specific-implementation-details)
+- [3. Understand current project structure](contributing.md#3-understand-current-project-structure)
+- [4. Find relevant code examples](contributing.md#4-find-relevant-code-examples)
       - [**Research Integration**](contributing.md#research-integration)
       - [**Code Quality Enhancement**](contributing.md#code-quality-enhancement)
     - [Menu Auditing Workflow](contributing.md#menu-auditing-workflow)
@@ -285,6 +312,7 @@
   - [See Also](contributing.md#see-also)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
+    - [🔗 MCP Integration Implementation (August 2025)](changelog.md#-mcp-integration-implementation-august-2025)
     - [🔊 Audio System Investigation & Robust Multi-Library Implementation (August 2025)](changelog.md#-audio-system-investigation--robust-multi-library-implementation-august-2025)
     - [🔧 zsteg.exe Standalone Executable Solution (August 2025)](changelog.md#-zstegexe-standalone-executable-solution-august-2025)
     - [🎨 Catppuccin Mocha Theming Consistency Checker (August 2025)](changelog.md#-catppuccin-mocha-theming-consistency-checker-august-2025)
@@ -1863,6 +1891,7 @@ Suggestions:
   - **Testing**: Ensure audio doesn't interfere with CLI operations
   - **Result**: Complete audio feedback throughout the application
 - [x] **Fix Test Failures**: Resolved 3 critical test failures in performance optimization module
+
   - **Problem**: 3 tests failing in `test_performance_optimization.py`:
     1. `test_gpu_image_analysis` - RuntimeError due to RGB vs grayscale tensor mismatch
     2. `test_prioritize_samples` - NameError due to missing `time` import
@@ -1877,9 +1906,26 @@ Suggestions:
   - **Testing**: All 306 tests now passing (298 passed, 7 skipped, 1 xfailed)
   - **Result**: Complete test suite stability restored
 
+- [x] **MCP Integration Implementation**: Comprehensive MCP (Model Context Protocol) integration for enhanced development
 
-
-
+  - **Status**: ✅ COMPLETED - MCP tools integration fully implemented and documented
+  - **MCP Tools Configured**:
+    1. **Brave Search Tools** - Primary research for latest libraries, best practices, and solutions
+    2. **Firecrawl Tools** - Deep web scraping for documentation and content extraction
+    3. **Filesystem Tools** - Project analysis and file management
+    4. **GitHub Integration Tools** - Code examples and repository documentation
+  - **Files Updated**:
+    - `.cursorrules` - Added comprehensive MCP Integration (MANDATORY) section with tool usage patterns
+    - `docs/style_guide.md` - Added MCP Integration Requirements section
+    - `docs/contributing.md` - Enhanced MCP Integration Development section with mandatory requirements
+    - `docs/TODO.md` - Added completion status for MCP Integration
+  - **Key Features**:
+    - **Mandatory MCP Tool Usage**: All contributors must use MCP tools before implementing solutions
+    - **Tool Usage Patterns**: Clear workflows for different development scenarios
+    - **Priority Order**: Brave Search → Firecrawl → Filesystem → GitHub Integration
+    - **Usage Examples**: Practical code examples for each tool category
+    - **Integration Requirements**: Specific requirements for MCP tool usage
+  - **Result**: Enhanced development workflow with comprehensive research and analysis capabilities
 
 - [ ] **dedicated de dupe menu**
 - [ ] **global search functionality**
@@ -1894,7 +1940,6 @@ Suggestions:
 - [ ] **title**
 - [ ] **title**
 - [ ] **title**
-
 
 - [ ] **lazy imports**: ensure lazy imports everywhere to speed up cli
 - [ ] **title**: lorem_ipsum
@@ -2191,6 +2236,7 @@ py main.py
 - Quality-based sample prioritization and adaptive batching.
 - **CLI Optimization**: Comprehensive lazy import system for 50-60% faster startup times.
 - **🎨 Emoji System Optimization**: Caching, lazy loading, and memory management for optimal emoji performance.
+- **🔗 MCP Integration**: Comprehensive Model Context Protocol integration for enhanced development workflow and research capabilities.
 
 <details>
 <summary><strong>Technical Implementation: Caching System</strong></summary>
@@ -2216,20 +2262,24 @@ py main.py
 Dataset Forge implements a comprehensive lazy import system to significantly speed up CLI startup times:
 
 **Performance Improvements:**
+
 - **Before Optimization**: ~3-5 seconds startup time, heavy imports loaded at startup
 - **After Optimization**: ~1.5-2 seconds startup time (50-60% improvement), lazy imports loaded only when needed
 
 **Core Components:**
+
 - **LazyImport Class**: Wrapper for deferring heavy library imports
 - **Pre-defined Lazy Imports**: torch, cv2, numpy, PIL, matplotlib, pandas, transformers, etc.
 - **Performance Monitoring**: Import timing analysis and monitoring decorators
 
 **Implementation Patterns:**
+
 - **Module-Level**: Replace direct imports with lazy imports
 - **Function-Level**: Import heavy libraries only when functions are called
 - **Class-Level**: Lazy loading in class properties
 
 **Usage Examples:**
+
 ```python
 # Instead of: import torch, cv2, numpy as np
 from dataset_forge.utils.lazy_imports import (
@@ -2252,14 +2302,71 @@ def critical_function():
 ```
 
 **Optimization Strategies:**
+
 - **Import Timing Analysis**: Monitor and optimize slow imports (>1s)
 - **CLI Startup Optimization**: Lazy menu loading, deferred heavy imports
 - **Memory Management**: Lazy memory allocation with automatic cleanup
 
 **Best Practices:**
+
 - Use lazy imports for heavy libraries (PyTorch, OpenCV, matplotlib, transformers)
 - Don't use lazy imports for core utilities or frequently used libraries
 - Monitor import performance and optimize based on usage patterns
+
+</details>
+
+<details>
+<summary><strong>Technical Implementation: MCP Integration & Development Workflow</strong></summary>
+
+Dataset Forge implements comprehensive MCP (Model Context Protocol) integration to enhance development workflow and research capabilities:
+
+**MCP Tools Available:**
+
+1. **Brave Search Tools** - Primary research for latest libraries, best practices, and solutions
+2. **Firecrawl Tools** - Deep web scraping for documentation and content extraction
+3. **Filesystem Tools** - Project analysis and file management
+4. **GitHub Integration Tools** - Code examples and repository documentation
+
+**Development Workflow Enhancement:**
+
+- **Research Phase**: Use Brave Search to find latest libraries, best practices, and solutions
+- **Deep Dive**: Use Firecrawl to extract detailed content from relevant sources
+- **Project Context**: Use Filesystem tools to understand current implementation
+- **Code Examples**: Use GitHub tools to find relevant code examples and patterns
+
+**Usage Patterns:**
+
+```python
+# Before Implementing Any Solution:
+# 1. Research current best practices
+mcp_brave-search_brave_web_search("latest Python image processing libraries 2024")
+
+# 2. Find specific implementation details
+mcp_firecrawl_firecrawl_search("Python PIL Pillow image processing best practices")
+
+# 3. Understand current project structure
+mcp_filesystem_list_directory("dataset_forge/utils")
+
+# 4. Find relevant code examples
+mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
+```
+
+**Integration Requirements:**
+
+- **ALWAYS** use at least 2-3 MCP tools before implementing any solution
+- **ALWAYS** document MCP findings and rationale for chosen solutions
+- **ALWAYS** use MCP tools to validate assumptions about current best practices
+- **ALWAYS** use MCP tools to find the most recent and relevant information
+- **ALWAYS** use MCP tools to understand existing codebase patterns before making changes
+- **ALWAYS** use MCP tools to find appropriate solutions based on project context
+
+**Benefits:**
+
+- Enhanced research capabilities for latest ML techniques and tools
+- Automated documentation extraction and analysis
+- Improved code quality through pattern analysis and best practices research
+- Faster development through comprehensive tool integration
+- Better decision-making through data-driven research and analysis
 
 See `docs/cli_optimization.md` for comprehensive details and advanced usage patterns.
 
@@ -2271,6 +2378,7 @@ See `docs/cli_optimization.md` for comprehensive details and advanced usage patt
 Dataset Forge implements a comprehensive emoji handling system with 3,655+ emoji mappings, context-aware validation, and smart suggestions:
 
 **Core Features:**
+
 - **3,655+ Emoji Mappings**: Complete mapping with short descriptions from Unicode emoji-test.txt
 - **Context-Aware Validation**: Validate emoji appropriateness for professional, technical, casual, and educational contexts
 - **Smart Emoji Suggestions**: Get contextually appropriate emoji suggestions based on context and categories
@@ -2282,6 +2390,7 @@ Dataset Forge implements a comprehensive emoji handling system with 3,655+ emoji
 - **Performance Optimization**: Caching and lazy loading for optimal performance
 
 **Implementation Patterns:**
+
 - **EmojiHandler Class**: Main emoji handling class with all core functionality
 - **Lazy Loading**: Emoji mapping loaded only when needed
 - **Caching System**: Validation cache, description cache, category cache
@@ -2289,6 +2398,7 @@ Dataset Forge implements a comprehensive emoji handling system with 3,655+ emoji
 - **Error Resilience**: Graceful fallbacks for all failure scenarios
 
 **Usage Examples:**
+
 ```python
 from dataset_forge.utils.emoji_utils import (
     get_emoji_description_from_mapping,
@@ -2317,12 +2427,14 @@ analysis = analyze_emoji_usage("😀 😍 🎉 Great job! 🚀 💯 Keep up the 
 ```
 
 **Performance Considerations:**
+
 - **Memory Usage**: ~2MB for emoji mapping, ~500KB disk space for JSON file
 - **Caching**: Automatic caching of validation results, descriptions, and categories
 - **Lazy Loading**: Mapping loaded only when first accessed
 - **Error Handling**: Comprehensive error handling with graceful fallbacks
 
 **Best Practices:**
+
 - Always validate emojis before using them in user-facing text
 - Use Unicode normalization for consistent text handling
 - Provide fallbacks for systems that don't support emojis
@@ -2364,10 +2476,11 @@ Dataset Forge features a comprehensive global command system that provides conte
 #### **Menu Context Structure**
 
 Each menu defines a comprehensive context dictionary:
+
 ```python
 menu_context = {
     "Purpose": "Clear description of menu functionality",
-    "Options": "Number and types of available options", 
+    "Options": "Number and types of available options",
     "Navigation": "How to navigate the menu",
     "Key Features": ["Feature 1", "Feature 2"],
     "Tips": ["Helpful tips for using the menu"],
@@ -2379,6 +2492,7 @@ menu_context = {
 #### **Standardized Menu Pattern**
 
 All menus follow the standardized key-based pattern with global command support:
+
 ```python
 def my_menu():
     """Menu implementation with global command support."""
@@ -2387,7 +2501,7 @@ def my_menu():
         "2": ("Option 2", function2),
         "0": ("🚪 Exit", None),
     }
-    
+
     menu_context = {
         "Purpose": "Menu purpose description",
         "Options": "Number of options available",
@@ -2395,12 +2509,12 @@ def my_menu():
         "Key Features": ["Feature 1", "Feature 2"],
         "Tips": ["Tip 1", "Tip 2"],
     }
-    
+
     while True:
         try:
             key = show_menu(
-                "Menu Title", 
-                options, 
+                "Menu Title",
+                options,
                 Mocha.lavender,
                 current_menu="Menu Name",
                 menu_context=menu_context
@@ -2563,12 +2677,13 @@ Dataset Forge is configured with three powerful MCP (Model Context Protocol) ser
 The project includes three MCP servers for enhanced development:
 
 - **Filesystem MCP**: Direct access to codebase and datasets
-- **Brave Search MCP**: Privacy-focused web research for ML techniques  
+- **Brave Search MCP**: Privacy-focused web research for ML techniques
 - **Firecrawl MCP**: Web scraping for documentation and resource extraction
 
 ### **Development Workflow Enhancements**
 
 #### **Code Analysis Workflow**
+
 ```bash
 # Daily Development Routine
 1. Use Filesystem MCP to navigate codebase
@@ -2579,6 +2694,7 @@ The project includes three MCP servers for enhanced development:
 ```
 
 #### **Research Integration Workflow**
+
 ```bash
 # Weekly Research Routine
 1. Search for new SISR papers and techniques
@@ -2591,21 +2707,25 @@ The project includes three MCP servers for enhanced development:
 ### **Proposed Improvements**
 
 #### **Enhanced Documentation System**
+
 - Add "Research Corner" section with latest ML findings
 - Include links to relevant papers and datasets
 - Provide integration guides for new tools
 
 #### **Automated Research Updates**
+
 - Create research automation system using MCP servers
 - Automatically update research database with new findings
 - Generate summary reports for new techniques
 
 #### **Enhanced Dataset Discovery**
+
 - Implement dataset discovery features using MCP servers
 - Search for new datasets and extract compatibility information
 - Generate compatibility reports for new datasets
 
 #### **Community Integration Hub**
+
 - Create community features section with user-submitted dataset reviews
 - Add performance benchmarks and real-world usage statistics
 - Implement tool integration requests and voting system
@@ -2613,6 +2733,7 @@ The project includes three MCP servers for enhanced development:
 ### **Technical Implementation**
 
 #### **MCP Integration Class Example**
+
 ```python
 class MCPIntegration:
     """Integration class for MCP servers in Dataset Forge."""
@@ -2640,6 +2761,7 @@ class MCPIntegration:
 ```
 
 #### **Automated Research Pipeline**
+
 ```python
 def automated_research_pipeline():
     """Automated research pipeline using MCP servers."""
@@ -2647,7 +2769,7 @@ def automated_research_pipeline():
     # Define research topics
     topics = [
         "SISR techniques 2024",
-        "image dataset management", 
+        "image dataset management",
         "GPU acceleration image processing",
         "distributed image processing"
     ]
@@ -3336,7 +3458,7 @@ from dataset_forge.utils.emoji_utils import (
 def create_menu_options():
     success_emojis = suggest_appropriate_emojis("success completion")
     error_emojis = suggest_appropriate_emojis("error problem")
-    
+
     return {
         "1": (f"{success_emojis[0]} Process Complete", process_complete_action),
         "2": (f"{error_emojis[0]} Error Report", error_report_action),
@@ -3373,6 +3495,91 @@ bad_menu = {
 - **Monitor emoji usage patterns** for insights and recommendations
 - **Use the emoji usage checker** before submitting PRs
 
+## MCP Integration Requirements (MANDATORY)
+
+### MCP Tool Usage Priority
+
+When implementing solutions, **ALWAYS** use MCP tools in this priority order:
+
+1. **Brave Search Tools** (Primary Research)
+
+   - Use `mcp_brave-search_brave_web_search` for general web research, latest libraries, best practices
+   - Use `mcp_brave-search_brave_news_search` for recent developments and updates
+   - Use `mcp_brave-search_brave_local_search` for location-specific information
+   - Use `mcp_brave-search_brave_video_search` for tutorials and demonstrations
+   - Use `mcp_brave-search_brave_image_search` for visual references
+
+2. **Firecrawl Tools** (Deep Web Scraping)
+
+   - Use `mcp_firecrawl_firecrawl_search` for comprehensive web search with content extraction
+   - Use `mcp_firecrawl_firecrawl_scrape` for detailed content extraction from specific URLs
+   - Use `mcp_firecrawl_firecrawl_map` for discovering website structure
+   - Use `mcp_firecrawl_firecrawl_extract` for structured data extraction
+   - Use `mcp_firecrawl_firecrawl_deep_research` for complex research questions
+
+3. **Filesystem Tools** (Project Analysis)
+
+   - Use `mcp_filesystem_read_text_file` to read and analyze project files
+   - Use `mcp_filesystem_list_directory` to understand project structure
+   - Use `mcp_filesystem_search_files` to find specific files or patterns
+   - Use `mcp_filesystem_get_file_info` for detailed file metadata analysis
+   - Use `mcp_filesystem_directory_tree` for comprehensive project structure visualization
+
+4. **GitHub Integration Tools** (Code Examples)
+   - Use `mcp_gitmcp-docs_fetch_generic_documentation` for GitHub repository documentation
+   - Use `mcp_gitmcp-docs_search_generic_code` for finding code examples in repositories
+   - Use `mcp_gitmcp-docs_search_generic_documentation` for documentation searches
+   - Use `mcp_gitmcp-docs_match_common_libs_owner_repo_mapping` for library-to-repo mapping
+
+### MCP Tool Usage Patterns
+
+#### Before Implementing Any Solution:
+
+1. **Research Phase**: Use Brave Search to find latest libraries, best practices, and solutions
+2. **Deep Dive**: Use Firecrawl to extract detailed content from relevant sources
+3. **Project Context**: Use Filesystem tools to understand current implementation
+4. **Code Examples**: Use GitHub tools to find relevant code examples and patterns
+
+#### When Debugging Issues:
+
+1. **Error Research**: Use Brave Search to find solutions for specific error messages
+2. **Documentation**: Use Firecrawl to extract troubleshooting guides
+3. **Project Analysis**: Use Filesystem tools to examine current code and configuration
+4. **Community Solutions**: Use GitHub tools to find similar issues and solutions
+
+#### When Adding New Features:
+
+1. **Best Practices**: Use Brave Search to find current best practices and patterns
+2. **Implementation Guides**: Use Firecrawl to extract detailed implementation tutorials
+3. **Project Integration**: Use Filesystem tools to understand how to integrate with existing code
+4. **Reference Implementations**: Use GitHub tools to find similar feature implementations
+
+### MCP Integration Requirements
+
+- **ALWAYS** use at least 2-3 MCP tools before implementing any solution
+- **ALWAYS** document MCP findings and rationale for chosen solutions
+- **ALWAYS** use MCP tools to validate assumptions about current best practices
+- **ALWAYS** use MCP tools to find the most recent and relevant information
+- **ALWAYS** use MCP tools to understand existing codebase patterns before making changes
+- **ALWAYS** use MCP tools to find appropriate solutions based on project context
+
+### MCP Tool Usage Examples
+
+```python
+# Example workflow for adding a new feature:
+# 1. Research current best practices
+mcp_brave-search_brave_web_search("latest Python image processing libraries 2024")
+
+# 2. Find specific implementation details
+mcp_firecrawl_firecrawl_search("Python PIL Pillow image processing best practices")
+
+# 3. Understand current project structure
+mcp_filesystem_list_directory("dataset_forge/utils")
+
+# 4. Find relevant code examples
+mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
+```
+
 ## Final Reminders
 
 1. **Always activate the virtual environment**: `venv312\Scripts\activate`
@@ -3387,6 +3594,7 @@ bad_menu = {
 10. **Always test your changes thoroughly before committing**
 11. **Always update documentation after adding new features or menus**
 12. **Always validate emojis and use context-aware emoji selection**
+13. **Always use MCP tools before implementing solutions to ensure current best practices**
 
 ---
 
@@ -3483,32 +3691,100 @@ bad_menu = {
 - **Testing**: Global command functionality must be covered by unit and integration tests
 - **Documentation**: Update help documentation when adding new menus or changing menu structure
 
-### MCP Integration Development
+### MCP Integration Development (MANDATORY)
 
-Dataset Forge is configured with three MCP (Model Context Protocol) servers for enhanced development:
+Dataset Forge is configured with comprehensive MCP (Model Context Protocol) servers for enhanced development. **ALL contributors MUST use MCP tools before implementing solutions.**
 
 #### **Available MCP Servers**
-- **Filesystem MCP**: Direct access to codebase and datasets for navigation and analysis
-- **Brave Search MCP**: Privacy-focused web research for ML techniques and tools
-- **Firecrawl MCP**: Web scraping for documentation and resource extraction
 
-#### **Development Workflow with MCP**
-```bash
-# Enhanced Development Routine
-1. Use Filesystem MCP to navigate and analyze codebase
-2. Use Brave Search to research new ML techniques and tools
-3. Use Firecrawl to extract relevant documentation and resources
-4. Implement improvements based on research findings
-5. Update documentation with new insights and techniques
+1. **Brave Search Tools** (Primary Research)
+
+   - `mcp_brave-search_brave_web_search` - General web research, latest libraries, best practices
+   - `mcp_brave-search_brave_news_search` - Recent developments and updates
+   - `mcp_brave-search_brave_local_search` - Location-specific information
+   - `mcp_brave-search_brave_video_search` - Tutorials and demonstrations
+   - `mcp_brave-search_brave_image_search` - Visual references
+
+2. **Firecrawl Tools** (Deep Web Scraping)
+
+   - `mcp_firecrawl_firecrawl_search` - Comprehensive web search with content extraction
+   - `mcp_firecrawl_firecrawl_scrape` - Detailed content extraction from specific URLs
+   - `mcp_firecrawl_firecrawl_map` - Discovering website structure
+   - `mcp_firecrawl_firecrawl_extract` - Structured data extraction
+   - `mcp_firecrawl_firecrawl_deep_research` - Complex research questions
+
+3. **Filesystem Tools** (Project Analysis)
+
+   - `mcp_filesystem_read_text_file` - Read and analyze project files
+   - `mcp_filesystem_list_directory` - Understand project structure
+   - `mcp_filesystem_search_files` - Find specific files or patterns
+   - `mcp_filesystem_get_file_info` - Detailed file metadata analysis
+   - `mcp_filesystem_directory_tree` - Comprehensive project structure visualization
+
+4. **GitHub Integration Tools** (Code Examples)
+   - `mcp_gitmcp-docs_fetch_generic_documentation` - GitHub repository documentation
+   - `mcp_gitmcp-docs_search_generic_code` - Finding code examples in repositories
+   - `mcp_gitmcp-docs_search_generic_documentation` - Documentation searches
+   - `mcp_gitmcp-docs_match_common_libs_owner_repo_mapping` - Library-to-repo mapping
+
+#### **MCP Tool Usage Patterns (MANDATORY)**
+
+##### Before Implementing Any Solution:
+
+1. **Research Phase**: Use Brave Search to find latest libraries, best practices, and solutions
+2. **Deep Dive**: Use Firecrawl to extract detailed content from relevant sources
+3. **Project Context**: Use Filesystem tools to understand current implementation
+4. **Code Examples**: Use GitHub tools to find relevant code examples and patterns
+
+##### When Debugging Issues:
+
+1. **Error Research**: Use Brave Search to find solutions for specific error messages
+2. **Documentation**: Use Firecrawl to extract troubleshooting guides
+3. **Project Analysis**: Use Filesystem tools to examine current code and configuration
+4. **Community Solutions**: Use GitHub tools to find similar issues and solutions
+
+##### When Adding New Features:
+
+1. **Best Practices**: Use Brave Search to find current best practices and patterns
+2. **Implementation Guides**: Use Firecrawl to extract detailed implementation tutorials
+3. **Project Integration**: Use Filesystem tools to understand how to integrate with existing code
+4. **Reference Implementations**: Use GitHub tools to find similar feature implementations
+
+#### **MCP Integration Requirements**
+
+- **ALWAYS** use at least 2-3 MCP tools before implementing any solution
+- **ALWAYS** document MCP findings and rationale for chosen solutions
+- **ALWAYS** use MCP tools to validate assumptions about current best practices
+- **ALWAYS** use MCP tools to find the most recent and relevant information
+- **ALWAYS** use MCP tools to understand existing codebase patterns before making changes
+- **ALWAYS** use MCP tools to find appropriate solutions based on project context
+
+#### **MCP Tool Usage Examples**
+
+```python
+# Example workflow for adding a new feature:
+# 1. Research current best practices
+mcp_brave-search_brave_web_search("latest Python image processing libraries 2024")
+
+# 2. Find specific implementation details
+mcp_firecrawl_firecrawl_search("Python PIL Pillow image processing best practices")
+
+# 3. Understand current project structure
+mcp_filesystem_list_directory("dataset_forge/utils")
+
+# 4. Find relevant code examples
+mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
 ```
 
 #### **Research Integration**
+
 - **Automated Research**: Use MCP servers to automatically research new SISR techniques and tools
 - **Documentation Extraction**: Extract and analyze documentation from external sources
 - **Community Research**: Research community feedback and competitor features
 - **Implementation Planning**: Use research findings to plan new features and improvements
 
 #### **Code Quality Enhancement**
+
 - **Pattern Analysis**: Use Filesystem MCP to analyze code patterns and consistency
 - **Documentation Coverage**: Use MCP servers to identify missing documentation topics
 - **Feature Research**: Research new features and tools for potential integration
@@ -3556,6 +3832,33 @@ For questions, open an issue or contact the project maintainer.
 
 ## [Unreleased]
 
+### 🔗 MCP Integration Implementation (August 2025)
+
+- **New Feature**: Comprehensive MCP (Model Context Protocol) integration for enhanced development workflow
+- **MCP Tools Configured**:
+  - **Brave Search Tools**: Primary research for latest libraries, best practices, and solutions
+  - **Firecrawl Tools**: Deep web scraping for documentation and content extraction
+  - **Filesystem Tools**: Project analysis and file management
+  - **GitHub Integration Tools**: Code examples and repository documentation
+- **Key Features**:
+  - **Mandatory MCP Tool Usage**: All contributors must use MCP tools before implementing solutions
+  - **Tool Usage Patterns**: Clear workflows for different development scenarios (implementing, debugging, adding features)
+  - **Priority Order**: Brave Search → Firecrawl → Filesystem → GitHub Integration
+  - **Usage Examples**: Practical code examples for each tool category
+  - **Integration Requirements**: Specific requirements for MCP tool usage and documentation
+- **Files Updated**:
+  - `.cursorrules` - Added comprehensive MCP Integration (MANDATORY) section with tool usage patterns
+  - `docs/style_guide.md` - Added MCP Integration Requirements section
+  - `docs/contributing.md` - Enhanced MCP Integration Development section with mandatory requirements
+  - `docs/TODO.md` - Added completion status for MCP Integration
+- **Development Workflow Enhancement**:
+  - Research Phase: Use Brave Search for latest libraries and best practices
+  - Deep Dive: Use Firecrawl for detailed content extraction
+  - Project Context: Use Filesystem tools for current implementation analysis
+  - Code Examples: Use GitHub tools for relevant code patterns
+- **Result**: Enhanced development workflow with comprehensive research and analysis capabilities
+- **Documentation**: Complete integration with existing documentation structure and development standards
+
 ### 🔊 Audio System Investigation & Robust Multi-Library Implementation (August 2025)
 
 - **Problem Resolved**: CLI hanging during exit due to audio playback issues
@@ -3577,7 +3880,7 @@ For questions, open an issue or contact the project maintainer.
   - `error.mp3` (32,600 bytes) - Error feedback
   - `startup.mp3` (78,240 bytes) - Application startup
   - `shutdown.mp3` (23,808 bytes) - Application exit
-- **Dependencies Added**: 
+- **Dependencies Added**:
   - `playsound==1.2.2` - Primary audio library
   - `pydub` - Alternative audio library for various formats
 - **Testing**: Comprehensive testing of all exit methods (`q`, `quit`, `exit`, `0`, `Ctrl+C`)

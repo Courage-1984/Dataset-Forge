@@ -77,32 +77,100 @@
 - **Testing**: Global command functionality must be covered by unit and integration tests
 - **Documentation**: Update help documentation when adding new menus or changing menu structure
 
-### MCP Integration Development
+### MCP Integration Development (MANDATORY)
 
-Dataset Forge is configured with three MCP (Model Context Protocol) servers for enhanced development:
+Dataset Forge is configured with comprehensive MCP (Model Context Protocol) servers for enhanced development. **ALL contributors MUST use MCP tools before implementing solutions.**
 
 #### **Available MCP Servers**
-- **Filesystem MCP**: Direct access to codebase and datasets for navigation and analysis
-- **Brave Search MCP**: Privacy-focused web research for ML techniques and tools
-- **Firecrawl MCP**: Web scraping for documentation and resource extraction
 
-#### **Development Workflow with MCP**
-```bash
-# Enhanced Development Routine
-1. Use Filesystem MCP to navigate and analyze codebase
-2. Use Brave Search to research new ML techniques and tools
-3. Use Firecrawl to extract relevant documentation and resources
-4. Implement improvements based on research findings
-5. Update documentation with new insights and techniques
+1. **Brave Search Tools** (Primary Research)
+
+   - `mcp_brave-search_brave_web_search` - General web research, latest libraries, best practices
+   - `mcp_brave-search_brave_news_search` - Recent developments and updates
+   - `mcp_brave-search_brave_local_search` - Location-specific information
+   - `mcp_brave-search_brave_video_search` - Tutorials and demonstrations
+   - `mcp_brave-search_brave_image_search` - Visual references
+
+2. **Firecrawl Tools** (Deep Web Scraping)
+
+   - `mcp_firecrawl_firecrawl_search` - Comprehensive web search with content extraction
+   - `mcp_firecrawl_firecrawl_scrape` - Detailed content extraction from specific URLs
+   - `mcp_firecrawl_firecrawl_map` - Discovering website structure
+   - `mcp_firecrawl_firecrawl_extract` - Structured data extraction
+   - `mcp_firecrawl_firecrawl_deep_research` - Complex research questions
+
+3. **Filesystem Tools** (Project Analysis)
+
+   - `mcp_filesystem_read_text_file` - Read and analyze project files
+   - `mcp_filesystem_list_directory` - Understand project structure
+   - `mcp_filesystem_search_files` - Find specific files or patterns
+   - `mcp_filesystem_get_file_info` - Detailed file metadata analysis
+   - `mcp_filesystem_directory_tree` - Comprehensive project structure visualization
+
+4. **GitHub Integration Tools** (Code Examples)
+   - `mcp_gitmcp-docs_fetch_generic_documentation` - GitHub repository documentation
+   - `mcp_gitmcp-docs_search_generic_code` - Finding code examples in repositories
+   - `mcp_gitmcp-docs_search_generic_documentation` - Documentation searches
+   - `mcp_gitmcp-docs_match_common_libs_owner_repo_mapping` - Library-to-repo mapping
+
+#### **MCP Tool Usage Patterns (MANDATORY)**
+
+##### Before Implementing Any Solution:
+
+1. **Research Phase**: Use Brave Search to find latest libraries, best practices, and solutions
+2. **Deep Dive**: Use Firecrawl to extract detailed content from relevant sources
+3. **Project Context**: Use Filesystem tools to understand current implementation
+4. **Code Examples**: Use GitHub tools to find relevant code examples and patterns
+
+##### When Debugging Issues:
+
+1. **Error Research**: Use Brave Search to find solutions for specific error messages
+2. **Documentation**: Use Firecrawl to extract troubleshooting guides
+3. **Project Analysis**: Use Filesystem tools to examine current code and configuration
+4. **Community Solutions**: Use GitHub tools to find similar issues and solutions
+
+##### When Adding New Features:
+
+1. **Best Practices**: Use Brave Search to find current best practices and patterns
+2. **Implementation Guides**: Use Firecrawl to extract detailed implementation tutorials
+3. **Project Integration**: Use Filesystem tools to understand how to integrate with existing code
+4. **Reference Implementations**: Use GitHub tools to find similar feature implementations
+
+#### **MCP Integration Requirements**
+
+- **ALWAYS** use at least 2-3 MCP tools before implementing any solution
+- **ALWAYS** document MCP findings and rationale for chosen solutions
+- **ALWAYS** use MCP tools to validate assumptions about current best practices
+- **ALWAYS** use MCP tools to find the most recent and relevant information
+- **ALWAYS** use MCP tools to understand existing codebase patterns before making changes
+- **ALWAYS** use MCP tools to find appropriate solutions based on project context
+
+#### **MCP Tool Usage Examples**
+
+```python
+# Example workflow for adding a new feature:
+# 1. Research current best practices
+mcp_brave-search_brave_web_search("latest Python image processing libraries 2024")
+
+# 2. Find specific implementation details
+mcp_firecrawl_firecrawl_search("Python PIL Pillow image processing best practices")
+
+# 3. Understand current project structure
+mcp_filesystem_list_directory("dataset_forge/utils")
+
+# 4. Find relevant code examples
+mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
 ```
 
 #### **Research Integration**
+
 - **Automated Research**: Use MCP servers to automatically research new SISR techniques and tools
 - **Documentation Extraction**: Extract and analyze documentation from external sources
 - **Community Research**: Research community feedback and competitor features
 - **Implementation Planning**: Use research findings to plan new features and improvements
 
 #### **Code Quality Enhancement**
+
 - **Pattern Analysis**: Use Filesystem MCP to analyze code patterns and consistency
 - **Documentation Coverage**: Use MCP servers to identify missing documentation topics
 - **Feature Research**: Research new features and tools for potential integration
