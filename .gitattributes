@@ -1,8 +1,8 @@
 # ─── Text file normalization ───
-* text=auto             # Normalize LF/CRLF on all text files
+* text=auto
 # ─── Enforce line endings for scripts ─
-*.py   text eol=lf      # Python scripts use LF
-*.sh   text eol=lf      # Shell scripts use LF
+*.py   text eol=lf
+*.sh   text eol=lf
 # ─── Treat specific files as binary ─
 *.png  binary
 *.PNG  binary
@@ -46,4 +46,11 @@ bin/** linguist-language=Shell
 # Custom overrides (optional)
 *.md linguist-language=Markdown
 *.txt linguist-language=Text
+*.bat linguist-language=Batchfile
 *.zip filter=lfs diff=lfs merge=lfs -text
+*.tar filter=lfs diff=lfs merge=lfs -text
+*.tar.gz filter=lfs diff=lfs merge=lfs -text
+*.tar.bz2 filter=lfs diff=lfs merge=lfs -text
+*.tar.xz filter=lfs diff=lfs merge=lfs -text
+*.tar.lzma filter=lfs diff=lfs merge=lfs -text
+*.tar.lzma filter=lfs diff=lfs merge=lfs -text

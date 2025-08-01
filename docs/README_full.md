@@ -24,6 +24,9 @@
 - [Special Installation Instructions](special_installation.md)
   - [1. PyTorch with CUDA (GPU Acceleration)](special_installation.md#1-pytorch-with-cuda-gpu-acceleration)
   - [2. VapourSynth & getnative](special_installation.md#2-vapoursynth--getnative)
+    - [Method 1: Windows (Quick)](special_installation.md#method-1-windows-quick)
+    - [Method 2: Windows (Better; but *TRICKY*...)](special_installation.md#method-2-windows-better-but-tricky)
+    - [Method 3: Windows (try building `getnative.exe` yourself)](special_installation.md#method-3-windows-try-building-getnativeexe-yourself)
   - [3. python-magic (for `Enhanced Directory Tree`)](special_installation.md#3-python-magic-for-enhanced-directory-tree)
   - [4. Using resdet for Native Resolution Detection](special_installation.md#4-using-resdet-for-native-resolution-detection)
     - [Method 1: Windows (WSL - Recommended for CLI Integration)](special_installation.md#method-1-windows-wsl---recommended-for-cli-integration)
@@ -509,6 +512,16 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 > (for [getnative](https://github.com/Infiziert90/getnative) functionality/native resolution detection)
 
+### Method 1: Windows (Quick)
+
+1. Extract the following file from `assets/getnative.zip`:
+
+   - `getnative.exe`
+
+2. Add the `getnative.exe` file's path to your PATH.
+
+### Method 2: Windows (Better; but *TRICKY*...)
+
 **VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
 **Steps (Windows):**
@@ -534,13 +547,33 @@ venv312\Scripts\activate
 pip install getnative
 ```
 
-- See [Getnative Recommended Windows Installation](https://github.com/Infiziert90/getnative?tab=readme-ov-file#recommended-windows-installation) for more details.
+### Method 3: Windows (try building `getnative.exe` yourself)
+
+**Steps (Windows):**
+
+1. Git clone the [getnative repo](https://github.com/Infiziert90/getnative):
+
+```bat
+git clone https://github.com/Infiziert90/getnative.git
+cd getnative
+```
+
+2. Extract the following folder from `assets/vapoursynth_install.zip`:
+
+   - `vapoursynth_install`
+
+3. Copy the contents of the `vapoursynth_install` folder to ./getnative/ repo root and REPLACE existing files.
+
+4. Follow the steps outlined in `env_create.md` which should be in your ./getnative/ repo root.
 
 **Troubleshooting:**
 
 - Install VapourSynth _before_ getnative or any requirements that depend on it.
 - If getnative fails to import, check that VapourSynth is installed and on your PATH.
 - Also make sure directory containing `vsrepo.py` and the plugin's folder containing the `.dll`s are also on your PATH.
+- `./assets/vapoursynth_plugins_dll.zip` contains all 4 of the vapoursynth plugins' dll's (`descale`, `ffms2`, `lsmas` & `imwri`) for whatever its worth.
+
+- See [Getnative Recommended Windows Installation](https://github.com/Infiziert90/getnative?tab=readme-ov-file#recommended-windows-installation) for more details.
 
 ---
 
