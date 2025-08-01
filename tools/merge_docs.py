@@ -25,6 +25,7 @@ DOC_ORDER = [
     "getting_started.md",  # Install & setup
     "special_installation.md",  # Special installation instructions
     "features.md",  # Features overview
+    "TODO.md",  # TODO list
     "usage.md",  # Usage guide
     "advanced.md",  # Advanced features
     "architecture.md",  # Project architecture

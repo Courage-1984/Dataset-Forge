@@ -44,10 +44,10 @@ This guide will help you install and launch Dataset Forge for the first time.
 
 ```bash
 ./run.bat
-# or
+OR
 venv312\Scripts\activate
 py main.py
-# or
+OR
 dataset-forge
 ```
 

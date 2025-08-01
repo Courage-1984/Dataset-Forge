@@ -18,8 +18,6 @@
   - [Prerequisites](getting_started.md#prerequisites)
   - [Installation](getting_started.md#installation)
   - [First Run](getting_started.md#first-run)
-- [or](getting_started.md#or)
-- [or](getting_started.md#or)
   - [Special Installation Notes](getting_started.md#special-installation-notes)
   - [Need Help?](getting_started.md#need-help)
   - [See Also](getting_started.md#see-also)
@@ -44,8 +42,6 @@
       - [Method 1: Gem Installation (Recommended)](special_installation.md#method-1-gem-installation-recommended)
       - [Method 2.1: Standalone Executable (Quick)](special_installation.md#method-21-standalone-executable-quick)
       - [Method 2.2: Standalone Executable (Advanced)](special_installation.md#method-22-standalone-executable-advanced)
-- [Remove the old OCRA](special_installation.md#remove-the-old-ocra)
-- [Install the newer OCRAN (maintained fork)](special_installation.md#install-the-newer-ocran-maintained-fork)
     - [steghide installation](special_installation.md#steghide-installation)
       - [Method 1.1: Windows (Quick)](special_installation.md#method-11-windows-quick)
       - [Method 1.2: Windows (Better)](special_installation.md#method-12-windows-better)
@@ -108,6 +104,7 @@
 - [🩺 Dataset Health Scoring (NEW July 2025)](features.md#-dataset-health-scoring-new-july-2025)
 - [🔊 Project Sounds & Audio Feedback](features.md#-project-sounds--audio-feedback)
   - [🖥️ User Experience and CLI Features](features.md#-user-experience-and-cli-features)
+- [📝 TODO / Planned Features](TODO.md)
 - [Usage Guide](usage.md)
   - [Quick Reference](usage.md#quick-reference)
   - [Global Commands & Menu Navigation](usage.md#global-commands--menu-navigation)
@@ -184,7 +181,6 @@
       - [**MCP Integration Class Example**](advanced.md#mcp-integration-class-example)
       - [**Automated Research Pipeline**](advanced.md#automated-research-pipeline)
     - [**Success Metrics**](advanced.md#success-metrics)
-  - [Planned/Future Advanced Features](advanced.md#plannedfuture-advanced-features)
   - [See Also](advanced.md#see-also)
 - [Project Architecture](architecture.md)
   - [Directory Structure (High-Level)](architecture.md#directory-structure-high-level)
@@ -424,10 +420,10 @@ This guide will help you install and launch Dataset Forge for the first time.
 
 ```bash
 ./run.bat
-# or
+OR
 venv312\Scripts\activate
 py main.py
-# or
+OR
 dataset-forge
 ```
 
@@ -765,11 +761,10 @@ For users who need a standalone `zsteg.exe` executable:
 
 3. Remove old OCRA and install OCRAN
 
-```bash
-# Remove the old OCRA
-gem uninstall ocra
+-  Remove the old OCRA then install the newer OCRAN (maintained fork)
 
-# Install the newer OCRAN (maintained fork)
+```bash
+gem uninstall ocra
 gem install ocran
 ```
 
@@ -1437,6 +1432,83 @@ These sounds help you know instantly when an operation finishes, fails, or the a
 ## 🖥️ User Experience and CLI Features
 
 - All interactive workflows and menu actions print clear, Mocha-styled headings before input/output prompts and before progress bars or long-running operations. This provides context and improves navigation. See the Style Guide for implementation details.
+
+---
+
+
+# Todo
+
+
+# 📝 TODO / Planned Features
+
+> This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place and keep being inspired.
+
+---
+
+- [ ] **Debug Mode**: I want to add a _Debug Mode_ to my project, which when used, activates the showing of more verbose output and debug output/print
+- [ ] **tl;dr**: Create a '# Features (tl;dr)' section in ./docs/features.md
+- [ ] **_Packaging_**: "Compile Dataset-Forge" AND/OR "Create docker file/container"
+- [ ] **Automated Documentation**
+- [ ] **Augmentation**: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
+- [x] **Dataset Health Scoring**: Add a "Dataset Health Scoring" workflow and menu option
+- [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
+- [ ] **Phhofm's sisr**: Investigate Phhofm's [sisr](https://github.com/Phhofm/sisr) for stuff i can add to DF
+- [x] **the-database's img-ab**: Fork and improve.
+- [ ] **Links .json's**: Further customize, add metadata, description, etc/
+- [ ] **Advanced Filtering / AI-Powered Features**:
+
+<details>
+<summary>Expand for details ^^</summary>
+
+```
+Semantic Filtering: Filter by image content/semantics
+Style-Based Filtering: Filter by artistic style
+Quality-Based Filtering: Advanced quality assessment filters
+Custom Filter Plugins: User-defined filtering logic
+Auto-Labeling: Automatic image labeling and classification
+Style Transfer: Apply artistic styles to datasets
+Content-Aware Cropping: Intelligent image cropping
+```
+
+</details>
+
+- [ ] **Advanced Data Augmentation**:
+
+<details>
+<summary>Expand for details ^^</summary>
+
+```
+What: Expand the augmentation capabilities to include more complex, model-aware techniques.
+
+Why: Your current augmentations are great for general image processing. Adding advanced techniques can significantly improve model generalization during training.
+
+Suggestions:
+- Compositional Augmentations: Integrate a library like Albumentations to create complex augmentation pipelines.
+- Mixing Augmentations: Implement Mixup (linearly interpolating images and their labels) and CutMix (pasting a patch from one image onto another).
+- GAN-based Augmentations: For advanced users, integrate with a pre-trained StyleGAN to generate synthetic data variations.
+
+```
+
+</details>
+
+
+
+- [ ] **Onboarding**: Add 'onboarding' doc/flow
+- [ ] **Build**: Release a stable build at some point
+
+- [ ] Advanced options for Align Images (SIFT/FLANN parameters, etc.).
+- [ ] Further modularization and extensibility for new workflows.
+- [ ] More advanced analytics and monitoring.
+- [ ] AI-powered dataset analysis and recommendations.
+- [ ] Cloud integration for distributed processing and storage.
+- [ ] Web interface for dataset management and visualization.
+- [ ] **Parallel Import Loading**: Load multiple modules in parallel with threading
+- [ ] **Smart Caching**: Predictive loading of frequently used modules
+- [ ] **Import Optimization**: Compile-time import analysis and automatic conversion
+- [ ] **Performance Monitoring**: Real-time metrics and automated regression detection
+
+---
+
 
 ---
 
@@ -2139,19 +2211,6 @@ def automated_research_pipeline():
 - **Development Efficiency**: Code navigation time reduced by 50%, research time reduced by 30%
 - **Project Visibility**: Improved search engine ranking and GitHub stars
 - **Feature Quality**: Research-based features implemented with improved user satisfaction
-
-## Planned/Future Advanced Features
-
-- Advanced options for Align Images (SIFT/FLANN parameters, etc.).
-- Further modularization and extensibility for new workflows.
-- More advanced analytics and monitoring.
-- AI-powered dataset analysis and recommendations.
-- Cloud integration for distributed processing and storage.
-- Web interface for dataset management and visualization.
-- **Parallel Import Loading**: Load multiple modules in parallel with threading
-- **Smart Caching**: Predictive loading of frequently used modules
-- **Import Optimization**: Compile-time import analysis and automatic conversion
-- **Performance Monitoring**: Real-time metrics and automated regression detection
 
 ---
 

@@ -300,11 +300,10 @@ For users who need a standalone `zsteg.exe` executable:
 
 3. Remove old OCRA and install OCRAN
 
-```bash
-# Remove the old OCRA
-gem uninstall ocra
+-  Remove the old OCRA then install the newer OCRAN (maintained fork)
 
-# Install the newer OCRAN (maintained fork)
+```bash
+gem uninstall ocra
 gem install ocran
 ```
 
