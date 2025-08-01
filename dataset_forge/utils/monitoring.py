@@ -18,23 +18,17 @@ import threading
 import time
 from typing import List, Dict, Optional, Any
 
-import psutil
 import uuid
 import signal
 import sys
 
-try:
-    import GPUtil
-except ImportError:
-    GPUtil = None
-try:
-    import torch
-except ImportError:
-    torch = None
-try:
-    import pygame
-except ImportError:
-    pygame = None
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    psutil,
+    GPUtil,
+    torch,
+    pygame,
+)
 
 from logging.handlers import RotatingFileHandler
 

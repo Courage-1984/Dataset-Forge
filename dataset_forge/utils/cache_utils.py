@@ -24,10 +24,6 @@ import pickle
 import gzip
 import shutil
 
-# Third-party imports
-from joblib import Memory
-import numpy as np
-
 # Local imports
 from dataset_forge.utils.printing import (
     print_info,
@@ -36,6 +32,12 @@ from dataset_forge.utils.printing import (
     print_success,
 )
 from dataset_forge.utils.monitoring import monitor_all
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    joblib,
+    numpy_as_np as np,
+)
 
 
 # ============================================================================
@@ -55,7 +57,7 @@ for cache_dir in [CACHE_BASE_DIR, DISK_CACHE_DIR, MODEL_CACHE_DIR, STATS_CACHE_D
     os.makedirs(cache_dir, exist_ok=True)
 
 # Initialize joblib memory for disk caching
-disk_memory = Memory(DISK_CACHE_DIR, verbose=0)
+disk_memory = joblib.Memory(DISK_CACHE_DIR, verbose=0)
 
 # Global cache statistics
 _cache_stats = {
@@ -282,7 +284,7 @@ def disk_cache(
         Decorated function with disk caching
     """
     # Use custom memory instance if cache_dir specified
-    memory_instance = Memory(cache_dir or DISK_CACHE_DIR, verbose=0)
+    memory_instance = joblib.Memory(cache_dir or DISK_CACHE_DIR, verbose=0)
 
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)

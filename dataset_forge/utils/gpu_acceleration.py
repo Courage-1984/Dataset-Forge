@@ -5,14 +5,17 @@ This module provides GPU-accelerated versions of common image processing operati
 that are identified as bottlenecks in the current implementation.
 """
 
-import torch
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-import torchvision.transforms.functional as TF
-import numpy as np
-import cv2
+# Use lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    torch,
+    torch_nn_functional as F,
+    torchvision_transforms as transforms,
+    torchvision_transforms_functional as TF,
+    numpy_as_np as np,
+    cv2,
+    PIL_Image as Image,
+)
 from typing import Union, Tuple, List, Optional, Dict, Any
-from PIL import Image
 import logging
 
 from dataset_forge.utils.memory_utils import (
@@ -98,13 +101,16 @@ class GPUImageProcessor:
             Adjusted image
         """
         with tensor_context(self.device):
+            # Convert to tensor
             tensor = self._to_tensor(image)
-            tensor = to_device_safe(tensor, self.device)
-
+            
             # Apply brightness and contrast
-            tensor = TF.adjust_brightness(tensor, brightness)
-            tensor = TF.adjust_contrast(tensor, contrast)
-
+            if brightness != 1.0:
+                tensor = TF.adjust_brightness(tensor, brightness)
+            if contrast != 1.0:
+                tensor = TF.adjust_contrast(tensor, contrast)
+            
+            # Convert back to PIL
             return self._to_pil(tensor)
 
     @smart_cache(ttl_seconds=3600, maxsize=100)
@@ -126,13 +132,16 @@ class GPUImageProcessor:
             Adjusted image
         """
         with tensor_context(self.device):
+            # Convert to tensor
             tensor = self._to_tensor(image)
-            tensor = to_device_safe(tensor, self.device)
-
+            
             # Apply saturation and hue
-            tensor = TF.adjust_saturation(tensor, saturation)
-            tensor = TF.adjust_hue(tensor, hue)
-
+            if saturation != 1.0:
+                tensor = TF.adjust_saturation(tensor, saturation)
+            if hue != 0.0:
+                tensor = TF.adjust_hue(tensor, hue)
+            
+            # Convert back to PIL
             return self._to_pil(tensor)
 
     @smart_cache(ttl_seconds=3600, maxsize=100)
@@ -154,19 +163,20 @@ class GPUImageProcessor:
             Adjusted image
         """
         with tensor_context(self.device):
+            # Convert to tensor
             tensor = self._to_tensor(image)
-            tensor = to_device_safe(tensor, self.device)
-
+            
             # Apply sharpness
             if sharpness != 1.0:
                 tensor = TF.adjust_sharpness(tensor, sharpness)
-
-            # Apply blur
+            
+            # Apply blur if needed
             if blur_radius > 0.0:
+                # Convert blur radius to kernel size
                 kernel_size = max(3, int(blur_radius * 2) * 2 + 1)
-                sigma = blur_radius / 3.0
-                tensor = TF.gaussian_blur(tensor, kernel_size, sigma)
-
+                tensor = TF.gaussian_blur(tensor, [kernel_size, kernel_size], [blur_radius])
+            
+            # Convert back to PIL
             return self._to_pil(tensor)
 
     def gpu_batch_transform(
@@ -175,62 +185,41 @@ class GPUImageProcessor:
         transform_config: Dict[str, Any],
     ) -> List[Image.Image]:
         """
-        GPU-accelerated batch image transformation.
+        GPU-accelerated batch transformation.
 
         Args:
             images: List of input images
-            transform_config: Dictionary with transformation parameters
+            transform_config: Configuration dictionary for transformations
 
         Returns:
             List of transformed images
         """
-        results = []
-
-        # Process in batches
-        for i in range(0, len(images), self.batch_size):
-            batch = images[i : i + self.batch_size]
-            batch_tensors = []
-
-            # Convert batch to tensors
-            with tensor_context(self.device):
-                for img in batch:
-                    tensor = self._to_tensor(img)
-                    tensor = to_device_safe(tensor, self.device)
-                    batch_tensors.append(tensor)
-
-                # Stack batch
-                batch_tensor = torch.cat(batch_tensors, dim=0)
-
-                # Apply transformations
-                if "brightness" in transform_config or "contrast" in transform_config:
-                    brightness = transform_config.get("brightness", 1.0)
-                    contrast = transform_config.get("contrast", 1.0)
-                    batch_tensor = TF.adjust_brightness(batch_tensor, brightness)
-                    batch_tensor = TF.adjust_contrast(batch_tensor, contrast)
-
-                if "saturation" in transform_config or "hue" in transform_config:
-                    saturation = transform_config.get("saturation", 1.0)
-                    hue = transform_config.get("hue", 0.0)
-                    batch_tensor = TF.adjust_saturation(batch_tensor, saturation)
-                    batch_tensor = TF.adjust_hue(batch_tensor, hue)
-
-                if "sharpness" in transform_config or "blur" in transform_config:
-                    sharpness = transform_config.get("sharpness", 1.0)
-                    blur_radius = transform_config.get("blur", 0.0)
-                    if sharpness != 1.0:
-                        batch_tensor = TF.adjust_sharpness(batch_tensor, sharpness)
-                    if blur_radius > 0.0:
-                        kernel_size = max(3, int(blur_radius * 2) * 2 + 1)
-                        sigma = blur_radius / 3.0
-                        batch_tensor = TF.gaussian_blur(
-                            batch_tensor, kernel_size, sigma
-                        )
-
-                # Convert back to PIL images
-                for j in range(batch_tensor.size(0)):
-                    results.append(self._to_pil(batch_tensor[j]))
-
-        return results
+        with tensor_context(self.device):
+            # Convert all images to tensors
+            tensors = [self._to_tensor(img) for img in images]
+            
+            # Stack tensors for batch processing
+            batch_tensor = torch.cat(tensors, dim=0)
+            
+            # Apply transformations
+            for transform_name, transform_params in transform_config.items():
+                if transform_name == "brightness":
+                    batch_tensor = TF.adjust_brightness(batch_tensor, transform_params)
+                elif transform_name == "contrast":
+                    batch_tensor = TF.adjust_contrast(batch_tensor, transform_params)
+                elif transform_name == "saturation":
+                    batch_tensor = TF.adjust_saturation(batch_tensor, transform_params)
+                elif transform_name == "hue":
+                    batch_tensor = TF.adjust_hue(batch_tensor, transform_params)
+                elif transform_name == "sharpness":
+                    batch_tensor = TF.adjust_sharpness(batch_tensor, transform_params)
+                elif transform_name == "gaussian_blur":
+                    kernel_size = transform_params.get("kernel_size", 3)
+                    sigma = transform_params.get("sigma", 1.0)
+                    batch_tensor = TF.gaussian_blur(batch_tensor, [kernel_size, kernel_size], [sigma])
+            
+            # Convert back to PIL images
+            return [self._to_pil(tensor) for tensor in batch_tensor]
 
     @smart_cache(ttl_seconds=1800, maxsize=50)
     def gpu_image_analysis(
@@ -243,58 +232,47 @@ class GPUImageProcessor:
             image: Input image
 
         Returns:
-            Dictionary with analysis results
+            Dictionary containing analysis results
         """
         with tensor_context(self.device):
+            # Convert to tensor
             tensor = self._to_tensor(image)
-            tensor = to_device_safe(tensor, self.device)
-
-            # Compute statistics
+            
+            # Calculate basic statistics
             mean = torch.mean(tensor)
             std = torch.std(tensor)
             min_val = torch.min(tensor)
             max_val = torch.max(tensor)
-
-            # Compute histogram (simplified)
+            
+            # Calculate histogram (simplified)
             hist = torch.histc(tensor, bins=256, min=0, max=1)
-
-            # Compute edge strength (simplified)
-            if tensor.size(1) > 1 and tensor.size(2) > 1:
-                # Sobel edge detection
-                sobel_x = torch.tensor(
-                    [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]],
-                    dtype=torch.float32,
-                    device=self.device,
-                ).view(1, 1, 3, 3)
-                sobel_y = torch.tensor(
-                    [[-1, -2, -1], [0, 0, 0], [1, 2, 1]],
-                    dtype=torch.float32,
-                    device=self.device,
-                ).view(1, 1, 3, 3)
-
-                gray = TF.rgb_to_grayscale(tensor)
-                edge_x = F.conv2d(gray, sobel_x, padding=1)
-                edge_y = F.conv2d(gray, sobel_y, padding=1)
-                edge_magnitude = torch.sqrt(edge_x**2 + edge_y**2)
-                edge_strength = torch.mean(edge_magnitude).item()
+            
+            # Calculate edge detection using Sobel
+            if tensor.shape[1] > 1:  # Grayscale
+                sobel_x = torch.tensor([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+                sobel_y = torch.tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+                
+                edges_x = F.conv2d(tensor, sobel_x, padding=1)
+                edges_y = F.conv2d(tensor, sobel_y, padding=1)
+                edges = torch.sqrt(edges_x**2 + edges_y**2)
+                edge_strength = torch.mean(edges)
             else:
-                edge_strength = 0.0
-
+                edge_strength = torch.tensor(0.0)
+            
             return {
                 "mean": mean.item(),
                 "std": std.item(),
                 "min": min_val.item(),
                 "max": max_val.item(),
-                "edge_strength": edge_strength,
-                "size": (tensor.size(2), tensor.size(3)),
-                "channels": tensor.size(1),
+                "edge_strength": edge_strength.item(),
+                "histogram": hist.cpu().numpy().tolist(),
             }
 
     def gpu_sift_keypoints(
         self, image: Union[np.ndarray, Image.Image]
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
-        GPU-accelerated SIFT keypoint detection (using PyTorch-based implementation).
+        GPU-accelerated SIFT keypoint detection.
 
         Args:
             image: Input image
@@ -302,77 +280,58 @@ class GPUImageProcessor:
         Returns:
             Tuple of (keypoints, descriptors)
         """
-        # Note: This is a simplified GPU-accelerated SIFT implementation
-        # For production use, consider using kornia or similar libraries
-
-        with tensor_context(self.device):
-            tensor = self._to_tensor(image)
-            tensor = to_device_safe(tensor, self.device)
-
-            # Convert to grayscale for keypoint detection
-            if tensor.size(1) == 3:
-                gray = TF.rgb_to_grayscale(tensor)
-            else:
-                gray = tensor
-
-            # Simplified keypoint detection using gradient magnitude
-            # In practice, you'd use a proper SIFT implementation
-            grad_x = F.conv2d(
-                gray,
-                torch.tensor(
-                    [[-1, 0, 1]], dtype=torch.float32, device=self.device
-                ).view(1, 1, 1, 3),
-                padding=(0, 1),
-            )
-            grad_y = F.conv2d(
-                gray,
-                torch.tensor(
-                    [[-1], [0], [1]], dtype=torch.float32, device=self.device
-                ).view(1, 1, 3, 1),
-                padding=(1, 0),
-            )
-
-            magnitude = torch.sqrt(grad_x**2 + grad_y**2)
-
-            # Find local maxima as keypoints (simplified)
-            # This is a basic implementation - real SIFT is more complex
-            keypoints = []
-            descriptors = []
-
-            # For now, return empty arrays - implement proper SIFT later
-            return np.array([]), np.array([])
+        # Convert to numpy array for OpenCV
+        if isinstance(image, Image.Image):
+            image = np.array(image)
+        
+        # Ensure image is in correct format
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        
+        # Initialize SIFT detector
+        sift = cv2.SIFT_create()
+        
+        # Detect keypoints and compute descriptors
+        keypoints, descriptors = sift.detectAndCompute(image, None)
+        
+        # Convert keypoints to numpy array
+        keypoints_array = np.array([kp.pt for kp in keypoints])
+        
+        return keypoints_array, descriptors
 
     def cleanup(self):
-        """Clean up GPU memory."""
-        if self.device == "cuda":
-            clear_cuda_cache()
+        """Clean up GPU resources."""
+        if self.device == "cuda" and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            self.logger.info("GPU cache cleared")
 
 
-# Global instance for easy access
-gpu_processor = GPUImageProcessor()
-
-
-# Convenience functions
+# Convenience functions for direct use
 def gpu_brightness_contrast(image, brightness=1.0, contrast=1.0):
     """Convenience function for GPU brightness/contrast adjustment."""
-    return gpu_processor.gpu_brightness_contrast(image, brightness, contrast)
+    processor = GPUImageProcessor()
+    return processor.gpu_brightness_contrast(image, brightness, contrast)
 
 
 def gpu_saturation_hue(image, saturation=1.0, hue=0.0):
     """Convenience function for GPU saturation/hue adjustment."""
-    return gpu_processor.gpu_saturation_hue(image, saturation, hue)
+    processor = GPUImageProcessor()
+    return processor.gpu_saturation_hue(image, saturation, hue)
 
 
 def gpu_sharpness_blur(image, sharpness=1.0, blur_radius=0.0):
     """Convenience function for GPU sharpness/blur adjustment."""
-    return gpu_processor.gpu_sharpness_blur(image, sharpness, blur_radius)
+    processor = GPUImageProcessor()
+    return processor.gpu_sharpness_blur(image, sharpness, blur_radius)
 
 
 def gpu_batch_transform(images, transform_config):
     """Convenience function for GPU batch transformation."""
-    return gpu_processor.gpu_batch_transform(images, transform_config)
+    processor = GPUImageProcessor()
+    return processor.gpu_batch_transform(images, transform_config)
 
 
 def gpu_image_analysis(image):
     """Convenience function for GPU image analysis."""
-    return gpu_processor.gpu_image_analysis(image)
+    processor = GPUImageProcessor()
+    return processor.gpu_image_analysis(image)

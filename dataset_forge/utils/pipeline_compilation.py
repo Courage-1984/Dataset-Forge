@@ -30,17 +30,11 @@ except ImportError:
     NUMBA_AVAILABLE = False
 
 try:
-    import Cython
-    from Cython.Build import cythonize
     from setuptools import Extension
 
     CYTHON_AVAILABLE = True
 except ImportError:
     CYTHON_AVAILABLE = False
-
-import torch
-import torch.jit
-import numpy as np
 
 from dataset_forge.utils.memory_utils import (
     clear_cuda_cache,
@@ -55,6 +49,13 @@ from dataset_forge.utils.printing import (
     print_success,
 )
 from dataset_forge.utils.monitoring import monitor_all
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    torch,
+    numpy_as_np as np,
+    cython,
+)
 
 
 class CompilationType(Enum):

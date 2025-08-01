@@ -186,6 +186,6 @@ def filter_non_images_menu():
 
 def directory_tree_menu():
     """Directory tree menu integration."""
-    from dataset_forge.menus.directory_tree_menu import directory_tree_menu as tree_menu
-
-    tree_menu()
+    # Lazy import for directory tree menu
+    from dataset_forge.utils.menu import lazy_menu
+    return lazy_menu("dataset_forge.menus.directory_tree_menu", "directory_tree_menu")()

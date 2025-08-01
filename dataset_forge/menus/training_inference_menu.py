@@ -1,7 +1,14 @@
-from dataset_forge.menus.model_management_menu import (
-    openmodeldb_model_browser_menu,
-    openmodeldb_model_browser_cli_interactive,
-)
+# Use lazy_menu for model management menu functions
+def openmodeldb_model_browser_menu():
+    """Lazy import wrapper for openmodeldb_model_browser_menu."""
+    from dataset_forge.utils.menu import lazy_menu
+    return lazy_menu("dataset_forge.menus.model_management_menu", "openmodeldb_model_browser_menu")()
+
+def openmodeldb_model_browser_cli_interactive():
+    """Lazy import wrapper for openmodeldb_model_browser_cli_interactive."""
+    from dataset_forge.utils.menu import lazy_menu
+    return lazy_menu("dataset_forge.menus.model_management_menu", "openmodeldb_model_browser_cli_interactive")()
+
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.printing import print_error
@@ -72,7 +79,11 @@ def openmodeldb_model_browser_mode_menu():
 
     while True:
         choice = show_menu(
-            "OpenModelDB Model Browser - Choose Mode", options, Mocha.lavender, current_menu="OpenModelDB Model Browser Mode", menu_context=menu_context
+            "OpenModelDB Model Browser - Choose Mode",
+            options,
+            Mocha.lavender,
+            current_menu="OpenModelDB Model Browser Mode",
+            menu_context=menu_context,
         )
         if choice is None or choice == "0":
             break

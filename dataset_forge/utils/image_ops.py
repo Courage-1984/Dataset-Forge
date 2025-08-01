@@ -1,17 +1,21 @@
 from abc import ABC, abstractmethod
 import os
-from PIL import Image
 import shutil
-import cv2
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.input_utils import (
     get_file_operation_choice,
     get_destination_path,
 )
-import PIL.ImageCms as ImageCms
 from io import BytesIO
 from dataset_forge.utils.history_log import log_operation
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    PIL_Image as Image,
+    PIL_ImageCms as ImageCms,
+    cv2,
+)
 
 
 class ImageOperation(ABC):

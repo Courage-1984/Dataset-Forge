@@ -20,10 +20,14 @@ import time
 import logging
 from dataclasses import dataclass
 from enum import Enum
-import numpy as np
-import torch
 
 from dataset_forge.utils.printing import print_info, print_warning
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    numpy_as_np as np,
+    torch,
+)
 
 
 class ProcessingType(Enum):

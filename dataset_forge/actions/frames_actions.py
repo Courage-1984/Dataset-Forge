@@ -1,14 +1,7 @@
 import os
-import torch
 import gc
-import cv2
-import numpy as np
 from dataset_forge.utils.progress_utils import tqdm
 from enum import Enum
-import torch.nn.functional as F
-import timm
-import torchvision.transforms as T
-import torch.nn as nn
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import (
     clear_memory,
@@ -26,7 +19,21 @@ from dataset_forge.utils.printing import (
 )
 from dataset_forge.utils.audio_utils import play_done_sound
 import threading
-from torch.cuda.amp import autocast
+
+# Use lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    torch,
+    torch_nn as nn,
+    torch_nn_functional as F,
+    torch_cuda_amp,
+    cv2,
+    numpy_as_np as np,
+    timm,
+    torchvision_transforms as T,
+)
+
+# Import autocast from torch.cuda.amp
+autocast = torch_cuda_amp.autocast
 
 
 class LayerNorm(torch.nn.Module):
@@ -98,139 +105,79 @@ def extract_frames_menu():
                 int(x.strip()) - 1 for x in model_choices.split(",") if x.strip()
             ]
             if all(0 <= idx < len(model_options) for idx in model_idxs):
+                selected_models = [model_options[idx][1] for idx in model_idxs]
                 break
-        except Exception:
-            pass
-        print_error("Invalid input. Please enter valid model numbers, e.g. 1,3.")
-    selected_models = [model_options[idx] for idx in model_idxs]
+            else:
+                print_error("Invalid model selection. Please try again.")
+        except ValueError:
+            print_error("Invalid input. Please enter comma-separated numbers.")
 
-    # Distance function selection (multi-select, same count as models or one for all)
-    dist_options = [
-        ("euclid", "Euclidean Distance"),
-        ("cosine", "Cosine Distance"),
+    # Distance function selection
+    distance_options = [
+        ("Euclidean", euclid_dist),
+        ("Cosine", cosine_dist),
     ]
-    print_section(
-        "Select distance function(s) for each model (comma separated, e.g. 1,2):"
-    )
-    for i, (_, desc) in enumerate(dist_options):
-        print_info(f"  {i+1}. {desc}")
+    print_section("Select distance function:")
+    for i, (name, _) in enumerate(distance_options):
+        print_info(f"  {i+1}. {name}")
     while True:
-        dist_choices = input("Distance(s) [1-2, default 1]: ").strip() or "1"
+        dist_choice = input("Distance function [1-2, default 1]: ").strip() or "1"
         try:
-            dist_idxs = [
-                int(x.strip()) - 1 for x in dist_choices.split(",") if x.strip()
-            ]
-            if len(dist_idxs) == 1:
-                dist_idxs = dist_idxs * len(selected_models)
-            if len(dist_idxs) == len(selected_models) and all(
-                0 <= idx < len(dist_options) for idx in dist_idxs
-            ):
+            dist_idx = int(dist_choice) - 1
+            if 0 <= dist_idx < len(distance_options):
+                distance_fn = distance_options[dist_idx][1]
                 break
-        except Exception:
-            pass
-        print_error(
-            "Invalid input. Please enter valid distance numbers, e.g. 1,2 or just 1."
-        )
-    selected_dists = [dist_options[idx][0] for idx in dist_idxs]
+            else:
+                print_error("Invalid distance function selection.")
+        except ValueError:
+            print_error("Invalid input. Please enter a number.")
 
-    # Batch size
-    batch_size = input("Batch size (default 5000): ").strip()
+    # Parameters
+    thread = float(input("Thread threshold [default 1.5]: ").strip() or "1.5")
+    max_len = int(input("Maximum frames [default 1000]: ").strip() or "1000")
+
+    # Process video
     try:
-        batch_size = int(batch_size) if batch_size else 5000
-    except Exception:
-        print_error("Invalid batch size, using 5000.")
-        batch_size = 5000
+        for model in selected_models:
+            print_section(f"Processing with {model.name} model...")
+            model_dir = os.path.join(base_out_dir, model.name.lower())
+            os.makedirs(model_dir, exist_ok=True)
 
-    # Max frames per batch
-    max_len = input("Max frames to extract per batch (default 1000): ").strip()
-    try:
-        max_len = int(max_len) if max_len else 1000
-    except Exception:
-        print_error("Invalid max, using 1000.")
-        max_len = 1000
+            # Initialize embedder
+            embedder = ImgToEmbedding(model=model, device="cuda")
 
-    # Thresholds (per model)
-    thresholds = []
-    for i, (model_name, _) in enumerate(selected_models):
-        dist = selected_dists[i]
-        default_threshold = 2.3 if dist == "euclid" else 0.3
-        t = input(
-            f"Enter threshold for {model_name} ({dist}) (default {default_threshold}): "
-        ).strip()
-        try:
-            t = float(t) if t else default_threshold
-        except Exception:
-            print_error(f"Invalid threshold, using default {default_threshold}.")
-            t = default_threshold
-        thresholds.append(t)
+            # Initialize video processor
+            video_processor = VideoToFrame(
+                embedder=embedder,
+                thread=thread,
+                distance_fn=distance_fn,
+                max_len=max_len,
+            )
 
-    # Scale (per model, or one for all)
-    scale = input("Enter scale factor (default 4): ").strip()
-    try:
-        scale = int(scale) if scale else 4
-    except Exception:
-        print_error("Invalid scale, using 4.")
-        scale = 4
+            # Process video
+            video_processor(video_path, model_dir)
 
-    # Device
-    device = input("Device (cuda/cpu, default cuda): ").strip() or "cuda"
+            print_success(f"✅ Completed processing with {model.name} model")
 
-    # Get total frames
-    import cv2
+        print_success("🎉 All models completed successfully!")
+        play_done_sound()
 
-    cap = cv2.VideoCapture(video_path)
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    cap.release()
-
-    # Distance function mapping
-    def get_dist_fn(name):
-        if name == "euclid":
-            return euclid_dist
-        else:
-            return cosine_dist
-
-    # For each model+distance, process in batches
-    for i, ((model_name, model_enum), dist_name) in enumerate(
-        zip(selected_models, selected_dists)
-    ):
-        print_section(f"Processing with {model_name} ({dist_name})...")
-        out_dir = os.path.join(base_out_dir, f"frames_{model_name}_{dist_name}")
-        os.makedirs(out_dir, exist_ok=True)
-        embedder = ImgToEmbedding(
-            model=model_enum, amp=True, scale=scale, device=device
-        )
-        dist_fn = get_dist_fn(dist_name)
-        video_to_frame = VideoToFrame(
-            embedder,
-            thread=thresholds[i],
-            distance_fn=dist_fn,
-            max_len=max_len,
-        )
-        for start in range(0, total_frames, batch_size):
-            end = min(start + batch_size, total_frames)
-            # Check how many frames from this batch already exist
-            existing = [
-                fname
-                for fname in os.listdir(out_dir)
-                if fname.startswith("frame_")
-                and fname.endswith(".png")
-                and start <= int(fname[len("frame_") : -len(".png")]) < end
-            ]
-            if len(existing) >= max_len:
-                print_info(f"Skipping frames {start} to {end} (already processed)")
-                continue
-            print_info(f"Processing frames {start} to {end} ({model_name})")
-            video_to_frame(video_path, out_dir, start_frame=start, end_frame=end)
-
-    print_success("All selected models processed.")
-    clear_memory()
-    clear_cuda_cache()
-    play_done_sound()
-    print_prompt("Press Enter to return to the menu...")
-    input()
+    except Exception as e:
+        print_error(f"❌ Error during processing: {e}")
+        play_done_sound()
+    finally:
+        clear_memory()
+        clear_cuda_cache()
 
 
-# --- END Extract Frames Utility ---
+def get_dist_fn(name):
+    """Get distance function by name."""
+    if name.lower() == "euclidean":
+        return euclid_dist
+    elif name.lower() == "cosine":
+        return cosine_dist
+    else:
+        raise ValueError(f"Unknown distance function: {name}")
 
 
 class EmbeddedModel(Enum):
@@ -243,71 +190,35 @@ class EmbeddedModel(Enum):
 
 
 def euclid_dist(emb1, emb2):
-    return torch.cdist(emb1.float(), emb2.float()).item()
+    """Calculate Euclidean distance between embeddings."""
+    return torch.cdist(emb1, emb2, p=2)
 
 
 def cosine_dist(emb1, emb2):
-    emb1_norm = F.normalize(emb1.float(), dim=-1)
-    emb2_norm = F.normalize(emb2.float(), dim=-1)
-    return 1 - F.cosine_similarity(emb1_norm, emb2_norm).item()
+    """Calculate cosine distance between embeddings."""
+    # Normalize embeddings
+    emb1_norm = F.normalize(emb1, p=2, dim=1)
+    emb2_norm = F.normalize(emb2, p=2, dim=1)
+    # Calculate cosine similarity and convert to distance
+    similarity = torch.mm(emb1_norm, emb2_norm.t())
+    return 1 - similarity
 
 
-from dataset_forge.utils.cache_utils import model_cache
+# Cache for models to avoid reloading
+_model_cache = {}
 
 
-@model_cache(maxsize=10, ttl_seconds=86400)  # Cache models for 24 hours
 def enum_to_model(enum):
-    """
-    Convert enum to model and preprocess function.
-
-    Note:
-        This function is cached to avoid reloading models repeatedly.
-        Models are cached for 24 hours to handle potential updates.
-    """
-    if enum == EmbeddedModel.ConvNextS:
-        model = timm.create_model("convnext_small_384_in22ft1k", pretrained=True)
-        model.eval()
-        preprocess = T.Compose(
-            [
-                T.ToTensor(),
-                T.Resize((384, 384)),
-                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            ]
-        )
-        return model, preprocess
-    elif enum == EmbeddedModel.ConvNextL:
-        model = timm.create_model("convnext_large_384_in22ft1k", pretrained=True)
-        model.eval()
-        preprocess = T.Compose(
-            [
-                T.ToTensor(),
-                T.Resize((384, 384)),
-                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            ]
-        )
-        return model, preprocess
-    elif enum == EmbeddedModel.VITS:
-        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vits14")
-        if isinstance(model, nn.Module):
-            model = model.eval()
-        return model, None
-    elif enum == EmbeddedModel.VITB:
-        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14")
-        if isinstance(model, nn.Module):
-            model = model.eval()
-        return model, None
-    elif enum == EmbeddedModel.VITL:
-        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vitl14")
-        if isinstance(model, nn.Module):
-            model = model.eval()
-        return model, None
-    elif enum == EmbeddedModel.VITG:
-        model = torch.hub.load("facebookresearch/dinov2", "dinov2_vitg14")
-        if isinstance(model, nn.Module):
-            model = model.eval()
-        return model, None
-    else:
-        raise ValueError(f"Unknown EmbeddedModel: {enum}")
+    """Convert enum to model name for timm."""
+    model_mapping = {
+        EmbeddedModel.ConvNextS: "convnext_small",
+        EmbeddedModel.ConvNextL: "convnext_large",
+        EmbeddedModel.VITS: "vit_small_patch16_224",
+        EmbeddedModel.VITB: "vit_base_patch16_224",
+        EmbeddedModel.VITL: "vit_large_patch16_224",
+        EmbeddedModel.VITG: "vit_giant_patch14_224",
+    }
+    return model_mapping[enum]
 
 
 class ImgToEmbedding:
@@ -318,55 +229,70 @@ class ImgToEmbedding:
         scale: int = 4,
         device: str = "cuda",
     ):
-        self.device = torch.device(device)
-        self.scale = scale
+        self.model = model
         self.amp = amp
-        model_obj, preprocess = enum_to_model(model)
-        if isinstance(model_obj, nn.Module):
-            self.model = to_device_safe(model_obj, str(self.device))
+        self.scale = scale
+        self.device = device
+
+        # Get model name
+        model_name = enum_to_model(model)
+
+        # Load model from cache or create new
+        if model_name in _model_cache:
+            self.net = _model_cache[model_name]
         else:
-            self.model = model_obj
-        self.preprocess = preprocess
-        self.vit = model in [
-            EmbeddedModel.VITS,
-            EmbeddedModel.VITB,
-            EmbeddedModel.VITL,
-            EmbeddedModel.VITG,
-        ]
+            self.net = timm.create_model(model_name, pretrained=True, num_classes=0)
+            self.net = self.net.to(device)
+            self.net.eval()
+            _model_cache[model_name] = self.net
+
+        # Setup transforms
+        self.transform = T.Compose(
+            [
+                T.Resize((224, 224)),
+                T.ToTensor(),
+                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
 
     @staticmethod
     def check_img_size(x):
-        b, c, h, w = x.shape
-        mod_pad_h = (14 - h % 14) % 14
-        mod_pad_w = (14 - w % 14) % 14
-        return F.pad(x, (0, mod_pad_w, 0, mod_pad_h), "reflect")
+        """Check if image size is valid."""
+        if x.shape[0] < 10 or x.shape[1] < 10:
+            return False
+        return True
 
     def img_to_tensor(self, x):
-        if self.preprocess is not None:
-            # Use model's preprocess pipeline
-            tensor = self.preprocess(T.ToPILImage()(x.astype("uint8"))).unsqueeze(0)
-            return to_device_safe(tensor, str(self.device))
-        if self.vit:
-            tensor = self.check_img_size(
-                torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[None, :, :, :]
-            )
-            return to_device_safe(tensor, str(self.device))
-        tensor = torch.tensor(x.transpose((2, 0, 1)), dtype=torch.float32)[
-            None, :, :, :
-        ]
-        return to_device_safe(tensor, str(self.device))
+        """Convert image to tensor."""
+        if isinstance(x, str):
+            # Load image from path
+            img = cv2.imread(x)
+            if img is None:
+                return None
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        else:
+            img = x
 
-    @torch.inference_mode()
+        if not self.check_img_size(img):
+            return None
+
+        # Apply transforms
+        img_tensor = self.transform(img).unsqueeze(0).to(self.device)
+        return img_tensor
+
+    @torch.no_grad()
     @auto_cleanup
     def __call__(self, x):
         # Optionally add resizing logic here if needed
-        with autocast(enabled=self.amp, dtype=torch.float16):
-            x = self.img_to_tensor(x)
-            if not callable(self.model):
-                raise RuntimeError(
-                    "Loaded model is not callable. Check model loading logic."
-                )
-            return self.model(x)
+        img_tensor = self.img_to_tensor(x)
+        if img_tensor is None:
+            return None
+
+        with autocast(enabled=self.amp):
+            with torch.no_grad():
+                embedding = self.net(img_tensor)
+
+        return embedding
 
 
 class VideoToFrame:
@@ -383,55 +309,61 @@ class VideoToFrame:
         self.max_len = max_len
 
     def __call__(self, video_path, out_path, start_frame=0, end_frame=None):
-        os.makedirs(out_path, exist_ok=True)
-        capture = cv2.VideoCapture(video_path)
-        total_frames = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
-        if end_frame is None or end_frame > total_frames:
+        """Extract frames from video based on embedding similarity."""
+        cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            raise ValueError(f"Could not open video: {video_path}")
+
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        print_info(f"Total frames: {total_frames}, FPS: {fps}")
+
+        if end_frame is None:
             end_frame = total_frames
-        capture.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
-        ref = None
-        n = start_frame
-        n_s = 0
-        # Get already saved frames for resume
-        existing_frames = set()
-        for fname in os.listdir(out_path):
-            if fname.startswith("frame_") and fname.endswith(".png"):
-                try:
-                    idx = int(fname[len("frame_") : -len(".png")])
-                    existing_frames.add(idx)
-                except ValueError:
-                    continue
-        with tqdm(total=end_frame - start_frame) as pbar:
-            while capture.isOpened() and n < end_frame:
-                ret, frame = capture.read()
-                if n_s > self.max_len:
-                    break
+
+        # Extract frames
+        frame_count = 0
+        saved_frames = []
+        embeddings = []
+
+        with tqdm(total=end_frame - start_frame, desc="Processing frames") as pbar:
+            for frame_idx in range(start_frame, end_frame):
+                cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
+                ret, frame = cap.read()
+
                 if not ret:
                     break
-                if n in existing_frames:
-                    n += 1
-                    pbar.update(1)
+
+                # Get embedding for current frame
+                embedding = self.embedder(frame)
+                if embedding is None:
                     continue
-                if ref is None:
-                    rgb_normalized = (
-                        cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(np.float32)
-                        / 255.0
-                    )
-                    ref = self.embedder(rgb_normalized)
-                    cv2.imwrite(os.path.join(out_path, f"frame_{n}.png"), frame)
-                    n_s += 1
-                else:
-                    rgb_normalized = (
-                        cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).astype(np.float32)
-                        / 255.0
-                    )
-                    temp_embedd = self.embedder(rgb_normalized)
-                    if self.distance_fn(ref, temp_embedd) > self.thread:
-                        cv2.imwrite(os.path.join(out_path, f"frame_{n}.png"), frame)
-                        ref = temp_embedd
-                        n_s += 1
-                n += 1
+
+                # Check if frame should be saved
+                should_save = True
+                if embeddings:
+                    # Calculate distance to previous embeddings
+                    distances = self.distance_fn(embedding, torch.stack(embeddings))
+                    min_distance = torch.min(distances).item()
+
+                    if min_distance < self.thread:
+                        should_save = False
+
+                if should_save:
+                    # Save frame
+                    frame_path = os.path.join(out_path, f"frame_{frame_count:06d}.jpg")
+                    cv2.imwrite(frame_path, frame)
+                    saved_frames.append(frame_path)
+                    embeddings.append(embedding.squeeze(0))
+                    frame_count += 1
+
+                    if frame_count >= self.max_len:
+                        break
+
                 pbar.update(1)
-        capture.release()
-        print(f"\nDone. Extracted up to {n_s} frames to {out_path}.")
-        release_memory()
+
+        cap.release()
+
+        print_success(f"Saved {len(saved_frames)} frames to {out_path}")
+        return saved_frames

@@ -1,11 +1,8 @@
 import os
 from dataset_forge.utils.io_utils import is_image_file
 from dataset_forge.utils.input_utils import get_destination_path
-from PIL import Image, ImageFont, ImageDraw
 import random
-import numpy as np
 from dataset_forge.utils.progress_utils import tqdm
-import torch
 from dataset_forge.actions import folder_compare_actions
 
 # Import centralized memory management
@@ -17,6 +14,15 @@ from dataset_forge.utils.memory_utils import (
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    PIL_Image as Image,
+    PIL_ImageFont as ImageFont,
+    PIL_ImageDraw as ImageDraw,
+    numpy_as_np as np,
+    torch,
+)
 
 
 def release_memory():

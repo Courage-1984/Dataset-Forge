@@ -48,6 +48,69 @@
 - **pepedpid ImportError:** Ensure pepedpid is installed in the correct environment.
 - **DPID workflow errors:** Check input folders for valid images and use the correct menu option.
 
+## Steganography Tools (zsteg, steghide)
+
+### ZSTEG Executable Issues
+
+**Problem**: `zsteg.exe` fails with side-by-side configuration error:
+```
+14001: The application has failed to start because its side-by-side configuration is incorrect.
+Please see the application event log or use the command-line sxstrace.exe tool for more detail.
+- C:/Users/anon/AppData/Local/Temp/ocran00074B817894/lib/ruby/3.4.0/x64-mingw-ucrt/zlib.so (LoadError)
+```
+
+**Root Cause**: OCRA-built executables have dependency issues with native extensions like `zlib.so` and missing `zlib1.dll`.
+
+**Solution 1: OCRAN-Based Executable (RECOMMENDED)**
+
+Replace OCRA with OCRAN (maintained fork) for better Windows compatibility:
+
+```bash
+# Remove old OCRA and install OCRAN
+gem uninstall ocra
+gem install ocran
+
+# Create zsteg CLI wrapper
+# Create file: zsteg_cli.rb
+#!/usr/bin/env ruby
+puts "Starting zsteg_cli.rb..."
+puts "ARGV: #{ARGV.inspect}"
+STDOUT.flush
+STDERR.flush
+require 'zsteg'
+require 'zsteg/cli/cli'
+ZSteg::CLI::Cli.new.run
+
+# Build executable with OCRAN
+ocran zsteg_cli.rb --gem-all --add-all-core --output zsteg.exe --verbose
+
+# Test the executable
+.\zsteg.exe --help
+```
+
+**Solution 2: PowerShell Wrapper (Alternative)**
+
+Use a PowerShell wrapper that gracefully falls back to gem-installed zsteg:
+
+```powershell
+# Create zsteg_wrapper.ps1
+# Attempts OCRA executable first, falls back to gem-installed zsteg
+powershell -ExecutionPolicy Bypass -File "zsteg_wrapper.ps1" --help
+```
+
+**Solution 3: Gem Installation (Simplest)**
+
+Use gem-installed zsteg directly:
+```bash
+gem install zsteg
+zsteg --help
+```
+
+### Other Steganography Issues
+
+- **zsteg not found:** Ensure zsteg is installed via `gem install zsteg`
+- **steghide not found:** Ensure steghide is installed and the folder is added to your PATH. See [Special Installation Instructions](special_installation.md).
+
 ---
 
 ## FAQ
@@ -92,6 +155,12 @@ See below for frequently asked questions. For more, visit the [Discussion Board]
 
 - **How do I get help or report a bug?**  
   Open an issue on GitHub or contact the project maintainer.
+
+- **How do I create a standalone zsteg.exe executable?**  
+  Use the OCRAN method described in [Special Installation Instructions](special_installation.md). This creates a self-contained executable that doesn't require Ruby to be installed on the target system.
+
+- **Why does my zsteg.exe show side-by-side configuration errors?**  
+  This is a common issue with the original OCRA. Use the newer OCRAN tool instead, which properly handles native dependencies like `zlib.so` and `zlib1.dll`.
 
 </details>
 

@@ -15,6 +15,8 @@ OUTPUT_FILE = os.path.join(DOCS_DIR, "README_full.md")
 TOC_FILE = os.path.join(DOCS_DIR, "toc.md")
 CURSORRULES_SOURCE = os.path.join(PROJECT_ROOT, ".cursorrules")
 CURSORRULES_DEST = os.path.join(PROJECT_ROOT, ".cursor", "rules", ".cursorrules")
+CURSORRULES_MDC_SOURCE = os.path.join(PROJECT_ROOT, "cursorrules.mdc")
+CURSORRULES_MDC_DEST = os.path.join(PROJECT_ROOT, ".cursor", "rules", "cursorrules.mdc")
 
 # Order of files to merge (edit as needed)
 DOC_ORDER = [
@@ -96,6 +98,57 @@ def strip_nav_links(content):
     return content
 
 
+def update_cursorrules_mdc():
+    """Update cursorrules.mdc with content from .cursorrules after the YAML block."""
+    if not os.path.exists(CURSORRULES_SOURCE):
+        print(f"Warning: {CURSORRULES_SOURCE} not found, skipping cursorrules.mdc update.")
+        return False
+    
+    if not os.path.exists(CURSORRULES_MDC_SOURCE):
+        print(f"Warning: {CURSORRULES_MDC_SOURCE} not found, skipping cursorrules.mdc update.")
+        return False
+    
+    try:
+        # Read .cursorrules content
+        with open(CURSORRULES_SOURCE, 'r', encoding='utf-8') as f:
+            cursorrules_content = f.read()
+        
+        # Read cursorrules.mdc content
+        with open(CURSORRULES_MDC_SOURCE, 'r', encoding='utf-8') as f:
+            mdc_content = f.read()
+        
+        # Find the YAML block end (second occurrence of ---)
+        lines = mdc_content.splitlines()
+        yaml_end_index = -1
+        dash_count = 0
+        
+        for i, line in enumerate(lines):
+            if line.strip() == '---':
+                dash_count += 1
+                if dash_count == 2:  # Second occurrence of ---
+                    yaml_end_index = i
+                    break
+        
+        if yaml_end_index == -1:
+            print("Warning: Could not find YAML block end in cursorrules.mdc, skipping update.")
+            return False
+        
+        # Reconstruct the file with YAML block + .cursorrules content
+        yaml_block = lines[:yaml_end_index + 1]  # Include the closing ---
+        updated_content = '\n'.join(yaml_block) + '\n\n' + cursorrules_content
+        
+        # Write back to cursorrules.mdc
+        with open(CURSORRULES_MDC_SOURCE, 'w', encoding='utf-8') as f:
+            f.write(updated_content)
+        
+        print(f"✅ cursorrules.mdc updated with .cursorrules content")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error updating cursorrules.mdc: {e}")
+        return False
+
+
 def copy_cursorrules():
     """Copy .cursorrules to .cursor/rules/ directory."""
     if not os.path.exists(CURSORRULES_SOURCE):
@@ -111,6 +164,24 @@ def copy_cursorrules():
         return True
     except Exception as e:
         print(f"❌ Error copying .cursorrules: {e}")
+        return False
+
+
+def copy_cursorrules_mdc():
+    """Copy cursorrules.mdc to .cursor/rules/ directory."""
+    if not os.path.exists(CURSORRULES_MDC_SOURCE):
+        print(f"Warning: {CURSORRULES_MDC_SOURCE} not found, skipping cursorrules.mdc copy.")
+        return False
+    
+    # Ensure the destination directory exists
+    os.makedirs(os.path.dirname(CURSORRULES_MDC_DEST), exist_ok=True)
+    
+    try:
+        shutil.copy2(CURSORRULES_MDC_SOURCE, CURSORRULES_MDC_DEST)
+        print(f"✅ cursorrules.mdc copied to {CURSORRULES_MDC_DEST}")
+        return True
+    except Exception as e:
+        print(f"❌ Error copying cursorrules.mdc: {e}")
         return False
 
 
@@ -142,8 +213,14 @@ def main():
     with open(TOC_FILE, "w", encoding="utf-8") as f:
         f.write(toc)
 
+    # Update cursorrules.mdc with .cursorrules content
+    update_cursorrules_mdc()
+    
     # Copy .cursorrules to .cursor/rules/
     copy_cursorrules()
+    
+    # Copy cursorrules.mdc to .cursor/rules/
+    copy_cursorrules_mdc()
 
     print(f"README_full.md and toc.md updated with hierarchical ToC.")
 

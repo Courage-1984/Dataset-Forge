@@ -14,10 +14,25 @@ from dataset_forge.menus import session_state
 from dataset_forge.utils.input_utils import get_folder_path, get_path_with_history
 from dataset_forge.utils import monitoring
 from dataset_forge.utils.menu import lazy_menu
-from dataset_forge.menus.correct_hq_lq_pairing_menu import (
-    correct_hq_lq_pairing_menu,
-    fuzzy_hq_lq_pairing_menu,
-)
+
+
+# Lazy imports for correct HQ/LQ pairing menus
+def correct_hq_lq_pairing_menu():
+    """Lazy import wrapper for correct_hq_lq_pairing_menu."""
+    from dataset_forge.utils.menu import lazy_menu
+
+    return lazy_menu(
+        "dataset_forge.menus.correct_hq_lq_pairing_menu", "correct_hq_lq_pairing_menu"
+    )()
+
+
+def fuzzy_hq_lq_pairing_menu():
+    """Lazy import wrapper for fuzzy_hq_lq_pairing_menu."""
+    from dataset_forge.utils.menu import lazy_menu
+
+    return lazy_menu(
+        "dataset_forge.menus.correct_hq_lq_pairing_menu", "fuzzy_hq_lq_pairing_menu"
+    )()
 
 
 def lazy_action(module_path, func_name):
@@ -301,9 +316,26 @@ def dataset_management_menu():
         "2": ("🔗 Combine or Split Datasets", combine_split_menu),
         "3": ("🔗 Manage HQ/LQ Pairs", hq_lq_pairs_menu),
         "4": ("🧹 Clean & Organize", clean_organize_menu),
-        "5": ("🧭 Align Images", lazy_action("dataset_forge.actions.align_images_actions", "align_images_workflow")),
-        "6": ("🩺 Dataset Health Scoring", lazy_menu("dataset_forge.menus.dataset_health_scoring_menu", "dataset_health_scoring_menu")),
-        "7": ("🐸 Umzi's Dataset Preprocessing", lazy_menu("dataset_forge.menus.umzi_dataset_preprocessing_menu", "umzi_dataset_preprocessing_menu")),
+        "5": (
+            "🧭 Align Images",
+            lazy_action(
+                "dataset_forge.actions.align_images_actions", "align_images_workflow"
+            ),
+        ),
+        "6": (
+            "🩺 Dataset Health Scoring",
+            lazy_menu(
+                "dataset_forge.menus.dataset_health_scoring_menu",
+                "dataset_health_scoring_menu",
+            ),
+        ),
+        "7": (
+            "🐸 Umzi's Dataset Preprocessing",
+            lazy_menu(
+                "dataset_forge.menus.umzi_dataset_preprocessing_menu",
+                "umzi_dataset_preprocessing_menu",
+            ),
+        ),
         "0": ("⬅️  Back", None),
     }
 

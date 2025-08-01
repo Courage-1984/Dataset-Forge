@@ -6,6 +6,25 @@
 
 ## [Unreleased]
 
+### 🔧 zsteg.exe Standalone Executable Solution (August 2025)
+
+- **New Feature**: Successfully resolved zsteg.exe side-by-side configuration issues
+- **Solution**: Implemented OCRAN-based standalone executable creation method
+- **Key Improvements**:
+  - Replaced problematic OCRA with newer OCRAN (Largo/ocran fork)
+  - Proper handling of native dependencies (`zlib.so`, `zlib1.dll`)
+  - Self-contained executable that doesn't require Ruby installation
+  - Comprehensive error handling and dependency inclusion
+- **Technical Details**:
+  - Uses `ocran zsteg_cli.rb --gem-all --add-all-core --output zsteg.exe --verbose`
+  - Includes all necessary gems and native extensions
+  - Proper manifest file handling for Windows compatibility
+  - Tested and verified working executable with help output
+- **Documentation**: Updated special_installation.md and troubleshooting.md with detailed instructions
+- **User Experience**: Provides both gem installation and standalone executable options
+- **Troubleshooting**: Added comprehensive FAQ and troubleshooting sections for zsteg-related issues
+- **Integration**: Comprehensive solution integrated into existing documentation structure and .cursorrules
+
 ### 🎨 Catppuccin Mocha Theming Consistency Checker (August 2025)
 
 - **New Feature**: Added comprehensive Catppuccin Mocha theming consistency checker tool
@@ -27,6 +46,18 @@
 - **Documentation**: Comprehensive usage instructions and best practices in features.md and usage.md
 - **CI/CD Ready**: Proper exit codes and reporting for automated workflows
 - **User Experience**: Real-time analysis progress, detailed markdown reports, and actionable recommendations
+
+### ⚡ CLI Optimization & Lazy Import System Integration (August 2025)
+
+- **Documentation Integration**: Comprehensive CLI optimization and lazy import system documentation integrated into existing structure
+- **Performance Guidelines**: Added detailed performance optimization guidelines to .cursorrules and advanced.md
+- **Lazy Import Standards**: Established mandatory lazy import patterns for heavy libraries (PyTorch, OpenCV, matplotlib, transformers)
+- **Startup Optimization**: Documented 50-60% startup time improvement through lazy loading strategies
+- **Memory Management**: Integrated lazy memory allocation and GPU memory optimization guidelines
+- **Performance Monitoring**: Added import timing analysis and monitoring decorator usage standards
+- **Best Practices**: Comprehensive best practices for when to use lazy imports vs. direct imports
+- **Troubleshooting**: Added troubleshooting guidelines for import errors and performance issues
+- **Future Improvements**: Documented planned enhancements including parallel import loading and smart caching
 
 ### 🧹 Cleanup & Optimization Tools (July 2025)
 

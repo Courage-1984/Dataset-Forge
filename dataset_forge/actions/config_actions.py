@@ -6,11 +6,13 @@ from dataset_forge.actions.analysis_actions import find_hq_lq_scale, report_dime
 from dataset_forge.actions.alpha_actions import find_alpha_channels
 
 # Helper functions from config_menu.py
-import yaml
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import yaml
 
 
 def extract_val_paths_from_yml(yml_path):

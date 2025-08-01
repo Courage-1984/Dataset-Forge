@@ -23,10 +23,14 @@ import json
 import csv
 from typing import Optional, List, Dict, Any
 from datetime import datetime
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from collections import defaultdict
-import numpy as np
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    matplotlib_pyplot as plt,
+    matplotlib_patches as mpatches,
+    numpy_as_np as np,
+)
 
 
 def quick_tree_generation():

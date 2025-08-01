@@ -2,16 +2,7 @@ import os
 import shutil
 from typing import Optional, List, Dict, Any
 from pathlib import Path
-import pandas as pd
 from dataset_forge.utils.progress_utils import tqdm
-
-try:
-    from imagededup.methods import PHash, DHash, AHash, WHash
-    from imagededup.utils import plot_duplicates
-
-    IMAGEDEDUP_AVAILABLE = True
-except ImportError:
-    IMAGEDEDUP_AVAILABLE = False
 
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
@@ -26,6 +17,20 @@ from dataset_forge.utils.printing import (
     print_header,
     print_section,
 )
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    pandas_as_pd as pd,
+    imagededup,
+)
+
+try:
+    from imagededup.methods import PHash, DHash, AHash, WHash
+    from imagededup.utils import plot_duplicates
+
+    IMAGEDEDUP_AVAILABLE = True
+except ImportError:
+    IMAGEDEDUP_AVAILABLE = False
 
 
 class ImageDedupHandler:

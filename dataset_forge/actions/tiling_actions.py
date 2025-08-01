@@ -1,19 +1,11 @@
 import os
 from dataset_forge.utils.file_utils import is_image_file
-import cv2
 from dataset_forge.utils.input_utils import (
     get_file_operation_choice,
     get_destination_path,
 )
-import numpy as np
-import imageio
-from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
 from dataset_forge.utils.progress_utils import tqdm, process_map, thread_map
 import random
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torchvision.models import resnet18, ResNet18_Weights
 from enum import Enum
 from abc import ABC, abstractmethod
 import time
@@ -32,6 +24,21 @@ from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    cv2,
+    numpy_as_np as np,
+    PIL_Image as Image,
+    PIL_ImageEnhance as ImageEnhance,
+    PIL_ImageFont as ImageFont,
+    PIL_ImageDraw as ImageDraw,
+    torch,
+    torch_nn as nn,
+    torch_nn_functional as F,
+    torchvision,
+    imageio,
+)
 
 
 # src/enum.py
@@ -148,8 +155,8 @@ class up_conv_bn_relu(nn.Module):
 class ICNet(nn.Module):
     def __init__(self, is_pretrain=True, size1=512, size2=256):
         super(ICNet, self).__init__()
-        resnet18Pretrained1 = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
-        resnet18Pretrained2 = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+        resnet18Pretrained1 = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
+        resnet18Pretrained2 = torchvision.models.resnet18(weights=torchvision.models.ResNet18_Weights.IMAGENET1K_V1)
 
         self.size1 = size1
         self.size2 = size2

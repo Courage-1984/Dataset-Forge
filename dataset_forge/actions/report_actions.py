@@ -6,10 +6,6 @@ Supports both HQ/LQ parent_path and single-folder workflows.
 import os
 import shutil
 from dataset_forge.utils.progress_utils import tqdm
-from PIL import Image
-import matplotlib.pyplot as plt
-import numpy as np
-from jinja2 import Environment, FileSystemLoader
 import random
 from collections import Counter
 from dataset_forge.utils.file_utils import is_image_file
@@ -22,6 +18,14 @@ from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    PIL_Image as Image,
+    matplotlib_pyplot as plt,
+    numpy_as_np as np,
+    jinja2,
+)
 
 
 def collect_image_stats(files):
@@ -79,8 +83,8 @@ def render_report(
     class_balance_path=None,
     lq_class_balance_path=None,
 ):
-    env = Environment(
-        loader=FileSystemLoader(
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(
             os.path.join(os.path.dirname(__file__), "../../reports/templates")
         )
     )

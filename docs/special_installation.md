@@ -179,7 +179,15 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 > (for [exiftool](https://exiftool.org/) integration)
 
-### Method 1: Windows
+### Method 1.1: Windows (Quick)
+
+1. Extract the following folder from `assets/exiftool-13.32_64.zip`:
+
+   - `exiftool-13.32_64`
+
+2. Add the `exiftool-13.32_64` folder path to your PATH.
+
+### Method 1.2: Windows (Better)
 
 1. Download ExifTool.exe:
 
@@ -196,11 +204,13 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 ### Method 2: Windows (Chocolatey)
 
 1. Download ExifTool.exe:
+
    ```sh
    choco install exiftool -y
    ```
 
 2. This will install `exiftool.exe` to:
+
    ```sh
    C:\ProgramData\chocolatey\lib\exiftool\tools\
    ```
@@ -214,7 +224,15 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 > (for [Oxipng](https://github.com/oxipng/oxipng) integration)
 > essential for 'Sanitise Image Workflow'
 
-### Method 1: Windows
+### Method 1.1: Windows (Quick)
+
+1. Extract the following folder from `assets/oxipng-9.1.5-x86_64-pc-windows-msvc.zip`:
+
+   - `oxipng-9.1.5-x86_64-pc-windows-msvc`
+
+2. Add the `oxipng-9.1.5-x86_64-pc-windows-msvc` folder path to your PATH.
+
+### Method 1.2: Windows (Better)
 
 1. Download oxipng.exe:
 
@@ -235,13 +253,15 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ### zsteg installation (Windows)
 
+#### Method 1: Gem Installation (Recommended)
+
 1. Install Ruby (via RubyInstaller for Windows)
 
-* Go to: [https://rubyinstaller.org/](https://rubyinstaller.org/)
-* Download the **latest Ruby+Devkit** version (e.g. `Ruby 3.3.0 with Devkit`).
-* Run the installer.
-* On the final screen, check **"Add Ruby executables to your PATH"**.
-* Also allow it to **install MSYS2 and development tools** when prompted.
+- Go to: [https://rubyinstaller.org/](https://rubyinstaller.org/)
+- Download the **latest Ruby+Devkit** version (e.g. `Ruby 3.3.0 with Devkit`).
+- Run the installer.
+- On the final screen, check **"Add Ruby executables to your PATH"**.
+- Also allow it to **install MSYS2 and development tools** when prompted.
 
 2. Restart PowerShell/Terminal/Console/CLI
 
@@ -250,7 +270,87 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    gem install zsteg
    ```
 
-### steghide installation (Windows)
+#### Method 2.1: Standalone Executable (Quick)
+
+For users who need a standalone `zsteg.exe` executable:
+
+1. Extract the following files from `assets/zsteg_0.2.13_win.zip`:
+
+   - `zsteg.exe`
+
+   (This is a prebuilt Windows binary built using [Largo/ocran](https://github.com/Largo/ocran) that I compiled.)
+
+2. Add `zsteg.exe` to a folder in your PATH, or add its folder to your PATH.
+
+3. You can now use `zsteg.exe` as a CLI tool.
+
+#### Method 2.2: Standalone Executable (Advanced)
+
+For users who need a standalone `zsteg.exe` executable:
+
+1. Install Ruby (via RubyInstaller for Windows)
+
+- Go to: [https://rubyinstaller.org/](https://rubyinstaller.org/)
+- Download the **latest Ruby+Devkit** version (e.g. `Ruby 3.3.0 with Devkit`).
+- Run the installer.
+- On the final screen, check **"Add Ruby executables to your PATH"**.
+- Also allow it to **install MSYS2 and development tools** when prompted.
+
+2. Restart PowerShell/Terminal/Console/CLI
+
+3. Remove old OCRA and install OCRAN
+
+```bash
+# Remove the old OCRA
+gem uninstall ocra
+
+# Install the newer OCRAN (maintained fork)
+gem install ocran
+```
+
+4. Install `zsteg`
+
+   ```sh
+   gem install zsteg
+   ```
+
+5. **Create zsteg CLI wrapper**
+
+   Extract the following files from `assets/zsteg_cli_build.zip`:
+
+   - `zsteg_cli.rb`
+   - `fiber.so`
+
+6. **Build the executable using OCRAN**
+
+   ```sh
+   ocran zsteg_cli.rb --gem-all --add-all-core --output zsteg.exe --verbose
+   ```
+
+7. **Test the executable**
+   ```sh
+   ./zsteg.exe --help
+   OR
+   ./zsteg.exe --help > output.txt 2>&1
+   ```
+
+> **Note**: The OCRAN-built executable includes all necessary dependencies and runs without requiring Ruby to be installed on the target system. This method uses the [Largo/ocran](https://github.com/Largo/ocran) fork which provides better Windows compatibility and dependency handling compared to the original OCRA.
+
+> **Technical Details**: OCRAN properly handles native dependencies like `zlib.so`, `zlib1.dll`, and assembly manifest files that cause side-by-side configuration failures with OCRA.
+
+> **Troubleshooting**: If you encounter side-by-side configuration errors with the original OCRA, use the OCRAN method above which properly handles native dependencies like `zlib.so` and `zlib1.dll`.
+
+### steghide installation
+
+#### Method 1.1: Windows (Quick)
+
+1. Extract the following folder from `assets/steghide-0.5.1-win32.zip`:
+
+   - `steghide`
+
+2. Add the `steghide` folder path to your PATH.
+
+#### Method 1.2: Windows (Better)
 
 1. Download Steghide
 
@@ -258,7 +358,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 2. Extract the contents (`steghide` folder).
 
-3. Add `steghide` folder path to your PATH.
+3. Add the `steghide` folder path to your PATH.
 
 ---
 

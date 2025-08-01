@@ -11,6 +11,7 @@ This menu provides access to all performance optimization features including:
 import os
 import time
 from typing import Optional, List, Dict, Any
+import importlib
 
 from dataset_forge.utils.menu import show_menu
 from dataset_forge.utils.color import Mocha
@@ -24,61 +25,170 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.monitoring import time_and_record_menu_load
+from dataset_forge.utils import monitoring
+from dataset_forge.utils.audio_utils import play_startup_sound
 
 # Import performance optimization modules
-from dataset_forge.utils.gpu_acceleration import gpu_processor
-from dataset_forge.utils.distributed_processing import (
-    distributed_processor,
-    multi_gpu_processor,
-    start_distributed_processing,
-    stop_distributed_processing,
-    DistributedConfig,
-    ProcessingMode,
-)
-from dataset_forge.utils.sample_prioritization import (
-    sample_prioritizer,
-    prioritize_samples,
-    PrioritizationStrategy,
-)
-from dataset_forge.utils.pipeline_compilation import (
-    pipeline_compiler,
-    compile_function,
-    CompilationType,
-)
+# Lazy imports for performance optimization modules
+def get_gpu_processor():
+    """Lazy import wrapper for gpu_processor."""
+    from dataset_forge.utils.gpu_acceleration import GPUImageProcessor
+    return GPUImageProcessor()
+
+def get_distributed_processor():
+    """Lazy import wrapper for distributed_processor."""
+    from dataset_forge.utils.distributed_processing import distributed_processor
+    return distributed_processor
+
+def get_multi_gpu_processor():
+    """Lazy import wrapper for multi_gpu_processor."""
+    from dataset_forge.utils.distributed_processing import multi_gpu_processor
+    return multi_gpu_processor
+
+def get_start_distributed_processing():
+    """Lazy import wrapper for start_distributed_processing."""
+    from dataset_forge.utils.distributed_processing import start_distributed_processing
+    return start_distributed_processing
+
+def get_stop_distributed_processing():
+    """Lazy import wrapper for stop_distributed_processing."""
+    from dataset_forge.utils.distributed_processing import stop_distributed_processing
+    return stop_distributed_processing
+
+def get_DistributedConfig():
+    """Lazy import wrapper for DistributedConfig."""
+    from dataset_forge.utils.distributed_processing import DistributedConfig
+    return DistributedConfig
+
+def get_ProcessingMode():
+    """Lazy import wrapper for ProcessingMode."""
+    from dataset_forge.utils.distributed_processing import ProcessingMode
+    return ProcessingMode
+
+def get_sample_prioritizer():
+    """Lazy import wrapper for sample_prioritizer."""
+    from dataset_forge.utils.sample_prioritization import sample_prioritizer
+    return sample_prioritizer
+
+def get_prioritize_samples():
+    """Lazy import wrapper for prioritize_samples."""
+    from dataset_forge.utils.sample_prioritization import prioritize_samples
+    return prioritize_samples
+
+def get_PrioritizationStrategy():
+    """Lazy import wrapper for PrioritizationStrategy."""
+    from dataset_forge.utils.sample_prioritization import PrioritizationStrategy
+    return PrioritizationStrategy
+
+def get_pipeline_compiler():
+    """Lazy import wrapper for pipeline_compiler."""
+    from dataset_forge.utils.pipeline_compilation import pipeline_compiler
+    return pipeline_compiler
+
+def get_compile_function():
+    """Lazy import wrapper for compile_function."""
+    from dataset_forge.utils.pipeline_compilation import compile_function
+    return compile_function
+
+def get_CompilationType():
+    """Lazy import wrapper for CompilationType."""
+    from dataset_forge.utils.pipeline_compilation import CompilationType
+    return CompilationType
+
+
+# Helper for lazy importing submenu modules
+def lazy_menu(module_name: str, func_name: str):
+    def _menu():
+        monitoring.time_and_record_menu_load(
+            func_name,
+            lambda: getattr(importlib.import_module(module_name), func_name)(),
+        )
+
+    return _menu
 
 
 def performance_optimization_menu():
-    """Main performance optimization menu."""
+    """Performance optimization and monitoring menu."""
+    # Play startup sound once per session
+    play_startup_sound(block=False)
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Performance optimization, monitoring, and CLI startup speed improvements",
+        "Options": "6 main categories available",
+        "Navigation": "Use numbers 1-6 to select, 0 to go back",
+        "Key Features": [
+            "Lazy Import Monitoring - Track and analyze import performance",
+            "CLI Startup Optimization - Monitor and improve startup times",
+            "Memory Management - Advanced memory optimization tools",
+            "GPU Performance - GPU utilization and optimization",
+            "Cache Management - Intelligent caching strategies",
+            "System Profiling - Comprehensive system performance analysis",
+        ],
+        "Tips": [
+            "Use Lazy Import Monitoring to identify slow imports",
+            "CLI Startup Optimization shows startup time improvements",
+            "Memory Management helps with large dataset processing",
+            "GPU Performance is essential for ML operations",
+        ],
+    }
+
     while True:
-        print_header("🚀 Performance Optimization", char="=", color=Mocha.lavender)
-
-        options = {
-            "1": ("🎮 GPU Acceleration", gpu_acceleration_menu),
-            "2": ("🌐 Distributed Processing", distributed_processing_menu),
-            "3": ("🎯 Sample Prioritization", sample_prioritization_menu),
-            "4": ("⚡ Pipeline Compilation", pipeline_compilation_menu),
-            "5": ("📊 Performance Analytics", performance_analytics_menu),
-            "6": ("⚙️ Optimization Settings", optimization_settings_menu),
-            "0": ("🚪 Back to Main Menu", None),
-        }
-
-        # Define menu context for help system
-        menu_context = {
-            "Purpose": "Optimize processing performance and resource utilization",
-            "Total Options": "6 optimization categories",
-            "Navigation": "Use numbers 1-6 to select, 0 to go back",
-            "Key Features": "GPU acceleration, distributed processing, sample prioritization, pipeline compilation",
-        }
-
         try:
-            key = show_menu("Performance Optimization", options, Mocha.lavender, current_menu="Performance Optimization", menu_context=menu_context)
-            if key is None:
-                break
+            options = {
+                "1": (
+                    "📊 Lazy Import Monitoring",
+                    lazy_import_monitoring_action,
+                ),
+                "2": (
+                    "🚀 CLI Startup Optimization",
+                    cli_startup_optimization_action,
+                ),
+                "3": (
+                    "🧠 Memory Management",
+                    lazy_menu(
+                        "dataset_forge.menus.memory_management_menu",
+                        "memory_management_menu",
+                    ),
+                ),
+                "4": (
+                    "🎮 GPU Performance",
+                    lazy_menu(
+                        "dataset_forge.menus.gpu_performance_menu",
+                        "gpu_performance_menu",
+                    ),
+                ),
+                "5": (
+                    "💾 Cache Management",
+                    lazy_menu(
+                        "dataset_forge.menus.cache_management_menu",
+                        "cache_management_menu",
+                    ),
+                ),
+                "6": (
+                    "📈 System Profiling",
+                    lazy_menu(
+                        "dataset_forge.menus.system_profiling_menu",
+                        "system_profiling_menu",
+                    ),
+                ),
+                "0": ("⬅️ Back", None),
+            }
+
+            key = show_menu(
+                "Performance Optimization",
+                options,
+                Mocha.lavender,
+                current_menu="Performance Optimization",
+                menu_context=menu_context,
+            )
+            if key is None or key == "0":
+                return
             action = options[key][1]
             if callable(action):
                 action()
         except (KeyboardInterrupt, EOFError):
-            print_info("\nExiting Performance Optimization Menu...")
+            print_info("\nExiting...")
             break
 
 
@@ -110,7 +220,13 @@ def gpu_acceleration_menu():
         }
 
         try:
-            key = show_menu("GPU Acceleration", options, Mocha.sky, current_menu="GPU Acceleration", menu_context=menu_context)
+            key = show_menu(
+                "GPU Acceleration",
+                options,
+                Mocha.sky,
+                current_menu="GPU Acceleration",
+                menu_context=menu_context,
+            )
             if key is None:
                 break
             action = options[key][1]
@@ -127,7 +243,7 @@ def distributed_processing_menu():
         print_header("🌐 Distributed Processing", char="-", color=Mocha.sky)
 
         # Get distributed processing status
-        status = distributed_processor.get_status()
+        status = get_distributed_processor().get_status()
 
         print_info("Distributed Processing Status:")
         for key, value in status.items():
@@ -150,7 +266,13 @@ def distributed_processing_menu():
         }
 
         try:
-            key = show_menu("Distributed Processing", options, Mocha.sky, current_menu="Distributed Processing", menu_context=menu_context)
+            key = show_menu(
+                "Distributed Processing",
+                options,
+                Mocha.sky,
+                current_menu="Distributed Processing",
+                menu_context=menu_context,
+            )
             if key is None:
                 break
             action = options[key][1]
@@ -185,7 +307,13 @@ def sample_prioritization_menu():
         }
 
         try:
-            key = show_menu("Sample Prioritization", options, Mocha.sky, current_menu="Sample Prioritization", menu_context=menu_context)
+            key = show_menu(
+                "Sample Prioritization",
+                options,
+                Mocha.sky,
+                current_menu="Sample Prioritization",
+                menu_context=menu_context,
+            )
             if key is None:
                 break
             action = options[key][1]
@@ -202,7 +330,7 @@ def pipeline_compilation_menu():
         print_header("⚡ Pipeline Compilation", char="-", color=Mocha.sky)
 
         # Get compilation status
-        status = pipeline_compiler.get_compilation_status()
+        status = get_pipeline_compiler().get_compilation_status()
 
         print_info("Compilation Backends Status:")
         for key, value in status.items():
@@ -226,7 +354,13 @@ def pipeline_compilation_menu():
         }
 
         try:
-            key = show_menu("Pipeline Compilation", options, Mocha.sky, current_menu="Pipeline Compilation", menu_context=menu_context)
+            key = show_menu(
+                "Pipeline Compilation",
+                options,
+                Mocha.sky,
+                current_menu="Pipeline Compilation",
+                menu_context=menu_context,
+            )
             if key is None:
                 break
             action = options[key][1]
@@ -263,7 +397,13 @@ def performance_analytics_menu():
         }
 
         try:
-            key = show_menu("Performance Analytics", options, Mocha.sky, current_menu="Performance Analytics", menu_context=menu_context)
+            key = show_menu(
+                "Performance Analytics",
+                options,
+                Mocha.sky,
+                current_menu="Performance Analytics",
+                menu_context=menu_context,
+            )
             if key is None:
                 break
             action = options[key][1]
@@ -298,7 +438,13 @@ def optimization_settings_menu():
         }
 
         try:
-            key = show_menu("Optimization Settings", options, Mocha.sky, current_menu="Optimization Settings", menu_context=menu_context)
+            key = show_menu(
+                "Optimization Settings",
+                options,
+                Mocha.sky,
+                current_menu="Optimization Settings",
+                menu_context=menu_context,
+            )
             if key is None:
                 break
             action = options[key][1]
@@ -342,6 +488,7 @@ def test_gpu_acceleration():
         # Test image analysis
         test_image_path = "test_image.jpg"  # You would need a test image
         if os.path.exists(test_image_path):
+            gpu_processor = get_gpu_processor()
             analysis = gpu_processor.gpu_image_analysis(test_image_path)
             print_success(f"GPU image analysis completed: {len(analysis)} metrics")
         else:
@@ -364,6 +511,7 @@ def configure_gpu_settings():
     print_section("⚙️ GPU Settings Configuration", char="-", color=Mocha.mauve)
 
     print_info("Current GPU Settings:")
+    gpu_processor = get_gpu_processor()
     print_info(f"  Device: {gpu_processor.device}")
     print_info(f"  Batch Size: {gpu_processor.batch_size}")
 
@@ -424,6 +572,7 @@ def start_distributed_cluster():
     print_section("🚀 Starting Distributed Cluster", char="-", color=Mocha.mauve)
 
     try:
+        start_distributed_processing = get_start_distributed_processing()
         success = start_distributed_processing()
         if success:
             print_success("Distributed cluster started successfully")
@@ -440,6 +589,7 @@ def stop_distributed_cluster():
     print_section("🛑 Stopping Distributed Cluster", char="-", color=Mocha.mauve)
 
     try:
+        stop_distributed_processing = get_stop_distributed_processing()
         stop_distributed_processing()
         print_success("Distributed cluster stopped")
     except Exception as e:
@@ -453,6 +603,7 @@ def configure_distributed_settings():
     print_section("⚙️ Distributed Processing Settings", char="-", color=Mocha.mauve)
 
     print_info("Current Settings:")
+    distributed_processor = get_distributed_processor()
     config = distributed_processor.config
     print_info(f"  Mode: {config.mode.value}")
     print_info(f"  Workers: {config.num_workers}")
@@ -467,9 +618,11 @@ def configure_distributed_settings():
 
     if choice == "1":
         print("Available modes:")
+        ProcessingMode = get_ProcessingMode()
         for mode in ProcessingMode:
             print(f"  {mode.value}")
         mode_name = input("Enter mode: ").strip()
+        ProcessingMode = get_ProcessingMode()
         for mode in ProcessingMode:
             if mode.value == mode_name:
                 config.mode = mode
@@ -507,6 +660,7 @@ def show_cluster_dashboard():
     """Show cluster dashboard information."""
     print_section("📊 Cluster Dashboard", char="-", color=Mocha.mauve)
 
+    distributed_processor = get_distributed_processor()
     status = distributed_processor.get_status()
 
     if status.get("client_active"):
@@ -536,6 +690,7 @@ def configure_prioritization():
     """Configure sample prioritization settings."""
     print_section("⚙️ Sample Prioritization Settings", char="-", color=Mocha.mauve)
 
+    sample_prioritizer = get_sample_prioritizer()
     config = sample_prioritizer.config
     print_info("Current Settings:")
     print_info(f"  Strategy: {config.strategy.value}")
@@ -551,9 +706,11 @@ def configure_prioritization():
 
     if choice == "1":
         print("Available strategies:")
+        PrioritizationStrategy = get_PrioritizationStrategy()
         for strategy in PrioritizationStrategy:
             print(f"  {strategy.value}")
         strategy_name = input("Enter strategy: ").strip()
+        PrioritizationStrategy = get_PrioritizationStrategy()
         for strategy in PrioritizationStrategy:
             if strategy.value == strategy_name:
                 config.strategy = strategy
@@ -600,6 +757,7 @@ def configure_compilation():
     """Configure pipeline compilation settings."""
     print_section("⚙️ Pipeline Compilation Settings", char="-", color=Mocha.mauve)
 
+    pipeline_compiler = get_pipeline_compiler()
     config = pipeline_compiler.config
     print_info("Current Settings:")
     print_info(f"  Numba: {config.enable_numba}")
@@ -645,6 +803,7 @@ def show_compilation_stats():
     """Show compilation statistics."""
     print_section("📊 Compilation Statistics", char="-", color=Mocha.mauve)
 
+    pipeline_compiler = get_pipeline_compiler()
     status = pipeline_compiler.get_compilation_status()
     print_info("Compilation Statistics:")
     for key, value in status.items():
@@ -761,3 +920,303 @@ def reset_optimization_settings():
 def lazy_performance_optimization_menu():
     """Lazy import wrapper for performance optimization menu."""
     return performance_optimization_menu
+
+
+def lazy_import_monitoring_action():
+    """Monitor and analyze lazy import performance."""
+    print_header("📊 Lazy Import Monitoring")
+
+    try:
+        from dataset_forge.utils.lazy_imports import (
+            get_import_times,
+            print_import_times,
+            clear_import_cache,
+            monitor_import_performance,
+        )
+
+        print_section("Current Import Statistics")
+        import_times = get_import_times()
+
+        if not import_times:
+            print_info("No lazy imports have been performed yet.")
+            print_info("Run some operations to see import performance data.")
+        else:
+            print_import_times()
+
+            # Calculate statistics
+            total_time = sum(import_times.values())
+            avg_time = total_time / len(import_times)
+            slowest_import = max(import_times.items(), key=lambda x: x[1])
+            fastest_import = min(import_times.items(), key=lambda x: x[1])
+
+            print_section("Performance Analysis")
+            print_info(f"Total import time: {total_time:.3f}s")
+            print_info(f"Average import time: {avg_time:.3f}s")
+            print_info(
+                f"Slowest import: {slowest_import[0]} ({slowest_import[1]:.3f}s)"
+            )
+            print_info(
+                f"Fastest import: {fastest_import[0]} ({fastest_import[1]:.3f}s)"
+            )
+
+            # Recommendations
+            print_section("Recommendations")
+            if slowest_import[1] > 1.0:
+                print_warning(
+                    f"⚠️  {slowest_import[0]} is very slow ({slowest_import[1]:.3f}s)"
+                )
+                print_info("Consider using this import only when absolutely necessary.")
+
+            if total_time > 5.0:
+                print_warning("⚠️  Total import time is high")
+                print_info("Consider optimizing frequently used imports.")
+
+        # Options
+        print_section("Actions")
+        print_info("1. Clear import cache")
+        print_info("2. Run import performance test")
+        print_info("3. Back to menu")
+
+        choice = input("\nSelect action (1-3): ").strip()
+
+        if choice == "1":
+            clear_import_cache()
+            print_success("✅ Import cache cleared")
+        elif choice == "2":
+            run_import_performance_test()
+        elif choice == "3":
+            return
+        else:
+            print_error("Invalid choice")
+
+    except ImportError as e:
+        print_error(f"❌ Failed to import lazy import utilities: {e}")
+    except Exception as e:
+        print_error(f"❌ Error in lazy import monitoring: {e}")
+
+
+def cli_startup_optimization_action():
+    """Monitor and optimize CLI startup performance."""
+    print_header("🚀 CLI Startup Optimization")
+
+    try:
+        import time
+        import sys
+        import os
+
+        print_section("Startup Performance Analysis")
+
+        # Measure current startup time
+        print_info("Measuring startup time...")
+        start_time = time.time()
+
+        # Simulate startup process
+        import warnings
+
+        warnings.filterwarnings(
+            "ignore", category=DeprecationWarning, module="pkg_resources"
+        )
+        warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
+
+        os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
+        # Import core modules
+        import logging
+
+        logging.basicConfig(level=logging.WARNING)
+
+        # Import main menu (this is where lazy imports help)
+        def get_main_menu():
+            from dataset_forge.menus.main_menu import main_menu
+            return main_menu
+
+        startup_time = time.time() - start_time
+
+        print_success(f"✅ Current startup time: {startup_time:.3f}s")
+
+        # Analyze startup components
+        print_section("Startup Components")
+
+        # Check for heavy imports in main modules
+        heavy_imports = [
+            "torch",
+            "cv2",
+            "numpy",
+            "PIL",
+            "matplotlib",
+            "pandas",
+            "seaborn",
+            "transformers",
+            "timm",
+        ]
+
+        print_info("Checking for heavy imports in startup path...")
+        heavy_imports_found = []
+
+        for module in heavy_imports:
+            if module in sys.modules:
+                heavy_imports_found.append(module)
+
+        if heavy_imports_found:
+            print_warning(
+                f"⚠️  Heavy imports found during startup: {', '.join(heavy_imports_found)}"
+            )
+            print_info(
+                "These imports are slowing down startup. Consider using lazy imports."
+            )
+        else:
+            print_success("✅ No heavy imports found during startup")
+
+        # Recommendations
+        print_section("Optimization Recommendations")
+
+        if startup_time > 2.0:
+            print_warning("⚠️  Startup time is slow (>2s)")
+            print_info("Recommendations:")
+            print_info("  • Use lazy imports for heavy libraries")
+            print_info("  • Defer non-essential imports")
+            print_info("  • Consider using import hooks")
+        elif startup_time > 1.0:
+            print_warning("⚠️  Startup time could be improved")
+            print_info("Consider using lazy imports for better performance.")
+        else:
+            print_success("✅ Startup time is good")
+
+        # Show optimization options
+        print_section("Optimization Actions")
+        print_info("1. Enable startup profiling")
+        print_info("2. Show import dependency graph")
+        print_info("3. Back to menu")
+
+        choice = input("\nSelect action (1-3): ").strip()
+
+        if choice == "1":
+            enable_startup_profiling()
+        elif choice == "2":
+            show_import_dependency_graph()
+        elif choice == "3":
+            return
+        else:
+            print_error("Invalid choice")
+
+    except Exception as e:
+        print_error(f"❌ Error in CLI startup optimization: {e}")
+
+
+def run_import_performance_test():
+    """Run a comprehensive import performance test."""
+    print_header("🧪 Import Performance Test")
+
+    try:
+        import time
+        from dataset_forge.utils.lazy_imports import clear_import_cache
+
+        # Clear cache for fresh test
+        clear_import_cache()
+
+        print_info("Running import performance test...")
+        print_info("This will test common heavy imports used in Dataset Forge.")
+
+        # Test imports
+        test_imports = [
+            ("numpy", "numpy"),
+            ("OpenCV", "cv2"),
+            ("PIL", "PIL"),
+            ("PyTorch", "torch"),
+            ("torchvision", "torchvision"),
+            ("matplotlib", "matplotlib"),
+            ("pandas", "pandas"),
+            ("seaborn", "seaborn"),
+        ]
+
+        results = []
+
+        for name, module_name in test_imports:
+            print_info(f"Testing {name}...")
+            start_time = time.time()
+
+            try:
+                __import__(module_name)
+                import_time = time.time() - start_time
+                results.append((name, import_time, "Success"))
+                print_success(f"  ✅ {name}: {import_time:.3f}s")
+            except ImportError:
+                import_time = time.time() - start_time
+                results.append((name, import_time, "Failed"))
+                print_error(f"  ❌ {name}: Not available")
+            except Exception as e:
+                import_time = time.time() - start_time
+                results.append((name, import_time, f"Error: {e}"))
+                print_error(f"  ❌ {name}: Error - {e}")
+
+        # Summary
+        print_section("Test Results Summary")
+
+        successful_imports = [r for r in results if r[2] == "Success"]
+        if successful_imports:
+            total_time = sum(r[1] for r in successful_imports)
+            avg_time = total_time / len(successful_imports)
+            slowest = max(successful_imports, key=lambda x: x[1])
+
+            print_info(f"Total successful imports: {len(successful_imports)}")
+            print_info(f"Total import time: {total_time:.3f}s")
+            print_info(f"Average import time: {avg_time:.3f}s")
+            print_info(f"Slowest import: {slowest[0]} ({slowest[1]:.3f}s)")
+
+        # Recommendations
+        print_section("Recommendations")
+        slow_imports = [r for r in successful_imports if r[1] > 0.5]
+        if slow_imports:
+            print_warning(f"⚠️  {len(slow_imports)} imports are slow (>0.5s):")
+            for name, time_taken, _ in slow_imports:
+                print_info(f"  • {name}: {time_taken:.3f}s")
+            print_info("Consider using lazy imports for these modules.")
+        else:
+            print_success("✅ All imports are reasonably fast")
+
+    except Exception as e:
+        print_error(f"❌ Error in import performance test: {e}")
+
+
+def enable_startup_profiling():
+    """Enable detailed startup profiling."""
+    print_header("📊 Startup Profiling")
+
+    print_info("Startup profiling would provide detailed analysis of:")
+    print_info("  • Module import times")
+    print_info("  • Function call durations")
+    print_info("  • Memory usage during startup")
+    print_info("  • I/O operations")
+
+    print_warning("⚠️  This feature requires additional profiling tools")
+    print_info("Consider using cProfile or line_profiler for detailed analysis.")
+
+    print_section("Manual Profiling Steps")
+    print_info("1. Run: python -m cProfile -o startup_profile.prof main.py")
+    print_info(
+        "2. Analyze: python -c \"import pstats; p=pstats.Stats('startup_profile.prof'); p.sort_stats('cumulative').print_stats(20)\""
+    )
+    print_info(
+        "3. Use snakeviz for visualization: pip install snakeviz && snakeviz startup_profile.prof"
+    )
+
+
+def show_import_dependency_graph():
+    """Show import dependency graph."""
+    print_header("📊 Import Dependency Graph")
+
+    print_info("Import dependency analysis would show:")
+    print_info("  • Which modules import heavy libraries")
+    print_info("  • Import chains and dependencies")
+    print_info("  • Potential optimization opportunities")
+
+    print_warning("⚠️  This feature requires additional analysis tools")
+    print_info("Consider using tools like:")
+    print_info("  • pipdeptree for dependency analysis")
+    print_info("  • importlib.util for module inspection")
+    print_info("  • Custom dependency graph generators")
+
+    print_section("Manual Analysis Steps")
+    print_info("1. Install: pip install pipdeptree")
+    print_info("2. Run: pipdeptree --warn silence")
+    print_info("3. Look for heavy dependencies in the tree")

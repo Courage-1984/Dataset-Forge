@@ -21,8 +21,11 @@ from dataset_forge.utils.printing import print_success
 # Import monitoring utilities (stubs for now)
 from dataset_forge.utils import monitoring
 
-# Import cleanup menu
-from dataset_forge.menus.cleanup_menu import cleanup_menu
+# Use lazy_menu for cleanup menu instead of wrapper function
+def cleanup_menu():
+    """Lazy import wrapper for cleanup_menu."""
+    from dataset_forge.utils.menu import lazy_menu
+    return lazy_menu("dataset_forge.menus.cleanup_menu", "cleanup_menu")()
 
 
 def lazy_action(module_path, func_name):

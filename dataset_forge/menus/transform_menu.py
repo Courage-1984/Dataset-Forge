@@ -9,7 +9,16 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.menus.hue_adjustment_menu import hue_adjustment_menu
+
+
+# Lazy import for hue adjustment menu
+def hue_adjustment_menu():
+    """Lazy import wrapper for hue_adjustment_menu."""
+    from dataset_forge.utils.menu import lazy_menu
+
+    return lazy_menu("dataset_forge.menus.hue_adjustment_menu", "hue_adjustment_menu")()
+
+
 from dataset_forge.menus import session_state
 
 

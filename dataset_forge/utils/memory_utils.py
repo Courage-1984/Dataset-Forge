@@ -7,8 +7,6 @@ to ensure proper cleanup and prevent memory leaks throughout the project.
 
 import gc
 import os
-import psutil
-import torch
 import logging
 from typing import Optional, Dict, Any, Callable, Union
 from contextlib import contextmanager
@@ -17,6 +15,12 @@ import time
 import warnings
 
 from dataset_forge.utils.printing import print_info, print_warning, print_error
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    psutil,
+    torch,
+)
 
 
 class MemoryManager:

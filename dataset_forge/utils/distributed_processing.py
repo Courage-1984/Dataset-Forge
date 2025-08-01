@@ -34,9 +34,6 @@ try:
 except ImportError:
     RAY_AVAILABLE = False
 
-import torch
-import numpy as np
-
 from dataset_forge.utils.memory_utils import (
     clear_cuda_cache,
     to_device_safe,
@@ -50,6 +47,12 @@ from dataset_forge.utils.printing import (
     print_success,
 )
 from dataset_forge.utils.monitoring import monitor_all
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    torch,
+    numpy_as_np as np,
+)
 
 
 class ProcessingMode(Enum):

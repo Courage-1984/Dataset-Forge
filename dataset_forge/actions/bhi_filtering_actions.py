@@ -4,19 +4,24 @@ from typing import Optional, Dict, List
 from dataset_forge.utils.progress_utils import tqdm
 
 # ===================== Inlined IQA Threads and Dependencies (from src.scripts.iqa and dependencies) =====================
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
-import numpy as np
-from PIL import Image
-import cv2
-import numpy as np
-
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    torch,
+    torch_nn as nn,
+    torch_nn_functional as F,
+    torchvision,
+    numpy_as_np as np,
+    PIL_Image as Image,
+    cv2,
+)
+
+# Import Dataset and DataLoader from torch.utils.data
+from torch.utils.data import Dataset, DataLoader
 
 
 # --- ImageDataset and IQANode (from utils/module.py and utils/objects.py) ---
@@ -127,7 +132,7 @@ class IQANode:
             "The forward method must be implemented in a subclass"
         )
 
-    @torch.inference_mode()
+    @torch.no_grad()
     def __call__(self):
         for images, filenames in tqdm(self.data_loader):
             iqa = self.forward(images)

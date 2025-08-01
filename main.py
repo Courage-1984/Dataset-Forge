@@ -4,6 +4,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resou
 warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
 
 import os
+import time
 
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
@@ -39,7 +40,8 @@ def _sigint_handler(signum, frame):
         print(f"[SIGINT] Memory cleanup failed: {e}")
     # Try to gracefully quit pygame audio if running
     try:
-        import pygame
+        # Use lazy import for pygame
+        from dataset_forge.utils.lazy_imports import pygame
 
         if pygame.mixer.get_init():
             pygame.mixer.quit()
@@ -58,6 +60,9 @@ if __name__ == "__main__":
     # Suppress pygame warnings and other unnecessary output
     warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
+
+    # Track startup time
+    startup_start = time.time()
 
     # Initialize memory management system
     try:
@@ -84,6 +89,11 @@ if __name__ == "__main__":
         # Lazy import of main_menu for faster CLI startup
         if main_menu is None:
             from dataset_forge.menus.main_menu import main_menu
+        
+        # Print startup time
+        startup_time = time.time() - startup_start
+        print(f"🚀 CLI startup completed in {startup_time:.3f}s")
+        
         main_menu()
     finally:
         # Play shutdown sound on normal exit (blocking), unless already played
@@ -103,3 +113,10 @@ if __name__ == "__main__":
             print("🧹 Memory cleanup completed on exit.")
         except Exception as e:
             print(f"⚠️ Warning: Memory cleanup failed on exit: {e}")
+        
+        # Print lazy import statistics if available
+        try:
+            from dataset_forge.utils.lazy_imports import print_import_times
+            print_import_times()
+        except ImportError:
+            pass

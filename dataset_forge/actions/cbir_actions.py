@@ -1,9 +1,6 @@
 import os
 import shutil
 from typing import List, Optional, Tuple, Dict
-import numpy as np
-from PIL import Image
-import torch
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.printing import (
     print_info,
@@ -18,6 +15,13 @@ from functools import partial
 # Import embedding extraction logic from frames_actions
 from dataset_forge.actions.frames_actions import ImgToEmbedding
 from dataset_forge.utils.cache_utils import in_memory_cache, disk_cache
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    numpy_as_np as np,
+    PIL_Image as Image,
+    torch,
+)
 
 
 @in_memory_cache(maxsize=32)

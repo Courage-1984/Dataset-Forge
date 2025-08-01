@@ -1,7 +1,5 @@
 import os
 import subprocess
-import pandas as pd
-from PIL import Image, ExifTags
 from typing import List, Dict
 from dataset_forge.utils.printing import (
     print_info,
@@ -19,6 +17,13 @@ from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.memory_utils import memory_context, clear_memory
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.file_utils import is_image_file
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    pandas_as_pd as pd,
+    PIL_Image as Image,
+    PIL_ImageCms as ExifTags,
+)
 
 
 # --- Helper: Check exiftool ---

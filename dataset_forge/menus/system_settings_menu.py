@@ -15,12 +15,17 @@ from dataset_forge.utils.input_utils import get_folder_path
 
 def user_profile_submenu():
     """Sub-menu for user profile management."""
-    from dataset_forge.menus.user_profile_menu import user_profile_menu
+
+    # Lazy import for user profile menu
+    def get_user_profile_menu():
+        from dataset_forge.utils.menu import lazy_menu
+
+        return lazy_menu("dataset_forge.menus.user_profile_menu", "user_profile_menu")
 
     options = {
-        "1": ("👤 Profile Management", lambda: user_profile_menu()),
-        "2": ("⭐ View/Edit Favorites & Presets", lambda: user_profile_menu()),
-        "3": ("🚀 Manage Quick Access Paths", lambda: user_profile_menu()),
+        "1": ("👤 Profile Management", lambda: get_user_profile_menu()()),
+        "2": ("⭐ View/Edit Favorites & Presets", lambda: get_user_profile_menu()()),
+        "3": ("🚀 Manage Quick Access Paths", lambda: get_user_profile_menu()()),
         "0": ("⬅️  Back", None),
     }
 
@@ -126,13 +131,16 @@ def show_memory_optimization():
 
 def cache_management_submenu():
     """Sub-menu for cache management."""
-    from dataset_forge.menus.cache_management_menu import cache_management_menu
-
+    # Lazy import for cache management menu
+    def get_cache_management_menu():
+        from dataset_forge.utils.menu import lazy_menu
+        return lazy_menu("dataset_forge.menus.cache_management_menu", "cache_management_menu")
+    
     options = {
-        "1": ("📊 View Cache Statistics", lambda: cache_management_menu()),
-        "2": ("🧹 Clear Caches", lambda: cache_management_menu()),
-        "3": ("📈 Performance Analysis", lambda: cache_management_menu()),
-        "4": ("🔧 Cache Maintenance", lambda: cache_management_menu()),
+        "1": ("📊 View Cache Statistics", lambda: get_cache_management_menu()()),
+        "2": ("🧹 Clear Caches", lambda: get_cache_management_menu()()),
+        "3": ("📈 Performance Analysis", lambda: get_cache_management_menu()()),
+        "4": ("🔧 Cache Maintenance", lambda: get_cache_management_menu()()),
         "0": ("⬅️  Back", None),
     }
 

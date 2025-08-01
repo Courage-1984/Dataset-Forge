@@ -17,9 +17,11 @@ import importlib
 # Recursively extract menu options from the main menu tree
 # Returns: [("Parent > Child", callable), ...]
 def extract_menu_tree():
-    from dataset_forge.menus.main_menu import (
-        main_menu,
-    )  # moved here to avoid circular import
+    # Lazy import to avoid circular import
+    def get_main_menu():
+        from dataset_forge.menus.main_menu import main_menu
+
+        return main_menu
 
     tree = []
     visited = set()
@@ -41,6 +43,7 @@ def extract_menu_tree():
                 tree.append((full_label, action))
 
     # Start from the main menu's static options
+    main_menu = get_main_menu()
     main_options = getattr(main_menu, "__menu_options__", None)
     if main_options:
         for key, (label, action) in main_options.items():
@@ -76,7 +79,13 @@ def user_profile_menu():
     from dataset_forge.actions import user_profile_actions
     from dataset_forge.utils.printing import print_error
 
-    options = user_profile_menu.__menu_options__
+    options = {
+        "1": ("👤 Profile Management", profile_management_menu),
+        "2": ("⭐ Favorites", favorites_menu),
+        "3": ("📁 Favorite Paths", favorite_paths_menu),
+        "4": ("⚙️ Settings", settings_menu),
+        "0": ("⬅️ Back", None),
+    }
     # Define menu context for help system
     menu_context = {
         "Purpose": "Manage user profiles and preferences",

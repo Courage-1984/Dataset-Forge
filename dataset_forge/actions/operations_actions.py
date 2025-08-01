@@ -3,7 +3,6 @@ import shutil
 import random
 from subprocess import CalledProcessError
 from dataset_forge.utils.progress_utils import tqdm
-from PIL import Image
 from dataset_forge.utils.file_utils import (
     is_image_file,
     get_unique_filename,
@@ -15,11 +14,8 @@ from dataset_forge.utils.input_utils import (
     get_destination_path,
 )
 import logging
-import numpy as np
 from collections import Counter, defaultdict
-import cv2
 import concurrent.futures
-from PIL import Image, ImageEnhance, UnidentifiedImageError, ImageFont, ImageDraw
 import subprocess
 from dataset_forge.utils.image_ops import ColorAdjuster
 from dataset_forge.utils.monitoring import monitor_all, task_registry
@@ -41,6 +37,16 @@ from dataset_forge.dpid.phhofm_dpid import (
 from dataset_forge.dpid.umzi_dpid import (
     run_umzi_dpid_single_folder,
     run_umzi_dpid_hq_lq,
+)
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    PIL_Image as Image,
+    PIL_ImageEnhance as ImageEnhance,
+    PIL_ImageFont as ImageFont,
+    PIL_ImageDraw as ImageDraw,
+    numpy_as_np as np,
+    cv2,
 )
 
 

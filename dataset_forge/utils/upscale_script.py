@@ -1,8 +1,5 @@
 import os
 import configparser
-import torch
-from PIL import Image
-import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import time
 import traceback
@@ -12,6 +9,15 @@ import sys
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.memory_utils import to_device_safe, clear_memory
 import chainner_ext
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    torch,
+    PIL_Image as Image,
+    numpy_as_np as np,
+    spandrel,
+    onnxruntime as ort,
+)
 
 try:
     import spandrel

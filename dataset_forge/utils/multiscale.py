@@ -1,7 +1,5 @@
 import os
 from dataset_forge.utils.file_utils import is_image_file
-from PIL import Image
-import numpy as np
 import shutil
 
 # Import new DPID modules
@@ -20,6 +18,12 @@ from dataset_forge.dpid.phhofm_dpid import (
 from dataset_forge.dpid.umzi_dpid import (
     run_umzi_dpid_single_folder,
     run_umzi_dpid_hq_lq,
+)
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    PIL_Image as Image,
+    numpy_as_np as np,
 )
 
 DPID_METHODS = {

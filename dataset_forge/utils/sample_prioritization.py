@@ -5,16 +5,10 @@ This module provides quality-based sample prioritization to optimize processing
 order and improve overall dataset quality.
 """
 
-import os
-import time
 import logging
 from typing import List, Dict, Any, Optional, Tuple, Union, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-import numpy as np
-from PIL import Image
-import torch
-import cv2
 
 from dataset_forge.utils.memory_utils import (
     clear_cuda_cache,
@@ -30,6 +24,14 @@ from dataset_forge.utils.printing import (
     print_success,
 )
 from dataset_forge.utils.monitoring import monitor_all
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    numpy_as_np as np,
+    PIL_Image as Image,
+    torch,
+    cv2,
+)
 
 
 class PrioritizationStrategy(Enum):

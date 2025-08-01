@@ -10,7 +10,15 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.color import Mocha
-from dataset_forge.menus.bhi_filtering_menu import bhi_filtering_menu
+
+
+# Lazy import for bhi filtering menu
+def bhi_filtering_menu():
+    """Lazy import wrapper for bhi_filtering_menu."""
+    from dataset_forge.utils.menu import lazy_menu
+    return lazy_menu("dataset_forge.menus.bhi_filtering_menu", "bhi_filtering_menu")()
+
+
 from dataset_forge.menus import session_state
 from dataset_forge.utils.input_utils import get_path_with_history
 from dataset_forge.utils import monitoring

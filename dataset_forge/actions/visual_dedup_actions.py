@@ -1,9 +1,6 @@
 import os
 import shutil
 from typing import List, Optional, Tuple, Dict
-from PIL import Image
-import torch
-import numpy as np
 from dataset_forge.utils.progress_utils import tqdm, image_map, smart_map
 from dataset_forge.utils.parallel_utils import (
     parallel_image_processing,
@@ -23,6 +20,14 @@ from dataset_forge.utils.printing import (
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.audio_utils import play_done_sound
+
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    PIL_Image as Image,
+    torch,
+    numpy_as_np as np,
+    lpips,
+)
 
 
 def load_images_from_folder(
@@ -497,11 +502,6 @@ def find_duplicate_groups(
 
 
 # Import statements at the end to avoid circular imports
-try:
-    import lpips
-except ImportError:
-    lpips = None
-
 try:
     import open_clip
 except ImportError:

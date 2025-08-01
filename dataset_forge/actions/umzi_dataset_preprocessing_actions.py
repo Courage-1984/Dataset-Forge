@@ -22,21 +22,24 @@ from dataset_forge.utils.input_utils import (
 )
 from dataset_forge.menus import session_state
 
-# --- Imports for PepeDP workflows ---
-from pepedp.enum import ProcessType
-from pepedp.scripts.utils.best_tile import BestTile
-from pepedp.scripts.utils.complexity.laplacian import LaplacianComplexity
-from pepedp.scripts.utils.complexity.ic9600 import IC9600Complexity
-from pepedp.embedding.embedding_class import ImgToEmbedding
-from pepedp.embedding.enum import EmbeddedModel
-from pepedp.scripts.utils.distance import euclid_dist, cosine_dist
-from pepedp.scripts.utils.video_to_frames import VideoToFrame
-from pepedp.scripts.utils.deduplicate import (
-    create_embedd,
-    filtered_pairs,
-    move_duplicate_files,
+# Lazy imports for heavy libraries
+from dataset_forge.utils.lazy_imports import (
+    pepedp,
+    pepedpid,
+    pepedp_enum as ProcessType,
+    pepedp_best_tile as BestTile,
+    pepedp_laplacian_complexity as LaplacianComplexity,
+    pepedp_ic9600_complexity as IC9600Complexity,
+    pepedp_img_to_embedding as ImgToEmbedding,
+    pepedp_embedded_model as EmbeddedModel,
+    pepedp_euclid_dist as euclid_dist,
+    pepedp_cosine_dist as cosine_dist,
+    pepedp_video_to_frame as VideoToFrame,
+    pepedp_create_embedd as create_embedd,
+    pepedp_filtered_pairs as filtered_pairs,
+    pepedp_move_duplicate_files as move_duplicate_files,
+    pepedp_threshold_alg as ThresholdAlg,
 )
-from pepedp.torch_enum import ThresholdAlg
 
 
 # --- 1. Best Tile Extraction ---
