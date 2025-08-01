@@ -13,6 +13,8 @@ from dataset_forge.utils.parallel_utils import (
 from dataset_forge.menus.session_state import parallel_config, user_preferences
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all
+from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.printing import print_success
 import json
 
 
@@ -371,6 +373,8 @@ def apply_augmentation_pipeline(
         print(
             f"Mixup augmentation complete: {successful}/{len(pairs)} pairs successful"
         )
+        print_success("Mixup augmentation pipeline complete!")
+        play_done_sound()
         return
 
     if hq_lq_mode and lq_input_dir and lq_output_dir:
@@ -470,6 +474,9 @@ def apply_augmentation_pipeline(
     log_operation(
         "augmentation_pipeline", f"{recipe_name}, {successful} images processed"
     )
+    
+    print_success("Augmentation pipeline complete!")
+    play_done_sound()
 
 
 @monitor_all("create_augmentation_variations", critical_on_error=True)
@@ -577,6 +584,8 @@ def create_augmentation_variations(
         print(
             f"Variation creation complete: {successful}/{total_expected} variations successful"
         )
+        print_success("HQ/LQ augmentation variations complete!")
+        play_done_sound()
 
     else:
         # Single folder mode
@@ -627,6 +636,8 @@ def create_augmentation_variations(
         print(
             f"Variation creation complete: {successful}/{total_expected} variations successful"
         )
+        print_success("Single folder augmentation variations complete!")
+        play_done_sound()
 
     # Log operation
     log_operation(

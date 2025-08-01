@@ -53,6 +53,7 @@
 ### ZSTEG Executable Issues
 
 **Problem**: `zsteg.exe` fails with side-by-side configuration error:
+
 ```
 14001: The application has failed to start because its side-by-side configuration is incorrect.
 Please see the application event log or use the command-line sxstrace.exe tool for more detail.
@@ -98,18 +99,117 @@ Use a PowerShell wrapper that gracefully falls back to gem-installed zsteg:
 powershell -ExecutionPolicy Bypass -File "zsteg_wrapper.ps1" --help
 ```
 
-**Solution 3: Gem Installation (Simplest)**
+## Audio System Issues
 
-Use gem-installed zsteg directly:
-```bash
-gem install zsteg
-zsteg --help
-```
+### CLI Hanging During Exit
 
-### Other Steganography Issues
+**Problem**: CLI hangs when trying to exit with `q`, `quit`, `exit`, `0`, or `Ctrl+C`
 
-- **zsteg not found:** Ensure zsteg is installed via `gem install zsteg`
-- **steghide not found:** Ensure steghide is installed and the folder is added to your PATH. See [Special Installation Instructions](special_installation.md).
+**Root Cause**: Audio playback system hanging during shutdown sound
+
+**Solution**: The audio system has been updated with robust fallbacks and timeout protection. If issues persist:
+
+1. **Check audio dependencies**:
+
+   ```bash
+   pip install playsound==1.2.2 pydub pygame
+   ```
+
+2. **Verify audio files exist**:
+
+   ```bash
+   ls assets/
+   # Should show: done.wav, error.mp3, startup.mp3, shutdown.mp3
+   ```
+
+3. **Test audio functionality**:
+   ```python
+   from dataset_forge.utils.audio_utils import play_done_sound
+   play_done_sound(block=True)
+   ```
+
+### Audio Not Playing
+
+**Problem**: No audio feedback during operations
+
+**Solutions**:
+
+1. **Check audio library installation**:
+
+   ```bash
+   pip install playsound==1.2.2 pydub
+   ```
+
+2. **Test individual audio libraries**:
+
+   ```python
+   # Test playsound
+   from playsound import playsound
+   playsound("assets/done.wav", block=True)
+
+   # Test winsound (Windows only)
+   import winsound
+   winsound.PlaySound("assets/done.wav", winsound.SND_FILENAME)
+   ```
+
+3. **Check audio file integrity**:
+   ```bash
+   # Verify file sizes
+   ls -la assets/
+   # done.wav should be ~352KB
+   # error.mp3 should be ~32KB
+   # startup.mp3 should be ~78KB
+   # shutdown.mp3 should be ~23KB
+   ```
+
+### Audio Library Conflicts
+
+**Problem**: Multiple audio libraries causing conflicts
+
+**Solution**: The audio system automatically selects the best available library:
+
+1. **Playsound (primary)** - Most reliable cross-platform
+2. **Winsound (Windows WAV)** - Best for WAV files on Windows
+3. **Pydub (various formats)** - Good for MP3 and other formats
+4. **Pygame (fallback)** - Cross-platform fallback
+
+### Audio System Error Messages
+
+**Common messages and solutions**:
+
+- `"Playsound failed: Error 277"` - MP3 format issue, system will fall back to pydub
+- `"Winsound failed"` - WAV file issue, system will try playsound
+- `"Audio playback not available"` - No audio libraries working, CLI continues without audio
+- `"Audio playback timeout"` - Audio took too long, automatically stopped
+
+### Audio System Best Practices
+
+1. **Always use centralized audio functions**:
+
+   ```python
+   from dataset_forge.utils.audio_utils import play_done_sound
+   # Don't use audio libraries directly
+   ```
+
+2. **Handle audio failures gracefully**:
+
+   ```python
+   try:
+       play_done_sound(block=True)
+   except Exception:
+       # Audio failed, but operation continues
+       pass
+   ```
+
+3. **Use appropriate blocking**:
+
+   - `block=True` for important feedback (success, error, shutdown)
+   - `block=False` for background sounds (startup)
+
+4. **Test audio on target platforms**:
+   - Windows: winsound + playsound
+   - macOS: playsound + pydub
+   - Linux: playsound + pygame
 
 ---
 

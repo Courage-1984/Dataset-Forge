@@ -26,7 +26,7 @@ from dataset_forge.menus import session_state
 from dataset_forge.utils.lazy_imports import (
     pepedp,
     pepedpid,
-    pepedp_enum as ProcessType,
+    pepedp_enum,
     pepedp_best_tile as BestTile,
     pepedp_laplacian_complexity as LaplacianComplexity,
     pepedp_ic9600_complexity as IC9600Complexity,
@@ -116,7 +116,7 @@ def best_tile_extraction_action(
             in_folder=in_folder,
             out_folder=out_folder,
             tile_size=tile_size,
-            process_type=getattr(ProcessType, process_type),
+            process_type=getattr(pepedp_enum.ProcessType, process_type),
             scale=scale,
             dynamic_n_tiles=dynamic_n_tiles,
             threshold=threshold,

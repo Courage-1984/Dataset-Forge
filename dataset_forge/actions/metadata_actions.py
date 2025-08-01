@@ -34,6 +34,8 @@ def exif_scrubber_menu():
             print(f"Failed to process {len(failed)} files: {failed}")
         else:
             print("All images processed successfully.")
+            print_success("EXIF scrubbing complete!")
+            play_done_sound()
     elif mode == "2":
         hq_folder = input("Enter HQ folder path: ").strip()
         lq_folder = input("Enter LQ folder path: ").strip()
@@ -53,6 +55,8 @@ def exif_scrubber_menu():
                 print(f"  {fname}: {err}")
         else:
             print("All HQ/LQ pairs processed successfully.")
+            print_success("HQ/LQ EXIF scrubbing complete!")
+            play_done_sound()
     else:
         print("Invalid mode.")
 
@@ -90,3 +94,5 @@ def icc_to_srgb_menu():
         print("Invalid choice.")
         return
     print("ICC to sRGB conversion completed.")
+    print_success("ICC to sRGB conversion complete!")
+    play_done_sound()

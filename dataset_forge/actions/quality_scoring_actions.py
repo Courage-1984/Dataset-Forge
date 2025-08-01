@@ -30,6 +30,9 @@ def score_images_with_pyiqa(folder, model_name="niqe", device="cpu"):
             scores.append((img_path, score))
         except Exception as e:
             print(f"[WARN] Failed to score {img_path}: {e}")
+
+    print_success(f"Quality scoring complete! Scored {len(scores)} images.")
+    play_done_sound()
     return scores
 
 
@@ -59,6 +62,11 @@ def score_hq_lq_folders(hq_folder, lq_folder, model_name="niqe", device="cpu"):
     hq_scores = score_images_with_pyiqa(hq_folder, model_name, device)
     print(f"Scoring LQ folder: {lq_folder}")
     lq_scores = score_images_with_pyiqa(lq_folder, model_name, device)
+
+    print_success(
+        f"HQ/LQ quality scoring complete! Scored {len(hq_scores)} HQ and {len(lq_scores)} LQ images."
+    )
+    play_done_sound()
     return hq_scores, lq_scores
 
 

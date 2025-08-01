@@ -23,6 +23,7 @@ from dataset_forge.utils.printing import (
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.cache_utils import clear_disk_cache, clear_in_memory_cache
 from dataset_forge.utils.progress_utils import smart_map
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def find_cache_folders(root_path: str = ".") -> Dict[str, List[str]]:
@@ -203,6 +204,9 @@ def cleanup_all_cache_folders() -> None:
     # Clear memory after cleanup
     clear_memory()
     clear_cuda_cache()
+    
+    print_success("Cache cleanup completed successfully!")
+    play_done_sound()
 
 
 def comprehensive_cleanup() -> None:
@@ -246,6 +250,7 @@ def comprehensive_cleanup() -> None:
     print_section("Cleanup Complete")
     print_success("Comprehensive cleanup completed successfully!")
     print_info("All cache folders, system caches, and memory have been cleared.")
+    play_done_sound()
 
 
 def analyze_cache_usage() -> None:

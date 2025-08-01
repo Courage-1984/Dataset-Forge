@@ -69,6 +69,10 @@ def organize_images_by_orientation(
         "orientation_organize",
         f"Organized {input_folder} by orientation: {', '.join(orientations)}",
     )
+    
+    total_processed = sum(len(files) for files in result.values())
+    print_success(f"Orientation organization complete! Processed {total_processed} images.")
+    play_done_sound()
     return result
 
 
@@ -114,4 +118,8 @@ def organize_hq_lq_by_orientation(
                 shutil.copy2(hq_path, dest_hq)
                 shutil.copy2(lq_path, dest_lq)
             result[orientation].append((dest_hq, dest_lq))
+    
+    total_processed = sum(len(pairs) for pairs in result.values())
+    print_success(f"HQ/LQ orientation organization complete! Processed {total_processed} pairs.")
+    play_done_sound()
     return result

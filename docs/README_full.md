@@ -45,6 +45,10 @@
     - [steghide installation](special_installation.md#steghide-installation)
       - [Method 1.1: Windows (Quick)](special_installation.md#method-11-windows-quick)
       - [Method 1.2: Windows (Better)](special_installation.md#method-12-windows-better)
+  - [8. ffmpeg integration](special_installation.md#8-ffmpeg-integration)
+    - [Method 1.1: Windows (Quick)](special_installation.md#method-11-windows-quick)
+    - [Method 1.2: Windows (Better)](special_installation.md#method-12-windows-better)
+    - [Method 1.3: Windows (`Method 1.1` but download first)](special_installation.md#method-13-windows-method-11-but-download-first)
 - [Features (tl;dr)](features.md)
 - [Feature Overview](features.md#feature-overview)
   - [⚙️ Core & Configuration](features.md#-core--configuration)
@@ -103,6 +107,12 @@
   - [🛠️ Utility Scripts (tools/)](features.md#-utility-scripts-tools)
 - [🩺 Dataset Health Scoring (NEW July 2025)](features.md#-dataset-health-scoring-new-july-2025)
 - [🔊 Project Sounds & Audio Feedback](features.md#-project-sounds--audio-feedback)
+  - [Audio System Architecture](features.md#audio-system-architecture)
+  - [Audio Files](features.md#audio-files)
+  - [Audio System Features](features.md#audio-system-features)
+  - [Audio Usage](features.md#audio-usage)
+- [Play audio with automatic fallback handling](features.md#play-audio-with-automatic-fallback-handling)
+  - [Audio System Benefits](features.md#audio-system-benefits)
   - [🖥️ User Experience and CLI Features](features.md#-user-experience-and-cli-features)
 - [📝 TODO / Planned Features](TODO.md)
 - [Usage Guide](usage.md)
@@ -207,7 +217,12 @@
 - [Test the executable](troubleshooting.md#test-the-executable)
 - [Create zsteg_wrapper.ps1](troubleshooting.md#create-zstegwrapperps1)
 - [Attempts OCRA executable first, falls back to gem-installed zsteg](troubleshooting.md#attempts-ocra-executable-first-falls-back-to-gem-installed-zsteg)
-    - [Other Steganography Issues](troubleshooting.md#other-steganography-issues)
+  - [Audio System Issues](troubleshooting.md#audio-system-issues)
+    - [CLI Hanging During Exit](troubleshooting.md#cli-hanging-during-exit)
+    - [Audio Not Playing](troubleshooting.md#audio-not-playing)
+    - [Audio Library Conflicts](troubleshooting.md#audio-library-conflicts)
+    - [Audio System Error Messages](troubleshooting.md#audio-system-error-messages)
+    - [Audio System Best Practices](troubleshooting.md#audio-system-best-practices)
   - [FAQ](troubleshooting.md#faq)
   - [See Also](troubleshooting.md#see-also)
 - [Dataset Forge Style Guide](style_guide.md)
@@ -243,6 +258,7 @@
   - [See Also](contributing.md#see-also)
 - [Changelog](changelog.md)
   - [[Unreleased]](changelog.md#unreleased)
+    - [🔊 Audio System Investigation & Robust Multi-Library Implementation (August 2025)](changelog.md#-audio-system-investigation--robust-multi-library-implementation-august-2025)
     - [🔧 zsteg.exe Standalone Executable Solution (August 2025)](changelog.md#-zstegexe-standalone-executable-solution-august-2025)
     - [🎨 Catppuccin Mocha Theming Consistency Checker (August 2025)](changelog.md#-catppuccin-mocha-theming-consistency-checker-august-2025)
     - [⚡ CLI Optimization & Lazy Import System Integration (August 2025)](changelog.md#-cli-optimization--lazy-import-system-integration-august-2025)
@@ -821,6 +837,55 @@ gem install ocran
 3. Add the `steghide` folder path to your PATH.
 
 ---
+
+## 8. ffmpeg integration
+
+> (for [ffmpeg](https://ffmpeg.org/) integration)
+
+### Method 1.1: Windows (Quick)
+
+1. Extract the following folder from `assets/ffmpeg-2025-07-31-git-119d127d05-full_build.zip`:
+
+   - `ffmpeg-2025-07-31-git-119d127d05-full_build`
+
+ - Note that this^ folder contains a `bin` folder which contains:
+
+   - `ffmpeg.exe`
+   - `ffplay.exe`
+   - `ffprobe.exe`
+
+2. Add the path to the `bin` folder to your PATH.
+
+### Method 1.2: Windows (Better)
+
+1. Download [`FFmpeg Builds`](https://www.gyan.dev/ffmpeg/builds/) (binaries for Windows):
+
+   ```bash
+   winget install ffmpeg
+   OR
+   choco install ffmpeg-full
+   OR
+   scoop install ffmpeg
+   ```
+
+### Method 1.3: Windows (`Method 1.1` but download first)
+
+1. Download `ffmpeg-git-full.7z`:
+
+   https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z
+
+2. Extract the contents of the downloaded archive.
+
+ - Note that this^ folder should contain a `bin` folder which contains:
+
+   - `ffmpeg.exe`
+   - `ffplay.exe`
+   - `ffprobe.exe`
+
+3. Add the path to the `bin` folder to your PATH.
+
+---
+
 
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
 
@@ -1413,19 +1478,82 @@ For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#ut
 
 # 🔊 Project Sounds & Audio Feedback
 
-Dataset Forge uses four distinct sounds to provide immediate feedback for key events:
+Dataset Forge uses a robust multi-library audio system to provide immediate feedback for key events. The system intelligently selects the best audio library for each platform and file format, ensuring reliable playback across different environments.
 
-| Sound    | File         | When it Plays                                 | Meaning for User                 |
-| -------- | ------------ | --------------------------------------------- | -------------------------------- |
-| Startup  | startup.mp3  | When the application starts                   | App is ready to use              |
-| Success  | done.wav     | After long or successful operations           | Operation completed successfully |
-| Error    | error.mp3    | On any user-facing error or failed operation  | Attention: an error occurred     |
-| Shutdown | shutdown.mp3 | When the application exits (normal or Ctrl+C) | App is shutting down             |
+## Audio System Architecture
+
+The audio system uses multiple libraries with intelligent fallbacks:
+
+1. **Playsound (1.2.2)** - Primary cross-platform library
+
+   - Most reliable for various audio formats
+   - Good cross-platform support
+   - Handles MP3, WAV, and other formats
+
+2. **Winsound** - Windows WAV files optimization
+
+   - Best performance for WAV files on Windows
+   - Native Windows audio system
+   - Fastest playback for short sounds
+
+3. **Pydub** - Various format support
+
+   - Excellent for MP3 and other formats
+   - Good cross-platform compatibility
+   - Advanced audio processing capabilities
+
+4. **Pygame** - Cross-platform fallback
+   - Reliable fallback option
+   - Good for longer audio files
+   - Thread-safe operations
+
+## Audio Files
+
+| Sound    | File         | Size      | When it Plays                                 | Meaning for User                 |
+| -------- | ------------ | --------- | --------------------------------------------- | -------------------------------- |
+| Startup  | startup.mp3  | 78,240 B  | When the application starts                   | App is ready to use              |
+| Success  | done.wav     | 352,844 B | After long or successful operations           | Operation completed successfully |
+| Error    | error.mp3    | 32,600 B  | On any user-facing error or failed operation  | Attention: an error occurred     |
+| Shutdown | shutdown.mp3 | 23,808 B  | When the application exits (normal or Ctrl+C) | App is shutting down             |
+
+## Audio System Features
+
+- **System-specific optimization**: Different libraries for different platforms
+- **Format-specific handling**: Optimized playback for WAV vs MP3 files
+- **Graceful fallbacks**: Multiple fallback options if primary method fails
+- **Non-blocking playback**: Timeout protection to prevent hanging
+- **Thread-safe operations**: Safe for concurrent audio playback
+- **Error resilience**: Continues operation even if audio fails
+
+## Audio Usage
+
+```python
+from dataset_forge.utils.audio_utils import (
+    play_done_sound,
+    play_error_sound,
+    play_startup_sound,
+    play_shutdown_sound
+)
+
+# Play audio with automatic fallback handling
+play_done_sound(block=True)      # Success feedback
+play_error_sound(block=True)     # Error feedback
+play_startup_sound(block=False)  # Non-blocking startup
+play_shutdown_sound(block=True)  # Exit feedback
+```
+
+## Audio System Benefits
+
+- **Reliable playback**: Multiple fallback options ensure audio works across platforms
+- **No hanging**: Timeout protection prevents CLI from hanging during audio playback
+- **Fast startup**: Optimized library selection for quick audio response
+- **Error resilience**: CLI continues working even if audio system fails
+- **Cross-platform**: Works on Windows, macOS, and Linux with appropriate libraries
 
 - All user-facing errors always trigger the error sound for immediate notification.
 - Success and error sounds are also used in progress bars and batch operations.
 - Sounds are played using the centralized audio utilities (see [Style Guide](style_guide.md#audio--user-feedback)).
-- (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
+- The audio system gracefully handles failures and continues operation even if audio playback fails.
 
 These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
 
@@ -1491,8 +1619,6 @@ Suggestions:
 
 </details>
 
-
-
 - [ ] **Onboarding**: Add 'onboarding' doc/flow
 - [ ] **Build**: Release a stable build at some point
 
@@ -1506,6 +1632,66 @@ Suggestions:
 - [ ] **Smart Caching**: Predictive loading of frequently used modules
 - [ ] **Import Optimization**: Compile-time import analysis and automatic conversion
 - [ ] **Performance Monitoring**: Real-time metrics and automated regression detection
+
+**NEW TODO:**
+
+- [ ] **dedicated de dupe menu**
+- [ ] **global search functionality**
+- [ ] **path sanitization**
+
+- [ ] **validate code that's from other repos**
+- [ ] **title**
+- [ ] **title**
+- [ ] **title**
+- [ ] **speed up cli**: lazy imports AND????
+- [x] **find_code_issues.py**: test and improve
+- [x] **Fix critical menu system errors**: Resolved 'str' object is not callable and 'module' object is not callable errors in dataset_management_menu.py - Fixed lazy_action vs lazy_menu usage, pepedp lazy imports, and ProcessType enum access
+- [x] **Audio System Investigation & Fix**: Resolved CLI hanging issues and implemented robust multi-library audio system
+  - **Problem**: CLI was hanging during exit due to audio playback issues
+  - **Investigation**: Tested audio files, pygame mixer, winsound, and alternative libraries
+  - **Solution**: Implemented robust audio system with multiple fallback libraries
+  - **Libraries**: playsound (primary), winsound (Windows WAV), pydub (various formats), pygame (fallback)
+  - **Features**: System-specific audio handling, format-specific optimizations, graceful error handling
+  - **Testing**: All 4 audio files (done.wav, error.mp3, startup.mp3, shutdown.mp3) working perfectly
+  - **Dependencies**: Added playsound==1.2.2 and pydub to requirements.txt
+  - **Result**: CLI exits cleanly with full audio functionality restored
+- [x] **Comprehensive Audio Implementation**: Add audio feedback throughout the entire application
+  - **Status**: ✅ COMPLETED - Audio feedback added to all major action functions
+  - **Files Updated**:
+    - `augmentation_actions.py` - Added completion audio to `apply_augmentation_pipeline` and `create_augmentation_variations`
+    - `metadata_actions.py` - Added completion audio to `exif_scrubber_menu` and `icc_to_srgb_menu`
+    - `quality_scoring_actions.py` - Added completion audio to `score_images_with_pyiqa` and `score_hq_lq_folders`
+    - `report_actions.py` - Added completion audio to `generate_rich_report`
+    - `resave_images_actions.py` - Added completion audio to `resave_images_workflow`
+    - `exif_scrubber_actions.py` - Added completion audio to `scrub_exif_single_folder` and `scrub_exif_hq_lq_folders`
+    - `orientation_organizer_actions.py` - Added completion audio to `organize_images_by_orientation` and `organize_hq_lq_by_orientation`
+    - `batch_rename_actions.py` - Added completion audio to `batch_rename_single_folder` and `batch_rename_hq_lq_folders`
+    - `hue_adjustment_actions.py` - Added completion audio to `process_folder`
+    - `frames_actions.py` - Already had completion audio in `extract_frames_menu`
+  - **Audio Files**: Successfully moved to `./assets/audio/` directory for better organization
+  - **Result**: Complete audio feedback throughout the application with success sounds for all major operations
+  - **Files to Update**: All action files, menu files, utility functions
+  - **Testing**: Ensure audio doesn't interfere with CLI operations
+  - **Result**: Complete audio feedback throughout the application
+- [x] **Fix Test Failures**: Resolved 3 critical test failures in performance optimization module
+  - **Problem**: 3 tests failing in `test_performance_optimization.py`:
+    1. `test_gpu_image_analysis` - RuntimeError due to RGB vs grayscale tensor mismatch
+    2. `test_prioritize_samples` - NameError due to missing `time` import
+    3. `test_end_to_end_optimization_pipeline` - NameError due to missing `time` import
+  - **Solution**:
+    1. Fixed GPU image analysis by properly converting RGB to grayscale for Sobel edge detection
+    2. Added missing `import time` to `sample_prioritization.py`
+    3. Added "size" key to GPU image analysis results to match test expectations
+  - **Files Modified**:
+    - `dataset_forge/utils/sample_prioritization.py` - Added time import
+    - `dataset_forge/utils/gpu_acceleration.py` - Fixed RGB/grayscale conversion and added size field
+  - **Testing**: All 306 tests now passing (298 passed, 7 skipped, 1 xfailed)
+  - **Result**: Complete test suite stability restored
+- [ ] **title**: lorem_ipsum
+- [ ] **title**: lorem_ipsum
+- [ ] **title**: lorem_ipsum
+- [ ] **title**: lorem_ipsum
+- [ ] **title**: lorem_ipsum
 
 ---
 
@@ -2465,6 +2651,7 @@ F -->|<70| I[❌ Unusable]
 ### ZSTEG Executable Issues
 
 **Problem**: `zsteg.exe` fails with side-by-side configuration error:
+
 ```
 14001: The application has failed to start because its side-by-side configuration is incorrect.
 Please see the application event log or use the command-line sxstrace.exe tool for more detail.
@@ -2510,18 +2697,117 @@ Use a PowerShell wrapper that gracefully falls back to gem-installed zsteg:
 powershell -ExecutionPolicy Bypass -File "zsteg_wrapper.ps1" --help
 ```
 
-**Solution 3: Gem Installation (Simplest)**
+## Audio System Issues
 
-Use gem-installed zsteg directly:
-```bash
-gem install zsteg
-zsteg --help
-```
+### CLI Hanging During Exit
 
-### Other Steganography Issues
+**Problem**: CLI hangs when trying to exit with `q`, `quit`, `exit`, `0`, or `Ctrl+C`
 
-- **zsteg not found:** Ensure zsteg is installed via `gem install zsteg`
-- **steghide not found:** Ensure steghide is installed and the folder is added to your PATH. See [Special Installation Instructions](special_installation.md).
+**Root Cause**: Audio playback system hanging during shutdown sound
+
+**Solution**: The audio system has been updated with robust fallbacks and timeout protection. If issues persist:
+
+1. **Check audio dependencies**:
+
+   ```bash
+   pip install playsound==1.2.2 pydub pygame
+   ```
+
+2. **Verify audio files exist**:
+
+   ```bash
+   ls assets/
+   # Should show: done.wav, error.mp3, startup.mp3, shutdown.mp3
+   ```
+
+3. **Test audio functionality**:
+   ```python
+   from dataset_forge.utils.audio_utils import play_done_sound
+   play_done_sound(block=True)
+   ```
+
+### Audio Not Playing
+
+**Problem**: No audio feedback during operations
+
+**Solutions**:
+
+1. **Check audio library installation**:
+
+   ```bash
+   pip install playsound==1.2.2 pydub
+   ```
+
+2. **Test individual audio libraries**:
+
+   ```python
+   # Test playsound
+   from playsound import playsound
+   playsound("assets/done.wav", block=True)
+
+   # Test winsound (Windows only)
+   import winsound
+   winsound.PlaySound("assets/done.wav", winsound.SND_FILENAME)
+   ```
+
+3. **Check audio file integrity**:
+   ```bash
+   # Verify file sizes
+   ls -la assets/
+   # done.wav should be ~352KB
+   # error.mp3 should be ~32KB
+   # startup.mp3 should be ~78KB
+   # shutdown.mp3 should be ~23KB
+   ```
+
+### Audio Library Conflicts
+
+**Problem**: Multiple audio libraries causing conflicts
+
+**Solution**: The audio system automatically selects the best available library:
+
+1. **Playsound (primary)** - Most reliable cross-platform
+2. **Winsound (Windows WAV)** - Best for WAV files on Windows
+3. **Pydub (various formats)** - Good for MP3 and other formats
+4. **Pygame (fallback)** - Cross-platform fallback
+
+### Audio System Error Messages
+
+**Common messages and solutions**:
+
+- `"Playsound failed: Error 277"` - MP3 format issue, system will fall back to pydub
+- `"Winsound failed"` - WAV file issue, system will try playsound
+- `"Audio playback not available"` - No audio libraries working, CLI continues without audio
+- `"Audio playback timeout"` - Audio took too long, automatically stopped
+
+### Audio System Best Practices
+
+1. **Always use centralized audio functions**:
+
+   ```python
+   from dataset_forge.utils.audio_utils import play_done_sound
+   # Don't use audio libraries directly
+   ```
+
+2. **Handle audio failures gracefully**:
+
+   ```python
+   try:
+       play_done_sound(block=True)
+   except Exception:
+       # Audio failed, but operation continues
+       pass
+   ```
+
+3. **Use appropriate blocking**:
+
+   - `block=True` for important feedback (success, error, shutdown)
+   - `block=False` for background sounds (startup)
+
+4. **Test audio on target platforms**:
+   - Windows: winsound + playsound
+   - macOS: playsound + pydub
+   - Linux: playsound + pygame
 
 ---
 
@@ -2930,6 +3216,35 @@ For questions, open an issue or contact the project maintainer.
 # Changelog
 
 ## [Unreleased]
+
+### 🔊 Audio System Investigation & Robust Multi-Library Implementation (August 2025)
+
+- **Problem Resolved**: CLI hanging during exit due to audio playback issues
+- **Investigation**: Comprehensive analysis of audio files, pygame mixer, winsound, and alternative libraries
+- **Solution**: Implemented robust multi-library audio system with intelligent fallbacks
+- **Audio Libraries Implemented**:
+  - **Playsound (1.2.2)**: Primary cross-platform audio library
+  - **Winsound**: Optimized for Windows WAV files
+  - **Pydub**: Handles various audio formats including MP3
+  - **Pygame**: Cross-platform fallback option
+- **Key Features**:
+  - System-specific audio handling (Windows vs other platforms)
+  - Format-specific optimizations (WAV vs MP3 handling)
+  - Graceful error handling and fallback mechanisms
+  - Non-blocking audio playback with timeout protection
+  - Thread-safe audio operations
+- **Audio Files Tested**: All 4 audio files working perfectly
+  - `done.wav` (352,844 bytes) - Success sounds
+  - `error.mp3` (32,600 bytes) - Error feedback
+  - `startup.mp3` (78,240 bytes) - Application startup
+  - `shutdown.mp3` (23,808 bytes) - Application exit
+- **Dependencies Added**: 
+  - `playsound==1.2.2` - Primary audio library
+  - `pydub` - Alternative audio library for various formats
+- **Testing**: Comprehensive testing of all exit methods (`q`, `quit`, `exit`, `0`, `Ctrl+C`)
+- **Result**: CLI exits cleanly with full audio functionality restored
+- **Documentation**: Updated requirements.txt and audio system documentation
+- **User Experience**: Reliable audio feedback without hanging or blocking issues
 
 ### 🔧 zsteg.exe Standalone Executable Solution (August 2025)
 

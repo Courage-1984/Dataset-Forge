@@ -248,16 +248,21 @@ class GPUImageProcessor:
             hist = torch.histc(tensor, bins=256, min=0, max=1)
             
             # Calculate edge detection using Sobel
-            if tensor.shape[1] > 1:  # Grayscale
-                sobel_x = torch.tensor([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
-                sobel_y = torch.tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
-                
-                edges_x = F.conv2d(tensor, sobel_x, padding=1)
-                edges_y = F.conv2d(tensor, sobel_y, padding=1)
-                edges = torch.sqrt(edges_x**2 + edges_y**2)
-                edge_strength = torch.mean(edges)
+            # Convert to grayscale for edge detection
+            if tensor.shape[1] == 3:  # RGB image
+                # Convert to grayscale using luminance weights
+                gray_tensor = 0.299 * tensor[:, 0:1, :, :] + 0.587 * tensor[:, 1:2, :, :] + 0.114 * tensor[:, 2:3, :, :]
             else:
-                edge_strength = torch.tensor(0.0)
+                gray_tensor = tensor
+            
+            # Apply Sobel filters
+            sobel_x = torch.tensor([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+            sobel_y = torch.tensor([[-1, -2, -1], [0, 0, 0], [1, 2, 1]], dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+            
+            edges_x = F.conv2d(gray_tensor, sobel_x, padding=1)
+            edges_y = F.conv2d(gray_tensor, sobel_y, padding=1)
+            edges = torch.sqrt(edges_x**2 + edges_y**2)
+            edge_strength = torch.mean(edges)
             
             return {
                 "mean": mean.item(),
@@ -266,6 +271,7 @@ class GPUImageProcessor:
                 "max": max_val.item(),
                 "edge_strength": edge_strength.item(),
                 "histogram": hist.cpu().numpy().tolist(),
+                "size": (tensor.shape[2], tensor.shape[3]),  # (height, width)
             }
 
     def gpu_sift_keypoints(

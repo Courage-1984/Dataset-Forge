@@ -41,6 +41,9 @@ def scrub_exif_single_folder(
             log_operation("exif_scrub", f"Scrubbed EXIF from {fpath}")
         except Exception as e:
             failed.append(fname)
+    
+    print_success(f"EXIF scrubbing complete! Processed {count} images.")
+    play_done_sound()
     return count, failed
 
 
@@ -78,6 +81,9 @@ def scrub_exif_hq_lq_folders(
             count += 1
         except Exception as e:
             failed.append((fname, str(e)))
+    
+    print_success(f"HQ/LQ EXIF scrubbing complete! Processed {count} pairs.")
+    play_done_sound()
     return count, failed
 
 

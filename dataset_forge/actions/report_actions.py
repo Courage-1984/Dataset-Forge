@@ -269,3 +269,5 @@ def generate_rich_report(
         lq_class_balance_path=lq_class_balance_path,
     )
     print(f"Report generated: {output_path}")
+    print_success("Rich report generation complete!")
+    play_done_sound()

@@ -582,19 +582,82 @@ For detailed usage, CLI options, and troubleshooting, see [usage.md](usage.md#ut
 
 # 🔊 Project Sounds & Audio Feedback
 
-Dataset Forge uses four distinct sounds to provide immediate feedback for key events:
+Dataset Forge uses a robust multi-library audio system to provide immediate feedback for key events. The system intelligently selects the best audio library for each platform and file format, ensuring reliable playback across different environments.
 
-| Sound    | File         | When it Plays                                 | Meaning for User                 |
-| -------- | ------------ | --------------------------------------------- | -------------------------------- |
-| Startup  | startup.mp3  | When the application starts                   | App is ready to use              |
-| Success  | done.wav     | After long or successful operations           | Operation completed successfully |
-| Error    | error.mp3    | On any user-facing error or failed operation  | Attention: an error occurred     |
-| Shutdown | shutdown.mp3 | When the application exits (normal or Ctrl+C) | App is shutting down             |
+## Audio System Architecture
+
+The audio system uses multiple libraries with intelligent fallbacks:
+
+1. **Playsound (1.2.2)** - Primary cross-platform library
+
+   - Most reliable for various audio formats
+   - Good cross-platform support
+   - Handles MP3, WAV, and other formats
+
+2. **Winsound** - Windows WAV files optimization
+
+   - Best performance for WAV files on Windows
+   - Native Windows audio system
+   - Fastest playback for short sounds
+
+3. **Pydub** - Various format support
+
+   - Excellent for MP3 and other formats
+   - Good cross-platform compatibility
+   - Advanced audio processing capabilities
+
+4. **Pygame** - Cross-platform fallback
+   - Reliable fallback option
+   - Good for longer audio files
+   - Thread-safe operations
+
+## Audio Files
+
+| Sound    | File         | Size      | When it Plays                                 | Meaning for User                 |
+| -------- | ------------ | --------- | --------------------------------------------- | -------------------------------- |
+| Startup  | startup.mp3  | 78,240 B  | When the application starts                   | App is ready to use              |
+| Success  | done.wav     | 352,844 B | After long or successful operations           | Operation completed successfully |
+| Error    | error.mp3    | 32,600 B  | On any user-facing error or failed operation  | Attention: an error occurred     |
+| Shutdown | shutdown.mp3 | 23,808 B  | When the application exits (normal or Ctrl+C) | App is shutting down             |
+
+## Audio System Features
+
+- **System-specific optimization**: Different libraries for different platforms
+- **Format-specific handling**: Optimized playback for WAV vs MP3 files
+- **Graceful fallbacks**: Multiple fallback options if primary method fails
+- **Non-blocking playback**: Timeout protection to prevent hanging
+- **Thread-safe operations**: Safe for concurrent audio playback
+- **Error resilience**: Continues operation even if audio fails
+
+## Audio Usage
+
+```python
+from dataset_forge.utils.audio_utils import (
+    play_done_sound,
+    play_error_sound,
+    play_startup_sound,
+    play_shutdown_sound
+)
+
+# Play audio with automatic fallback handling
+play_done_sound(block=True)      # Success feedback
+play_error_sound(block=True)     # Error feedback
+play_startup_sound(block=False)  # Non-blocking startup
+play_shutdown_sound(block=True)  # Exit feedback
+```
+
+## Audio System Benefits
+
+- **Reliable playback**: Multiple fallback options ensure audio works across platforms
+- **No hanging**: Timeout protection prevents CLI from hanging during audio playback
+- **Fast startup**: Optimized library selection for quick audio response
+- **Error resilience**: CLI continues working even if audio system fails
+- **Cross-platform**: Works on Windows, macOS, and Linux with appropriate libraries
 
 - All user-facing errors always trigger the error sound for immediate notification.
 - Success and error sounds are also used in progress bars and batch operations.
 - Sounds are played using the centralized audio utilities (see [Style Guide](style_guide.md#audio--user-feedback)).
-- (If configurable: You can enable/disable sounds in the user preferences/settings menu.)
+- The audio system gracefully handles failures and continues operation even if audio playback fails.
 
 These sounds help you know instantly when an operation finishes, fails, or the app starts/stops—no need to watch the screen at all times.
 

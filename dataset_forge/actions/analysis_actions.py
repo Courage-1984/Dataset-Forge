@@ -23,6 +23,7 @@ from dataset_forge.actions.analysis_ops_actions import (
 from dataset_forge.utils.image_ops import get_image_size
 from dataset_forge.utils.monitoring import monitor_all
 from dataset_forge.utils.cache_utils import in_memory_cache
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 @monitor_all("analyze_single_image")
@@ -289,6 +290,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
         )
 
     print("=" * 30)
+    from dataset_forge.utils.printing import print_success
+    print_success("HQ/LQ dataset report generation complete!")
+    play_done_sound()
 
 
 def find_hq_lq_scale(hq_folder, lq_folder, verbose=True):
@@ -402,6 +406,9 @@ def test_hq_lq_scale(hq_folder, lq_folder):
         print(f"\nHQ files missing LQ: {len(scale_results['missing_lq'])}")
     if scale_results["missing_hq"]:
         print(f"\nLQ files missing HQ: {len(scale_results['missing_hq'])}")
+    
+    print_success("HQ/LQ scale analysis complete!")
+    play_done_sound()
 
 
 def check_consistency(folder_path, folder_name, verbose=True):

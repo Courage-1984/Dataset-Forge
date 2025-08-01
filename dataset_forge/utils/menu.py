@@ -70,12 +70,32 @@ def handle_global_command(
         except Exception as e:
             print_error(f"Memory cleanup failed: {e}")
 
+        # Play shutdown sound non-blocking to prevent hanging
         try:
             from .audio_utils import play_shutdown_sound
+            import threading
+            import time
 
-            play_shutdown_sound(block=True)
-        except Exception:
-            pass
+            # Play shutdown sound in a separate thread with better timeout handling
+            def play_shutdown_with_timeout():
+                try:
+                    # Try to play the shutdown sound
+                    play_shutdown_sound(block=True)
+                except Exception as e:
+                    print(f"Shutdown sound failed: {e}")
+
+            shutdown_thread = threading.Thread(target=play_shutdown_with_timeout, daemon=True)
+            shutdown_thread.start()
+            
+            # Wait for a reasonable time for the sound to play (most audio files are 1-3 seconds)
+            shutdown_thread.join(timeout=3.0)
+            
+            # If thread is still running, let it continue in background
+            if shutdown_thread.is_alive():
+                print("Shutdown sound playing in background...")
+            
+        except Exception as e:
+            print(f"Audio system error: {e}")
 
         print_success("👋 Thank you for using Dataset Forge!")
         sys.exit(0)

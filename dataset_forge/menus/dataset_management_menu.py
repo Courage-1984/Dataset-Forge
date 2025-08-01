@@ -1,5 +1,5 @@
 import importlib
-from dataset_forge.utils.menu import show_menu
+from dataset_forge.utils.menu import show_menu, lazy_action
 from dataset_forge.utils.printing import (
     print_header,
     print_section,
@@ -35,16 +35,7 @@ def fuzzy_hq_lq_pairing_menu():
     )()
 
 
-def lazy_action(module_path, func_name):
-    def _action(*args, **kwargs):
-        return monitoring.time_and_record_menu_load(
-            func_name,
-            lambda: getattr(importlib.import_module(module_path), func_name)(
-                *args, **kwargs
-            ),
-        )
-
-    return _action
+# lazy_action is already imported at the top of the file
 
 
 def dataset_creation_menu():
@@ -72,9 +63,9 @@ def dataset_creation_menu():
         "3": ("🖼️ Create from Images", create_dataset_from_images),
         "4": (
             "🐸 Umzi's Dataset Preprocessing",
-            lazy_action(
-                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
-                "best_tile_extraction_action",
+            lazy_menu(
+                "dataset_forge.menus.umzi_dataset_preprocessing_menu",
+                "umzi_dataset_preprocessing_menu",
             ),
         ),
         "0": ("⬅️  Back", None),
@@ -88,28 +79,23 @@ def dataset_creation_menu():
     }
 
     while True:
-        action = show_menu(
-            "🎯 Create Dataset from Source",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-            current_menu="Dataset Creation",
-            menu_context=menu_context,
-        )
-        print(f"DEBUG: key={action!r}, type={type(action)}")
-        if action is None or action == "0":
-            break
-        if callable(action):
-            print(f"DEBUG: Calling action for menu selection: {action}")
-            try:
-                action()
-            except Exception as e:
-                print_error(f"Exception in menu action: {e}")
-                input("Press Enter to return to the menu...")
-        else:
-            print_error(
-                f"Selected action is not callable: {action!r} (type={type(action)})"
+        try:
+            key = show_menu(
+                "🎯 Create Dataset from Source",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="Dataset Creation",
+                menu_context=menu_context,
             )
+            if key is None or key == "0":
+                break
+            action = options[key][1]
+            if callable(action):
+                action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
+            break
 
 
 def combine_split_menu():
@@ -139,18 +125,23 @@ def combine_split_menu():
     }
 
     while True:
-        action = show_menu(
-            "🔗 Combine or Split Datasets",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-            current_menu="Combine/Split Datasets",
-            menu_context=menu_context,
-        )
-        if action is None or action == "0":
+        try:
+            key = show_menu(
+                "🔗 Combine or Split Datasets",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="Combine/Split Datasets",
+                menu_context=menu_context,
+            )
+            if key is None or key == "0":
+                break
+            action = options[key][1]
+            if callable(action):
+                action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
             break
-        if callable(action):
-            action()
 
 
 def hq_lq_pairs_menu():
@@ -190,18 +181,23 @@ def hq_lq_pairs_menu():
     }
 
     while True:
-        action = show_menu(
-            "🔗 Manage HQ/LQ Pairs",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-            current_menu="HQ/LQ Pair Management",
-            menu_context=menu_context,
-        )
-        if action is None or action == "0":
+        try:
+            key = show_menu(
+                "🔗 Manage HQ/LQ Pairs",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="HQ/LQ Pair Management",
+                menu_context=menu_context,
+            )
+            if key is None or key == "0":
+                break
+            action = options[key][1]
+            if callable(action):
+                action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
             break
-        if callable(action):
-            action()
 
 
 def clean_organize_menu():
@@ -224,18 +220,23 @@ def clean_organize_menu():
         }
 
         while True:
-            action = show_menu(
-                "🔍 Duplicate Management",
-                options,
-                header_color=Mocha.sapphire,
-                char="-",
-                current_menu="Duplicate Management",
-                menu_context=menu_context,
-            )
-            if action is None or action == "0":
+            try:
+                key = show_menu(
+                    "🔍 Duplicate Management",
+                    options,
+                    header_color=Mocha.sapphire,
+                    char="-",
+                    current_menu="Duplicate Management",
+                    menu_context=menu_context,
+                )
+                if key is None or key == "0":
+                    break
+                action = options[key][1]
+                if callable(action):
+                    action()
+            except (KeyboardInterrupt, EOFError):
+                print_info("\nExiting...")
                 break
-            if callable(action):
-                action()
 
     def remove_small_pairs():
         hq_folder = get_folder_path("📁 Enter HQ folder path: ")
@@ -266,18 +267,23 @@ def clean_organize_menu():
         }
 
         while True:
-            action = show_menu(
-                "📝 Batch Rename",
-                options,
-                header_color=Mocha.sapphire,
-                char="-",
-                current_menu="Batch Rename",
-                menu_context=menu_context,
-            )
-            if action is None or action == "0":
+            try:
+                key = show_menu(
+                    "📝 Batch Rename",
+                    options,
+                    header_color=Mocha.sapphire,
+                    char="-",
+                    current_menu="Batch Rename",
+                    menu_context=menu_context,
+                )
+                if key is None or key == "0":
+                    break
+                action = options[key][1]
+                if callable(action):
+                    action()
+            except (KeyboardInterrupt, EOFError):
+                print_info("\nExiting...")
                 break
-            if callable(action):
-                action()
 
     options = {
         "1": ("🔍 Duplicate Management", dedupe_menu),
@@ -295,18 +301,23 @@ def clean_organize_menu():
     }
 
     while True:
-        action = show_menu(
-            "🧹 Clean & Organize",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-            current_menu="Clean & Organize",
-            menu_context=menu_context,
-        )
-        if action is None or action == "0":
+        try:
+            key = show_menu(
+                "🧹 Clean & Organize",
+                options,
+                header_color=Mocha.sapphire,
+                char="-",
+                current_menu="Clean & Organize",
+                menu_context=menu_context,
+            )
+            if key is None or key == "0":
+                break
+            action = options[key][1]
+            if callable(action):
+                action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
             break
-        if callable(action):
-            action()
 
 
 def dataset_management_menu():

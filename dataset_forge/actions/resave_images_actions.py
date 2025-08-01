@@ -24,6 +24,7 @@ from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.file_utils import get_unique_filename, is_image_file
 from dataset_forge.utils.monitoring import monitor_all
 from dataset_forge.menus.session_state import parallel_config
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def process_single_image(
@@ -384,6 +385,8 @@ def resave_images_workflow(
         if failed > 0:
             print_error(f"❌ Failed: {failed} images")
 
+        print_success("Image resaving workflow complete!")
+        play_done_sound()
         print_prompt("Press Enter to return to the menu...")
 
     except Exception as e:

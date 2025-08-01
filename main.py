@@ -24,14 +24,33 @@ shutdown_sound_played = False
 
 def _sigint_handler(signum, frame):
     global shutdown_sound_played
-    # Play shutdown sound on Ctrl+C (blocking)
+    # Play shutdown sound on Ctrl+C (non-blocking with timeout)
     try:
         from dataset_forge.utils.audio_utils import play_shutdown_sound
+        import threading
 
-        play_shutdown_sound(block=True)
-        shutdown_sound_played = True
-    except Exception:
-        pass
+        # Play shutdown sound in a separate thread with better timeout handling
+        def play_shutdown_with_timeout():
+            try:
+                play_shutdown_sound(block=True)
+                shutdown_sound_played = True
+            except Exception as e:
+                print(f"Shutdown sound failed: {e}")
+
+        shutdown_thread = threading.Thread(
+            target=play_shutdown_with_timeout, daemon=True
+        )
+        shutdown_thread.start()
+
+        # Wait for a reasonable time for the sound to play
+        shutdown_thread.join(timeout=2.0)
+
+        # If thread is still running, let it continue in background
+        if shutdown_thread.is_alive():
+            print("Shutdown sound playing in background...")
+
+    except Exception as e:
+        print(f"Audio system error: {e}")
     try:
         from dataset_forge.utils.memory_utils import clear_memory
 
@@ -89,22 +108,41 @@ if __name__ == "__main__":
         # Lazy import of main_menu for faster CLI startup
         if main_menu is None:
             from dataset_forge.menus.main_menu import main_menu
-        
+
         # Print startup time
         startup_time = time.time() - startup_start
         print(f"🚀 CLI startup completed in {startup_time:.3f}s")
-        
+
         main_menu()
     finally:
-        # Play shutdown sound on normal exit (blocking), unless already played
+        # Play shutdown sound on normal exit (non-blocking with timeout), unless already played
         if not shutdown_sound_played:
             try:
                 from dataset_forge.utils.audio_utils import play_shutdown_sound
+                import threading
 
-                play_shutdown_sound(block=True)
-                shutdown_sound_played = True
-            except Exception:
-                pass
+                # Play shutdown sound in a separate thread with better timeout handling
+                def play_shutdown_with_timeout():
+                    try:
+                        play_shutdown_sound(block=True)
+                        shutdown_sound_played = True
+                    except Exception as e:
+                        print(f"Shutdown sound failed: {e}")
+
+                shutdown_thread = threading.Thread(
+                    target=play_shutdown_with_timeout, daemon=True
+                )
+                shutdown_thread.start()
+
+                # Wait for a reasonable time for the sound to play
+                shutdown_thread.join(timeout=2.0)
+
+                # If thread is still running, let it continue in background
+                if shutdown_thread.is_alive():
+                    print("Shutdown sound playing in background...")
+
+            except Exception as e:
+                print(f"Audio system error: {e}")
         # Cleanup memory on exit
         try:
             from dataset_forge.utils.memory_utils import clear_memory
@@ -113,10 +151,11 @@ if __name__ == "__main__":
             print("🧹 Memory cleanup completed on exit.")
         except Exception as e:
             print(f"⚠️ Warning: Memory cleanup failed on exit: {e}")
-        
+
         # Print lazy import statistics if available
         try:
             from dataset_forge.utils.lazy_imports import print_import_times
+
             print_import_times()
         except ImportError:
             pass

@@ -202,18 +202,24 @@ pepedp = lazy_import("pepedp")
 
 # PepeDP specific imports
 pepedp_enum = lazy_import("pepedp.enum")
-pepedp_best_tile = lazy_import("pepedp.scripts.utils.best_tile")
-pepedp_laplacian_complexity = lazy_import("pepedp.scripts.utils.complexity.laplacian")
-pepedp_ic9600_complexity = lazy_import("pepedp.scripts.utils.complexity.ic9600")
-pepedp_img_to_embedding = lazy_import("pepedp.embedding.embedding_class")
-pepedp_embedded_model = lazy_import("pepedp.embedding.enum")
-pepedp_euclid_dist = lazy_import("pepedp.scripts.utils.distance")
-pepedp_cosine_dist = lazy_import("pepedp.scripts.utils.distance")
-pepedp_video_to_frame = lazy_import("pepedp.scripts.utils.video_to_frames")
-pepedp_create_embedd = lazy_import("pepedp.scripts.utils.deduplicate")
-pepedp_filtered_pairs = lazy_import("pepedp.scripts.utils.deduplicate")
-pepedp_move_duplicate_files = lazy_import("pepedp.scripts.utils.deduplicate")
-pepedp_threshold_alg = lazy_import("pepedp.torch_enum")
+pepedp_best_tile = lazy_import("pepedp.scripts.utils.best_tile", "BestTile")
+pepedp_laplacian_complexity = lazy_import(
+    "pepedp.scripts.utils.complexity.laplacian", "LaplacianComplexity"
+)
+pepedp_ic9600_complexity = lazy_import(
+    "pepedp.scripts.utils.complexity.ic9600", "IC9600Complexity"
+)
+pepedp_img_to_embedding = lazy_import(
+    "pepedp.embedding.embedding_class", "ImgToEmbedding"
+)
+pepedp_embedded_model = lazy_import("pepedp.embedding.enum", "EmbeddedModel")
+pepedp_euclid_dist = lazy_import("pepedp.scripts.utils.distance", "euclid_dist")
+pepedp_cosine_dist = lazy_import("pepedp.scripts.utils.distance", "cosine_dist")
+pepedp_video_to_frame = lazy_import("pepedp.scripts.utils.video_to_frames", "VideoToFrame")
+pepedp_create_embedd = lazy_import("pepedp.scripts.utils.deduplicate", "create_embedd")
+pepedp_filtered_pairs = lazy_import("pepedp.scripts.utils.deduplicate", "filtered_pairs")
+pepedp_move_duplicate_files = lazy_import("pepedp.scripts.utils.deduplicate", "move_duplicate_files")
+pepedp_threshold_alg = lazy_import("pepedp.torch_enum", "ThresholdAlg")
 
 # Deduplication
 imagededup = lazy_import("imagededup")

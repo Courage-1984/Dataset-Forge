@@ -193,6 +193,8 @@ class DatasetCombiner(DatasetOperation):
         print(f"Combined dataset is located in: {dest_root}")
         print("-" * 30)
         print("=" * 30)
+        print_success("Dataset combination complete!")
+        play_done_sound()
 
 
 # TODO: Add DatasetSplitter and DatasetShuffler classes following the same pattern.

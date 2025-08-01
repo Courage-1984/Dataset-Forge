@@ -37,6 +37,8 @@ questionary
 # Audio Feedback
 # =============================
 pygame
+playsound==1.2.2
+pydub
 # playsound
 # playsound2
 
@@ -79,7 +81,10 @@ libmagic==1.0
 # =============================
 # Data Compression & Archiving
 # =============================
-ffmpeg
+# ffmpeg
+# ^^ winget install ffmpeg
+ffmpeg-python
+# ^^ Requires ffmpeg binary: winget install ffmpeg OR choco install ffmpeg-full OR scoop install ffmpeg
 
 # =============================
 # Jinja2 for Report Templates

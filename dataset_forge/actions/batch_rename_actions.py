@@ -100,6 +100,8 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
         log_operation("rename_final", f"{temp_path} -> {final_path}")
 
     print("Batch renaming complete.")
+    print_success(f"Batch renaming complete! Renamed {len(files)} files.")
+    play_done_sound()
 
 
 def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=True):
@@ -164,3 +166,5 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
         log_operation("rename_final_lq", f"{lq_temp_path} -> {lq_final_path}")
 
     print("Batch renaming complete.")
+    print_success(f"HQ/LQ batch renaming complete! Renamed {len(matching_files)} pairs.")
+    play_done_sound()

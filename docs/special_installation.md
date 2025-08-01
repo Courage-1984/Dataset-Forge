@@ -361,5 +361,54 @@ gem install ocran
 
 ---
 
+## 8. ffmpeg integration
+
+> (for [ffmpeg](https://ffmpeg.org/) integration)
+
+### Method 1.1: Windows (Quick)
+
+1. Extract the following folder from `assets/ffmpeg-2025-07-31-git-119d127d05-full_build.zip`:
+
+   - `ffmpeg-2025-07-31-git-119d127d05-full_build`
+
+ - Note that this^ folder contains a `bin` folder which contains:
+
+   - `ffmpeg.exe`
+   - `ffplay.exe`
+   - `ffprobe.exe`
+
+2. Add the path to the `bin` folder to your PATH.
+
+### Method 1.2: Windows (Better)
+
+1. Download [`FFmpeg Builds`](https://www.gyan.dev/ffmpeg/builds/) (binaries for Windows):
+
+   ```bash
+   winget install ffmpeg
+   OR
+   choco install ffmpeg-full
+   OR
+   scoop install ffmpeg
+   ```
+
+### Method 1.3: Windows (`Method 1.1` but download first)
+
+1. Download `ffmpeg-git-full.7z`:
+
+   https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z
+
+2. Extract the contents of the downloaded archive.
+
+ - Note that this^ folder should contain a `bin` folder which contains:
+
+   - `ffmpeg.exe`
+   - `ffplay.exe`
+   - `ffprobe.exe`
+
+3. Add the path to the `bin` folder to your PATH.
+
+---
+
+
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
 

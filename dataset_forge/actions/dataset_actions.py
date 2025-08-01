@@ -221,6 +221,7 @@ def create_multiscale_dataset(*args, **kwargs):
                 **dpid_kwargs,
             )
     print_success("Multiscale dataset creation complete!")
+    play_done_sound()
     print_prompt("Press Enter to return to the menu...")
     input()
 

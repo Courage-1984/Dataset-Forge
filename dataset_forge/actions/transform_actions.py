@@ -18,6 +18,7 @@ from dataset_forge.utils.input_utils import (
 from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
+from dataset_forge.utils.audio_utils import play_done_sound
 
 
 @monitor_all("apply_transformation_to_image")
@@ -239,6 +240,11 @@ def transform_dataset(hq_folder, lq_folder):
         f"{selected_transform}={value}, {operation}, {successful}/{len(pairs)} pairs",
     )
 
+    from dataset_forge.utils.printing import print_success
+
+    print_success("Dataset transformation complete!")
+    play_done_sound()
+
 
 @monitor_all("transform_single_folder", critical_on_error=True)
 def transform_single_folder(folder_path: str):
@@ -331,6 +337,9 @@ def transform_single_folder(folder_path: str):
         f"{selected_transform}={value}, {operation}, {successful}/{len(image_files)} images",
     )
 
+    print_success("Single folder transformation complete!")
+    play_done_sound()
+
 
 @monitor_all("batch_transform_with_parameters", critical_on_error=True)
 def batch_transform_with_parameters(
@@ -412,6 +421,9 @@ def batch_transform_with_parameters(
     print(f"\nBatch transformation complete:")
     print(f"  Total operations: {len(combinations)}")
     print(f"  Successful: {successful}")
+    
+    print_success("Batch transformation complete!")
+    play_done_sound()
     print(f"  Failed: {failed}")
 
     # Log operation
@@ -1534,10 +1546,10 @@ def shuffle_images_menu():
 
         print_header("Shuffle Images", color=Mocha.lavender)
         print_info("Choose input mode:")
-        print_info("  1. \U0001F4C2 HQ/LQ paired folders")
-        print_info("  2. \U0001F5C1 Single folder")
+        print_info("  1. \U0001f4c2 HQ/LQ paired folders")
+        print_info("  2. \U0001f5c1 Single folder")
         print_info("  0. \u274c Cancel")
-        mode = input("\U0001F3AF Select mode: ").strip()
+        mode = input("\U0001f3af Select mode: ").strip()
         print(f"DEBUG: mode={{mode!r}}")
         if mode == "0":
             input("Press Enter to return to the menu...")
@@ -1567,14 +1579,18 @@ def shuffle_images_menu():
             return
     except Exception as e:
         from dataset_forge.utils.printing import print_error
+
         print_error(f"Exception in shuffle_images_menu: {e}")
         import traceback
+
         traceback.print_exc()
         input("Press Enter to return to the menu...")
 
 
 def shuffle_images_single_folder(folder_path):
-    print(f"DEBUG: Entered shuffle_images_single_folder with folder_path={{folder_path!r}}")
+    print(
+        f"DEBUG: Entered shuffle_images_single_folder with folder_path={{folder_path!r}}"
+    )
     try:
         from dataset_forge.utils.input_utils import (
             get_file_operation_choice,
@@ -1607,7 +1623,9 @@ def shuffle_images_single_folder(folder_path):
                 )
                 return
             os.makedirs(output_dir, exist_ok=True)
-            print_info(f"Shuffled images will be {operation}d and renamed in: {output_dir}")
+            print_info(
+                f"Shuffled images will be {operation}d and renamed in: {output_dir}"
+            )
         else:
             print_info("Shuffling and renaming files in-place within original folder.")
 
@@ -1689,7 +1707,9 @@ def shuffle_images_single_folder(folder_path):
         input("Press Enter to return to the menu...")
     except Exception as e:
         from dataset_forge.utils.printing import print_error
+
         print_error(f"Exception in shuffle_images_single_folder: {e}")
         import traceback
+
         traceback.print_exc()
         input("Press Enter to return to the menu...")

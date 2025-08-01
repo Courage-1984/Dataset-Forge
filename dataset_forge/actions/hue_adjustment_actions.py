@@ -110,3 +110,7 @@ def process_folder(
             if paired_lq_folder and paired_output_lq_folder:
                 out_lq_path = os.path.join(paired_output_lq_folder, out_name)
                 cv2.imwrite(out_lq_path, adj_lq_img)
+
+    total_processed = len(files) * duplicates
+    print_success(f"Color adjustment complete! Processed {total_processed} images.")
+    play_done_sound()
