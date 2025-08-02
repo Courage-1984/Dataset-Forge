@@ -31,12 +31,23 @@ def metadata_menu():
         "2": ("🎯 Convert ICC Profile to sRGB", icc_to_srgb_menu),
         "0": ("⬅️  Back", None),
     }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Manage EXIF metadata and ICC color profiles",
+        "Total Options": "2 metadata operations",
+        "Navigation": "Use numbers 1-2 to select, 0 to go back",
+        "Key Features": "EXIF scrubbing, ICC profile conversion",
+    }
+
     while True:
         key = show_menu(
             "EXIF & ICC Profile Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Metadata Management",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":

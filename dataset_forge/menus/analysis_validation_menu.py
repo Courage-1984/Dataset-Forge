@@ -457,12 +457,22 @@ def analyze_properties_menu():
     }
     from dataset_forge.utils.printing import print_error
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Analyze various dataset properties and characteristics",
+        "Options": "6 analysis operations available",
+        "Navigation": "Use numbers 1-6 to select, 0 to go back",
+        "Key Features": "Consistency checking, aspect ratio testing, scale analysis, dimension reporting",
+    }
+
     while True:
         key = show_menu(
             "📊 Analyze Properties",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Analyze Properties",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
@@ -493,12 +503,22 @@ def analysis_validation_menu():
     }
     from dataset_forge.utils.printing import print_error
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Analyze dataset quality and validate image pairs",
+        "Total Options": "3 main validation categories",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+        "Key Features": "Comprehensive validation, issue detection, property analysis",
+    }
+
     while True:
         key = show_menu(
             "🔍 Analysis & Validation",
             options,
             header_color=Mocha.lavender,
             char="=",
+            current_menu="Analysis & Validation",
+            menu_context=menu_context,
         )
         print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":

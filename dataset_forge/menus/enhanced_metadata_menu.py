@@ -25,12 +25,23 @@ def enhanced_metadata_menu():
         "4": ("🧹 Batch Anonymize Metadata", batch_anonymize_metadata),
         "0": ("⬅️  Back", None),
     }
+    
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Advanced metadata handling and management",
+        "Total Options": "4 metadata operations",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        "Key Features": "Batch extraction, metadata editing, filtering, anonymization",
+    }
+    
     while True:
         key = show_menu(
             "🗂️  Enhanced Metadata Management",
             options,
             header_color=Mocha.yellow,
             char="=",
+            current_menu="Enhanced Metadata Management",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             break
