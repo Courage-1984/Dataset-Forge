@@ -1,7 +1,7 @@
 import re
 import json
 
-EMOJI_TEST_PATH = "tools/emoji-test.txt"
+EMOJI_TEST_PATH = "docs/emoji-test.txt"
 PYTHON_DICT_PATH = "dataset_forge/utils/emoji_mapping.py"
 JSON_PATH = "dataset_forge/utils/emoji_mapping.json"
 

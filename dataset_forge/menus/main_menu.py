@@ -11,10 +11,11 @@ from dataset_forge.utils.printing import print_info
 
 def lazy_menu(module_name: str, func_name: str):
     def _menu():
-        monitoring.time_and_record_menu_load(
-            func_name,
-            lambda: getattr(importlib.import_module(module_name), func_name)(),
+        # Use the decorator pattern
+        decorated_func = monitoring.time_and_record_menu_load(func_name)(
+            lambda: getattr(importlib.import_module(module_name), func_name)()
         )
+        return decorated_func()  # Call the decorated function
 
     return _menu
 

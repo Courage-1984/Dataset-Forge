@@ -522,21 +522,25 @@ error_tracker = ErrorTracker()
 task_registry = TaskRegistry()
 
 
-def time_and_record_menu_load(menu_name, func, *args, **kwargs):
+def time_and_record_menu_load(menu_name):
     """
-    Utility to time and record the duration of a menu or submenu load.
+    Decorator to time and record the duration of a menu or submenu load.
     Records the timing in perf_analytics and prints to the user.
-    Only times if func is callable; otherwise returns func as is.
     """
-    import time
-    from dataset_forge.utils.printing import print_info, print_warning
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            import time
+            from dataset_forge.utils.printing import print_info, print_warning
 
-    if not callable(func):
-        print_warning(f"[Menu Timing] {menu_name} is not callable; skipping timing.")
-        return func
-    start = time.time()
-    result = func(*args, **kwargs)
-    duration = time.time() - start
-    perf_analytics.record_operation(f"menu:{menu_name}", duration)
-    print_info(f"⏱️ Loaded {menu_name} in {duration:.3f} seconds.")
-    return result
+            if not callable(func):
+                print_warning(f"[Menu Timing] {menu_name} is not callable; skipping timing.")
+                return func
+            start = time.time()
+            result = func(*args, **kwargs)
+            duration = time.time() - start
+            perf_analytics.record_operation(f"menu:{menu_name}", duration)
+            print_info(f"⏱️ Loaded {menu_name} in {duration:.3f} seconds.")
+            return result
+        return wrapper
+    return decorator

@@ -28,7 +28,7 @@ from ..utils.emoji_utils import (
     extract_emojis,
     categorize_emoji
 )
-from ..utils.memory_utils import auto_cleanup
+from ..utils.memory_utils import auto_cleanup, memory_context
 from ..utils.printing import print_info, print_success, print_warning, print_error
 
 # Try to import magic for better file type detection

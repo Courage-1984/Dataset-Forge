@@ -146,17 +146,11 @@ def performance_optimization_menu():
                 ),
                 "3": (
                     "🧠 Memory Management",
-                    lazy_menu(
-                        "dataset_forge.menus.memory_management_menu",
-                        "memory_management_menu",
-                    ),
+                    lambda: print_warning("Memory Management menu not yet implemented"),
                 ),
                 "4": (
                     "🎮 GPU Performance",
-                    lazy_menu(
-                        "dataset_forge.menus.gpu_performance_menu",
-                        "gpu_performance_menu",
-                    ),
+                    lambda: print_warning("GPU Performance menu not yet implemented"),
                 ),
                 "5": (
                     "💾 Cache Management",
@@ -167,10 +161,7 @@ def performance_optimization_menu():
                 ),
                 "6": (
                     "📈 System Profiling",
-                    lazy_menu(
-                        "dataset_forge.menus.system_profiling_menu",
-                        "system_profiling_menu",
-                    ),
+                    lambda: print_warning("System Profiling menu not yet implemented"),
                 ),
                 "0": ("⬅️ Back", None),
             }

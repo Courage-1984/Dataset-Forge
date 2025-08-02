@@ -164,7 +164,17 @@ def show_menu(
 
             # Handle global commands
             if handle_global_command(choice, current_menu, menu_context):
-                return None
+                # Redraw the menu after global command
+                print_header(safe_title, char, header_color)
+                print()
+                for key, (description, action) in options.items():
+                    try:
+                        safe_description = sanitize_emoji(normalize_unicode(description))
+                    except (NameError, ImportError):
+                        safe_description = description
+                    print(f"{key}. {safe_description}")
+                print()
+                continue
 
             # Check if choice is valid
             if choice in options:

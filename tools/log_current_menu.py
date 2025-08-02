@@ -205,6 +205,15 @@ class MenuAuditor:
                         func_arg = self.extract_string_literal(node.args[1])
                         if module_arg and func_arg:
                             return f"lazy_menu('{module_arg}', '{func_arg}')"
+                    elif func_name == "lazy_action" and len(node.args) >= 2:
+                        module_arg = self.extract_string_literal(node.args[0])
+                        func_arg = self.extract_string_literal(node.args[1])
+                        if module_arg and func_arg:
+                            return f"lazy_action('{module_arg}', '{func_arg}')"
+                    elif func_name == "require_hq_lq" and len(node.args) >= 1:
+                        # Handle require_hq_lq(lambda: ...) calls
+                        arg_str = self.ast_node_to_string(node.args[0])
+                        return f"require_hq_lq({arg_str})"
                 # Handle other function calls
                 return self.ast_node_to_string(node)
             elif isinstance(node, ast.Name):
@@ -373,6 +382,57 @@ class MenuAuditor:
                     except ImportError:
                         print_warning(f"Could not import module {module_path}")
                         return None
+
+            # Handle lazy_action calls
+            elif "lazy_action(" in function_ref:
+                # Extract module and function from lazy_action call
+                match = re.search(
+                    r'lazy_action\s*\(\s*["\']([^"\']+)["\'],\s*["\']([^"\']+)["\']',
+                    function_ref,
+                )
+                if match:
+                    module_path = match.group(1)
+                    func_name = match.group(2)
+                    try:
+                        module = importlib.import_module(module_path)
+                        return getattr(module, func_name, None)
+                    except ImportError:
+                        print_warning(f"Could not import module {module_path}")
+                        return None
+
+            # Handle require_hq_lq calls (these are function wrappers, not module imports)
+            elif "require_hq_lq(" in function_ref:
+                # This is a function wrapper, not a module import
+                # Extract the inner function call if possible
+                lambda_match = re.search(r'lambda:\s*([^(]+)\(', function_ref)
+                if lambda_match:
+                    func_name = lambda_match.group(1).strip()
+                    # Try to find the function in the current module or common action modules
+                    try:
+                        # First try current module
+                        module = importlib.import_module(current_module)
+                        func = getattr(module, func_name, None)
+                        if func:
+                            return func
+                        
+                        # Try common action modules
+                        action_modules = [
+                            "dataset_forge.actions.transform_actions",
+                            "dataset_forge.actions.comparison_actions",
+                            "dataset_forge.actions.analysis_actions",
+                        ]
+                        for action_module in action_modules:
+                            try:
+                                module = importlib.import_module(action_module)
+                                func = getattr(module, func_name, None)
+                                if func:
+                                    return func
+                            except ImportError:
+                                continue
+                    except ImportError:
+                        pass
+                # If we can't resolve it, just return None (don't print warning)
+                return None
 
             # Handle direct function references
             elif "." in function_ref and not function_ref.startswith("<"):

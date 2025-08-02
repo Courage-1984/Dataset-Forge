@@ -35,7 +35,9 @@ from dataset_forge.utils.printing import (
     print_success,
     print_warning,
     print_error,
+    print_section,
 )
+from dataset_forge.utils.color import Mocha
 
 
 class EmojiUsageChecker:
@@ -272,7 +274,7 @@ class EmojiUsageChecker:
 
     def print_report(self) -> None:
         """Print a comprehensive analysis report."""
-        print_info("📊 Emoji Usage Analysis Report", "=", Mocha.lavender)
+        print_section("📊 Emoji Usage Analysis Report", "=", Mocha.lavender)
 
         # Summary statistics
         print_section("📈 Summary Statistics", "-", Mocha.sapphire)
