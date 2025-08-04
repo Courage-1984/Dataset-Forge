@@ -1,105 +1,94 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-find_code_issues.py - Comprehensive static analysis tool for Dataset Forge
+Comprehensive static analysis tool for Dataset Forge codebase.
 
-Finds:
-- Unused functions/methods/classes (dead code)
-- Untested code (missing test coverage)
-- Functions/methods/classes defined but never called
-- Test files without corresponding code, and vice versa
-- Missing docstrings in public functions/classes/methods
-- Unused dependencies in requirements.txt
-- Configuration file issues
-- Import/usage analysis across all directories
-- Code quality issues
+This tool performs multiple types of analysis:
+- Dead code detection (vulture)
+- Test coverage analysis (pytest-cov)
+- Call graph analysis (pyan3)
+- Code quality checks (pyflakes)
+- Test/code mapping
+- AST-based analysis
+- Documentation checks
+- Dependency analysis
+- Configuration validation
+- Import analysis
 
 Usage:
     python tools/find_code_issues.py [options]
 
 Options:
-    --vulture         Run vulture for dead code
-    --coverage        Run pytest-cov for coverage
-    --callgraph       Run pyan3 for call graph analysis
-    --pyflakes        Run pyflakes for unused imports/variables
-    --test-mapping    Check test/code correspondence
-    --ast             AST: Find defined but never called functions/classes
-    --docstrings      Check for missing docstrings
-    --dependencies    Analyze unused dependencies
-    --configs         Analyze configuration files
-    --all             Run all analyses (default)
-    --view            View detailed results for each analysis after run
-    -h, --help        Show help
-
-Requirements:
-    pip install vulture pytest pytest-cov coverage pyan3 pyflakes
-
+    --all              Run all analyses (default)
+    --vulture          Dead code detection
+    --coverage         Test coverage analysis
+    --callgraph        Call graph analysis
+    --pyflakes         Code quality checks
+    --test-mapping     Test/code correspondence
+    --ast              AST-based analysis
+    --docstrings       Documentation checks
+    --dependencies     Dependency analysis
+    --configs          Configuration validation
+    --view             View detailed results after analysis
 """
+
 import os
 import sys
 import subprocess
 import argparse
-import tempfile
-import ast
-import json
-import re
 from pathlib import Path
-from datetime import datetime
-from typing import Optional, Dict, List, Set, Tuple
-from collections import defaultdict
+from typing import Optional, List, Dict, Any
+import json
+import ast
+import importlib.util
+import re
 
-# --- CONFIG ---
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from dataset_forge.utils.printing import print_info, print_success, print_warning, print_error, print_header, print_section
+
+
+# --- CONFIGURATION ---
 CODE_DIR = "dataset_forge"
 TESTS_DIR = "tests"
 CONFIGS_DIR = "configs"
 TOOLS_DIR = "tools"
-LOG_DIR = "logs/find_code_issues"
-LOG_FILE = os.path.join(LOG_DIR, "find_code_issues.log")
-VIEW_FILE = os.path.join(LOG_DIR, "find_code_issues_view.txt")
-REPORT_FILE = os.path.join(LOG_DIR, "find_code_issues_report.txt")
-DEPENDENCIES_FILE = os.path.join(LOG_DIR, "dependencies_analysis.txt")
-
-# Directories to analyze
 ANALYSIS_DIRS = [CODE_DIR, TESTS_DIR, CONFIGS_DIR, TOOLS_DIR]
 
+# Ensure logs directory exists
+LOGS_DIR = "logs/find_code_issues"
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 # --- LOGGING ---
-def ensure_log_dir():
-    os.makedirs(LOG_DIR, exist_ok=True)
-
-
 def log(msg: str):
-    ensure_log_dir()
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
+    with open(os.path.join(LOGS_DIR, "find_code_issues.log"), "a", encoding="utf-8") as f:
         f.write(msg + "\n")
 
 
 def clear_log():
-    ensure_log_dir()
-    with open(LOG_FILE, "w", encoding="utf-8") as f:
+    with open(os.path.join(LOGS_DIR, "find_code_issues.log"), "w", encoding="utf-8") as f:
         f.write(f"# find_code_issues.py log - {datetime.now()}\n\n")
 
 
 def write_view_output(content: str):
-    ensure_log_dir()
-    with open(VIEW_FILE, "w", encoding="utf-8") as f:
+    with open(os.path.join(LOGS_DIR, "find_code_issues_view.txt"), "w", encoding="utf-8") as f:
         f.write(content)
 
 
 def write_report_output(content: str):
-    ensure_log_dir()
-    with open(REPORT_FILE, "w", encoding="utf-8") as f:
+    with open(os.path.join(LOGS_DIR, "find_code_issues_report.txt"), "w", encoding="utf-8") as f:
         f.write(content)
 
 
 def write_dependencies_output(content: str):
-    ensure_log_dir()
-    with open(DEPENDENCIES_FILE, "w", encoding="utf-8") as f:
+    with open(os.path.join(LOGS_DIR, "dependencies_analysis.txt"), "w", encoding="utf-8") as f:
         f.write(content)
 
 
 # --- UTILS ---
 def print_header(msg: str):
-    print(f"\n{'='*60}\n{msg}\n{'='*60}")
+    print_info(f"\n{'='*60}\n{msg}\n{'='*60}")
 
 
 def run_cmd(cmd, capture=True):
@@ -162,7 +151,7 @@ results = AnalysisResults()
 # --- 1. VULTURE: Find unused code ---
 def run_vulture(verbose=False):
     if not verbose:
-        print("Running: VULTURE (dead code analysis)...")
+        print_info("Running: VULTURE (dead code analysis)...")
 
     # Run vulture on all analysis directories
     all_output = []
@@ -190,7 +179,7 @@ def run_vulture(verbose=False):
 # --- 2. COVERAGE: Find untested code ---
 def run_coverage(verbose=False):
     if not verbose:
-        print("Running: COVERAGE (untested code)...")
+        print_info("Running: COVERAGE (untested code)...")
     cov_file = ".coverage"
     if os.path.exists(cov_file):
         os.remove(cov_file)
@@ -215,7 +204,7 @@ def run_coverage(verbose=False):
 # --- 3. PYAN3: Call graph analysis ---
 def run_pyan3(verbose=False):
     if not verbose:
-        print("Running: PYAN3 (call graph analysis)...")
+        print_info("Running: PYAN3 (call graph analysis)...")
 
     # Get all Python files from all directories
     all_py_files = []
@@ -246,7 +235,7 @@ def run_pyan3(verbose=False):
 # --- 4. PYFLAKES: Unused imports/variables ---
 def run_pyflakes(verbose=False):
     if not verbose:
-        print("Running: PYFLAKES (unused imports/variables)...")
+        print_info("Running: PYFLAKES (unused imports/variables)...")
 
     all_py_files = []
     for directory in ANALYSIS_DIRS:
@@ -276,7 +265,7 @@ def run_pyflakes(verbose=False):
 # --- 5. TEST/CODE MAPPING ---
 def test_code_mapping(verbose=False):
     if not verbose:
-        print("Running: TEST/CODE MAPPING (test/code correspondence)...")
+        print_info("Running: TEST/CODE MAPPING (test/code correspondence)...")
 
     # Get all Python files from dataset_forge
     code_files = set([Path(f).stem for f in find_py_files(CODE_DIR)])
@@ -311,7 +300,7 @@ def test_code_mapping(verbose=False):
 # --- 6. AST: Find defined but never called functions/classes ---
 def ast_defined_but_never_called(verbose=False):
     if not verbose:
-        print("Running: AST (defined but never called)...")
+        print_info("Running: AST (defined but never called)...")
 
     defined = set()
     called = set()
@@ -350,7 +339,7 @@ def ast_defined_but_never_called(verbose=False):
 # --- 7. DOCSTRING CHECK: Find missing docstrings ---
 def check_missing_docstrings(verbose=False):
     if not verbose:
-        print("Running: DOCSTRING CHECK (missing docstrings)...")
+        print_info("Running: DOCSTRING CHECK (missing docstrings)...")
 
     missing = []
     all_py_files = []
@@ -406,7 +395,7 @@ def check_missing_docstrings(verbose=False):
 # --- 8. DEPENDENCIES: Analyze unused dependencies ---
 def analyze_dependencies(verbose=False):
     if not verbose:
-        print("Running: DEPENDENCIES (analyze unused dependencies)...")
+        print_info("Running: DEPENDENCIES (analyze unused dependencies)...")
 
     # Read requirements.txt
     requirements_file = "requirements.txt"
@@ -494,7 +483,7 @@ def analyze_dependencies(verbose=False):
 # --- 9. CONFIGS: Analyze configuration files ---
 def analyze_configs(verbose=False):
     if not verbose:
-        print("Running: CONFIGS (analyze configuration files)...")
+        print_info("Running: CONFIGS (analyze configuration files)...")
 
     config_issues = []
     config_files = find_json_files(CONFIGS_DIR)
@@ -557,7 +546,7 @@ def analyze_configs(verbose=False):
 # --- 10. IMPORT ANALYSIS: Cross-directory import analysis ---
 def analyze_imports(verbose=False):
     if not verbose:
-        print("Running: IMPORT ANALYSIS (cross-directory import analysis)...")
+        print_info("Running: IMPORT ANALYSIS (cross-directory import analysis)...")
 
     import_map = defaultdict(set)
     all_py_files = []
@@ -667,7 +656,7 @@ def generate_report():
     report_lines.append("\n[Done] Review the above output for actionable issues.\n")
 
     report = "\n".join(report_lines)
-    print("\n" + report)
+    print_info(report)
     write_report_output(report)
 
 
@@ -694,7 +683,7 @@ def view_detailed_results():
         view_lines.append(value or "No output.")
 
     view = "\n".join(view_lines)
-    print("\n" + view)
+    print_info(view)
     write_view_output(view)
 
     # Write dependencies analysis to separate file

@@ -322,11 +322,11 @@ class EmojiUsageChecker:
                     if rec["priority"] == "high"
                     else Mocha.peach if rec["priority"] == "medium" else Mocha.sky
                 )
-                print(
+                print_info(
                     f"{priority_color}  [{rec['priority'].upper()}] {rec['message']}{Mocha.reset}"
                 )
 
-        print()
+        print_info("")
         print_success("✅ Emoji usage analysis completed!")
 
     def save_report(self, output_path: Path) -> None:

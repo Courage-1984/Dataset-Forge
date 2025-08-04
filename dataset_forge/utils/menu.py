@@ -1,19 +1,24 @@
-import importlib
-import sys
-from typing import Dict, Any, Optional, Callable
+#!/usr/bin/env python3
+"""
+Menu system utilities for Dataset Forge.
 
-from .printing import (
-    print_header,
-    print_error,
-    print_prompt,
+This module provides the core menu functionality including display, input handling,
+global commands, and help system integration.
+"""
+
+import sys
+import threading
+from typing import Any, Dict, Optional
+
+from dataset_forge.utils.printing import (
     print_info,
     print_success,
     print_warning,
+    print_error,
+    print_header,
+    print_prompt,
 )
-from .color import Mocha
-from .audio_utils import play_error_sound
-from .help_system import HelpSystem
-# Lazy imports for emoji utilities to avoid circular dependencies
+from dataset_forge.utils.audio_utils import play_shutdown_sound
 
 
 def show_global_help(
@@ -21,14 +26,36 @@ def show_global_help(
     menu_context: Optional[Dict[str, Any]] = None,
     pause: bool = True,
 ) -> None:
-    """Display global help information with context-aware content.
-
-    Args:
-        current_menu: Name of the current menu for context
-        menu_context: Optional context information about the current menu
-        pause: If True, prompt for Enter at the end
-    """
-    HelpSystem.show_menu_help(current_menu, menu_context, pause=pause)
+    """Show context-aware help for the current menu."""
+    print_header("Help", char="=", color="")
+    
+    if menu_context:
+        print_info(f"Menu: {current_menu}")
+        print_info(f"Purpose: {menu_context.get('Purpose', 'Not specified')}")
+        print_info(f"Options: {menu_context.get('Options', 'Not specified')}")
+        print_info(f"Navigation: {menu_context.get('Navigation', 'Not specified')}")
+        
+        if 'Key Features' in menu_context:
+            print_info("Key Features:")
+            for feature in menu_context['Key Features']:
+                print_info(f"  • {feature}")
+        
+        if 'Tips' in menu_context:
+            print_info("Tips:")
+            for tip in menu_context['Tips']:
+                print_info(f"  • {tip}")
+    else:
+        print_info(f"Help for: {current_menu}")
+        print_info("No specific context available for this menu.")
+    
+    print_info("\nGlobal Commands:")
+    print_info("  help, h, ? - Show this help")
+    print_info("  quit, exit, q - Exit Dataset Forge")
+    print_info("  0 - Go back to previous menu")
+    print_info("  Ctrl+C - Emergency exit")
+    
+    if pause:
+        input("\nPress Enter to continue...")
 
 
 def handle_global_command(
@@ -37,53 +64,34 @@ def handle_global_command(
     menu_context: Optional[Dict[str, Any]] = None,
     pause: bool = True,
 ) -> bool:
-    """Handle global commands and return True if command was handled.
-
-    Args:
-        command: The user input command
-        current_menu: Name of the current menu
-        menu_context: Optional context information
-        pause: If True, prompt for Enter at the end (for help)
-
+    """Handle global commands that work in any menu.
+    
     Returns:
-        True if command was handled as a global command, False otherwise
+        True if a global command was handled, False otherwise
     """
-    # Handle None or empty commands gracefully
-    if command is None or not isinstance(command, str):
+    if not command:
         return False
     
     command_lower = command.lower().strip()
-
+    
+    # Help commands
     if command_lower in ["help", "h", "?"]:
-        show_global_help(current_menu, menu_context, pause=pause)
+        show_global_help(current_menu, menu_context, pause)
         return True
-
+    
+    # Quit commands
     elif command_lower in ["quit", "exit", "q"]:
-        print_warning("\n🛑 Quitting Dataset Forge...")
-        print_info("🧹 Cleaning up memory and resources...")
-
-        # Cleanup operations
+        print_info("🔄 Shutting down Dataset Forge...")
+        
+        # Play shutdown sound in background
         try:
-            from .memory_utils import clear_memory, clear_cuda_cache
-
-            clear_memory()
-            clear_cuda_cache()
-        except Exception as e:
-            print_error(f"Memory cleanup failed: {e}")
-
-        # Play shutdown sound non-blocking to prevent hanging
-        try:
-            from .audio_utils import play_shutdown_sound
-            import threading
-            import time
-
             # Play shutdown sound in a separate thread with better timeout handling
             def play_shutdown_with_timeout():
                 try:
                     # Try to play the shutdown sound
                     play_shutdown_sound(block=True)
                 except Exception as e:
-                    print(f"Shutdown sound failed: {e}")
+                    print_error(f"Shutdown sound failed: {e}")
 
             shutdown_thread = threading.Thread(target=play_shutdown_with_timeout, daemon=True)
             shutdown_thread.start()
@@ -93,10 +101,10 @@ def handle_global_command(
             
             # If thread is still running, let it continue in background
             if shutdown_thread.is_alive():
-                print("Shutdown sound playing in background...")
+                print_info("Shutdown sound playing in background...")
             
         except Exception as e:
-            print(f"Audio system error: {e}")
+            print_error(f"Audio system error: {e}")
 
         print_success("👋 Thank you for using Dataset Forge!")
         sys.exit(0)
@@ -142,7 +150,7 @@ def show_menu(
     
     # Print header
     print_header(safe_title, char, header_color)
-    print()
+    print_info("")
 
     # Display options with emoji safety
     for key, (description, action) in options.items():
@@ -152,9 +160,9 @@ def show_menu(
         except (NameError, ImportError):
             # Fallback if emoji utilities are not available
             safe_description = description
-        print(f"{key}. {safe_description}")
+        print_info(f"{key}. {safe_description}")
 
-    print()
+    print_info("")
 
     # Get user input
     while True:
@@ -166,54 +174,43 @@ def show_menu(
             if handle_global_command(choice, current_menu, menu_context):
                 # Redraw the menu after global command
                 print_header(safe_title, char, header_color)
-                print()
+                print_info("")
                 for key, (description, action) in options.items():
                     try:
                         safe_description = sanitize_emoji(normalize_unicode(description))
                     except (NameError, ImportError):
                         safe_description = description
-                    print(f"{key}. {safe_description}")
-                print()
+                    print_info(f"{key}. {safe_description}")
+                print_info("")
                 continue
 
             # Check if choice is valid
             if choice in options:
                 return choice
-            elif choice == "0" and "0" in options:
-                return "0"
+            elif choice == "0":
+                return None
             else:
                 print_error(f"Invalid choice: {choice}")
-                print_info("Please enter a valid option number.")
-
+                print_info("Please enter a valid option.")
+                
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting...")
-            return None
-        except Exception as e:
-            print_error(f"Error reading input: {e}")
             return None
 
 
 def lazy_action(module_name: str, func_name: str):
-    """
-    Returns a callable that lazy-loads and calls the specified function.
-    """
-
+    """Create a lazy action that imports the module when called."""
     def _action(*args, **kwargs):
-        module = importlib.import_module(module_name)
+        module = __import__(module_name, fromlist=[func_name])
         func = getattr(module, func_name)
         return func(*args, **kwargs)
-
     return _action
 
 
 def lazy_menu(module_name: str, func_name: str):
-    """
-    Returns a callable that lazy-loads and calls the specified menu function.
-    """
-
+    """Create a lazy menu that imports the module when called."""
     def _menu(*args, **kwargs):
-        module = importlib.import_module(module_name)
+        module = __import__(module_name, fromlist=[func_name])
         func = getattr(module, func_name)
         return func(*args, **kwargs)
-
     return _menu

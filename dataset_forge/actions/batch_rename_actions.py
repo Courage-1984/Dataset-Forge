@@ -90,14 +90,34 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
     # Phase 2: Execute temporary renames
     print("Phase 1: Renaming to temporary names...")
     for src, temp_path in temp_renames:
-        os.rename(src, temp_path)
-        log_operation("rename_temp", f"{src} -> {temp_path}")
+        try:
+            os.rename(src, temp_path)
+            log_operation("rename_temp", f"{src} -> {temp_path}")
+        except FileExistsError:
+            # If temp file exists, use a unique name
+            base, ext = os.path.splitext(temp_path)
+            counter = 1
+            while os.path.exists(temp_path):
+                temp_path = os.path.join(folder_path, f"{base}_{counter}{ext}")
+                counter += 1
+            os.rename(src, temp_path)
+            log_operation("rename_temp", f"{src} -> {temp_path} (unique)")
 
     # Phase 3: Execute final renames
     print("Phase 2: Renaming to final names...")
     for temp_path, final_path in final_renames:
-        os.rename(temp_path, final_path)
-        log_operation("rename_final", f"{temp_path} -> {final_path}")
+        try:
+            os.rename(temp_path, final_path)
+            log_operation("rename_final", f"{temp_path} -> {final_path}")
+        except FileExistsError:
+            # If final name exists, use a unique name
+            base, ext = os.path.splitext(final_path)
+            counter = 1
+            while os.path.exists(final_path):
+                final_path = os.path.join(folder_path, f"{base}_{counter}{ext}")
+                counter += 1
+            os.rename(temp_path, final_path)
+            log_operation("rename_final", f"{temp_path} -> {final_path} (unique)")
 
     print("Batch renaming complete.")
     print_success(f"Batch renaming complete! Renamed {len(files)} files.")
@@ -150,20 +170,62 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
     # Phase 2: Execute temporary renames
     print("Phase 1: Renaming to temporary names...")
     for hq_src, hq_temp_path in hq_temp_renames:
-        os.rename(hq_src, hq_temp_path)
-        log_operation("rename_temp_hq", f"{hq_src} -> {hq_temp_path}")
+        try:
+            os.rename(hq_src, hq_temp_path)
+            log_operation("rename_temp_hq", f"{hq_src} -> {hq_temp_path}")
+        except FileExistsError:
+            # If temp file exists, use a unique name
+            base, ext = os.path.splitext(hq_temp_path)
+            counter = 1
+            while os.path.exists(hq_temp_path):
+                hq_temp_path = os.path.join(hq_path, f"{base}_{counter}{ext}")
+                counter += 1
+            os.rename(hq_src, hq_temp_path)
+            log_operation("rename_temp_hq", f"{hq_src} -> {hq_temp_path} (unique)")
+    
     for lq_src, lq_temp_path in lq_temp_renames:
-        os.rename(lq_src, lq_temp_path)
-        log_operation("rename_temp_lq", f"{lq_src} -> {lq_temp_path}")
+        try:
+            os.rename(lq_src, lq_temp_path)
+            log_operation("rename_temp_lq", f"{lq_src} -> {lq_temp_path}")
+        except FileExistsError:
+            # If temp file exists, use a unique name
+            base, ext = os.path.splitext(lq_temp_path)
+            counter = 1
+            while os.path.exists(lq_temp_path):
+                lq_temp_path = os.path.join(lq_path, f"{base}_{counter}{ext}")
+                counter += 1
+            os.rename(lq_src, lq_temp_path)
+            log_operation("rename_temp_lq", f"{lq_src} -> {lq_temp_path} (unique)")
 
     # Phase 3: Execute final renames
     print("Phase 2: Renaming to final names...")
     for hq_temp_path, hq_final_path in hq_final_renames:
-        os.rename(hq_temp_path, hq_final_path)
-        log_operation("rename_final_hq", f"{hq_temp_path} -> {hq_final_path}")
+        try:
+            os.rename(hq_temp_path, hq_final_path)
+            log_operation("rename_final_hq", f"{hq_temp_path} -> {hq_final_path}")
+        except FileExistsError:
+            # If final name exists, use a unique name
+            base, ext = os.path.splitext(hq_final_path)
+            counter = 1
+            while os.path.exists(hq_final_path):
+                hq_final_path = os.path.join(hq_path, f"{base}_{counter}{ext}")
+                counter += 1
+            os.rename(hq_temp_path, hq_final_path)
+            log_operation("rename_final_hq", f"{hq_temp_path} -> {hq_final_path} (unique)")
+    
     for lq_temp_path, lq_final_path in lq_final_renames:
-        os.rename(lq_temp_path, lq_final_path)
-        log_operation("rename_final_lq", f"{lq_temp_path} -> {lq_final_path}")
+        try:
+            os.rename(lq_temp_path, lq_final_path)
+            log_operation("rename_final_lq", f"{lq_temp_path} -> {lq_final_path}")
+        except FileExistsError:
+            # If final name exists, use a unique name
+            base, ext = os.path.splitext(lq_final_path)
+            counter = 1
+            while os.path.exists(lq_final_path):
+                lq_final_path = os.path.join(lq_path, f"{base}_{counter}{ext}")
+                counter += 1
+            os.rename(lq_temp_path, lq_final_path)
+            log_operation("rename_final_lq", f"{lq_temp_path} -> {lq_final_path} (unique)")
 
     print("Batch renaming complete.")
     print_success(f"HQ/LQ batch renaming complete! Renamed {len(matching_files)} pairs.")

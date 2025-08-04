@@ -58,8 +58,8 @@ class GPUImageProcessor:
             self.logger.warning("GPU not available, falling back to CPU")
 
     def _to_tensor(
-        self, image: Union[np.ndarray, Image.Image, torch.Tensor]
-    ) -> torch.Tensor:
+        self, image: Union[np.ndarray, Image.Image, "torch.Tensor"]
+    ) -> "torch.Tensor":
         """Convert image to tensor format."""
         if isinstance(image, torch.Tensor):
             return image
@@ -76,7 +76,7 @@ class GPUImageProcessor:
         else:
             raise ValueError(f"Unsupported image type: {type(image)}")
 
-    def _to_pil(self, tensor: torch.Tensor) -> Image.Image:
+    def _to_pil(self, tensor: "torch.Tensor") -> Image.Image:
         """Convert tensor back to PIL Image."""
         if tensor.dim() == 4:
             tensor = tensor.squeeze(0)

@@ -27,12 +27,10 @@ def require_hq_lq(func):
 
 
 def lazy_action(module_path, func_name):
+    @monitoring.time_and_record_menu_load(func_name)
     def _action(*args, **kwargs):
-        return monitoring.time_and_record_menu_load(
-            func_name,
-            lambda: getattr(importlib.import_module(module_path), func_name)(
-                *args, **kwargs
-            ),
+        return getattr(importlib.import_module(module_path), func_name)(
+            *args, **kwargs
         )
 
     return _action
@@ -79,8 +77,20 @@ def utilities_menu():
                 "dataset_forge.menus.sanitize_images_menu", "sanitize_images_menu"
             ),
         ),
-        "7": ("🧹 Filter non-Images", lazy_action(__name__, "filter_non_images_menu")),
+        "7": (
+            "👁️ Visual De-duplication",
+            lazy_action("dataset_forge.menus.visual_dedup_menu", "visual_dedup_menu"),
+        ),
         "8": (
+            "🔐 De-Duplicate (File Hash)",
+            lazy_action("dataset_forge.menus.de_dupe_menu", "de_dupe_menu"),
+        ),
+        "9": (
+            "🔍 ImageDedup - Advanced Duplicate Detection",
+            lazy_action("dataset_forge.menus.imagededup_menu", "imagededup_menu"),
+        ),
+        "10": ("🧹 Filter non-Images", lazy_action(__name__, "filter_non_images_menu")),
+        "11": (
             "🌳 Enhanced Directory Tree",
             lazy_action(
                 "dataset_forge.menus.directory_tree_menu", "directory_tree_menu"
@@ -90,10 +100,15 @@ def utilities_menu():
     }
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Access various utility functions and tools",
-        "Total Options": "8 utility categories",
-        "Navigation": "Use numbers 1-8 to select, 0 to go back",
-        "Key Features": "Path management, file operations, directory trees, filtering",
+        "Purpose": "Access various utility functions and tools including de-duplication",
+        "Total Options": "11 utility categories",
+        "Navigation": "Use numbers 1-11 to select, 0 to go back",
+        "Key Features": [
+            "Path management, file operations, directory trees, filtering",
+            "👁️ Visual De-duplication - CLIP/LPIPS based duplicate detection",
+            "🔐 De-Duplicate (File Hash) - Perceptual hash based deduplication",
+            "🔍 ImageDedup - Advanced duplicate detection with multiple hash methods"
+        ],
     }
 
     while True:

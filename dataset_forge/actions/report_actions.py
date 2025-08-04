@@ -16,7 +16,15 @@ from dataset_forge.actions.bhi_filtering_actions import (
 )
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # Lazy imports for heavy libraries
@@ -205,7 +213,7 @@ def generate_rich_report(
         base = os.path.basename(hq_path.rstrip("/\\"))
         report_name = f"{base}_HQ"
     else:
-        print("No valid path(s) provided.")
+        print_error("No valid path(s) provided.")
         return
     # Output directory
     output_dir = os.path.join(os.getcwd(), "reports", report_name)
@@ -268,6 +276,6 @@ def generate_rich_report(
         class_balance_path=class_balance_path,
         lq_class_balance_path=lq_class_balance_path,
     )
-    print(f"Report generated: {output_path}")
+    print_info(f"Report generated: {output_path}")
     print_success("Rich report generation complete!")
     play_done_sound()

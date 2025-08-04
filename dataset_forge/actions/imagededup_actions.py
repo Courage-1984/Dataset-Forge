@@ -722,3 +722,37 @@ def imagededup_hq_lq_workflow(
     except Exception as e:
         print_error(f"Error in imagededup HQ/LQ workflow: {e}")
         raise
+
+
+# Standalone wrapper functions for menu integration
+def find_duplicates(image_dir: str, max_distance_threshold: int = 10, **kwargs):
+    """Standalone wrapper for finding duplicates."""
+    if not IMAGEDEDUP_AVAILABLE:
+        raise ImportError(
+            "imagededup library is not available. Please install it with: pip install imagededup"
+        )
+    
+    handler = ImageDedupHandler()
+    return handler.find_duplicates(image_dir, max_distance_threshold, **kwargs)
+
+
+def remove_duplicates(image_dir: str, max_distance_threshold: int = 10, dry_run: bool = True, **kwargs):
+    """Standalone wrapper for removing duplicates."""
+    if not IMAGEDEDUP_AVAILABLE:
+        raise ImportError(
+            "imagededup library is not available. Please install it with: pip install imagededup"
+        )
+    
+    handler = ImageDedupHandler()
+    return handler.remove_duplicates(image_dir, max_distance_threshold, dry_run, **kwargs)
+
+
+def move_duplicates(image_dir: str, destination_dir: str, max_distance_threshold: int = 10, dry_run: bool = True, **kwargs):
+    """Standalone wrapper for moving duplicates."""
+    if not IMAGEDEDUP_AVAILABLE:
+        raise ImportError(
+            "imagededup library is not available. Please install it with: pip install imagededup"
+        )
+    
+    handler = ImageDedupHandler()
+    return handler.move_duplicates(image_dir, destination_dir, max_distance_threshold, dry_run, **kwargs)

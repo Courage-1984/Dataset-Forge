@@ -363,8 +363,8 @@ class TorchJITCompiler:
             return func  # Fall back to original function
 
     def compile_model(
-        self, model: torch.nn.Module, example_input: torch.Tensor
-    ) -> torch.nn.Module:
+        self, model: "torch.nn.Module", example_input: "torch.Tensor"
+    ) -> "torch.nn.Module":
         """
         Compile a PyTorch model using TorchScript.
 

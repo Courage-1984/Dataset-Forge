@@ -3,7 +3,15 @@ from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.file_utils import is_image_file
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # Lazy imports for heavy libraries
@@ -29,7 +37,7 @@ def score_images_with_pyiqa(folder, model_name="niqe", device="cpu"):
             score = float(model(img_path))
             scores.append((img_path, score))
         except Exception as e:
-            print(f"[WARN] Failed to score {img_path}: {e}")
+            print_warning(f"Failed to score {img_path}: {e}")
 
     print_success(f"Quality scoring complete! Scored {len(scores)} images.")
     play_done_sound()
@@ -58,9 +66,9 @@ def filter_images_by_quality(scores, threshold, mode="above"):
 
 
 def score_hq_lq_folders(hq_folder, lq_folder, model_name="niqe", device="cpu"):
-    print(f"Scoring HQ folder: {hq_folder}")
+    print_info(f"Scoring HQ folder: {hq_folder}")
     hq_scores = score_images_with_pyiqa(hq_folder, model_name, device)
-    print(f"Scoring LQ folder: {lq_folder}")
+    print_info(f"Scoring LQ folder: {lq_folder}")
     lq_scores = score_images_with_pyiqa(lq_folder, model_name, device)
 
     print_success(

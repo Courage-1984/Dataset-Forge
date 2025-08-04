@@ -1,518 +1,469 @@
+#!/usr/bin/env python3
 """
-monitoring.py - Advanced system/resource monitoring for Dataset Forge
+Monitoring utilities for Dataset Forge.
 
-Features:
-- Resource Monitoring: CPU, RAM, disk, GPU (NVIDIA, extensible)
-- Performance Analytics: Operation timing, throughput
-- Error Tracking: Summary logging, critical error sound
-- Health Checks: System, CUDA, disk, RAM, etc.
-- Subprocess/Thread Registry: Track, pause, resume, kill
-- CLI-friendly output for menu integration
-
-Dependencies: psutil, GPUtil, torch, pygame
+This module provides comprehensive monitoring capabilities including resource tracking,
+performance analytics, error tracking, and health checks.
 """
 
-import os
-import logging
-import threading
-import time
-from typing import List, Dict, Optional, Any
-
-import uuid
-import signal
-import sys
-
-# Lazy imports for heavy libraries
-from dataset_forge.utils.lazy_imports import (
-    psutil,
-    GPUtil,
-    torch,
-    pygame,
-)
-
-from logging.handlers import RotatingFileHandler
-
-LOG_PATH = os.path.join("logs", "monitoring.log")
-os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
-
-# Set up logging with rotation
-logger = logging.getLogger("monitoring")
-logger.setLevel(logging.INFO)
-if not logger.handlers:
-    fh = RotatingFileHandler(LOG_PATH, maxBytes=5 * 1024 * 1024, backupCount=3)
-    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
-
-# Global singletons for integration
-# perf_analytics = PerformanceAnalytics()
-# error_tracker = ErrorTracker()
-# task_registry = TaskRegistry()
-
-# Decorators for easy integration
 import functools
+import os
+import psutil
+import time
+from typing import Any, Dict, List, Optional
+
+from dataset_forge.utils.printing import print_info, print_warning, print_error
 
 
 def monitor_performance(op_name):
+    """Decorator to monitor and record function performance."""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            start = time.time()
+            start_time = time.time()
             try:
-                return func(*args, **kwargs)
-            finally:
-                duration = time.time() - start
-                if perf_analytics:
-                    perf_analytics.record_operation(op_name, duration)
-
+                result = func(*args, **kwargs)
+                duration = time.time() - start_time
+                perf_analytics.record_operation(op_name, duration)
+                return result
+            except Exception as e:
+                duration = time.time() - start_time
+                perf_analytics.record_operation(op_name, duration, {"error": str(e)})
+                raise
         return wrapper
-
     return decorator
 
 
 def monitor_all(op_name, critical_on_error=False):
+    """Comprehensive monitoring decorator that tracks performance, errors, and resources."""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            start = time.time()
+            start_time = time.time()
             try:
-                return func(*args, **kwargs)
+                result = func(*args, **kwargs)
+                duration = time.time() - start_time
+                perf_analytics.record_operation(op_name, duration)
+                return result
             except Exception as e:
-                if error_tracker:
-                    error_tracker.log_error(e, critical=critical_on_error)
+                duration = time.time() - start_time
+                error_tracker.log_error(e, critical=critical_on_error)
+                perf_analytics.record_operation(op_name, duration, {"error": str(e)})
+                if critical_on_error:
+                    print_error(f"Critical error in {op_name}: {e}")
                 raise
-            finally:
-                duration = time.time() - start
-                if perf_analytics:
-                    perf_analytics.record_operation(op_name, duration)
-
         return wrapper
-
     return decorator
 
 
-# Export for import *
-__all__ = [
-    "ResourceMonitor",
-    "PerformanceAnalytics",
-    "ErrorTracker",
-    "HealthChecker",
-    "TaskRegistry",
-    "print_resource_snapshot",
-    "print_performance_summary",
-    "print_error_summary",
-    "print_health_check_results",
-    "perf_analytics",
-    "error_tracker",
-    "task_registry",
-    "monitor_performance",
-    "monitor_all",
-]
-
-
-# Resource Monitoring
 class ResourceMonitor:
-    """
-    Monitors CPU, RAM, disk, and GPU usage for main and subprocesses.
-    """
+    """Monitor system resources in real-time."""
 
     def __init__(self):
-        self._running = False
-        self._thread = None
-        self.interval = 2.0
-        self.snapshots = []
+        self.background_thread = None
+        self.stop_flag = False
 
     def snapshot(self) -> Dict[str, Any]:
-        """Return current resource usage snapshot."""
-        cpu = psutil.cpu_percent(interval=None)
-        mem = psutil.virtual_memory()
-        disk = psutil.disk_usage(os.getcwd())
-        gpu_info = []
-        if GPUtil:
+        """Take a snapshot of current resource usage."""
+        try:
+            # CPU usage
+            cpu_percent = psutil.cpu_percent(interval=0.1)
+
+            # Memory usage
+            memory = psutil.virtual_memory()
+            ram_percent = memory.percent
+            ram_used = memory.used
+            ram_total = memory.total
+
+            # Disk usage
+            disk = psutil.disk_usage('.')
+            disk_percent = (disk.used / disk.total) * 100
+            disk_used = disk.used
+            disk_total = disk.total
+
+            # GPU usage (if available)
+            gpu_info = []
             try:
-                gpus = GPUtil.getGPUs()
-                for gpu in gpus:
-                    gpu_info.append(
-                        {
-                            "id": gpu.id,
-                            "name": gpu.name,
-                            "load": gpu.load,
-                            "mem_total": gpu.memoryTotal,
-                            "mem_used": gpu.memoryUsed,
-                            "mem_util": gpu.memoryUtil,
-                            "temperature": gpu.temperature,
+                import torch
+                if torch.cuda.is_available():
+                    for i in range(torch.cuda.device_count()):
+                        gpu = {
+                            'id': i,
+                            'name': torch.cuda.get_device_name(i),
+                            'load': 0.0,  # Not easily available
+                            'mem_used': torch.cuda.memory_allocated(i),
+                            'mem_total': torch.cuda.get_device_properties(i).total_memory,
+                            'mem_util': torch.cuda.memory_allocated(i) / torch.cuda.get_device_properties(i).total_memory,
+                            'temperature': 0,  # Not easily available
+                            'mem_allocated': torch.cuda.memory_allocated(i),
+                            'mem_reserved': torch.cuda.memory_reserved(i)
                         }
-                    )
-            except Exception as e:
-                gpu_info.append({"error": str(e)})
-        elif torch and torch.cuda.is_available():
-            try:
-                for i in range(torch.cuda.device_count()):
-                    gpu_info.append(
-                        {
-                            "id": i,
-                            "name": torch.cuda.get_device_name(i),
-                            "mem_allocated": torch.cuda.memory_allocated(i),
-                            "mem_reserved": torch.cuda.memory_reserved(i),
-                        }
-                    )
-            except Exception as e:
-                gpu_info.append({"error": str(e)})
-        snapshot = {
-            "cpu_percent": cpu,
-            "ram_percent": mem.percent,
-            "ram_used": mem.used,
-            "ram_total": mem.total,
-            "disk_percent": disk.percent,
-            "disk_used": disk.used,
-            "disk_total": disk.total,
-            "gpu": gpu_info,
-            "timestamp": time.time(),
-        }
-        return snapshot
+                        gpu_info.append(gpu)
+            except ImportError:
+                pass
+
+            return {
+                'timestamp': time.time(),
+                'cpu_percent': cpu_percent,
+                'ram_percent': ram_percent,
+                'ram_used': ram_used,
+                'ram_total': ram_total,
+                'disk_percent': disk_percent,
+                'disk_used': disk_used,
+                'disk_total': disk_total,
+                'gpu': gpu_info
+            }
+        except Exception as e:
+            print_error(f"Error taking resource snapshot: {e}")
+            return {
+                'timestamp': time.time(),
+                'cpu_percent': 0,
+                'ram_percent': 0,
+                'ram_used': 0,
+                'ram_total': 0,
+                'disk_percent': 0,
+                'disk_used': 0,
+                'disk_total': 0,
+                'gpu': []
+            }
 
     def _background_loop(self):
-        while self._running:
-            snap = self.snapshot()
-            self.snapshots.append(snap)
-            logger.info(f"Resource snapshot: {snap}")
-            time.sleep(self.interval)
+        """Background monitoring loop."""
+        while not self.stop_flag:
+            snapshot = self.snapshot()
+            # Store or process snapshot as needed
+            time.sleep(2.0)
 
     def start_background(self, interval: float = 2.0):
-        """Start background monitoring thread."""
-        if self._running:
-            return
-        self.interval = interval
-        self._running = True
-        self._thread = threading.Thread(target=self._background_loop, daemon=True)
-        self._thread.start()
+        """Start background monitoring."""
+        import threading
+        self.stop_flag = False
+        self.background_thread = threading.Thread(target=self._background_loop, daemon=True)
+        self.background_thread.start()
 
     def stop_background(self):
-        """Stop background monitoring thread."""
-        self._running = False
-        if self._thread:
-            self._thread.join(timeout=2)
-            self._thread = None
+        """Stop background monitoring."""
+        self.stop_flag = True
+        if self.background_thread:
+            self.background_thread.join()
 
 
-# Performance Analytics
 class PerformanceAnalytics:
-    """
-    Tracks operation timing, throughput, and efficiency.
-    """
+    """Track and analyze performance metrics."""
 
     def __init__(self):
-        self.records = []  # List of dicts: {name, duration, extra, timestamp}
+        self.operations = {}
 
     def record_operation(
         self, name: str, duration: float, extra: Optional[Dict[str, Any]] = None
     ):
         """Record an operation's performance."""
-        rec = {
-            "name": name,
-            "duration": duration,
-            "extra": extra or {},
-            "timestamp": time.time(),
-        }
-        self.records.append(rec)
-        # logger.info(f"Performance: {rec}")  # <-- Remove or comment out this line to suppress console output
+        if name not in self.operations:
+            self.operations[name] = {
+                'count': 0,
+                'total': 0.0,
+                'min': float('inf'),
+                'max': 0.0,
+                'errors': 0
+            }
+        
+        op = self.operations[name]
+        op['count'] += 1
+        op['total'] += duration
+        op['min'] = min(op['min'], duration)
+        op['max'] = max(op['max'], duration)
+        
+        if extra and 'error' in extra:
+            op['errors'] += 1
 
     def summary(self) -> Dict[str, Any]:
-        """Return analytics summary."""
-        from collections import defaultdict
-
-        stats = defaultdict(
-            lambda: {"count": 0, "total": 0.0, "min": float("inf"), "max": 0.0}
-        )
-        for rec in self.records:
-            s = stats[rec["name"]]
-            s["count"] += 1
-            s["total"] += rec["duration"]
-            s["min"] = min(s["min"], rec["duration"])
-            s["max"] = max(s["max"], rec["duration"])
-        for name, s in stats.items():
-            if s["count"]:
-                s["avg"] = s["total"] / s["count"]
-            else:
-                s["avg"] = 0.0
-        return dict(stats)
+        """Get performance summary."""
+        summary = {}
+        for name, stats in self.operations.items():
+            if stats['count'] > 0:
+                summary[name] = {
+                    'count': stats['count'],
+                    'avg': stats['total'] / stats['count'],
+                    'min': stats['min'],
+                    'max': stats['max'],
+                    'total': stats['total'],
+                    'errors': stats['errors']
+                }
+        return summary
 
 
-# Error Tracking
 class ErrorTracker:
-    """
-    Logs errors, triggers sound on critical errors, provides summary.
-    """
+    """Track and analyze errors."""
 
     def __init__(self, error_sound_path: str = "assets/error.wav"):
+        self.errors = []
         self.error_sound_path = error_sound_path
-        self.errors = []  # List of dicts: {type, message, critical, timestamp}
 
     def log_error(self, error: Exception, critical: bool = False):
-        """Log error and play sound if critical."""
-        err_type = type(error).__name__
-        msg = str(error)
-        entry = {
-            "type": err_type,
-            "message": msg,
-            "critical": critical,
-            "timestamp": time.time(),
+        """Log an error with timestamp and context."""
+        error_info = {
+            'timestamp': time.time(),
+            'type': type(error).__name__,
+            'message': str(error),
+            'critical': critical
         }
-        self.errors.append(entry)
-        logger.error(f"Error: {entry}")
-        if critical and pygame:
+        self.errors.append(error_info)
+        
+        # Play error sound for critical errors
+        if critical:
             try:
-                pygame.mixer.init()
-                pygame.mixer.music.load(self.error_sound_path)
-                pygame.mixer.music.play()
-            except Exception as e:
-                logger.error(f"Failed to play error sound: {e}")
+                from .audio_utils import play_error_sound
+                play_error_sound(block=False)
+            except ImportError:
+                pass
 
     def summary(self) -> Dict[str, Any]:
-        """Return error summary."""
-        from collections import Counter
-
+        """Get error summary."""
         if not self.errors:
-            return {"count": 0, "by_type": {}, "last": None}
-        by_type = Counter(e["type"] for e in self.errors)
-        last = self.errors[-1]
+            return {'count': 0}
+        
+        by_type = {}
+        for error in self.errors:
+            error_type = error['type']
+            by_type[error_type] = by_type.get(error_type, 0) + 1
+        
         return {
-            "count": len(self.errors),
-            "by_type": dict(by_type),
-            "last": last,
+            'count': len(self.errors),
+            'by_type': by_type,
+            'last': self.errors[-1] if self.errors else None
         }
 
 
-# Health Checks
 class HealthChecker:
-    """
-    Runs system health checks (RAM, disk, CUDA, etc.).
-    """
+    """System health checking utilities."""
 
     def run_all(self) -> Dict[str, Any]:
+        """Run all health checks."""
         results = {}
-        # RAM
-        mem = psutil.virtual_memory()
-        results["ram_total_gb"] = round(mem.total / (1024**3), 2)
-        results["ram_available_gb"] = round(mem.available / (1024**3), 2)
-        results["ram_ok"] = mem.available / mem.total > 0.1
-        # Disk
-        disk = psutil.disk_usage(os.getcwd())
-        results["disk_total_gb"] = round(disk.total / (1024**3), 2)
-        results["disk_free_gb"] = round(disk.free / (1024**3), 2)
-        results["disk_ok"] = disk.free / disk.total > 0.05
-        # CUDA
-        cuda_ok = False
-        cuda_msg = ""
-        if torch:
-            try:
-                cuda_ok = torch.cuda.is_available()
-                cuda_msg = (
-                    f"CUDA available: {cuda_ok}, devices: {torch.cuda.device_count()}"
-                )
-            except Exception as e:
-                cuda_msg = f"CUDA check failed: {e}"
-        else:
-            cuda_msg = "torch not installed"
-        results["cuda_ok"] = cuda_ok
-        results["cuda_msg"] = cuda_msg
-        # Python version
-        pyver = sys.version_info
-        results["python_version"] = f"{pyver.major}.{pyver.minor}.{pyver.micro}"
-        results["python_ok"] = pyver >= (3, 8)
-        # Permissions
+        
+        # RAM check
+        memory = psutil.virtual_memory()
+        results['ram_total_gb'] = memory.total // (1024**3)
+        results['ram_available_gb'] = memory.available // (1024**3)
+        results['ram_ok'] = memory.percent < 90
+        
+        # Disk check
+        disk = psutil.disk_usage('.')
+        results['disk_total_gb'] = disk.total // (1024**3)
+        results['disk_free_gb'] = disk.free // (1024**3)
+        results['disk_ok'] = (disk.free / disk.total) > 0.1
+        
+        # CUDA check
         try:
-            testfile = os.path.join(os.getcwd(), ".__healthcheck_test__")
-            with open(testfile, "w") as f:
-                f.write("ok")
-            os.remove(testfile)
-            results["write_permission"] = True
+            import torch
+            if torch.cuda.is_available():
+                results['cuda_ok'] = True
+                results['cuda_msg'] = f"CUDA {torch.version.cuda} available"
+            else:
+                results['cuda_ok'] = False
+                results['cuda_msg'] = "CUDA not available"
+        except ImportError:
+            results['cuda_ok'] = False
+            results['cuda_msg'] = "PyTorch not installed"
+        
+        # Python version check
+        import sys
+        results['python_version'] = sys.version.split()[0]
+        results['python_ok'] = sys.version_info >= (3, 8)
+        
+        # Write permission check
+        try:
+            test_file = '.health_check_test'
+            with open(test_file, 'w') as f:
+                f.write('test')
+            os.remove(test_file)
+            results['write_permission'] = True
         except Exception:
-            results["write_permission"] = False
+            results['write_permission'] = False
+        
         return results
 
 
-# Subprocess/Thread Registry
 class TaskRegistry:
-    """
-    Tracks subprocesses and threads, allows pause/resume/kill.
-    """
+    """Registry for tracking background tasks."""
 
     def __init__(self):
-        self.tasks = (
-            {}
-        )  # task_id: {'type': 'process'|'thread', 'obj': obj, 'status': str, ...}
+        self.processes = {}
+        self.threads = {}
 
     def register_process(self, proc):
-        """Register a subprocess.Popen object."""
-        task_id = str(uuid.uuid4())
-        self.tasks[task_id] = {"type": "process", "obj": proc, "status": "running"}
+        """Register a process for monitoring."""
+        task_id = f"proc_{proc.pid}"
+        self.processes[task_id] = {
+            'type': 'process',
+            'pid': proc.pid,
+            'process': proc,
+            'start_time': time.time()
+        }
         return task_id
 
     def register_thread(self, thread, stop_flag=None):
-        """Register a threading.Thread object. Optionally provide a stop_flag (thread-safe Event)."""
-        task_id = str(uuid.uuid4())
-        self.tasks[task_id] = {
-            "type": "thread",
-            "obj": thread,
-            "status": "running",
-            "stop_flag": stop_flag,
+        """Register a thread for monitoring."""
+        task_id = f"thread_{thread.ident}"
+        self.threads[task_id] = {
+            'type': 'thread',
+            'thread': thread,
+            'stop_flag': stop_flag,
+            'start_time': time.time()
         }
         return task_id
 
     def list_tasks(self) -> List[Dict[str, Any]]:
-        """List all tracked tasks."""
-        result = []
-        for tid, info in self.tasks.items():
-            entry = {"id": tid, "type": info["type"], "status": info["status"]}
-            if info["type"] == "process":
-                proc = info["obj"]
-                entry["pid"] = getattr(proc, "pid", None)
-                entry["alive"] = proc.poll() is None
-            elif info["type"] == "thread":
-                thread = info["obj"]
-                entry["name"] = getattr(thread, "name", None)
-                entry["alive"] = thread.is_alive()
-            result.append(entry)
-        return result
+        """List all registered tasks."""
+        tasks = []
+        
+        # Add processes
+        for task_id, info in self.processes.items():
+            try:
+                proc = info['process']
+                tasks.append({
+                    'id': task_id,
+                    'type': 'process',
+                    'pid': proc.pid,
+                    'status': proc.status(),
+                    'cpu_percent': proc.cpu_percent(),
+                    'memory_percent': proc.memory_percent(),
+                    'start_time': info['start_time']
+                })
+            except psutil.NoSuchProcess:
+                # Process has ended
+                del self.processes[task_id]
+        
+        # Add threads
+        for task_id, info in self.threads.items():
+            thread = info['thread']
+            tasks.append({
+                'id': task_id,
+                'type': 'thread',
+                'alive': thread.is_alive(),
+                'start_time': info['start_time']
+            })
+        
+        return tasks
 
     def pause_task(self, task_id: str):
-        """Pause a task by ID (best effort, only works for processes on POSIX)."""
-        info = self.tasks.get(task_id)
-        if not info:
-            raise ValueError(f"No such task: {task_id}")
-        if info["type"] == "process":
-            proc = info["obj"]
+        """Pause a task (process only)."""
+        if task_id in self.processes:
             try:
-                proc.send_signal(signal.SIGSTOP)
-                info["status"] = "paused"
-            except Exception as e:
-                logger.error(f"Failed to pause process {task_id}: {e}")
-        elif info["type"] == "thread":
-            # No safe way to pause threads in Python
-            logger.warning(f"Cannot pause threads safely in Python (task {task_id})")
+                proc = self.processes[task_id]['process']
+                proc.suspend()
+                print_info(f"Paused process {task_id}")
+            except psutil.NoSuchProcess:
+                print_error(f"Process {task_id} not found")
         else:
-            logger.error(f"Unknown task type for {task_id}")
+            print_error(f"Task {task_id} not found or not a process")
 
     def resume_task(self, task_id: str):
-        """Resume a paused task by ID (processes only)."""
-        info = self.tasks.get(task_id)
-        if not info:
-            raise ValueError(f"No such task: {task_id}")
-        if info["type"] == "process":
-            proc = info["obj"]
+        """Resume a task (process only)."""
+        if task_id in self.processes:
             try:
-                proc.send_signal(signal.SIGCONT)
-                info["status"] = "running"
-            except Exception as e:
-                logger.error(f"Failed to resume process {task_id}: {e}")
-        elif info["type"] == "thread":
-            logger.warning(f"Cannot resume threads safely in Python (task {task_id})")
+                proc = self.processes[task_id]['process']
+                proc.resume()
+                print_info(f"Resumed process {task_id}")
+            except psutil.NoSuchProcess:
+                print_error(f"Process {task_id} not found")
         else:
-            logger.error(f"Unknown task type for {task_id}")
+            print_error(f"Task {task_id} not found or not a process")
 
     def kill_task(self, task_id: str):
-        """Kill a task by ID."""
-        info = self.tasks.get(task_id)
-        if not info:
-            raise ValueError(f"No such task: {task_id}")
-        if info["type"] == "process":
-            proc = info["obj"]
+        """Kill a task."""
+        if task_id in self.processes:
             try:
+                proc = self.processes[task_id]['process']
                 proc.terminate()
-                info["status"] = "terminated"
-            except Exception as e:
-                logger.error(f"Failed to terminate process {task_id}: {e}")
-        elif info["type"] == "thread":
-            stop_flag = info.get("stop_flag")
-            if stop_flag is not None:
-                stop_flag.set()
-                info["status"] = "stopping"
-            else:
-                logger.warning(
-                    f"No stop_flag for thread {task_id}; cannot kill cleanly."
-                )
+                del self.processes[task_id]
+                print_info(f"Killed process {task_id}")
+            except psutil.NoSuchProcess:
+                print_error(f"Process {task_id} not found")
+        elif task_id in self.threads:
+            info = self.threads[task_id]
+            if info['stop_flag']:
+                info['stop_flag'].set()
+            del self.threads[task_id]
+            print_info(f"Stopped thread {task_id}")
         else:
-            logger.error(f"Unknown task type for {task_id}")
-
-
-# CLI Output Helpers
+            print_error(f"Task {task_id} not found")
 
 
 def print_resource_snapshot(snapshot: Dict[str, Any]):
     """Pretty-print resource usage snapshot for CLI."""
-    print("\n--- Resource Usage Snapshot ---")
-    print(f"CPU: {snapshot['cpu_percent']}%")
-    print(
+    print_info("\n--- Resource Usage Snapshot ---")
+    print_info(f"CPU: {snapshot['cpu_percent']}%")
+    print_info(
         f"RAM: {snapshot['ram_percent']}% ({snapshot['ram_used'] // (1024**2)}MB / {snapshot['ram_total'] // (1024**2)}MB)"
     )
-    print(
+    print_info(
         f"Disk: {snapshot['disk_percent']}% ({snapshot['disk_used'] // (1024**3)}GB / {snapshot['disk_total'] // (1024**3)}GB)"
     )
     if snapshot["gpu"]:
         for gpu in snapshot["gpu"]:
             if "error" in gpu:
-                print(f"GPU Error: {gpu['error']}")
+                print_error(f"GPU Error: {gpu['error']}")
             else:
-                print(f"GPU {gpu.get('id', '?')}: {gpu.get('name', '?')}")
+                print_info(f"GPU {gpu.get('id', '?')}: {gpu.get('name', '?')}")
                 if "load" in gpu:
-                    print(
+                    print_info(
                         f"  Load: {gpu['load']*100:.1f}%  Mem: {gpu['mem_used']}/{gpu['mem_total']}MB  Util: {gpu['mem_util']*100:.1f}%  Temp: {gpu['temperature']}C"
                     )
                 elif "mem_allocated" in gpu:
-                    print(
+                    print_info(
                         f"  Mem Allocated: {gpu['mem_allocated']//(1024**2)}MB  Mem Reserved: {gpu['mem_reserved']//(1024**2)}MB"
                     )
     else:
-        print("GPU: None detected")
-    print(
+        print_info("GPU: None detected")
+    print_info(
         f"Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(snapshot['timestamp']))}"
     )
 
 
 def print_performance_summary(summary: Dict[str, Any]):
     """Pretty-print performance analytics summary for CLI."""
-    print("\n--- Performance Analytics ---")
+    print_info("\n--- Performance Analytics ---")
     if not summary:
-        print("No performance data recorded.")
+        print_info("No performance data recorded.")
         return
     for name, stats in summary.items():
-        print(f"Operation: {name}")
-        print(
+        print_info(f"Operation: {name}")
+        print_info(
             f"  Count: {stats['count']}  Avg: {stats['avg']:.3f}s  Min: {stats['min']:.3f}s  Max: {stats['max']:.3f}s  Total: {stats['total']:.3f}s"
         )
 
 
 def print_error_summary(summary: Dict[str, Any]):
     """Pretty-print error summary for CLI."""
-    print("\n--- Error Summary ---")
-    print(f"Total errors: {summary.get('count', 0)}")
+    print_info("\n--- Error Summary ---")
+    print_info(f"Total errors: {summary.get('count', 0)}")
     if summary.get("by_type"):
         for t, c in summary["by_type"].items():
-            print(f"  {t}: {c}")
+            print_info(f"  {t}: {c}")
     if summary.get("last"):
         last = summary["last"]
-        print(
+        print_info(
             f"Last error: [{last['type']}] {last['message']} (critical={last['critical']}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(last['timestamp']))}"
         )
 
 
 def print_health_check_results(results: Dict[str, Any]):
     """Pretty-print health check results for CLI."""
-    print("\n--- System Health Check ---")
-    print(
+    print_info("\n--- System Health Check ---")
+    print_info(
         f"RAM: {results['ram_available_gb']}GB free / {results['ram_total_gb']}GB total - {'OK' if results['ram_ok'] else 'LOW'}"
     )
-    print(
+    print_info(
         f"Disk: {results['disk_free_gb']}GB free / {results['disk_total_gb']}GB total - {'OK' if results['disk_ok'] else 'LOW'}"
     )
-    print(
+    print_info(
         f"CUDA: {results['cuda_msg']} - {'OK' if results['cuda_ok'] else 'NOT AVAILABLE'}"
     )
-    print(
+    print_info(
         f"Python: {results['python_version']} - {'OK' if results['python_ok'] else 'TOO OLD'}"
     )
-    print(
+    print_info(
         f"Write permission in cwd: {'OK' if results['write_permission'] else 'NO PERMISSION'}"
     )
 

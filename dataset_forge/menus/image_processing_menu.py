@@ -75,14 +75,20 @@ def basic_transformations_menu():
                 "dataset_forge.actions.transform_actions", "shuffle_images_menu"
             ),
         ),
+        "6": (
+            "💾 Resave Images",
+            lazy_action(
+                "dataset_forge.menus.resave_images_menu", "resave_images_menu"
+            ),
+        ),
         "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
     menu_context = {
         "Purpose": "Apply basic geometric transformations to images",
-        "Options": "5 transformation types available",
-        "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        "Options": "6 transformation types available",
+        "Navigation": "Use numbers 1-6 to select, 0 to go back",
     }
 
     while True:
@@ -266,7 +272,7 @@ def image_processing_menu():
         "Purpose": "Transform, enhance, and augment images for ML training",
         "Total Options": "5 processing categories",
         "Navigation": "Use numbers 1-5 to select, 0 to go back",
-        "Key Features": "Geometric transformations, color adjustments, metadata management, augmentation",
+        "Key Features": "Geometric transformations, color adjustments, metadata management, augmentation, resave images",
     }
 
     while True:

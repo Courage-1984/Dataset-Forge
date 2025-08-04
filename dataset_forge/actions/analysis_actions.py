@@ -24,6 +24,11 @@ from dataset_forge.utils.image_ops import get_image_size
 from dataset_forge.utils.monitoring import monitor_all
 from dataset_forge.utils.cache_utils import in_memory_cache
 from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.printing import (
+    print_info, print_success, print_warning, print_error,
+    print_header, print_section
+)
+from dataset_forge.utils.color import Mocha
 
 
 @monitor_all("analyze_single_image")
@@ -69,11 +74,9 @@ def analyze_image_batch(image_paths: list) -> list:
 
 @monitor_all("generate_hq_lq_dataset_report", critical_on_error=True)
 def generate_hq_lq_dataset_report(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("   HQ/LQ DATASET REPORT")
-    print("=" * 30)
-
-    print("\n--- Overall Dataset Information ---")
+    print_header("HQ/LQ DATASET REPORT", char="=", color=Mocha.sapphire)
+    print_section("Overall Dataset Information", char="-", color=Mocha.lavender)
+    
     try:
         hq_files_list = sorted(
             [
@@ -90,207 +93,206 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
             ]
         )
     except FileNotFoundError as fnf_e:
-        print(f"Error: One of the dataset folders not found: {fnf_e}")
-        print("Please ensure HQ and LQ folders are correctly set.")
-        print("=" * 30)
+        print_error(f"Error: One of the dataset folders not found: {fnf_e}")
+        print_warning("Please ensure HQ and LQ folders are correctly set.")
+        print_header("", char="=", color=Mocha.sapphire)
         return
 
     matching_pairs_list = [
         f for f in hq_files_list if f in lq_files_list
     ]  # Ensure it's a list for len
 
-    print(f"HQ Folder: {hq_folder}")
-    print(f"LQ Folder: {lq_folder}")
-    print(f"Total HQ Images (root): {len(hq_files_list)}")
-    print(f"Total LQ Images (root): {len(lq_files_list)}")
-    print(f"Matching HQ/LQ Pairs (based on root filenames): {len(matching_pairs_list)}")
+    print_info(f"HQ Folder: {hq_folder}")
+    print_info(f"LQ Folder: {lq_folder}")
+    print_info(f"Total HQ Images (root): {len(hq_files_list)}")
+    print_info(f"Total LQ Images (root): {len(lq_files_list)}")
+    print_info(f"Matching HQ/LQ Pairs (based on root filenames): {len(matching_pairs_list)}")
 
     hq_unique_files = [f for f in hq_files_list if f not in lq_files_list]
     lq_unique_files = [f for f in lq_files_list if f not in hq_files_list]
-    print(f"Images unique to HQ folder (root): {len(hq_unique_files)}")
+    print_info(f"Images unique to HQ folder (root): {len(hq_unique_files)}")
     if hq_unique_files and len(hq_unique_files) <= 5:
-        print(f"  ({', '.join(hq_unique_files)})")
+        print_info(f"  ({', '.join(hq_unique_files)})")
     elif hq_unique_files:
-        print(f"  (e.g., {', '.join(hq_unique_files[:3])} ...)")
+        print_info(f"  (e.g., {', '.join(hq_unique_files[:3])} ...)")
 
-    print(f"Images unique to LQ folder (root): {len(lq_unique_files)}")
+    print_info(f"Images unique to LQ folder (root): {len(lq_unique_files)}")
     if lq_unique_files and len(lq_unique_files) <= 5:
-        print(f"  ({', '.join(lq_unique_files)})")
+        print_info(f"  ({', '.join(lq_unique_files)})")
     elif lq_unique_files:
-        print(f"  (e.g., {', '.join(lq_unique_files[:3])} ...)")
+        print_info(f"  (e.g., {', '.join(lq_unique_files[:3])} ...)")
 
-    print("\n--- Scale Analysis (based on root filenames) ---")
+    print_section("Scale Analysis (based on root filenames)", char="-", color=Mocha.lavender)
     scale_results = find_hq_lq_scale(
         hq_folder, lq_folder, verbose=False
     )  # verbose=False for report summary
     if scale_results["scales"]:
         scale_counts = Counter(scale_results["scales"])
         most_common_scale = scale_counts.most_common(1)[0]
-        print(
+        print_info(
             f"Most common consistent scale: {most_common_scale[0]:.2f} (occurred {most_common_scale[1]} times out of {scale_results['processed_pairs']} pairs)"
         )
         other_scales = scale_counts.most_common()[1:6]  # Show up to 5 other scales
         if other_scales:
-            print("Other consistent scales found:")
+            print_info("Other consistent scales found:")
             for s, c in other_scales:
-                print(f"  - {s:.2f} ({c} times)")
+                print_info(f"  - {s:.2f} ({c} times)")
     else:
-        print("No consistent scales found among processed pairs.")
+        print_warning("No consistent scales found among processed pairs.")
     if scale_results["inconsistent_scales"]:
-        print(
+        print_warning(
             f"Pairs with inconsistent width/height scales or processing errors: {len(scale_results['inconsistent_scales'])}"
         )
     if scale_results["missing_lq"]:
-        print(
+        print_warning(
             f"HQ files missing corresponding LQ file: {len(scale_results['missing_lq'])}"
         )
     if scale_results["missing_hq"]:
-        print(
+        print_warning(
             f"LQ files missing corresponding HQ file: {len(scale_results['missing_hq'])}"
         )
 
-    print("\n--- Consistency Check (HQ) ---")
+    print_section("Consistency Check (HQ)", char="-", color=Mocha.lavender)
     hq_consistency = check_consistency(hq_folder, "HQ", verbose=False)
     if hq_consistency["formats"]:
-        print(
+        print_info(
             f"HQ File Formats: {{ {k: len(v) for k, v in hq_consistency['formats'].items()} }}"
         )
     else:
-        print("HQ File Formats: No image files found or processed.")
+        print_warning("HQ File Formats: No image files found or processed.")
     if hq_consistency["modes"]:
-        print(
+        print_info(
             f"HQ Color Modes: {{ {k: len(v) for k, v in hq_consistency['modes'].items()} }}"
         )
     else:
-        print("HQ Color Modes: No image files found or processed.")
+        print_warning("HQ Color Modes: No image files found or processed.")
     if hq_consistency["errors"]:
-        print(f"HQ files with processing errors: {len(hq_consistency['errors'])}")
+        print_warning(f"HQ files with processing errors: {len(hq_consistency['errors'])}")
 
-    print("\n--- Consistency Check (LQ) ---")
+    print_section("Consistency Check (LQ)", char="-", color=Mocha.lavender)
     lq_consistency = check_consistency(lq_folder, "LQ", verbose=False)
     if lq_consistency["formats"]:
-        print(
+        print_info(
             f"LQ File Formats: {{ {k: len(v) for k, v in lq_consistency['formats'].items()} }}"
         )
     else:
-        print("LQ File Formats: No image files found or processed.")
+        print_warning("LQ File Formats: No image files found or processed.")
     if lq_consistency["modes"]:
-        print(
+        print_info(
             f"LQ Color Modes: {{ {k: len(v) for k, v in lq_consistency['modes'].items()} }}"
         )
     else:
-        print("LQ Color Modes: No image files found or processed.")
+        print_warning("LQ Color Modes: No image files found or processed.")
     if lq_consistency["errors"]:
-        print(f"LQ files with processing errors: {len(lq_consistency['errors'])}")
+        print_warning(f"LQ files with processing errors: {len(lq_consistency['errors'])}")
 
-    print("\n--- Dimension Report (HQ) ---")
+    print_section("Dimension Report (HQ)", char="-", color=Mocha.lavender)
     hq_dimensions_report = report_dimensions(hq_folder, "HQ", verbose=False)
     if hq_dimensions_report["dimensions"]:
         hq_widths = [dim[0] for dim in hq_dimensions_report["dimensions"]]
         hq_heights = [dim[1] for dim in hq_dimensions_report["dimensions"]]
-        print(
+        print_info(
             f"HQ Width (processed {len(hq_widths)} images): Min={min(hq_widths)}, Max={max(hq_widths)}, Avg={sum(hq_widths)/len(hq_widths):.2f}"
         )
-        print(
+        print_info(
             f"HQ Height (processed {len(hq_heights)} images): Min={min(hq_heights)}, Max={max(hq_heights)}, Avg={sum(hq_heights)/len(hq_heights):.2f}"
         )
         unique_dims_hq = sorted(list(set(hq_dimensions_report["dimensions"])))
-        print(
+        print_info(
             f"HQ Unique Dimensions (WxH): {len(unique_dims_hq)}. Examples: {unique_dims_hq[:min(3, len(unique_dims_hq))]}"
         )
 
     else:
-        print("HQ Dimensions: No images successfully processed for dimensions.")
+        print_warning("HQ Dimensions: No images successfully processed for dimensions.")
     if hq_dimensions_report["errors"]:
-        print(f"HQ dimension processing errors: {len(hq_dimensions_report['errors'])}")
+        print_warning(f"HQ dimension processing errors: {len(hq_dimensions_report['errors'])}")
 
-    print("\n--- Dimension Report (LQ) ---")
+    print_section("Dimension Report (LQ)", char="-", color=Mocha.lavender)
     lq_dimensions_report = report_dimensions(lq_folder, "LQ", verbose=False)
     if lq_dimensions_report["dimensions"]:
         lq_widths = [dim[0] for dim in lq_dimensions_report["dimensions"]]
         lq_heights = [dim[1] for dim in lq_dimensions_report["dimensions"]]
-        print(
+        print_info(
             f"LQ Width (processed {len(lq_widths)} images): Min={min(lq_widths)}, Max={max(lq_widths)}, Avg={sum(lq_widths)/len(lq_widths):.2f}"
         )
-        print(
+        print_info(
             f"LQ Height (processed {len(lq_heights)} images): Min={min(lq_heights)}, Max={max(lq_heights)}, Avg={sum(lq_heights)/len(lq_heights):.2f}"
         )
         unique_dims_lq = sorted(list(set(lq_dimensions_report["dimensions"])))
-        print(
+        print_info(
             f"LQ Unique Dimensions (WxH): {len(unique_dims_lq)}. Examples: {unique_dims_lq[:min(3, len(unique_dims_lq))]}"
         )
 
     else:
-        print("LQ Dimensions: No images successfully processed for dimensions.")
+        print_warning("LQ Dimensions: No images successfully processed for dimensions.")
     if lq_dimensions_report["errors"]:
-        print(f"LQ dimension processing errors: {len(lq_dimensions_report['errors'])}")
+        print_warning(f"LQ dimension processing errors: {len(lq_dimensions_report['errors'])}")
 
-    print("\n--- Extreme Dimensions (HQ) ---")
+    print_section("Extreme Dimensions (HQ)", char="-", color=Mocha.lavender)
     hq_extreme_dims = find_extreme_dimensions(hq_folder, "HQ", verbose=False)
     if hq_extreme_dims["successfully_processed"] > 0:
         bd_hq = hq_extreme_dims["biggest_dimension"]
         sd_hq = hq_extreme_dims["smallest_dimension"]
         bf_hq = hq_extreme_dims["biggest_files"]
         sf_hq = hq_extreme_dims["smallest_files"]
-        print(
+        print_info(
             f"HQ Biggest Dimension (pixels): {bd_hq[0]}x{bd_hq[1]} (Area: {bd_hq[0]*bd_hq[1]})"
         )
         if bf_hq:
-            print(f"  Files: {', '.join(bf_hq[:2])}{'...' if len(bf_hq) > 2 else ''}")
-        print(
+            print_info(f"  Files: {', '.join(bf_hq[:2])}{'...' if len(bf_hq) > 2 else ''}")
+        print_info(
             f"HQ Smallest Dimension (pixels): {sd_hq[0]}x{sd_hq[1]} (Area: {sd_hq[0]*sd_hq[1]})"
         )
         if sf_hq:
-            print(f"  Files: {', '.join(sf_hq[:2])}{'...' if len(sf_hq) > 2 else ''}")
+            print_info(f"  Files: {', '.join(sf_hq[:2])}{'...' if len(sf_hq) > 2 else ''}")
     else:
-        print("HQ Extreme Dimensions: No images successfully processed.")
+        print_warning("HQ Extreme Dimensions: No images successfully processed.")
     if hq_extreme_dims["errors"]:
-        print(
+        print_warning(
             f"HQ extreme dimension processing errors: {len(hq_extreme_dims['errors'])}"
         )
 
-    print("\n--- Extreme Dimensions (LQ) ---")
+    print_section("Extreme Dimensions (LQ)", char="-", color=Mocha.lavender)
     lq_extreme_dims = find_extreme_dimensions(lq_folder, "LQ", verbose=False)
     if lq_extreme_dims["successfully_processed"] > 0:
         bd_lq = lq_extreme_dims["biggest_dimension"]
         sd_lq = lq_extreme_dims["smallest_dimension"]
         bf_lq = lq_extreme_dims["biggest_files"]
         sf_lq = lq_extreme_dims["smallest_files"]
-        print(
+        print_info(
             f"LQ Biggest Dimension (pixels): {bd_lq[0]}x{bd_lq[1]} (Area: {bd_lq[0]*bd_lq[1]})"
         )
         if bf_lq:
-            print(f"  Files: {', '.join(bf_lq[:2])}{'...' if len(bf_lq) > 2 else ''}")
-        print(
+            print_info(f"  Files: {', '.join(bf_lq[:2])}{'...' if len(bf_lq) > 2 else ''}")
+        print_info(
             f"LQ Smallest Dimension (pixels): {sd_lq[0]}x{sd_lq[1]} (Area: {sd_lq[0]*sd_lq[1]})"
         )
         if sf_lq:
-            print(f"  Files: {', '.join(sf_lq[:2])}{'...' if len(sf_lq) > 2 else ''}")
+            print_info(f"  Files: {', '.join(sf_lq[:2])}{'...' if len(sf_lq) > 2 else ''}")
     else:
-        print("LQ Extreme Dimensions: No images successfully processed.")
+        print_warning("LQ Extreme Dimensions: No images successfully processed.")
     if lq_extreme_dims["errors"]:
-        print(
+        print_warning(
             f"LQ extreme dimension processing errors: {len(lq_extreme_dims['errors'])}"
         )
 
-    print("\n--- File Size Analysis ---")
+    print_section("File Size Analysis", char="-", color=Mocha.lavender)
     hq_size_report = analyze_file_sizes(hq_folder, "HQ", verbose=False)
     lq_size_report = analyze_file_sizes(lq_folder, "LQ", verbose=False)
 
     if hq_size_report["sizes"]:
         hq_sizes = hq_size_report["sizes"]
-        print(
+        print_info(
             f"HQ File Sizes: Min={min(hq_sizes):.2f}MB, Max={max(hq_sizes):.2f}MB, Avg={sum(hq_sizes)/len(hq_sizes):.2f}MB"
         )
 
     if lq_size_report["sizes"]:
         lq_sizes = lq_size_report["sizes"]
-        print(
+        print_info(
             f"LQ File Sizes: Min={min(lq_sizes):.2f}MB, Max={max(lq_sizes):.2f}MB, Avg={sum(lq_sizes)/len(lq_sizes):.2f}MB"
         )
 
-    print("=" * 30)
-    from dataset_forge.utils.printing import print_success
+    print_header("", char="=", color=Mocha.sapphire)
     print_success("HQ/LQ dataset report generation complete!")
     play_done_sound()
 
@@ -383,29 +385,29 @@ def test_hq_lq_scale(hq_folder, lq_folder):
     scale_results = find_hq_lq_scale(hq_folder, lq_folder, verbose=True)
 
     if scale_results["scales"]:
-        print(f"\nScale Analysis Results:")
-        print(f"Processed pairs: {scale_results['processed_pairs']}")
-        print(f"Consistent scales found: {len(scale_results['scales'])}")
+        print_section("Scale Analysis Results", char="-", color=Mocha.lavender)
+        print_info(f"Processed pairs: {scale_results['processed_pairs']}")
+        print_info(f"Consistent scales found: {len(scale_results['scales'])}")
 
         if scale_results["scales"]:
             scale_counts = Counter(scale_results["scales"])
-            print(f"\nMost common scales:")
+            print_info("Most common scales:")
             for scale, count in scale_counts.most_common(5):
-                print(f"  {scale:.2f}x: {count} pairs")
+                print_info(f"  {scale:.2f}x: {count} pairs")
 
         if scale_results["inconsistent_scales"]:
-            print(
-                f"\nInconsistent scales: {len(scale_results['inconsistent_scales'])} pairs"
+            print_warning(
+                f"Inconsistent scales: {len(scale_results['inconsistent_scales'])} pairs"
             )
             for filename in scale_results["inconsistent_scales"][:5]:
-                print(f"  {filename}")
+                print_warning(f"  {filename}")
             if len(scale_results["inconsistent_scales"]) > 5:
-                print(f"  ... and {len(scale_results['inconsistent_scales']) - 5} more")
+                print_warning(f"  ... and {len(scale_results['inconsistent_scales']) - 5} more")
 
     if scale_results["missing_lq"]:
-        print(f"\nHQ files missing LQ: {len(scale_results['missing_lq'])}")
+        print_warning(f"HQ files missing LQ: {len(scale_results['missing_lq'])}")
     if scale_results["missing_hq"]:
-        print(f"\nLQ files missing HQ: {len(scale_results['missing_hq'])}")
+        print_warning(f"LQ files missing HQ: {len(scale_results['missing_hq'])}")
     
     print_success("HQ/LQ scale analysis complete!")
     play_done_sound()
@@ -687,24 +689,24 @@ def verify_images(hq_folder, lq_folder):
             else:
                 lq_errors.append(result["path"])
 
-    print(f"Image verification complete:")
-    print(f"  Successful: {successful}")
-    print(f"  HQ errors: {len(hq_errors)}")
-    print(f"  LQ errors: {len(lq_errors)}")
+    print_section("Image verification complete", char="-", color=Mocha.lavender)
+    print_info(f"  Successful: {successful}")
+    print_info(f"  HQ errors: {len(hq_errors)}")
+    print_info(f"  LQ errors: {len(lq_errors)}")
 
     if hq_errors:
-        print(f"\nHQ errors:")
+        print_warning("HQ errors:")
         for error in hq_errors[:5]:
-            print(f"  {error}")
+            print_warning(f"  {error}")
         if len(hq_errors) > 5:
-            print(f"  ... and {len(hq_errors) - 5} more")
+            print_warning(f"  ... and {len(hq_errors) - 5} more")
 
     if lq_errors:
-        print(f"\nLQ errors:")
+        print_warning("LQ errors:")
         for error in lq_errors[:5]:
-            print(f"  {error}")
+            print_warning(f"  {error}")
         if len(lq_errors) > 5:
-            print(f"  ... and {len(lq_errors) - 5} more")
+            print_warning(f"  ... and {len(lq_errors) - 5} more")
 
 
 @monitor_all("fix_corrupted_images", critical_on_error=True)
@@ -724,7 +726,7 @@ def find_misaligned_images(hq_folder, lq_folder):
     matching_files = sorted(hq_files & lq_files)
 
     if not matching_files:
-        print("No matching files found.")
+        print_warning("No matching files found.")
         return
 
     def check_alignment(filename):
@@ -784,22 +786,22 @@ def find_misaligned_images(hq_folder, lq_folder):
         else:
             misaligned.append(result)
 
-    print(f"Alignment check complete:")
-    print(f"  Aligned pairs: {len(aligned)}")
-    print(f"  Misaligned pairs: {len(misaligned)}")
+    print_section("Alignment check complete", char="-", color=Mocha.lavender)
+    print_info(f"  Aligned pairs: {len(aligned)}")
+    print_info(f"  Misaligned pairs: {len(misaligned)}")
 
     if misaligned:
-        print(f"\nMisaligned pairs:")
+        print_warning("Misaligned pairs:")
         for item in misaligned[:5]:
-            print(f"  {item['filename']}")
+            print_warning(f"  {item['filename']}")
             if "width_scale" in item:
-                print(
+                print_warning(
                     f"    Width scale: {item['width_scale']:.2f}, Height scale: {item['height_scale']:.2f}"
                 )
             if "error" in item:
-                print(f"    Error: {item['error']}")
+                print_warning(f"    Error: {item['error']}")
         if len(misaligned) > 5:
-            print(f"  ... and {len(misaligned) - 5} more")
+            print_warning(f"  ... and {len(misaligned) - 5} more")
 
 
 def find_alpha_channels(*args, **kwargs):
@@ -843,7 +845,7 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
         folders = [hq_folder, lq_folder]
         folder_names = ["HQ", "LQ"]
     else:
-        print("Please provide either single_path or both hq_folder and lq_folder.")
+        print_error("Please provide either single_path or both hq_folder and lq_folder.")
         return
 
     def analyze_aspect_ratios(folder_info):
@@ -918,82 +920,82 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
         errors = result["errors"]
 
         if aspects:
-            print(f"\n{folder_name} Aspect Ratios:")
-            print(f"  Count: {len(aspects)}")
-            print(f"  Min: {min(aspects):.3f}")
-            print(f"  Max: {max(aspects):.3f}")
-            print(f"  Mean: {sum(aspects)/len(aspects):.3f}")
-            print(f"  Std: {np.std(aspects):.3f}")
+            print_section(f"{folder_name} Aspect Ratios", char="-", color=Mocha.lavender)
+            print_info(f"  Count: {len(aspects)}")
+            print_info(f"  Min: {min(aspects):.3f}")
+            print_info(f"  Max: {max(aspects):.3f}")
+            print_info(f"  Mean: {sum(aspects)/len(aspects):.3f}")
+            print_info(f"  Std: {np.std(aspects):.3f}")
 
             # Check for consistency
             mean_aspect = sum(aspects) / len(aspects)
             consistent = [
                 a for a in aspects if abs(a - mean_aspect) / mean_aspect < tolerance
             ]
-            print(
+            print_info(
                 f"  Consistent (within {tolerance*100}%): {len(consistent)}/{len(aspects)}"
             )
 
         if errors:
-            print(f"  Errors: {len(errors)}")
+            print_warning(f"  Errors: {len(errors)}")
 
 
 @monitor_all("progressive_dataset_validation", critical_on_error=True)
 def progressive_dataset_validation(hq_folder, lq_folder):
     """Run progressive dataset validation with parallel processing."""
-    print("Starting progressive dataset validation...")
+    print_header("Starting progressive dataset validation...", color=Mocha.lavender)
 
     # Step 1: Basic file count and matching
-    print("\n1. Basic file analysis...")
+    print_section("1. Basic file analysis", char="-", color=Mocha.lavender)
     hq_files = {f for f in os.listdir(hq_folder) if is_image_file(f)}
     lq_files = {f for f in os.listdir(lq_folder) if is_image_file(f)}
     matching_files = hq_files & lq_files
 
-    print(f"   HQ files: {len(hq_files)}")
-    print(f"   LQ files: {len(lq_files)}")
-    print(f"   Matching pairs: {len(matching_files)}")
+    print_info(f"   HQ files: {len(hq_files)}")
+    print_info(f"   LQ files: {len(lq_files)}")
+    print_info(f"   Matching pairs: {len(matching_files)}")
 
     if len(matching_files) == 0:
-        print("   ERROR: No matching files found!")
+        print_error("   ERROR: No matching files found!")
         return
 
     # Step 2: Image integrity check
-    print("\n2. Image integrity check...")
+    print_section("2. Image integrity check", char="-", color=Mocha.lavender)
     verify_images(hq_folder, lq_folder)
 
     # Step 3: Scale analysis
-    print("\n3. Scale analysis...")
+    print_section("3. Scale analysis", char="-", color=Mocha.lavender)
     scale_results = find_hq_lq_scale(hq_folder, lq_folder, verbose=False)
     if scale_results["scales"]:
         scale_counts = Counter(scale_results["scales"])
         most_common_scale = scale_counts.most_common(1)[0]
-        print(
+        print_info(
             f"   Most common scale: {most_common_scale[0]:.2f}x ({most_common_scale[1]} pairs)"
         )
 
     # Step 4: Dimension analysis
-    print("\n4. Dimension analysis...")
+    print_section("4. Dimension analysis", char="-", color=Mocha.lavender)
     hq_dims = report_dimensions(hq_folder, "HQ", verbose=False)
     lq_dims = report_dimensions(lq_folder, "LQ", verbose=False)
 
     if hq_dims["dimensions"]:
         hq_areas = [w * h for w, h in hq_dims["dimensions"]]
-        print(
+        print_info(
             f"   HQ: {len(hq_dims['dimensions'])} images, avg area: {sum(hq_areas)/len(hq_areas):.0f} pixels"
         )
 
     if lq_dims["dimensions"]:
         lq_areas = [w * h for w, h in lq_dims["dimensions"]]
-        print(
+        print_info(
             f"   LQ: {len(lq_dims['dimensions'])} images, avg area: {sum(lq_areas)/len(lq_areas):.0f} pixels"
         )
 
     # Step 5: Consistency check
-    print("\n5. Consistency check...")
+    print_section("5. Consistency check", char="-", color=Mocha.lavender)
     hq_consistency = check_consistency(hq_folder, "HQ", verbose=False)
     lq_consistency = check_consistency(lq_folder, "LQ", verbose=False)
 
-    print(f"   HQ formats: {len(hq_consistency['formats'])}")
-    print(f"   LQ formats: {len(lq_consistency['formats'])}")
+    print_info(f"   HQ formats: {len(hq_consistency['formats'])}")
+    print_info(f"   LQ formats: {len(lq_consistency['formats'])}")
 
-    print("\nProgressive validation complete!")
+    print_success("\nProgressive validation complete!")

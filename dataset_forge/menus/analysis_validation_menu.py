@@ -28,12 +28,10 @@ def require_hq_lq(func):
 
 
 def lazy_action(module_path, func_name):
+    @monitoring.time_and_record_menu_load(func_name)
     def _action(*args, **kwargs):
-        return monitoring.time_and_record_menu_load(
-            func_name,
-            lambda: getattr(importlib.import_module(module_path), func_name)(
-                *args, **kwargs
-            ),
+        return getattr(importlib.import_module(module_path), func_name)(
+            *args, **kwargs
         )
 
     return _action

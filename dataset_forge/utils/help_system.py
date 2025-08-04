@@ -98,23 +98,9 @@ class HelpSystem:
             "description": "Exit Dataset Forge completely with cleanup",
             "usage": "Type 'quit', 'exit', or 'q' in any menu",
             "examples": [
-                "quit - Exit with full cleanup",
-                "exit - Same as quit",
+                "quit - Exit with cleanup",
+                "exit - Alternative exit command",
                 "q - Short form of quit",
-            ],
-            "notes": [
-                "Performs memory cleanup",
-                "Saves any pending operations",
-                "Plays shutdown sound",
-            ],
-        },
-        "navigation": {
-            "description": "Navigate through menus and options",
-            "usage": "Use number keys to select options",
-            "examples": [
-                "0 - Go back to previous menu",
-                "1-9 - Select numbered menu options",
-                "Ctrl+C - Emergency exit",
             ],
         },
     }
@@ -126,7 +112,7 @@ class HelpSystem:
         menu_context: Optional[Dict[str, Any]] = None,
         pause: bool = True,
     ) -> None:
-        """Show help specific to a menu.
+        """Show context-aware help for a specific menu.
 
         Args:
             menu_name: Name of the menu to show help for
@@ -146,18 +132,18 @@ class HelpSystem:
             if "categories" in menu_help:
                 print_info(f"\n📋 Available Options:")
                 for category in menu_help["categories"]:
-                    print(f"  {Mocha.blue}•{Mocha.reset} {category}")
+                    print_info(f"  {Mocha.blue}•{Mocha.reset} {category}")
 
             if "tips" in menu_help:
                 print_info(f"\n💡 Tips:")
                 for tip in menu_help["tips"]:
-                    print(f"  {Mocha.green}•{Mocha.reset} {tip}")
+                    print_info(f"  {Mocha.green}•{Mocha.reset} {tip}")
 
         # Show menu context if provided
         if menu_context:
             print_info(f"\n📍 Menu Context:")
             for key, value in menu_context.items():
-                print(f"  {Mocha.yellow}{key}{Mocha.reset}: {value}")
+                print_info(f"  {Mocha.yellow}{key}{Mocha.reset}: {value}")
 
         # Show global commands
         cls._show_global_commands()
@@ -191,12 +177,12 @@ class HelpSystem:
             if "examples" in feature_help:
                 print_info(f"\n📝 Examples:")
                 for example in feature_help["examples"]:
-                    print(f"  {Mocha.blue}•{Mocha.reset} {example}")
+                    print_info(f"  {Mocha.blue}•{Mocha.reset} {example}")
 
             if "notes" in feature_help:
                 print_info(f"\n💡 Notes:")
                 for note in feature_help["notes"]:
-                    print(f"  {Mocha.green}•{Mocha.reset} {note}")
+                    print_info(f"  {Mocha.green}•{Mocha.reset} {note}")
         else:
             print_warning(f"No help available for feature: {feature_name}")
 
@@ -209,21 +195,21 @@ class HelpSystem:
         print_header("📚 Quick Reference Guide", char="=", color=Mocha.mauve)
 
         print_info("🚀 Essential Commands:")
-        print(f"  {Mocha.green}help{Mocha.reset}     - Show help for current menu")
-        print(f"  {Mocha.green}quit{Mocha.reset}     - Exit Dataset Forge")
-        print(f"  {Mocha.green}0{Mocha.reset}        - Go back to previous menu")
-        print(f"  {Mocha.green}Ctrl+C{Mocha.reset}   - Emergency exit")
+        print_info(f"  {Mocha.green}help{Mocha.reset}     - Show help for current menu")
+        print_info(f"  {Mocha.green}quit{Mocha.reset}     - Exit Dataset Forge")
+        print_info(f"  {Mocha.green}0{Mocha.reset}        - Go back to previous menu")
+        print_info(f"  {Mocha.green}Ctrl+C{Mocha.reset}   - Emergency exit")
 
         print_info(f"\n🎯 Navigation:")
-        print("  • Use number keys (1, 2, 3...) to select options")
-        print("  • Use '0' to go back to previous menu")
-        print("  • Use 'help' anytime for context-aware assistance")
+        print_info("  • Use number keys (1, 2, 3...) to select options")
+        print_info("  • Use '0' to go back to previous menu")
+        print_info("  • Use 'help' anytime for context-aware assistance")
 
         print_info(f"\n💡 Pro Tips:")
-        print("  • Commands are case-insensitive")
-        print("  • You can use 'help' in any menu")
-        print("  • 'quit' works from any menu level")
-        print("  • Use Ctrl+C for emergency exit with cleanup")
+        print_info("  • Commands are case-insensitive")
+        print_info("  • You can use 'help' in any menu")
+        print_info("  • 'quit' works from any menu level")
+        print_info("  • Use Ctrl+C for emergency exit with cleanup")
 
         print_success(f"\n✨ Happy dataset processing!")
         if pause:
@@ -231,29 +217,28 @@ class HelpSystem:
 
     @classmethod
     def _show_global_commands(cls) -> None:
-        """Show global commands section."""
-        print_info(f"\n🌐 Global Commands (available anywhere):")
-        print(f"  {Mocha.green}help{Mocha.reset}     - Show this help information")
-        print(f"  {Mocha.green}quit{Mocha.reset}     - Exit Dataset Forge completely")
-        print(f"  {Mocha.green}0{Mocha.reset}        - Go back to previous menu")
-        print(f"  {Mocha.green}Ctrl+C{Mocha.reset}   - Emergency exit with cleanup")
+        """Show global commands that work in any menu."""
+        print_info(f"\n🌐 Global Commands:")
+        print_info(f"  {Mocha.green}help{Mocha.reset}     - Show this help information")
+        print_info(f"  {Mocha.green}quit{Mocha.reset}     - Exit Dataset Forge completely")
+        print_info(f"  {Mocha.green}0{Mocha.reset}        - Go back to previous menu")
+        print_info(f"  {Mocha.green}Ctrl+C{Mocha.reset}   - Emergency exit with cleanup")
 
 
 def show_help(help_type: str = "general", pause: bool = True, **kwargs) -> None:
-    """Convenience function to show different types of help.
+    """Show help information based on type.
 
     Args:
-        help_type: Type of help to show ('general', 'menu', 'feature', 'quick')
+        help_type: Type of help to show ("general", "menu", "feature")
         pause: If True, prompt for Enter at the end
         **kwargs: Additional arguments for specific help types
     """
     if help_type == "menu":
-        HelpSystem.show_menu_help(
-            kwargs.get("menu_name", "Menu"), kwargs.get("menu_context"), pause=pause
-        )
+        menu_name = kwargs.get("menu_name", "Unknown Menu")
+        menu_context = kwargs.get("menu_context")
+        HelpSystem.show_menu_help(menu_name, menu_context, pause)
     elif help_type == "feature":
-        HelpSystem.show_feature_help(kwargs.get("feature_name", "feature"), pause=pause)
-    elif help_type == "quick":
-        HelpSystem.show_quick_reference(pause=pause)
+        feature_name = kwargs.get("feature_name", "Unknown Feature")
+        HelpSystem.show_feature_help(feature_name, pause)
     else:
-        HelpSystem.show_quick_reference(pause=pause)
+        HelpSystem.show_quick_reference(pause)

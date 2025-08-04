@@ -545,7 +545,7 @@ def to_device_safe(obj: object, device: str, non_blocking: bool = True) -> objec
         return obj  # Optionally, raise an error if strict typing is desired
 
 
-def detach_and_clear(tensor: torch.Tensor) -> torch.Tensor:
+def detach_and_clear(tensor: "torch.Tensor") -> "torch.Tensor":
     """
     Detach tensor and clear gradients to free memory.
 

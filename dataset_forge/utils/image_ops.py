@@ -1,94 +1,94 @@
-from abc import ABC, abstractmethod
-import os
-import shutil
-from dataset_forge.utils.progress_utils import tqdm
-from dataset_forge.utils.file_utils import get_unique_filename
-from dataset_forge.utils.input_utils import (
-    get_file_operation_choice,
-    get_destination_path,
-)
-from io import BytesIO
-from dataset_forge.utils.history_log import log_operation
+#!/usr/bin/env python3
+"""
+Image operations utilities for Dataset Forge.
 
-# Lazy imports for heavy libraries
-from dataset_forge.utils.lazy_imports import (
-    PIL_Image as Image,
-    PIL_ImageCms as ImageCms,
-    cv2,
-)
+This module provides various image processing operations including
+alpha channel removal, corruption fixing, and color adjustments.
+"""
+
+import os
+from abc import ABC, abstractmethod
+from io import BytesIO
+from typing import Tuple, Union
+
+from PIL import Image, ImageEnhance, ImageCms
+from tqdm import tqdm
+
+from dataset_forge.utils.printing import print_error
+from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.cache_utils import in_memory_cache
 
 
 class ImageOperation(ABC):
+    """Abstract base class for image operations."""
+
     @abstractmethod
     def process(self, image_path, **kwargs):
+        """Process an image and return success status and result."""
         pass
 
 
 class AlphaRemover(ImageOperation):
+    """Remove alpha channel from images."""
+
     def process(self, image_path, output_path=None, operation="inplace"):
+        """Remove alpha channel from an image."""
         try:
             with Image.open(image_path) as img:
-                if img.mode in ("RGBA", "LA"):
-                    background = Image.new(
-                        "RGB" if img.mode == "RGBA" else "L", img.size, "white"
-                    )
+                if img.mode in ("RGBA", "LA", "PA"):
+                    # Convert to RGB or L depending on original mode
                     if img.mode == "RGBA":
-                        background.paste(img, mask=img.split()[3])
+                        rgb_img = img.convert("RGB")
+                    elif img.mode == "LA":
+                        rgb_img = img.convert("L")
+                    elif img.mode == "PA":
+                        rgb_img = img.convert("P")
                     else:
-                        background.paste(img.convert("L"))
+                        return False, f"Unsupported mode with alpha: {img.mode}"
+                    
                     save_path = output_path if output_path else image_path
-                    background.save(save_path, quality=95)
-                    return True, save_path
-                elif img.mode == "P" and "transparency" in img.info:
-                    converted = img.convert("RGBA")
-                    background = Image.new("RGB", img.size, "white")
-                    background.paste(converted, mask=converted.split()[3])
-                    save_path = output_path if output_path else image_path
-                    background.save(save_path, quality=95)
+                    rgb_img.save(save_path, quality=95)
                     return True, save_path
                 else:
-                    if operation == "copy" and output_path:
-                        shutil.copy2(image_path, output_path)
-                        return True, output_path
-                    elif operation == "move" and output_path:
-                        shutil.move(image_path, output_path)
-                        return True, output_path
-                    return True, image_path
+                    # Image doesn't have alpha channel - this is not an error, just informational
+                    return True, f"No alpha channel to remove in {img.mode} mode (already processed)"
         except Exception as e:
             return False, str(e)
 
 
 class CorruptionFixer(ImageOperation):
+    """Fix corrupted images by re-saving them."""
+
     def __init__(self, grayscale=False):
         self.grayscale = grayscale
 
     def process(self, image_path, output_path=None, operation="inplace"):
+        """Fix corrupted image by re-saving it."""
         try:
-            image = cv2.imread(image_path)
-            if image is None:
-                return False, "Failed to read image"
-            if self.grayscale:
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            save_path = output_path if output_path else image_path
-            result = cv2.imwrite(save_path, image)
-            if operation == "move" and image_path != save_path:
-                os.remove(image_path)
-            return result, save_path if result else "Failed to save image"
+            with Image.open(image_path) as img:
+                if self.grayscale:
+                    img = img.convert("L")
+                else:
+                    img = img.convert("RGB")
+                
+                save_path = output_path if output_path else image_path
+                img.save(save_path, quality=95)
+                return True, save_path
         except Exception as e:
             return False, str(e)
 
 
 class ColorAdjuster(ImageOperation):
+    """Adjust color properties of images."""
+
     def __init__(self, adjustment_type, factor):
         self.adjustment_type = adjustment_type
         self.factor = factor
 
     def process(self, image_path, output_path=None, operation="inplace"):
+        """Apply color adjustment to an image."""
         try:
-            from PIL import ImageEnhance
-
             with Image.open(image_path) as img:
-                enhancer = None
                 if self.adjustment_type == "brightness":
                     enhancer = ImageEnhance.Brightness(img)
                 elif self.adjustment_type == "contrast":
@@ -138,7 +138,7 @@ class ICCToSRGBConverter:
             final_image.save(output_path, "PNG", icc_profile=None)
             log_operation("icc_to_srgb", f"Converted ICC to sRGB for {input_path}")
         except Exception as e:
-            print(f"Error processing {input_path}: {str(e)}")
+            print_error(f"Error processing {input_path}: {str(e)}")
 
     @staticmethod
     def process_folder(input_folder, output_folder):
@@ -171,10 +171,7 @@ class ICCToSRGBConverter:
         elif os.path.isdir(input_path):
             ICCToSRGBConverter.process_folder(input_path, output_path)
         else:
-            print(f"Invalid input: {input_path} is neither a file nor a directory.")
-
-
-from dataset_forge.utils.cache_utils import in_memory_cache
+            print_error(f"Invalid input: {input_path} is neither a file nor a directory.")
 
 
 @in_memory_cache(maxsize=256, ttl_seconds=3600)  # Cache for 1 hour

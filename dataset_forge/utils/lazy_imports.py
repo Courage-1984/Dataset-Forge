@@ -1,136 +1,127 @@
+#!/usr/bin/env python3
 """
-Lazy import utilities for Dataset Forge.
+Lazy import system for Dataset Forge.
 
-This module provides lazy import functionality to speed up CLI startup by deferring
-heavy library imports until they are actually needed.
+This module provides lazy loading capabilities for heavy libraries to improve
+CLI startup times and memory usage.
 """
 
 import importlib
 import sys
-from typing import Any, Optional, Dict, Callable
+import time
 from functools import wraps
-import logging
+from typing import Any, Callable, Dict, Optional
 
-logger = logging.getLogger(__name__)
-
-# Registry of lazy imports
-_lazy_imports: Dict[str, Any] = {}
-_import_times: Dict[str, float] = {}
+from dataset_forge.utils.printing import print_info
 
 
 class LazyImport:
-    """Lazy import wrapper that defers import until first access."""
+    """Lazy import wrapper for modules."""
 
     def __init__(self, module_name: str, import_name: Optional[str] = None):
-        """
-        Initialize lazy import.
-
-        Args:
-            module_name: Full module name to import
-            import_name: Optional specific name to import from module
-        """
         self.module_name = module_name
-        self.import_name = import_name
+        self.import_name = import_name or module_name
         self._module = None
         self._imported = False
 
     def __getattr__(self, name: str) -> Any:
-        """Get attribute from lazily imported module."""
+        """Get attribute from the lazily imported module."""
         if not self._imported:
             self._import_module()
         return getattr(self._module, name)
 
     def __getattribute__(self, name: str) -> Any:
-        """Get attribute, triggering lazy import for most attributes."""
-        # Don't trigger lazy import for internal attributes
-        if name in [
-            "_module",
-            "_imported",
-            "module_name",
-            "import_name",
-            "_import_module",
-        ]:
+        """Get attribute, handling special cases."""
+        if name in ["module_name", "import_name", "_module", "_imported", "_import_module"]:
             return super().__getattribute__(name)
-
-        # Trigger lazy import for all other attributes
         if not self._imported:
             self._import_module()
         return getattr(self._module, name)
 
     def _import_module(self) -> None:
-        """Import the module and cache it."""
+        """Import the module and record timing."""
+        start_time = time.time()
         try:
-            import time
-
-            start_time = time.time()
-
-            if self.import_name:
-                # Import specific name from module
-                self._module = importlib.import_module(self.module_name)
-                self._module = getattr(self._module, self.import_name)
-            else:
-                # Import entire module
-                self._module = importlib.import_module(self.module_name)
-
-            import_time = time.time() - start_time
-            _import_times[self.module_name] = import_time
-            logger.debug(f"Lazy imported {self.module_name} in {import_time:.3f}s")
-
-        except ImportError as e:
-            logger.error(f"Failed to lazy import {self.module_name}: {e}")
-            raise
-        finally:
+            self._module = importlib.import_module(self.module_name)
             self._imported = True
+            
+            # Record import time
+            import_time = time.time() - start_time
+            _import_times[self.import_name] = import_time
+            
+        except ImportError as e:
+            raise ImportError(f"Failed to import {self.module_name}: {e}")
 
     def __call__(self, *args, **kwargs) -> Any:
-        """Call the lazily imported object if it's callable."""
+        """Call the module as a function or get a class from the module."""
         if not self._imported:
             self._import_module()
+        
+        # If import_name is different from module_name, we're importing a specific class/function
+        if self.import_name != self.module_name:
+            # Get the specific class/function from the module
+            if hasattr(self._module, self.import_name):
+                return getattr(self._module, self.import_name)(*args, **kwargs)
+            else:
+                raise AttributeError(f"Module {self.module_name} has no attribute {self.import_name}")
+        
+        # Otherwise, call the module itself
         return self._module(*args, **kwargs)
 
 
+# Global import timing tracking
+_import_times: Dict[str, float] = {}
+
+
 def lazy_import(module_name: str, import_name: Optional[str] = None) -> LazyImport:
-    """
-    Create a lazy import wrapper.
-
-    Args:
-        module_name: Full module name to import
-        import_name: Optional specific name to import from module
-
-    Returns:
-        LazyImport wrapper
-    """
+    """Create a lazy import wrapper for a module."""
     return LazyImport(module_name, import_name)
 
 
 def lazy_import_decorator(module_name: str, import_name: Optional[str] = None):
-    """
-    Decorator to make a function lazy import its dependencies.
-
-    Args:
-        module_name: Module to import
-        import_name: Optional specific name to import
-
-    Returns:
-        Decorated function
-    """
-
+    """Decorator for lazy importing modules when functions are called."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             # Import the module when function is called
             module = importlib.import_module(module_name)
-            if import_name:
-                module = getattr(module, import_name)
-
-            # Add module to function's globals for access
-            func.__globals__[import_name or module_name.split(".")[-1]] = module
-
+            
+            # Record import time
+            start_time = time.time()
+            import_time = time.time() - start_time
+            _import_times[import_name or module_name] = import_time
+            
+            # Call the original function
             return func(*args, **kwargs)
-
         return wrapper
-
     return decorator
+
+
+def get_import_times() -> Dict[str, float]:
+    """Get a copy of the import timing data."""
+    return _import_times.copy()
+
+
+def print_import_times() -> None:
+    """Print timing information for lazy imports."""
+    if not _import_times:
+        print_info("No lazy imports have been performed yet.")
+        return
+
+    print_info("\nLazy Import Times:")
+    print_info("-" * 40)
+    for module, time_taken in sorted(
+        _import_times.items(), key=lambda x: x[1], reverse=True
+    ):
+        print_info(f"{module:<30} {time_taken:.3f}s")
+    print_info("-" * 40)
+    total_time = sum(_import_times.values())
+    print_info(f"Total lazy import time: {total_time:.3f}s")
+
+
+def clear_import_cache() -> None:
+    """Clear the import timing cache."""
+    _import_times.clear()
 
 
 # Pre-defined lazy imports for common heavy libraries
@@ -212,44 +203,18 @@ pepedp_ic9600_complexity = lazy_import(
 pepedp_img_to_embedding = lazy_import(
     "pepedp.embedding.embedding_class", "ImgToEmbedding"
 )
-pepedp_embedded_model = lazy_import("pepedp.embedding.enum", "EmbeddedModel")
+# Fix: Import the actual enum modules based on PepeDP source structure
+pepedp_embedded_model = lazy_import("pepedp.embedding.enum")
 pepedp_euclid_dist = lazy_import("pepedp.scripts.utils.distance", "euclid_dist")
 pepedp_cosine_dist = lazy_import("pepedp.scripts.utils.distance", "cosine_dist")
 pepedp_video_to_frame = lazy_import("pepedp.scripts.utils.video_to_frames", "VideoToFrame")
 pepedp_create_embedd = lazy_import("pepedp.scripts.utils.deduplicate", "create_embedd")
 pepedp_filtered_pairs = lazy_import("pepedp.scripts.utils.deduplicate", "filtered_pairs")
 pepedp_move_duplicate_files = lazy_import("pepedp.scripts.utils.deduplicate", "move_duplicate_files")
-pepedp_threshold_alg = lazy_import("pepedp.torch_enum", "ThresholdAlg")
+pepedp_threshold_alg = lazy_import("pepedp.torch_enum")
 
 # Deduplication
 imagededup = lazy_import("imagededup")
-
-
-def get_import_times() -> Dict[str, float]:
-    """Get timing information for lazy imports."""
-    return _import_times.copy()
-
-
-def print_import_times() -> None:
-    """Print timing information for lazy imports."""
-    if not _import_times:
-        print("No lazy imports have been performed yet.")
-        return
-
-    print("\nLazy Import Times:")
-    print("-" * 40)
-    for module, time_taken in sorted(
-        _import_times.items(), key=lambda x: x[1], reverse=True
-    ):
-        print(f"{module:<30} {time_taken:.3f}s")
-    print("-" * 40)
-    total_time = sum(_import_times.values())
-    print(f"Total lazy import time: {total_time:.3f}s")
-
-
-def clear_import_cache() -> None:
-    """Clear the import timing cache."""
-    _import_times.clear()
 
 
 # Convenience functions for common import patterns
@@ -330,18 +295,18 @@ def monitor_import_performance(func: Callable) -> Callable:
             total_new_time = sum(new_imports.values())
 
             if new_imports:
-                logger.info(
+                print_info(
                     f"Function {func.__name__} triggered imports: {new_imports}"
                 )
-                logger.info(f"Total new import time: {total_new_time:.3f}s")
+                print_info(f"Total new import time: {total_new_time:.3f}s")
 
             return result
 
         except Exception as e:
-            logger.error(f"Function {func.__name__} failed: {e}")
+            print_info(f"Function {func.__name__} failed: {e}")
             raise
         finally:
             function_time = time.time() - start_time
-            logger.debug(f"Function {func.__name__} took {function_time:.3f}s")
+            print_info(f"Function {func.__name__} took {function_time:.3f}s")
 
     return wrapper

@@ -1,112 +1,120 @@
-# This script merges all documentation files in docs/ into a single README_full.md and generates a hierarchical Table of Contents (toc.md).
-# It also copies the .cursorrules file to .cursor/rules/ directory for Cursor IDE integration.
-# To add new documentation files, update DOC_ORDER below and ensure navigation links are consistent.
+#!/usr/bin/env python3
+"""
+Documentation merger for Dataset Forge.
+
+This script merges all documentation files into a single comprehensive document.
+"""
 
 import os
-import sys
 import re
 import shutil
+from pathlib import Path
 
-# Always resolve docs/ relative to the project root (parent of this script)
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir))
-DOCS_DIR = os.path.join(PROJECT_ROOT, "docs")
-OUTPUT_FILE = os.path.join(DOCS_DIR, "README_full.md")
-TOC_FILE = os.path.join(DOCS_DIR, "toc.md")
-CURSORRULES_SOURCE = os.path.join(PROJECT_ROOT, ".cursorrules")
-CURSORRULES_DEST = os.path.join(PROJECT_ROOT, ".cursor", "rules", ".cursorrules")
-CURSORRULES_MDC_SOURCE = os.path.join(PROJECT_ROOT, "cursorrules.mdc")
-CURSORRULES_MDC_DEST = os.path.join(PROJECT_ROOT, ".cursor", "rules", "cursorrules.mdc")
+# Add project root to path
+project_root = Path(__file__).parent.parent
+import sys
+sys.path.insert(0, str(project_root))
 
-# Order of files to merge (edit as needed)
+from dataset_forge.utils.printing import print_info, print_success, print_warning, print_error
+
+# Configuration
+DOCS_DIR = "docs"
+OUTPUT_FILE = "docs/README_full.md"
+TOC_FILE = "docs/toc.md"
+
+# Documentation files in order
 DOC_ORDER = [
-    "README.md",  # Project landing page
-    "index.md",  # Documentation home
-    "getting_started.md",  # Install & setup
-    "special_installation.md",  # Special installation instructions
-    "features.md",  # Features overview
-    "TODO.md",  # TODO list
-    "usage.md",  # Usage guide
-    "advanced.md",  # Advanced features
-    "architecture.md",  # Project architecture
-    "troubleshooting.md",  # Troubleshooting & FAQ
-    "style_guide.md",  # Coding & style guide
-    "contributing.md",  # Contributing guide
-    "changelog.md",  # Changelog
-    "license.md",  # License
+    "index.md",
+    "getting_started.md",
+    "features.md",
+    "usage.md",
+    "advanced.md",
+    "architecture.md",
+    "contributing.md",
+    "style_guide.md",
+    "troubleshooting.md",
+    "special_installation.md",
+    "changelog.md",
+    "license.md",
 ]
 
-NAV_LINKS = (
-    "[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | "
-    "[Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | "
-    "[Style Guide](style_guide.md) | [Contributing](contributing.md) | [Changelog](changelog.md) | [ToC](toc.md)\n"
-)
+# Navigation links
+NAV_LINKS = """[← Back to README](../README.md) | [↑ Table of Contents](#dataset-forge-full-documentation) | [→ Next Section](getting_started.md)
+
+---
+
+"""
+
+# Cursorrules paths
+CURSORRULES_SOURCE = ".cursorrules"
+CURSORRULES_MDC_SOURCE = "cursorrules.mdc"
+CURSORRULES_DEST = ".cursor/rules/.cursorrules"
+CURSORRULES_MDC_DEST = ".cursor/rules/cursorrules.mdc"
 
 
-# Helper to create anchor links in GitHub style
-# (lowercase, spaces to -, remove non-alphanum except -)
 def anchor_link(text):
-    anchor = text.strip().lower()
-    anchor = re.sub(r"[\s]+", "-", anchor)
-    anchor = re.sub(r"[^a-z0-9\-]", "", anchor)
-    return anchor
+    """Convert text to anchor link format."""
+    # Remove special characters and convert spaces to hyphens
+    anchor = re.sub(r'[^\w\s-]', '', text.lower())
+    anchor = re.sub(r'[-\s]+', '-', anchor)
+    return anchor.strip('-')
 
 
-# Parse headings from a markdown file, return list of (level, text, anchor)
 def parse_headings(md_path):
+    """Parse markdown file and extract headings."""
     headings = []
-    with open(md_path, encoding="utf-8") as f:
-        for line in f:
-            m = re.match(r"^(#+) (.+)", line)
-            if m:
-                level = len(m.group(1))
-                text = m.group(2).strip()
-                anchor = anchor_link(text)
-                headings.append((level, text, anchor))
+    try:
+        with open(md_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            lines = content.split('\n')
+            for line in lines:
+                if line.startswith('#'):
+                    level = len(line) - len(line.lstrip('#'))
+                    title = line.lstrip('#').strip()
+                    if title:
+                        headings.append((level, title))
+    except Exception as e:
+        print_error(f"Error parsing {md_path}: {e}")
     return headings
 
 
-# Build hierarchical ToC for all docs
 def build_toc():
-    toc_lines = ["# Table of Contents\n"]
+    """Build table of contents from all documentation files."""
+    toc_lines = []
+    
     for doc in DOC_ORDER:
-        doc_path = os.path.join(DOCS_DIR, doc)
-        if not os.path.exists(doc_path):
-            continue
-        doc_headings = parse_headings(doc_path)
-        if not doc_headings:
-            continue
-        # Top-level entry for the file
-        main_title = (
-            doc_headings[0][1]
-            if doc_headings[0][0] == 1
-            else os.path.splitext(doc)[0].replace("_", " ").title()
-        )
-        toc_lines.append(f"- [{main_title}]({doc})")
-        prev_level = 1
-        for level, text, anchor in doc_headings[1:]:
-            indent = "  " * (level - 1)
-            toc_lines.append(f"{indent}- [{text}]({doc}#{anchor})")
-    return "\n".join(toc_lines) + "\n"
+        path = os.path.join(DOCS_DIR, doc)
+        if os.path.exists(path):
+            headings = parse_headings(path)
+            if headings:
+                # Add document title
+                doc_title = doc.replace('.md', '').replace('_', ' ').title()
+                toc_lines.append(f"\n## {doc_title}\n")
+                
+                # Add headings
+                for level, title in headings:
+                    indent = "  " * (level - 1)
+                    anchor = anchor_link(title)
+                    toc_lines.append(f"{indent}- [{title}](#{anchor})")
+    
+    return "\n".join(toc_lines)
 
 
 def strip_nav_links(content):
-    """Remove the navigation links from the top of a doc file."""
-    lines = content.splitlines()
-    # Remove the first line if it matches the nav links pattern
-    if lines and lines[0].startswith("[← Main README]"):
-        return "\n".join(lines[1:]).lstrip()
+    """Remove navigation links from content."""
+    # Remove the navigation links pattern
+    content = re.sub(r'\[← Back to README\].*?---\s*\n', '', content, flags=re.DOTALL)
     return content
 
 
 def update_cursorrules_mdc():
     """Update cursorrules.mdc with content from .cursorrules after the YAML block."""
     if not os.path.exists(CURSORRULES_SOURCE):
-        print(f"Warning: {CURSORRULES_SOURCE} not found, skipping cursorrules.mdc update.")
+        print_warning(f"{CURSORRULES_SOURCE} not found, skipping cursorrules.mdc update.")
         return False
     
     if not os.path.exists(CURSORRULES_MDC_SOURCE):
-        print(f"Warning: {CURSORRULES_MDC_SOURCE} not found, skipping cursorrules.mdc update.")
+        print_warning(f"{CURSORRULES_MDC_SOURCE} not found, skipping cursorrules.mdc update.")
         return False
     
     try:
@@ -131,7 +139,7 @@ def update_cursorrules_mdc():
                     break
         
         if yaml_end_index == -1:
-            print("Warning: Could not find YAML block end in cursorrules.mdc, skipping update.")
+            print_warning("Could not find YAML block end in cursorrules.mdc, skipping update.")
             return False
         
         # Reconstruct the file with YAML block + .cursorrules content
@@ -142,18 +150,18 @@ def update_cursorrules_mdc():
         with open(CURSORRULES_MDC_SOURCE, 'w', encoding='utf-8') as f:
             f.write(updated_content)
         
-        print(f"✅ cursorrules.mdc updated with .cursorrules content")
+        print_success(f"cursorrules.mdc updated with .cursorrules content")
         return True
         
     except Exception as e:
-        print(f"❌ Error updating cursorrules.mdc: {e}")
+        print_error(f"Error updating cursorrules.mdc: {e}")
         return False
 
 
 def copy_cursorrules():
     """Copy .cursorrules to .cursor/rules/ directory."""
     if not os.path.exists(CURSORRULES_SOURCE):
-        print(f"Warning: {CURSORRULES_SOURCE} not found, skipping cursorrules copy.")
+        print_warning(f"{CURSORRULES_SOURCE} not found, skipping cursorrules copy.")
         return False
     
     # Ensure the destination directory exists
@@ -161,17 +169,17 @@ def copy_cursorrules():
     
     try:
         shutil.copy2(CURSORRULES_SOURCE, CURSORRULES_DEST)
-        print(f"✅ .cursorrules copied to {CURSORRULES_DEST}")
+        print_success(f".cursorrules copied to {CURSORRULES_DEST}")
         return True
     except Exception as e:
-        print(f"❌ Error copying .cursorrules: {e}")
+        print_error(f"Error copying .cursorrules: {e}")
         return False
 
 
 def copy_cursorrules_mdc():
     """Copy cursorrules.mdc to .cursor/rules/ directory."""
     if not os.path.exists(CURSORRULES_MDC_SOURCE):
-        print(f"Warning: {CURSORRULES_MDC_SOURCE} not found, skipping cursorrules.mdc copy.")
+        print_warning(f"{CURSORRULES_MDC_SOURCE} not found, skipping cursorrules.mdc copy.")
         return False
     
     # Ensure the destination directory exists
@@ -179,10 +187,10 @@ def copy_cursorrules_mdc():
     
     try:
         shutil.copy2(CURSORRULES_MDC_SOURCE, CURSORRULES_MDC_DEST)
-        print(f"✅ cursorrules.mdc copied to {CURSORRULES_MDC_DEST}")
+        print_success(f"cursorrules.mdc copied to {CURSORRULES_MDC_DEST}")
         return True
     except Exception as e:
-        print(f"❌ Error copying cursorrules.mdc: {e}")
+        print_error(f"Error copying cursorrules.mdc: {e}")
         return False
 
 
@@ -197,34 +205,41 @@ def main():
     for doc in DOC_ORDER:
         path = os.path.join(DOCS_DIR, doc)
         if not os.path.exists(path):
-            print(f"Warning: {doc} not found, skipping.")
+            print_warning(f"{doc} not found, skipping.")
             continue
-        with open(path, encoding="utf-8") as f:
-            content = f.read()
-        content = strip_nav_links(content)
-        # Add a section header for clarity
-        section_title = os.path.splitext(doc)[0].replace("_", " ").title()
-        merged.append(f"\n# {section_title}\n\n")
-        merged.append(content)
-        merged.append("\n---\n")
+        
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Strip navigation links
+            content = strip_nav_links(content)
+            
+            # Add document content
+            merged.append(f"\n# {doc.replace('.md', '').replace('_', ' ').title()}\n\n")
+            merged.append(content)
+            merged.append("\n---\n")
+            
+        except Exception as e:
+            print_error(f"Error reading {doc}: {e}")
+            continue
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        f.write("\n".join(merged))
+    # Write merged content
+    try:
+        with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+            f.write(''.join(merged))
+        print_success(f"README_full.md and toc.md updated with hierarchical ToC.")
+    except Exception as e:
+        print_error(f"Error writing merged documentation: {e}")
+        return 1
 
-    with open(TOC_FILE, "w", encoding="utf-8") as f:
-        f.write(toc)
-
-    # Update cursorrules.mdc with .cursorrules content
+    # Update cursorrules files
     update_cursorrules_mdc()
-    
-    # Copy .cursorrules to .cursor/rules/
     copy_cursorrules()
-    
-    # Copy cursorrules.mdc to .cursor/rules/
     copy_cursorrules_mdc()
 
-    print(f"README_full.md and toc.md updated with hierarchical ToC.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    exit(main())

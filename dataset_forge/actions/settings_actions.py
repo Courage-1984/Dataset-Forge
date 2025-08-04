@@ -1,6 +1,13 @@
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.input_utils import get_folder_path
@@ -15,11 +22,11 @@ def settings_menu_action(hq_folder, lq_folder):
         print_section("Settings", char="-", color=Mocha.sky)
         print_info(f"Current HQ Folder: {hq_folder or 'Not Set'}")
         print_info(f"Current LQ Folder: {lq_folder or 'Not Set'}")
-        print("\n[1] Set HQ/LQ Folders")
-        print("[2] Parallel Processing Settings")
-        print("[3] User Preferences")
-        print("[4] System Information")
-        print("[0] Back to Main Menu")
+        print_info("\n[1] Set HQ/LQ Folders")
+        print_info("[2] Parallel Processing Settings")
+        print_info("[3] User Preferences")
+        print_info("[4] System Information")
+        print_info("[0] Back to Main Menu")
 
         choice = input("Choice: ").strip()
 
@@ -61,19 +68,19 @@ def configure_parallel_processing():
 
     while True:
         print_info("Current Settings:")
-        print(f"  Max Workers: {parallel_config['max_workers'] or 'Auto-detect'}")
-        print(f"  Processing Type: {parallel_config['processing_type']}")
-        print(f"  Use GPU: {parallel_config['use_gpu']}")
-        print(f"  GPU Memory Fraction: {parallel_config['gpu_memory_fraction']}")
-        print(f"  Chunk Size: {parallel_config['chunk_size']}")
-        print(f"  CPU Only: {parallel_config['cpu_only']}")
+        print_info(f"  Max Workers: {parallel_config['max_workers'] or 'Auto-detect'}")
+        print_info(f"  Processing Type: {parallel_config['processing_type']}")
+        print_info(f"  Use GPU: {parallel_config['use_gpu']}")
+        print_info(f"  GPU Memory Fraction: {parallel_config['gpu_memory_fraction']}")
+        print_info(f"  Chunk Size: {parallel_config['chunk_size']}")
+        print_info(f"  CPU Only: {parallel_config['cpu_only']}")
 
-        print("\n[1] Set Max Workers")
-        print("[2] Set Processing Type")
-        print("[3] Configure GPU Settings")
-        print("[4] Set Chunk Size")
-        print("[5] Reset to Defaults")
-        print("[0] Back to Settings")
+        print_info("\n[1] Set Max Workers")
+        print_info("[2] Set Processing Type")
+        print_info("[3] Configure GPU Settings")
+        print_info("[4] Set Chunk Size")
+        print_info("[5] Reset to Defaults")
+        print_info("[0] Back to Settings")
 
         choice = input("Choice: ").strip()
 
@@ -97,9 +104,9 @@ def set_max_workers():
     """Set the maximum number of workers for parallel processing."""
     print_info(f"Current CPU count: {os.cpu_count()}")
     print_info("Recommended settings:")
-    print(f"  - I/O bound tasks: {get_optimal_worker_count('io')}")
-    print(f"  - CPU bound tasks: {get_optimal_worker_count('cpu')}")
-    print(f"  - GPU tasks: {get_optimal_worker_count('gpu')}")
+    print_info(f"  - I/O bound tasks: {get_optimal_worker_count('io')}")
+    print_info(f"  - CPU bound tasks: {get_optimal_worker_count('cpu')}")
+    print_info(f"  - GPU tasks: {get_optimal_worker_count('gpu')}")
 
     value = input("Enter max workers (or 'auto' for auto-detect): ").strip().lower()
 
@@ -121,9 +128,9 @@ def set_max_workers():
 def set_processing_type():
     """Set the processing type for parallel operations."""
     print_info("Processing Types:")
-    print("  auto: Automatically choose based on task type")
-    print("  thread: Use threading (good for I/O bound tasks)")
-    print("  process: Use multiprocessing (good for CPU bound tasks)")
+    print_info("  auto: Automatically choose based on task type")
+    print_info("  thread: Use threading (good for I/O bound tasks)")
+    print_info("  process: Use multiprocessing (good for CPU bound tasks)")
 
     value = input("Enter processing type (auto/thread/process): ").strip().lower()
 
@@ -139,14 +146,14 @@ def set_processing_type():
 def configure_gpu_settings():
     """Configure GPU-related settings."""
     print_info("GPU Settings:")
-    print(f"  Current Use GPU: {parallel_config['use_gpu']}")
-    print(f"  Current GPU Memory Fraction: {parallel_config['gpu_memory_fraction']}")
-    print(f"  Current CPU Only: {parallel_config['cpu_only']}")
+    print_info(f"  Current Use GPU: {parallel_config['use_gpu']}")
+    print_info(f"  Current GPU Memory Fraction: {parallel_config['gpu_memory_fraction']}")
+    print_info(f"  Current CPU Only: {parallel_config['cpu_only']}")
 
-    print("\n[1] Toggle GPU Usage")
-    print("[2] Set GPU Memory Fraction")
-    print("[3] Toggle CPU Only Mode")
-    print("[0] Back")
+    print_info("\n[1] Toggle GPU Usage")
+    print_info("[2] Set GPU Memory Fraction")
+    print_info("[3] Toggle CPU Only Mode")
+    print_info("[0] Back")
 
     choice = input("Choice: ").strip()
 
@@ -209,29 +216,29 @@ def configure_user_preferences():
 
     while True:
         print_info("Current Preferences:")
-        print(f"  Play Audio: {user_preferences['play_audio']}")
-        print(f"  Show Progress: {user_preferences['show_progress']}")
-        print(f"  Verbose Output: {user_preferences['verbose_output']}")
-        print(f"  Auto Save Reports: {user_preferences['auto_save_reports']}")
-        print(f"  Default Batch Size: {user_preferences['default_batch_size']}")
-        print(f"  Default Quality: {user_preferences['default_quality']}")
-        print(f"  Default Tile Size: {user_preferences['default_tile_size']}")
-        print(
+        print_info(f"  Play Audio: {user_preferences['play_audio']}")
+        print_info(f"  Show Progress: {user_preferences['show_progress']}")
+        print_info(f"  Verbose Output: {user_preferences['verbose_output']}")
+        print_info(f"  Auto Save Reports: {user_preferences['auto_save_reports']}")
+        print_info(f"  Default Batch Size: {user_preferences['default_batch_size']}")
+        print_info(f"  Default Quality: {user_preferences['default_quality']}")
+        print_info(f"  Default Tile Size: {user_preferences['default_tile_size']}")
+        print_info(
             f"  BHI Blockiness Threshold: {user_preferences['bhi_blockiness_threshold']}"
         )
-        print(f"  BHI HyperIQA Threshold: {user_preferences['bhi_hyperiqa_threshold']}")
-        print(f"  BHI IC9600 Threshold: {user_preferences['bhi_ic9600_threshold']}")
+        print_info(f"  BHI HyperIQA Threshold: {user_preferences['bhi_hyperiqa_threshold']}")
+        print_info(f"  BHI IC9600 Threshold: {user_preferences['bhi_ic9600_threshold']}")
 
-        print("\n[1] Toggle Audio")
-        print("[2] Toggle Progress Display")
-        print("[3] Toggle Verbose Output")
-        print("[4] Toggle Auto Save Reports")
-        print("[5] Set Default Batch Size")
-        print("[6] Set Default Quality")
-        print("[7] Set Default Tile Size")
-        print("[8] Configure BHI Filtering Thresholds")
-        print("[9] Reset to Defaults")
-        print("[0] Back to Settings")
+        print_info("\n[1] Toggle Audio")
+        print_info("[2] Toggle Progress Display")
+        print_info("[3] Toggle Verbose Output")
+        print_info("[4] Toggle Auto Save Reports")
+        print_info("[5] Set Default Batch Size")
+        print_info("[6] Set Default Quality")
+        print_info("[7] Set Default Tile Size")
+        print_info("[8] Configure BHI Filtering Thresholds")
+        print_info("[9] Reset to Defaults")
+        print_info("[0] Back to Settings")
 
         choice = input("Choice: ").strip()
 
@@ -303,35 +310,35 @@ def configure_bhi_thresholds():
 
     while True:
         print_info("Current BHI Thresholds:")
-        print(f"  Blockiness: {user_preferences['bhi_blockiness_threshold']}")
-        print(f"  HyperIQA: {user_preferences['bhi_hyperiqa_threshold']}")
-        print(f"  IC9600: {user_preferences['bhi_ic9600_threshold']}")
+        print_info(f"  Blockiness: {user_preferences['bhi_blockiness_threshold']}")
+        print_info(f"  HyperIQA: {user_preferences['bhi_hyperiqa_threshold']}")
+        print_info(f"  IC9600: {user_preferences['bhi_ic9600_threshold']}")
 
         print_info("\nSuggested Threshold Presets:")
         suggested = user_preferences["bhi_suggested_thresholds"]
-        print(
+        print_info(
             f"  Conservative: Blockiness={suggested['conservative']['blockiness']}, "
             f"HyperIQA={suggested['conservative']['hyperiqa']}, "
             f"IC9600={suggested['conservative']['ic9600']}"
         )
-        print(
+        print_info(
             f"  Moderate: Blockiness={suggested['moderate']['blockiness']}, "
             f"HyperIQA={suggested['moderate']['hyperiqa']}, "
             f"IC9600={suggested['moderate']['ic9600']}"
         )
-        print(
+        print_info(
             f"  Aggressive: Blockiness={suggested['aggressive']['blockiness']}, "
             f"HyperIQA={suggested['aggressive']['hyperiqa']}, "
             f"IC9600={suggested['aggressive']['ic9600']}"
         )
 
-        print("\n[1] Set Blockiness Threshold")
-        print("[2] Set HyperIQA Threshold")
-        print("[3] Set IC9600 Threshold")
-        print("[4] Use Conservative Preset")
-        print("[5] Use Moderate Preset")
-        print("[6] Use Aggressive Preset")
-        print("[0] Back to User Preferences")
+        print_info("\n[1] Set Blockiness Threshold")
+        print_info("[2] Set HyperIQA Threshold")
+        print_info("[3] Set IC9600 Threshold")
+        print_info("[4] Use Conservative Preset")
+        print_info("[5] Use Moderate Preset")
+        print_info("[6] Use Aggressive Preset")
+        print_info("[0] Back to User Preferences")
 
         choice = input("Choice: ").strip()
 

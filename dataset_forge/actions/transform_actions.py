@@ -19,6 +19,15 @@ from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 
 
 @monitor_all("apply_transformation_to_image")
@@ -72,7 +81,7 @@ def apply_transformation_to_image(
                 img_array = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
                 img = Image.fromarray(img_array)
             else:
-                print(f"Unknown transformation type: {transform_type}")
+                print_error(f"Unknown transformation type: {transform_type}")
                 return False
 
             # Save image
@@ -86,7 +95,7 @@ def apply_transformation_to_image(
             return True
 
     except Exception as e:
-        print(f"Error applying {transform_type} to {input_path}: {e}")
+        print_error(f"Error applying {transform_type} to {input_path}: {e}")
         return False
 
 
@@ -141,18 +150,16 @@ def transform_single_pair(
 @monitor_all("transform_dataset", critical_on_error=True)
 def transform_dataset(hq_folder, lq_folder):
     """Transform dataset with parallel processing."""
-    print("\n" + "=" * 30)
-    print("  TRANSFORM DATASET")
-    print("=" * 30)
+    print_header("TRANSFORM DATASET", char="=", color=Mocha.lavender)
 
     # Get transformation type
-    print("\nAvailable transformations:")
-    print("1. brightness - Adjust image brightness")
-    print("2. contrast - Adjust image contrast")
-    print("3. saturation - Adjust color saturation")
-    print("4. sharpness - Adjust image sharpness")
-    print("5. blur - Apply Gaussian blur")
-    print("6. hue - Adjust hue (color shift)")
+    print_section("Available transformations", char="-", color=Mocha.lavender)
+    print_info("1. brightness - Adjust image brightness")
+    print_info("2. contrast - Adjust image contrast")
+    print_info("3. saturation - Adjust color saturation")
+    print_info("4. sharpness - Adjust image sharpness")
+    print_info("5. blur - Apply Gaussian blur")
+    print_info("6. hue - Adjust hue (color shift)")
 
     transform_choice = input("\nSelect transformation (1-6): ").strip()
 
@@ -166,7 +173,7 @@ def transform_dataset(hq_folder, lq_folder):
     }
 
     if transform_choice not in transform_map:
-        print("Invalid choice.")
+        print_error("Invalid choice.")
         return
 
     selected_transform = transform_map[transform_choice]
@@ -184,7 +191,7 @@ def transform_dataset(hq_folder, lq_folder):
         dest_hq_dir = get_destination_path("Enter destination HQ folder: ")
         dest_lq_dir = get_destination_path("Enter destination LQ folder: ")
         if not dest_hq_dir or not dest_lq_dir:
-            print("Operation aborted as destination paths were not provided.")
+            print_error("Operation aborted as destination paths were not provided.")
             return
         os.makedirs(dest_hq_dir, exist_ok=True)
         os.makedirs(dest_lq_dir, exist_ok=True)
@@ -195,10 +202,10 @@ def transform_dataset(hq_folder, lq_folder):
     matching_files = sorted(hq_files & lq_files)
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found.")
+        print_warning("No matching HQ/LQ pairs found.")
         return
 
-    print(f"\nFound {len(matching_files)} matching pairs to transform.")
+    print_info(f"\nFound {len(matching_files)} matching pairs to transform.")
 
     # Prepare pair information
     pairs = []
@@ -230,17 +237,15 @@ def transform_dataset(hq_folder, lq_folder):
     successful = sum(1 for result in results if result)
     failed = len(results) - successful
 
-    print(f"\nTransformation complete:")
-    print(f"  Successful pairs: {successful}")
-    print(f"  Failed pairs: {failed}")
+    print_section("Transformation complete", char="-", color=Mocha.lavender)
+    print_info(f"  Successful pairs: {successful}")
+    print_info(f"  Failed pairs: {failed}")
 
     # Log operation
     log_operation(
         "transform_dataset",
         f"{selected_transform}={value}, {operation}, {successful}/{len(pairs)} pairs",
     )
-
-    from dataset_forge.utils.printing import print_success
 
     print_success("Dataset transformation complete!")
     play_done_sound()
@@ -249,18 +254,16 @@ def transform_dataset(hq_folder, lq_folder):
 @monitor_all("transform_single_folder", critical_on_error=True)
 def transform_single_folder(folder_path: str):
     """Transform images in a single folder with parallel processing."""
-    print("\n" + "=" * 30)
-    print("  TRANSFORM SINGLE FOLDER")
-    print("=" * 30)
+    print_header("TRANSFORM SINGLE FOLDER", char="=", color=Mocha.lavender)
 
     # Get transformation type
-    print("\nAvailable transformations:")
-    print("1. brightness - Adjust image brightness")
-    print("2. contrast - Adjust image contrast")
-    print("3. saturation - Adjust color saturation")
-    print("4. sharpness - Adjust image sharpness")
-    print("5. blur - Apply Gaussian blur")
-    print("6. hue - Adjust hue (color shift)")
+    print_section("Available transformations", char="-", color=Mocha.lavender)
+    print_info("1. brightness - Adjust image brightness")
+    print_info("2. contrast - Adjust image contrast")
+    print_info("3. saturation - Adjust color saturation")
+    print_info("4. sharpness - Adjust image sharpness")
+    print_info("5. blur - Apply Gaussian blur")
+    print_info("6. hue - Adjust hue (color shift)")
 
     transform_choice = input("\nSelect transformation (1-6): ").strip()
 
@@ -274,7 +277,7 @@ def transform_single_folder(folder_path: str):
     }
 
     if transform_choice not in transform_map:
-        print("Invalid choice.")
+        print_error("Invalid choice.")
         return
 
     selected_transform = transform_map[transform_choice]
@@ -290,7 +293,7 @@ def transform_single_folder(folder_path: str):
     if operation != "inplace":
         dest_dir = get_destination_path("Enter destination folder: ")
         if not dest_dir:
-            print("Operation aborted as destination path was not provided.")
+            print_error("Operation aborted as destination path was not provided.")
             return
         os.makedirs(dest_dir, exist_ok=True)
 
@@ -298,10 +301,10 @@ def transform_single_folder(folder_path: str):
     image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
 
     if not image_files:
-        print("No image files found in folder.")
+        print_warning("No image files found in folder.")
         return
 
-    print(f"\nFound {len(image_files)} images to transform.")
+    print_info(f"\nFound {len(image_files)} images to transform.")
 
     # Prepare image paths
     image_paths = [os.path.join(folder_path, f) for f in image_files]
@@ -327,9 +330,9 @@ def transform_single_folder(folder_path: str):
     successful = sum(1 for result in results if result)
     failed = len(results) - successful
 
-    print(f"\nTransformation complete:")
-    print(f"  Successful images: {successful}")
-    print(f"  Failed images: {failed}")
+    print_section("Transformation complete", char="-", color=Mocha.lavender)
+    print_info(f"  Successful images: {successful}")
+    print_info(f"  Failed images: {failed}")
 
     # Log operation
     log_operation(
@@ -363,10 +366,10 @@ def batch_transform_with_parameters(
     image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
 
     if not image_files:
-        print("No image files found in folder.")
+        print_warning("No image files found in folder.")
         return
 
-    print(
+    print_info(
         f"Found {len(image_files)} images to transform with {len(parameters)} parameters."
     )
 
@@ -418,19 +421,19 @@ def batch_transform_with_parameters(
     successful = sum(1 for result in results if result)
     failed = len(results) - successful
 
-    print(f"\nBatch transformation complete:")
-    print(f"  Total operations: {len(combinations)}")
-    print(f"  Successful: {successful}")
-    
-    print_success("Batch transformation complete!")
-    play_done_sound()
-    print(f"  Failed: {failed}")
+    print_section("Batch transformation complete", char="-", color=Mocha.lavender)
+    print_info(f"  Total operations: {len(combinations)}")
+    print_info(f"  Successful: {successful}")
+    print_info(f"  Failed: {failed}")
 
     # Log operation
     log_operation(
         "batch_transform",
         f"{transform_type}, {len(parameters)} params, {operation}, {successful}/{len(combinations)} operations",
     )
+
+    print_success("Batch transformation complete!")
+    play_done_sound()
 
 
 @monitor_all("apply_custom_transformation", critical_on_error=True)
@@ -455,10 +458,10 @@ def apply_custom_transformation(
     image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
 
     if not image_files:
-        print("No image files found in folder.")
+        print_warning("No image files found in folder.")
         return
 
-    print(f"Found {len(image_files)} images to transform.")
+    print_info(f"Found {len(image_files)} images to transform.")
 
     # Create destination directory if needed
     if operation != "inplace" and dest_dir:
@@ -495,7 +498,7 @@ def apply_custom_transformation(
             return True
 
         except Exception as e:
-            print(f"Error applying custom transformation to {image_path}: {e}")
+            print_error(f"Error applying custom transformation to {image_path}: {e}")
             return False
 
     # Process images in parallel
@@ -510,9 +513,9 @@ def apply_custom_transformation(
     successful = sum(1 for result in results if result)
     failed = len(results) - successful
 
-    print(f"\nCustom transformation complete:")
-    print(f"  Successful images: {successful}")
-    print(f"  Failed images: {failed}")
+    print_section("Custom transformation complete", char="-", color=Mocha.lavender)
+    print_info(f"  Successful images: {successful}")
+    print_info(f"  Failed images: {failed}")
 
     # Log operation
     log_operation(
@@ -1525,7 +1528,7 @@ def rotate_image_menu():
 
 
 def shuffle_images_menu():
-    print("DEBUG: Entered shuffle_images_menu")
+    print_info("DEBUG: Entered shuffle_images_menu")
     try:
         from dataset_forge.utils.input_utils import (
             get_path_with_history,
@@ -1550,14 +1553,14 @@ def shuffle_images_menu():
         print_info("  2. \U0001f5c1 Single folder")
         print_info("  0. \u274c Cancel")
         mode = input("\U0001f3af Select mode: ").strip()
-        print(f"DEBUG: mode={{mode!r}}")
+        print_info(f"DEBUG: mode={{mode!r}}")
         if mode == "0":
             input("Press Enter to return to the menu...")
             return
         elif mode == "1":
             hq_folder = get_path_with_history("Enter HQ folder path:")
             lq_folder = get_path_with_history("Enter LQ folder path:")
-            print(f"DEBUG: hq_folder={{hq_folder!r}}, lq_folder={{lq_folder!r}}")
+            print_info(f"DEBUG: hq_folder={{hq_folder!r}}, lq_folder={{lq_folder!r}}")
             if not hq_folder or not lq_folder:
                 print_error("Both HQ and LQ folder paths are required.")
                 input("Press Enter to return to the menu...")
@@ -1566,7 +1569,7 @@ def shuffle_images_menu():
             input("Press Enter to return to the menu...")
         elif mode == "2":
             folder = get_path_with_history("Enter folder path:")
-            print(f"DEBUG: folder={{folder!r}}")
+            print_info(f"DEBUG: folder={{folder!r}}")
             if not folder or not os.path.isdir(folder):
                 print_error("Input path must be a valid directory.")
                 input("Press Enter to return to the menu...")
@@ -1588,7 +1591,7 @@ def shuffle_images_menu():
 
 
 def shuffle_images_single_folder(folder_path):
-    print(
+    print_info(
         f"DEBUG: Entered shuffle_images_single_folder with folder_path={{folder_path!r}}"
     )
     try:
@@ -1604,19 +1607,19 @@ def shuffle_images_single_folder(folder_path):
         import shutil
 
         image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
-        print(f"DEBUG: image_files={{image_files}}")
+        print_info(f"DEBUG: image_files={{image_files}}")
         if not image_files:
             print_error("No image files found in the folder.")
             return
         print_info(f"Found {len(image_files)} images to shuffle and rename.")
         operation = get_file_operation_choice()
-        print(f"DEBUG: operation={{operation!r}}")
+        print_info(f"DEBUG: operation={{operation!r}}")
         output_dir = folder_path
         if operation != "inplace":
             output_dir = get_destination_path(
                 "Enter destination folder for shuffled images:"
             )
-            print(f"DEBUG: output_dir={{output_dir!r}}")
+            print_info(f"DEBUG: output_dir={{output_dir!r}}")
             if not output_dir:
                 print_error(
                     f"Operation aborted as no destination path was provided for {operation}."
@@ -1632,7 +1635,7 @@ def shuffle_images_single_folder(folder_path):
         # Shuffle file order
         shuffled_files = list(image_files)
         random.shuffle(shuffled_files)
-        print(f"DEBUG: shuffled_files={{shuffled_files}}")
+        print_info(f"DEBUG: shuffled_files={{shuffled_files}}")
 
         # Temporary renaming for inplace shuffle to avoid collisions
         temp_suffix = "_shuffletemp_" + str(random.randint(10000, 99999))
@@ -1675,7 +1678,7 @@ def shuffle_images_single_folder(folder_path):
                         f"Error {operation}ing file {orig_name} to destination: {e}"
                     )
 
-        print(f"DEBUG: files_in_final_location={{files_in_final_location}}")
+        print_info(f"DEBUG: files_in_final_location={{files_in_final_location}}")
         print_info("\nStage 2: Renaming files to final shuffled order...")
         for idx, (current_path, ext) in enumerate(
             tqdm(files_in_final_location, desc="Final Renaming")

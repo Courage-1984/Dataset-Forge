@@ -1,47 +1,32 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-tools/launcher.py - Tools Launcher for Dataset Forge
+Tools Launcher for Dataset Forge
 
-This script provides a menu-driven interface to launch various development tools
-in the ./tools/ directory. It automatically discovers available tools and
-provides a user-friendly selection interface.
-
-Usage:
-    python tools/launcher.py
-    python tools/launcher.py [tool_name]
-
-Features:
-    - Automatic tool discovery from ./tools/ directory
-    - Menu-driven selection interface
-    - Direct tool execution with command-line arguments
-    - Comprehensive help and documentation
-    - Follows Dataset Forge patterns and conventions
+This script provides a menu-driven interface to run various development tools.
 """
 
 import os
 import sys
 import subprocess
-import importlib.util
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, List, Optional
 
-# Add project root to path for imports
-SCRIPT_DIR = Path(__file__).parent
-PROJECT_ROOT = SCRIPT_DIR.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
 try:
-    from dataset_forge.utils.menu import show_menu, handle_global_command
     from dataset_forge.utils.printing import (
-        print_header,
         print_info,
         print_success,
         print_warning,
         print_error,
+        print_header,
         print_section,
     )
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.audio_utils import play_error_sound
+    from dataset_forge.utils.menu import show_menu, handle_global_command
 except ImportError:
     # Fallback for when running outside Dataset Forge environment
     def print_header(msg: str):
@@ -62,7 +47,7 @@ except ImportError:
         print(f"[ERROR] {msg}")
     
     def print_section(msg: str):
-        print(f"\n--- {msg} ---")
+        print_info(f"\n--- {msg} ---")
     
     class Mocha:
         lavender = "\033[95m"
@@ -78,16 +63,16 @@ except ImportError:
     def show_menu(title, options, color, current_menu="", menu_context=None):
         print_header(title)
         for key, (description, _) in options.items():
-            print(f"{key}. {description}")
+            print_info(f"{key}. {description}")
         return input(f"\nSelect option (0 to exit): ").strip()
     
     def handle_global_command(command, current_menu="", menu_context=None, pause=True):
         if command and command.lower() in ["help", "h", "?"]:
             print_section("Help")
-            print("Available commands:")
-            print("- help, h, ?: Show this help")
-            print("- quit, exit, q: Exit the launcher")
-            print("- 0: Go back/exit")
+            print_info("Available commands:")
+            print_info("- help, h, ?: Show this help")
+            print_info("- quit, exit, q: Exit the launcher")
+            print_info("- 0: Go back/exit")
             if pause:
                 input("\nPress Enter to continue...")
             return True
@@ -180,6 +165,7 @@ class ToolsLauncher:
             "log_current_menu.py": "Menu hierarchy auditing and analysis tool",
             "print_zsteg_env.py": "Environment checker for zsteg tool",
             "check_mocha_theming.py": "Check Catppuccin Mocha theming consistency across codebase",
+            "find_alpha_images.py": "Find images with alpha channels in directories",
         }
         
         for file_path in self.tools_dir.glob("*.py"):
@@ -220,7 +206,7 @@ class ToolsLauncher:
         
         try:
             # Run the tool
-            result = subprocess.run(cmd, cwd=PROJECT_ROOT)
+            result = subprocess.run(cmd, cwd=project_root)
             
             if result.returncode == 0:
                 print_success(f"Tool '{tool_name}' completed successfully")

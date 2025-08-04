@@ -9,7 +9,7 @@ Sanitize Images Actions
 
 import os
 import shutil
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from dataset_forge.actions import exif_scrubber_actions
 from dataset_forge.utils.image_ops import AlphaRemover
 from dataset_forge.utils.progress_utils import tqdm
@@ -18,6 +18,8 @@ from dataset_forge.utils.printing import (
     print_success,
     print_warning,
     print_error,
+    print_header,
+    print_section,
 )
 from dataset_forge.utils.history_log import log_operation
 import tempfile
@@ -30,7 +32,6 @@ import concurrent.futures
 import uuid
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.utils.input_utils import ask_yes_no
 from dataset_forge.utils.color import Mocha
@@ -38,6 +39,7 @@ from dataset_forge.utils.color import Mocha
 import subprocess
 from PIL import Image
 import os
+
 
 def remove_metadata(input_path: str, output_path: str) -> bool:
     """
@@ -57,6 +59,7 @@ def remove_metadata(input_path: str, output_path: str) -> bool:
     except Exception:
         return False
 
+
 def convert_to_png(input_path: str, output_path: str) -> bool:
     """
     Convert an image to PNG format.
@@ -74,6 +77,7 @@ def convert_to_png(input_path: str, output_path: str) -> bool:
         return True
     except Exception:
         return False
+
 
 def remove_alpha(input_path: str, output_path: str) -> bool:
     """
@@ -99,6 +103,7 @@ def remove_alpha(input_path: str, output_path: str) -> bool:
         print_error(f"remove_alpha failed: {e}")
         return False
 
+
 def run_steghide_check(input_path: str) -> dict:
     """
     Run steghide to check for hidden data in an image.
@@ -116,6 +121,7 @@ def run_steghide_check(input_path: str) -> dict:
     except Exception as e:
         return {"error": str(e)}
 
+
 def run_zsteg_check(input_path: str) -> dict:
     """
     Run zsteg to check for hidden data in a PNG image.
@@ -132,6 +138,7 @@ def run_zsteg_check(input_path: str) -> dict:
         return {"result": result.stdout}
     except Exception as e:
         return {"error": str(e)}
+
 
 SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".tif", ".tiff", ".bmp")
 
@@ -417,21 +424,67 @@ def sanitize_images(
                 )
                 n = len(files)
                 padding = len(str(n))
-                temp_names = []
-                for idx, fname in enumerate(files, 1):
-                    ext = os.path.splitext(fname)[1].lower()
-                    new_name = f"{str(idx).zfill(padding)}{ext}"
-                    temp_names.append((fname, new_name))
+
+                # Two-phase approach: first rename all to temporary names, then to final names
+                temp_renames = []
+                final_renames = []
+
+                # Phase 1: Create temporary names and plan final names
+                for idx, filename in enumerate(files, 1):
+                    ext = os.path.splitext(filename)[1].lower()
+                    final_name = f"{str(idx).zfill(padding)}{ext}"
+                    temp_name = f"temp_{uuid.uuid4().hex[:12]}{ext}"
+
+                    src = os.path.join(folder, filename)
+                    temp_path = os.path.join(folder, temp_name)
+                    final_path = os.path.join(folder, final_name)
+
+                    temp_renames.append((src, temp_path))
+                    final_renames.append((temp_path, final_path))
+
                 print_info(f"Batch renaming in {folder}...")
-                for old, new in tqdm(
-                    temp_names, desc=f"Rename {os.path.basename(folder)}"
+
+                # Phase 2: Execute temporary renames
+                for src, temp_path in tqdm(
+                    temp_renames, desc=f"Rename to temp {os.path.basename(folder)}"
                 ):
-                    src = os.path.join(folder, old)
-                    dst = os.path.join(folder, new)
                     if not dry_run:
-                        os.rename(src, dst)
+                        try:
+                            os.rename(src, temp_path)
+                        except FileExistsError:
+                            # If temp file exists, use a unique name
+                            base, ext = os.path.splitext(temp_path)
+                            counter = 1
+                            while os.path.exists(temp_path):
+                                temp_path = os.path.join(
+                                    folder, f"{base}_{counter}{ext}"
+                                )
+                                counter += 1
+                            os.rename(src, temp_path)
                     else:
-                        print_info(f"[Dry run] Would rename {src} -> {dst}")
+                        print_info(f"[Dry run] Would rename {src} -> {temp_path}")
+
+                # Phase 3: Execute final renames
+                for temp_path, final_path in tqdm(
+                    final_renames, desc=f"Rename to final {os.path.basename(folder)}"
+                ):
+                    if not dry_run:
+                        try:
+                            os.rename(temp_path, final_path)
+                        except FileExistsError:
+                            # If final name exists, use a unique name
+                            base, ext = os.path.splitext(final_path)
+                            counter = 1
+                            while os.path.exists(final_path):
+                                final_path = os.path.join(
+                                    folder, f"{base}_{counter}{ext}"
+                                )
+                                counter += 1
+                            os.rename(temp_path, final_path)
+                    else:
+                        print_info(
+                            f"[Dry run] Would rename {temp_path} -> {final_path}"
+                        )
 
             if is_pair:
                 hq_files = sorted(
@@ -450,17 +503,106 @@ def sanitize_images(
                 )
                 n = min(len(hq_files), len(lq_files))
                 padding = len(str(n))
-                for idx in range(n):
-                    for folder, files in zip(tempA_folders, [hq_files, lq_files]):
-                        old = files[idx]
-                        ext = os.path.splitext(old)[1].lower()
-                        new = f"{str(idx+1).zfill(padding)}{ext}"
-                        src = os.path.join(folder, old)
-                        dst = os.path.join(folder, new)
-                        if not dry_run:
-                            os.rename(src, dst)
-                        else:
-                            print_info(f"[Dry run] Would rename {src} -> {dst}")
+
+                # Two-phase approach for HQ/LQ folders
+                hq_temp_renames = []
+                lq_temp_renames = []
+                hq_final_renames = []
+                lq_final_renames = []
+
+                # Phase 1: Create temporary names and plan final names
+                for idx, filename in enumerate(hq_files[:n], 1):
+                    ext = os.path.splitext(filename)[1].lower()
+                    final_name = f"{str(idx).zfill(padding)}{ext}"
+                    temp_name = f"temp_{uuid.uuid4().hex[:12]}{ext}"
+
+                    hq_src = os.path.join(tempA_folders[0], filename)
+                    lq_src = os.path.join(tempA_folders[1], filename)
+                    hq_temp_path = os.path.join(tempA_folders[0], temp_name)
+                    lq_temp_path = os.path.join(tempA_folders[1], temp_name)
+                    hq_final_path = os.path.join(tempA_folders[0], final_name)
+                    lq_final_path = os.path.join(tempA_folders[1], final_name)
+
+                    hq_temp_renames.append((hq_src, hq_temp_path))
+                    lq_temp_renames.append((lq_src, lq_temp_path))
+                    hq_final_renames.append((hq_temp_path, hq_final_path))
+                    lq_final_renames.append((lq_temp_path, lq_final_path))
+
+                # Phase 2: Execute temporary renames
+                print_info("Phase 1: Renaming to temporary names...")
+                for hq_src, hq_temp_path in hq_temp_renames:
+                    if not dry_run:
+                        try:
+                            os.rename(hq_src, hq_temp_path)
+                        except FileExistsError:
+                            # If temp file exists, use a unique name
+                            base, ext = os.path.splitext(hq_temp_path)
+                            counter = 1
+                            while os.path.exists(hq_temp_path):
+                                hq_temp_path = os.path.join(
+                                    tempA_folders[0], f"{base}_{counter}{ext}"
+                                )
+                                counter += 1
+                            os.rename(hq_src, hq_temp_path)
+                    else:
+                        print_info(f"[Dry run] Would rename {hq_src} -> {hq_temp_path}")
+
+                for lq_src, lq_temp_path in lq_temp_renames:
+                    if not dry_run:
+                        try:
+                            os.rename(lq_src, lq_temp_path)
+                        except FileExistsError:
+                            # If temp file exists, use a unique name
+                            base, ext = os.path.splitext(lq_temp_path)
+                            counter = 1
+                            while os.path.exists(lq_temp_path):
+                                lq_temp_path = os.path.join(
+                                    tempA_folders[1], f"{base}_{counter}{ext}"
+                                )
+                                counter += 1
+                            os.rename(lq_src, lq_temp_path)
+                    else:
+                        print_info(f"[Dry run] Would rename {lq_src} -> {lq_temp_path}")
+
+                # Phase 3: Execute final renames
+                print_info("Phase 2: Renaming to final names...")
+                for hq_temp_path, hq_final_path in hq_final_renames:
+                    if not dry_run:
+                        try:
+                            os.rename(hq_temp_path, hq_final_path)
+                        except FileExistsError:
+                            # If final name exists, use a unique name
+                            base, ext = os.path.splitext(hq_final_path)
+                            counter = 1
+                            while os.path.exists(hq_final_path):
+                                hq_final_path = os.path.join(
+                                    tempA_folders[0], f"{base}_{counter}{ext}"
+                                )
+                                counter += 1
+                            os.rename(hq_temp_path, hq_final_path)
+                    else:
+                        print_info(
+                            f"[Dry run] Would rename {hq_temp_path} -> {hq_final_path}"
+                        )
+
+                for lq_temp_path, lq_final_path in lq_final_renames:
+                    if not dry_run:
+                        try:
+                            os.rename(lq_temp_path, lq_final_path)
+                        except FileExistsError:
+                            # If final name exists, use a unique name
+                            base, ext = os.path.splitext(lq_final_path)
+                            counter = 1
+                            while os.path.exists(lq_final_path):
+                                lq_final_path = os.path.join(
+                                    tempA_folders[1], f"{base}_{counter}{ext}"
+                                )
+                                counter += 1
+                            os.rename(lq_temp_path, lq_final_path)
+                    else:
+                        print_info(
+                            f"[Dry run] Would rename {lq_temp_path} -> {lq_final_path}"
+                        )
             else:
                 batch_rename_sequential(tempA_folders[0])
         else:
@@ -554,14 +696,25 @@ def sanitize_images(
         remove_alpha = ask_yes_no("Remove transparency (alpha channel)?", default=False)
         summary["🧊 Remove Alpha"] = "Run" if remove_alpha else "Skipped"
         if remove_alpha:
-            print_info("Removing transparency in tempB (parallel)...")
+            print_info("🔍 First, scanning for images with alpha channels...")
 
             def remove_alpha_one(fpath):
                 if not dry_run:
                     remover = AlphaRemover()
                     success, result = remover.process(fpath, output_path=fpath)
                     if not success:
-                        print_warning(f"Failed to remove alpha from {fpath}: {result}")
+                        # Check if this is just an informational message about no alpha channel
+                        if (
+                            "No alpha channel to remove" in result
+                            and "already processed" in result
+                        ):
+                            print_info(f"✓ {os.path.basename(fpath)}: {result}")
+                        else:
+                            print_warning(
+                                f"Failed to remove alpha from {fpath}: {result}"
+                            )
+                    else:
+                        print_success(f"✓ Removed alpha from {os.path.basename(fpath)}")
                 else:
                     print_info(f"[Dry run] Would remove alpha: {fpath}")
 
@@ -569,11 +722,34 @@ def sanitize_images(
                 if not os.path.exists(tempB):
                     print_warning(f"Folder does not exist: {tempB}")
                     continue
-                files = [
-                    os.path.join(tempB, f)
-                    for f in os.listdir(tempB)
-                    if f.lower().endswith(".png")
-                ]
+
+                # First, scan for images with alpha channels
+                print_info(
+                    f"🔍 Scanning {os.path.basename(tempB)} for images with alpha channels..."
+                )
+                images_with_alpha = find_images_with_alpha(tempB)
+
+                if not images_with_alpha:
+                    print_success(
+                        f"✓ No images with alpha channels found in {os.path.basename(tempB)}"
+                    )
+                    continue
+
+                print_success(
+                    f"✓ Found {len(images_with_alpha)} images with alpha channels in {os.path.basename(tempB)}"
+                )
+
+                # Show the files that will be processed
+                if not dry_run:
+                    print_info("📋 Images to process:")
+                    for img_path in images_with_alpha:
+                        print_info(f"  • {os.path.basename(img_path)}")
+
+                # Now process only the images with alpha channels
+                print_info(
+                    f"🧊 Removing alpha channels from {len(images_with_alpha)} images..."
+                )
+
                 import threading
 
                 thread = threading.Thread(target=lambda: None)
@@ -583,8 +759,8 @@ def sanitize_images(
                 ) as executor:
                     list(
                         tqdm(
-                            executor.map(remove_alpha_one, files),
-                            total=len(files),
+                            executor.map(remove_alpha_one, images_with_alpha),
+                            total=len(images_with_alpha),
                             desc=f"Remove alpha {os.path.basename(tempB)}",
                         )
                     )
@@ -696,9 +872,9 @@ def _batch_rename_pngs(folder: str, dry_run: bool = False):
         for idx, filename in enumerate(files, 1):
             ext = ".png"
             new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
-            print(f"Would rename: {filename} -> {new_name}")
-        print("Dry run complete. No files were renamed.")
-        return
+        print_info(f"Would rename: {filename} -> {new_name}")
+    print_info("Dry run complete. No files were renamed.")
+    return
     temp_renames = []
     final_renames = []
     for idx, filename in enumerate(files, 1):
@@ -710,15 +886,66 @@ def _batch_rename_pngs(folder: str, dry_run: bool = False):
         final_path = os.path.join(folder, final_name)
         temp_renames.append((src, temp_path))
         final_renames.append((temp_path, final_path))
-    print("Phase 1: Renaming to temporary names...")
+    print_info("Phase 1: Renaming to temporary names...")
     for src, temp_path in tqdm(temp_renames, desc="Temp renaming"):
         os.rename(src, temp_path)
         log_operation("rename_temp", f"{src} -> {temp_path}")
-    print("Phase 2: Renaming to final names...")
+    print_info("Phase 2: Renaming to final names...")
     for temp_path, final_path in tqdm(final_renames, desc="Final renaming"):
         os.rename(temp_path, final_path)
         log_operation("rename_final", f"{temp_path} -> {final_path}")
-    print("Batch renaming complete.")
+    print_info("Batch renaming complete.")
+
+
+def has_alpha_channel(image_path: str) -> bool:
+    """Check if an image has an alpha channel.
+
+    Args:
+        image_path: Path to the image file
+
+    Returns:
+        True if the image has an alpha channel, False otherwise
+    """
+    try:
+        from PIL import Image
+
+        with Image.open(image_path) as img:
+            return img.mode.endswith("A")
+    except Exception as e:
+        print_warning(f"Error checking alpha channel for {image_path}: {e}")
+        return False
+
+
+def find_images_with_alpha(folder_path: str) -> List[str]:
+    """Find all images with alpha channels in a folder.
+
+    Args:
+        folder_path: Path to the folder to search
+
+    Returns:
+        List of image paths that have alpha channels
+    """
+    images_with_alpha = []
+    if not os.path.exists(folder_path):
+        return images_with_alpha
+
+    # Get all image files first
+    image_files = [
+        file
+        for file in os.listdir(folder_path)
+        if file.lower().endswith((".png", ".tiff", ".bmp", ".gif"))
+    ]
+
+    if not image_files:
+        return images_with_alpha
+
+    # Scan with progress bar
+    for file in tqdm(image_files, desc="Scanning for alpha channels"):
+        image_path = os.path.join(folder_path, file)
+        if has_alpha_channel(image_path):
+            images_with_alpha.append(image_path)
+
+    return images_with_alpha
 
 
 def _run_steghide_check(image_path: str):

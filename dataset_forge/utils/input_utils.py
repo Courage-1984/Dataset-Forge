@@ -1,6 +1,7 @@
 import os
 import random
 import dataset_forge.utils.path_history as path_history
+from dataset_forge.utils.printing import print_info, print_warning, print_error
 
 
 def get_path_with_history(
@@ -36,15 +37,15 @@ def get_path_with_history(
             return path
 
         # If no path entered, show the options menu
-        print("\nPath Entry Options:")
-        print("[1] Enter path manually")
-        print("[2] Use last used path")
-        print("[3] View path history")
+        print_info("\nPath Entry Options:")
+        print_info("[1] Enter path manually")
+        print_info("[2] Use last used path")
+        print_info("[3] View path history")
         if allow_hq_lq_options and allow_hq_lq:
-            print("[4] Use HQ path from settings")
-            print("[5] Use LQ path from settings")
+            print_info("[4] Use HQ path from settings")
+            print_info("[5] Use LQ path from settings")
         if is_optional:
-            print("[Enter] Leave blank")
+            print_info("[Enter] Leave blank")
 
         choice = input("Select option (1-5): ").strip()
 
@@ -62,17 +63,17 @@ def get_path_with_history(
         elif choice == "2":
             last_path = path_history.get_last_path()
             if last_path:
-                print(f"Using last used path: {last_path}")
+                print_info(f"Using last used path: {last_path}")
                 return last_path
             else:
-                print("No path in history.")
+                print_warning("No path in history.")
         elif choice == "3":
             history = path_history.get_history()
             if not history:
-                print("No path history available.")
+                print_warning("No path history available.")
                 continue
             for idx, p in enumerate(history, 1):
-                print(f"[{idx}] {p}")
+                print_info(f"[{idx}] {p}")
             sel = input("Select a path by number, or press Enter to cancel: ").strip()
             if sel.isdigit() and 1 <= int(sel) <= len(history):
                 path = history[int(sel) - 1]
@@ -85,7 +86,7 @@ def get_path_with_history(
                 path_history.add_path(session_state.hq_folder)
                 return session_state.hq_folder
             else:
-                print("HQ folder not set in settings.")
+                print_warning("HQ folder not set in settings.")
         elif allow_hq_lq_options and allow_hq_lq and choice == "5":
             from dataset_forge.menus import session_state
 
@@ -93,9 +94,9 @@ def get_path_with_history(
                 path_history.add_path(session_state.lq_folder)
                 return session_state.lq_folder
             else:
-                print("LQ folder not set in settings.")
+                print_warning("LQ folder not set in settings.")
         else:
-            print("Invalid choice. Please try again.")
+            print_error("Invalid choice. Please try again.")
 
 
 def get_folder_path(prompt, allow_blank=False, allow_hq_lq_options=True):
@@ -107,7 +108,7 @@ def get_folder_path(prompt, allow_blank=False, allow_hq_lq_options=True):
             return ""
         if os.path.isdir(path):
             return path
-        print("Error: Invalid path. Please enter a valid directory.")
+        print_error("Error: Invalid path. Please enter a valid directory.")
 
 
 def select_folder(prompt):
@@ -121,7 +122,7 @@ def get_file_operation_choice():
         choice = input("Enter operation choice (copy/move/inplace): ").strip().lower()
         if choice in ["copy", "move", "inplace"]:
             return choice
-        print("Invalid choice. Please enter 'copy', 'move', or 'inplace'.")
+        print_error("Invalid choice. Please enter 'copy', 'move', or 'inplace'.")
 
 
 def get_destination_path(is_optional=False):
@@ -137,11 +138,11 @@ def get_destination_path(is_optional=False):
         if not os.path.exists(parent_dir):
             try:
                 os.makedirs(parent_dir)
-                print(f"Created parent directory: {parent_dir}")
+                print_info(f"Created parent directory: {parent_dir}")
                 return path
             except OSError as e:
-                print(f"Error creating parent directory {parent_dir}: {e}")
-                print("Please enter a valid path.")
+                print_error(f"Error creating parent directory {parent_dir}: {e}")
+                print_error("Please enter a valid path.")
         else:
             return path
 
@@ -149,10 +150,10 @@ def get_destination_path(is_optional=False):
 def get_pairs_to_process(matching_files, operation_name="process"):
     """Prompt the user for how many pairs to process and return a randomly ordered list of selected file names."""
     if not matching_files:
-        print(f"No matching pairs found to {operation_name}.")
+        print_warning(f"No matching pairs found to {operation_name}.")
         return []
     num_available = len(matching_files)
-    print(f"\nFound {num_available} matching pairs.")
+    print_info(f"\nFound {num_available} matching pairs.")
     while True:
         choice_prompt = (
             f"How many pairs do you want to {operation_name}?\n"
@@ -172,7 +173,7 @@ def get_pairs_to_process(matching_files, operation_name="process"):
                 num_to_process = 0
             else:
                 num_to_process = random.randint(1, num_available)
-            print(f"Selected random amount: {num_to_process} pairs.")
+            print_info(f"Selected random amount: {num_to_process} pairs.")
             break
         elif choice.endswith("%"):
             try:
@@ -181,9 +182,9 @@ def get_pairs_to_process(matching_files, operation_name="process"):
                     num_to_process = int(num_available * (percentage / 100))
                     break
                 else:
-                    print("Percentage must be between 0 and 100.")
+                    print_error("Percentage must be between 0 and 100.")
             except ValueError:
-                print("Invalid percentage format. Example: '10%'")
+                print_error("Invalid percentage format. Example: '10%'")
         else:
             try:
                 num = int(choice)
@@ -191,15 +192,15 @@ def get_pairs_to_process(matching_files, operation_name="process"):
                     num_to_process = num
                     break
                 else:
-                    print(f"Number of pairs must be between 0 and {num_available}.")
+                    print_error(f"Number of pairs must be between 0 and {num_available}.")
             except ValueError:
-                print(
+                print_error(
                     "Invalid input. Please enter 'all', a number, a percentage (e.g., '10%'), or 'random'."
                 )
     if num_to_process == 0:
-        print(f"No pairs selected to {operation_name}. Exiting this operation.")
+        print_warning(f"No pairs selected to {operation_name}. Exiting this operation.")
         return []
-    print(
+    print_info(
         f"\nWill {operation_name} {num_to_process} pairs out of {num_available} available pairs."
     )
     selected_files = random.sample(matching_files, num_to_process)
@@ -223,7 +224,7 @@ def ask_yes_no(prompt, default=None):
             return True
         if resp in ("n", "no"):
             return False
-        print("Please enter 'y' or 'n'.")
+        print_error("Please enter 'y' or 'n'.")
 
 
 def ask_int(prompt, default=None, min_value=None, max_value=None):
@@ -237,13 +238,13 @@ def ask_int(prompt, default=None, min_value=None, max_value=None):
             try:
                 value = int(resp)
             except ValueError:
-                print("Please enter a valid integer.")
+                print_error("Please enter a valid integer.")
                 continue
         if min_value is not None and value < min_value:
-            print(f"Value must be at least {min_value}.")
+            print_error(f"Value must be at least {min_value}.")
             continue
         if max_value is not None and value > max_value:
-            print(f"Value must be at most {max_value}.")
+            print_error(f"Value must be at most {max_value}.")
             continue
         return value
 
@@ -259,13 +260,13 @@ def ask_float(prompt, default=None, min_value=None, max_value=None):
             try:
                 value = float(resp)
             except ValueError:
-                print("Please enter a valid number.")
+                print_error("Please enter a valid number.")
                 continue
         if min_value is not None and value < min_value:
-            print(f"Value must be at least {min_value}.")
+            print_error(f"Value must be at least {min_value}.")
             continue
         if max_value is not None and value > max_value:
-            print(f"Value must be at most {max_value}.")
+            print_error(f"Value must be at most {max_value}.")
             continue
         return value
 
@@ -275,9 +276,9 @@ def ask_choice(prompt, choices, default=None, return_index=False):
     if not choices:
         raise ValueError("No choices provided.")
     while True:
-        print(prompt)
+        print_info(prompt)
         for i, choice in enumerate(choices):
-            print(f"  [{i}] {choice}")
+            print_info(f"  [{i}] {choice}")
         suffix = f" [default: {default}]" if default is not None else ""
         resp = input(f"Select option (0-{len(choices)-1}){suffix}: ").strip()
         if not resp and default is not None:
@@ -286,11 +287,11 @@ def ask_choice(prompt, choices, default=None, return_index=False):
             try:
                 idx = int(resp)
             except ValueError:
-                print("Please enter a valid number.")
+                print_error("Please enter a valid number.")
                 continue
         if 0 <= idx < len(choices):
             return idx if return_index else choices[idx]
-        print(f"Please enter a number between 0 and {len(choices)-1}.")
+        print_error(f"Please enter a number between 0 and {len(choices)-1}.")
 
 
 def get_input(prompt: str, default: str = None) -> str:

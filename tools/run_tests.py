@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 run_tests.py - Flexible test runner for Dataset Forge
 
@@ -19,6 +19,13 @@ Notes:
 import sys
 import subprocess
 import os
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+from dataset_forge.utils.printing import print_info, print_error
 
 VENV_ACTIVATE = os.path.join("venv312", "Scripts", "activate")
 PYTHON_EXE = os.path.join("venv312", "Scripts", "python")
@@ -53,14 +60,6 @@ Select test run mode:
 5. Full Trace: venv312\\Scripts\\activate + venv312\\Scripts\\python -m pytest --full-trace --maxfail=5 --disable-warnings -v tests/
 
 Enter 1, 2, 3, 4, or 5 (or q to quit): """
-
-
-def print_info(msg: str):
-    print(f"[INFO] {msg}")
-
-
-def print_error(msg: str):
-    print(f"[ERROR] {msg}", file=sys.stderr)
 
 
 def run_commands(commands):

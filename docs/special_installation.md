@@ -470,6 +470,7 @@ oxipng.exe
 resdet.exe
 steghide.exe
 zsteg.exe
+pyiqa.exe
 ```
 
 ### Step 2: Windows dll dump

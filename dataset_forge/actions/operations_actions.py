@@ -20,7 +20,15 @@ import subprocess
 from dataset_forge.utils.image_ops import ColorAdjuster
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.dpid.basicsr_dpid import (
     run_basicsr_dpid_single_folder,
@@ -51,9 +59,7 @@ from dataset_forge.utils.lazy_imports import (
 
 
 def split_dataset_in_half(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Splitting Dataset in Half")
-    print("=" * 30)
+    print_header("Splitting Dataset in Half", "=", Mocha.lavender)
 
     hq_files = sorted(
         [
@@ -74,8 +80,7 @@ def split_dataset_in_half(hq_folder, lq_folder):
     matching_files = [f for f in hq_files if f in lq_files]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found.")
         return
 
     num_pairs = len(matching_files)
@@ -89,7 +94,7 @@ def split_dataset_in_half(hq_folder, lq_folder):
     first_half_files = matching_files[:split_point]
     second_half_files = matching_files[split_point:]
 
-    print(
+    print_info(
         f"Found {num_pairs} matching pairs. Splitting into {len(first_half_files)} for first half and {len(second_half_files)} for second half."
     )
 
@@ -99,7 +104,7 @@ def split_dataset_in_half(hq_folder, lq_folder):
     if operation != "inplace":
         output_base_dir = get_destination_path()  # Get base output path
         if not output_base_dir:
-            print(
+            print_error(
                 "Operation aborted as no destination path was provided for copy/move."
             )
             return
@@ -112,13 +117,13 @@ def split_dataset_in_half(hq_folder, lq_folder):
         for d in [output_dir_1_hq, output_dir_1_lq, output_dir_2_hq, output_dir_2_lq]:
             os.makedirs(d, exist_ok=True)
     else:
-        print(
+        print_info(
             "Performing inplace split. This means no files will be moved or copied; the split is conceptual."
         )
-        print("If you intended to move files, please choose 'copy' or 'move'.")
+        print_warning("If you intended to move files, please choose 'copy' or 'move'.")
 
     # Process first half
-    print(
+    print_info(
         f"\nProcessing first half ({len(first_half_files)} pairs) using {operation}..."
     )
     processed_first_half = 0
@@ -152,7 +157,7 @@ def split_dataset_in_half(hq_folder, lq_folder):
         processed_first_half = len(first_half_files)
 
     # Process second half
-    print(
+    print_info(
         f"\nProcessing second half ({len(second_half_files)} pairs) using {operation}..."
     )
     processed_second_half = 0
@@ -196,29 +201,25 @@ def split_dataset_in_half(hq_folder, lq_folder):
     else:  # Inplace, just count
         processed_second_half = len(second_half_files)
 
-    print("\nSplit in half operation complete.")
+    print_success("\nSplit in half operation complete.")
     if operation == "inplace":
-        print(
+        print_info(
             f"Note: 'Inplace' operation for splitting means {processed_first_half} pairs identified for first half, {processed_second_half} for second. No files were moved or copied."
         )
     else:
-        print(
+        print_info(
             f"Total processed into first half: {processed_first_half}, into second half: {processed_second_half}"
         )
         if errors_first_half or errors_second_half:
-            print("Errors encountered during split:")
+            print_error("Errors encountered during split:")
             for e in errors_first_half:
-                print(f"  - {e}")
+                print_error(f"  - {e}")
             for e in errors_second_half:
-                print(f"  - {e}")
-
-    print("=" * 30)
+                print_error(f"  - {e}")
 
 
 def remove_pairs_by_count_percentage(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Remove Pairs by Count/Percentage")
-    print("=" * 30)
+    print_header("Remove Pairs by Count/Percentage", "=", Mocha.lavender)
 
     hq_files_list = sorted(
         [
@@ -237,12 +238,11 @@ def remove_pairs_by_count_percentage(hq_folder, lq_folder):
     matching_files = [f for f in hq_files_list if f in lq_files_list]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found.")
         return
 
     num_available = len(matching_files)
-    print(f"Found {num_available} matching pairs.")
+    print_info(f"Found {num_available} matching pairs.")
 
     while True:
         amount_str = input(

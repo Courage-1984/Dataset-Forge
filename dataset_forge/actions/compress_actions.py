@@ -17,7 +17,15 @@ from dataset_forge.utils.file_utils import (
 )
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -93,7 +101,7 @@ def compress_single_image(
         return True
 
     except Exception as e:
-        print(f"Error compressing {image_path}: {e}")
+        print_error(f"Error compressing {image_path}: {e}")
         return False
 
 
@@ -141,14 +149,16 @@ def compress_images(
         ]
         paired_mode = True
     else:
-        print("No valid input folder(s) provided.")
+        print_error("No valid input folder(s) provided.")
         return
 
     if not image_paths:
-        print("No images found to compress.")
+        print_warning("No images found to compress.")
         return
 
-    print(f"Compressing {len(image_paths)} image{' pairs' if paired_mode else 's'}...")
+    print_info(
+        f"Compressing {len(image_paths)} image{' pairs' if paired_mode else 's'}..."
+    )
 
     # Setup parallel processing configuration
     config = ParallelConfig(
@@ -225,7 +235,7 @@ def compress_images(
     successful = sum(1 for result in results if result)
     failed = len(results) - successful
 
-    print(f"Compression complete: {successful} successful, {failed} failed")
+    print_info(f"Compression complete: {successful} successful, {failed} failed")
 
 
 @monitor_all("compress_directory", critical_on_error=True)
@@ -276,10 +286,10 @@ def compress_directory(
                 image_paths.append((input_path, output_path))
 
     if not image_paths:
-        print("No images found to compress.")
+        print_warning("No images found to compress.")
         return
 
-    print(f"Found {len(image_paths)} images to compress.")
+    print_info(f"Found {len(image_paths)} images to compress.")
 
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
@@ -325,7 +335,9 @@ def compress_directory(
     successful = sum(1 for result in results if result)
     failed = len(results) - successful
 
-    print(f"Directory compression complete: {successful} successful, {failed} failed")
+    print_info(
+        f"Directory compression complete: {successful} successful, {failed} failed"
+    )
 
 
 def batch_compress_with_quality_analysis(
@@ -358,10 +370,10 @@ def batch_compress_with_quality_analysis(
             image_paths.append(os.path.join(input_dir, file))
 
     if not image_paths:
-        print("No images found to compress.")
+        print_warning("No images found to compress.")
         return
 
-    print(f"Found {len(image_paths)} images for quality-based compression.")
+    print_info(f"Found {len(image_paths)} images for quality-based compression.")
 
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
@@ -408,7 +420,7 @@ def batch_compress_with_quality_analysis(
                 os.remove(output_path)
 
             except Exception as e:
-                print(f"Error processing {image_path}: {e}")
+                print_error(f"Error processing {image_path}: {e}")
                 return False, 0
 
         return False, 0
@@ -424,7 +436,7 @@ def batch_compress_with_quality_analysis(
     successful = sum(1 for success, _ in results if success)
     failed = len(results) - successful
 
-    print(
+    print_info(
         f"Quality-based compression complete: {successful} successful, {failed} failed"
     )
 
@@ -432,5 +444,5 @@ def batch_compress_with_quality_analysis(
     qualities = [quality for success, quality in results if success]
     if qualities:
         avg_quality = sum(qualities) / len(qualities)
-        print(f"Average quality used: {avg_quality:.1f}")
-        print(f"Quality range: {min(qualities)} - {max(qualities)}")
+        print_info(f"Average quality used: {avg_quality:.1f}")
+        print_info(f"Quality range: {min(qualities)} - {max(qualities)}")

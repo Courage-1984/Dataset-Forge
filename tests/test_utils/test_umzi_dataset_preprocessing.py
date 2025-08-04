@@ -46,7 +46,7 @@ def test_best_tile_extraction_action(cleanup_test_dirs):
     in_folder = "test_input"
     out_folder = "test_output"
     setup_dummy_folder(in_folder, n=3)
-    print("DEBUG: Starting best_tile_extraction_action test")
+    # DEBUG: Starting best_tile_extraction_action test
     umzi.best_tile_extraction_action(
         in_folder=in_folder,
         out_folder=out_folder,

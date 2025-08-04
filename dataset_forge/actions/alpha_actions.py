@@ -28,19 +28,33 @@ class AlphaAnalyzer:
             images_with_alpha = []
             errors = []
 
-            # Collect all image files recursively
+            # Collect all image files recursively with progress bar
             image_files = []
-            for root, dirs, files in os.walk(folder_path):
-                for filename in files:
-                    if is_image_file(filename):
-                        # Get relative path from the root folder
-                        rel_path = os.path.relpath(
-                            os.path.join(root, filename), folder_path
-                        )
-                        image_files.append((rel_path, os.path.join(root, filename)))
+            total_files = 0
 
+            # First, count total files for progress bar
+            for root, dirs, files in os.walk(folder_path):
+                total_files += len(files)
+
+            # Now collect image files with progress bar
+            with tqdm(
+                total=total_files,
+                desc=f"Discovering images in {folder_name}",
+                unit="files",
+            ) as pbar:
+                for root, dirs, files in os.walk(folder_path):
+                    for filename in files:
+                        pbar.update(1)
+                        if is_image_file(filename):
+                            # Get relative path from the root folder
+                            rel_path = os.path.relpath(
+                                os.path.join(root, filename), folder_path
+                            )
+                            image_files.append((rel_path, os.path.join(root, filename)))
+
+            # Check alpha channels with progress bar
             for rel_path, full_path in tqdm(
-                image_files, desc=f"Checking {folder_name} (recursively)"
+                image_files, desc=f"Checking {folder_name} for alpha channels"
             ):
                 try:
                     with Image.open(full_path) as img:
@@ -131,6 +145,9 @@ class AlphaAnalyzer:
 
         print("-" * 30)
         print("=" * 30)
+
+        # Play completion sound
+        play_done_sound()
 
         return results
 
@@ -286,6 +303,9 @@ def remove_alpha_channels(hq_folder, lq_folder):
     print("-" * 30)
     print("=" * 30)
 
+    # Play completion sound
+    play_done_sound()
+
 
 def remove_alpha_channels_menu():
     """
@@ -434,3 +454,6 @@ def remove_alpha_channels_menu():
         "remove_alpha_channels",
         f"{operation}, {successful}/{len(image_files_with_alpha)} images (recursive)",
     )
+
+    # Play completion sound
+    play_done_sound()

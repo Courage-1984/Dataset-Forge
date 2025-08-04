@@ -1,47 +1,52 @@
+#!/usr/bin/env python3
+"""
+File utilities for Dataset Forge.
+
+This module provides file operation utilities including path handling,
+file type detection, and optimization functions.
+"""
+
 import os
 import shutil
-import logging
+from typing import List, Optional, Callable
+
+from dataset_forge.utils.printing import print_info, print_warning, print_error
 from dataset_forge.utils.cache_utils import in_memory_cache
 
-IMAGE_TYPES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".ico", ".tiff", ".webp"]
+# Supported image file types
+IMAGE_TYPES = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif", ".webp", ".gif"}
 
 
 def get_unique_filename(dest_dir, filename):
-    """Return a unique filename in dest_dir by appending a counter if needed."""
+    """Generate a unique filename in the destination directory."""
     base, ext = os.path.splitext(filename)
     counter = 1
-    unique_name = filename
-    while os.path.exists(os.path.join(dest_dir, unique_name)):
-        unique_name = f"{base}_{counter}{ext}"
+    new_filename = filename
+    while os.path.exists(os.path.join(dest_dir, new_filename)):
+        new_filename = f"{base}_{counter}{ext}"
         counter += 1
-    return unique_name
+    return new_filename
 
 
 def perform_file_operation(src_path, dest_dir, operation, filename):
-    """Performs file operations (copy, move, inplace save). Returns the path to the resulting file if successful, None otherwise."""
-    try:
-        if operation == "inplace":
-            return src_path
-        os.makedirs(dest_dir, exist_ok=True)
-        dest_path = os.path.join(dest_dir, get_unique_filename(dest_dir, filename))
-        if operation == "copy":
-            shutil.copy2(src_path, dest_path)
-        elif operation == "move":
-            shutil.move(src_path, dest_path)
-        return dest_path
-    except Exception as e:
-        logging.error(f"Error performing {operation} on {src_path} to {dest_dir}: {e}")
-        return None
+    """Perform file operation (copy, move, or in-place)."""
+    dest_path = os.path.join(dest_dir, filename)
+    
+    if operation == "copy":
+        shutil.copy2(src_path, dest_path)
+    elif operation == "move":
+        shutil.move(src_path, dest_path)
+    elif operation == "inplace":
+        return src_path  # No operation needed
+    else:
+        raise ValueError(f"Unknown operation: {operation}")
+    
+    return dest_path
 
 
 @in_memory_cache(maxsize=512)  # Cache file type checks
 def is_image_file(filename):
-    """
-    Checks if a file is an image based on its extension.
-
-    Note:
-        This function is cached for fast repeated checks of the same filename.
-    """
+    """Check if a filename represents an image file."""
     return any(filename.lower().endswith(image_type) for image_type in IMAGE_TYPES)
 
 
@@ -69,11 +74,10 @@ def run_oxipng(image_path, level=4, strip=None, alpha=False):
         alpha (bool): Whether to use --alpha for transparent pixel optimization.
     """
     import subprocess
-    import shutil
 
     oxipng_bin = shutil.which("oxipng")
     if not oxipng_bin:
-        print(f"[Oxipng] Not found in PATH. Skipping optimization for {image_path}.")
+        print_warning(f"[Oxipng] Not found in PATH. Skipping optimization for {image_path}.")
         return
     level_arg = str(level) if isinstance(level, int) else level
     cmd = [oxipng_bin, "-o", str(level_arg)]
@@ -85,11 +89,11 @@ def run_oxipng(image_path, level=4, strip=None, alpha=False):
     try:
         result = subprocess.run(cmd, capture_output=True, text=True)
         if result.returncode == 0:
-            print(f"[Oxipng] Optimized: {image_path}")
+            print_info(f"[Oxipng] Optimized: {image_path}")
         else:
-            print(f"[Oxipng] Error optimizing {image_path}: {result.stderr}")
+            print_error(f"[Oxipng] Error optimizing {image_path}: {result.stderr}")
     except Exception as e:
-        print(f"[Oxipng] Exception: {e}")
+        print_error(f"[Oxipng] Exception: {e}")
 
 
 def archive_folder(

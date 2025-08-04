@@ -1,5 +1,13 @@
 import re
 import json
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent
+import sys
+sys.path.insert(0, str(project_root))
+
+from dataset_forge.utils.printing import print_success
 
 EMOJI_TEST_PATH = "docs/emoji-test.txt"
 PYTHON_DICT_PATH = "dataset_forge/utils/emoji_mapping.py"
@@ -45,7 +53,7 @@ def main():
     mapping = parse_emoji_test(EMOJI_TEST_PATH)
     write_python_dict(mapping, PYTHON_DICT_PATH)
     write_json(mapping, JSON_PATH)
-    print(f"Wrote {len(mapping)} emoji mappings to {PYTHON_DICT_PATH} and {JSON_PATH}")
+    print_success(f"Wrote {len(mapping)} emoji mappings to {PYTHON_DICT_PATH} and {JSON_PATH}")
 
 
 if __name__ == "__main__":

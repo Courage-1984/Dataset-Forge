@@ -24,6 +24,50 @@ from dataset_forge.utils.lazy_imports import (
 from torch.utils.data import Dataset, DataLoader
 
 
+def collate_fn_resize(batch):
+    """Custom collate function that resizes all images to a common size."""
+    from torchvision.transforms import functional as F
+
+    # Find the maximum dimensions in the batch
+    max_height = max(img.shape[1] for img, _ in batch)
+    max_width = max(img.shape[2] for img, _ in batch)
+
+    # Resize all images to the maximum dimensions
+    resized_images = []
+    filenames = []
+
+    for img, filename in batch:
+        # Resize image to max dimensions using bilinear interpolation
+        resized_img = F.resize(
+            img.unsqueeze(0), [max_height, max_width], antialias=True
+        ).squeeze(0)
+        resized_images.append(resized_img)
+        filenames.append(filename)
+
+    # Stack the resized images
+    images = torch.stack(resized_images)
+    return images, filenames
+
+
+def collate_fn_individual(batch):
+    """Alternative collate function that processes images individually."""
+    # Return the batch as-is, but with batch_size=1 to avoid stacking issues
+    return batch
+
+
+def collate_fn_safe(batch):
+    """Safe collate function that handles size mismatches gracefully."""
+    try:
+        # Try the resize approach first
+        return collate_fn_resize(batch)
+    except Exception as e:
+        print(
+            f"Warning: Resize collate failed ({e}), falling back to individual processing"
+        )
+        # Fall back to individual processing
+        return collate_fn_individual(batch)
+
+
 # --- ImageDataset and IQANode (from utils/module.py and utils/objects.py) ---
 class ImageDataset(Dataset):
     def __init__(self, image_dir, device, transform=None):
@@ -114,7 +158,9 @@ class IQANode:
             torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
         )
         dataset = ImageDataset(img_dir, self.device, transform)
-        self.data_loader = DataLoader(dataset, batch_size=batch_size)
+        self.data_loader = DataLoader(
+            dataset, batch_size=batch_size, collate_fn=collate_fn_safe
+        )
         self.img_dir: str = img_dir
         self.thread = thread
         self.reverse = reverse
@@ -134,29 +180,51 @@ class IQANode:
 
     @torch.no_grad()
     def __call__(self):
-        for images, filenames in tqdm(self.data_loader):
-            iqa = self.forward(images)
-            for index in range(iqa.shape[0]):
-                file_name = filenames[index]
-                iqa_value = iqa[index]
-                if self.thread_list is None:
-                    if iqa[index] > self.thread and self.move_folder:
-                        shutil.move(
-                            os.path.join(self.img_dir, file_name),
-                            os.path.join(self.move_folder, file_name),
-                        )
-                    elif iqa[index] < self.thread and not self.move_folder:
-                        os.remove(os.path.join(self.img_dir, file_name))
+        for batch_data in tqdm(self.data_loader):
+            try:
+                # Handle both collate function outputs
+                if isinstance(batch_data, tuple):
+                    images, filenames = batch_data
                 else:
-                    if (iqa[index] > self.thread and not self.reverse) or (
-                        iqa[index] < self.thread and self.reverse
-                    ):
-                        self.thread_list.append(
-                            Thread(name=file_name, thread=float(iqa_value))
-                        )
-                    else:
-                        if not self.move_folder:
+                    # Individual processing case
+                    images = [batch_data[0][0]]  # Single image
+                    filenames = [batch_data[0][1]]  # Single filename
+
+                # Ensure images is a tensor for batch processing
+                if not isinstance(images, torch.Tensor):
+                    # Convert list of tensors to batch tensor
+                    images = torch.stack(images)
+
+                iqa = self.forward(images)
+
+                for index in range(iqa.shape[0]):
+                    file_name = filenames[index]
+                    iqa_value = iqa[index]
+
+                    if self.thread_list is None:
+                        if iqa[index] > self.thread and self.move_folder:
+                            shutil.move(
+                                os.path.join(self.img_dir, file_name),
+                                os.path.join(self.move_folder, file_name),
+                            )
+                        elif iqa[index] < self.thread and not self.move_folder:
                             os.remove(os.path.join(self.img_dir, file_name))
+                    else:
+                        if (iqa[index] > self.thread and not self.reverse) or (
+                            iqa[index] < self.thread and self.reverse
+                        ):
+                            self.thread_list.append(
+                                Thread(name=file_name, thread=float(iqa_value))
+                            )
+                        else:
+                            if not self.move_folder:
+                                os.remove(os.path.join(self.img_dir, file_name))
+
+            except Exception as e:
+                print(f"Error processing batch: {e}")
+                print("Continuing with next batch...")
+                continue
+
         if self.thread_list:
             self.thread_list.sort(self.reverse)
             clip_index = int(len(self.thread_list) * self.median_thread)
@@ -218,7 +286,7 @@ def calc_margin(height: int, width: int, block_size: int = DEFAULT_BLOCK_SIZE):
 
 
 def calc_v_torch(
-    dct_img: torch.Tensor,
+    dct_img: "torch.Tensor",
     height_block_num: int,
     width_block_num: int,
     block_size: int = DEFAULT_BLOCK_SIZE,
@@ -270,7 +338,7 @@ def calc_v_torch(
 
 
 def blockwise_dct(
-    gray_imgs: torch.Tensor,
+    gray_imgs: "torch.Tensor",
     height_block_num: int,
     width_block_num: int,
     block_size: int = DEFAULT_BLOCK_SIZE,
@@ -309,7 +377,7 @@ def rgb_to_grayscale(tensor):
 
 
 def calculate_image_blockiness(
-    rgb_images: torch.Tensor, block_size: int = DEFAULT_BLOCK_SIZE
+    rgb_images: "torch.Tensor", block_size: int = DEFAULT_BLOCK_SIZE
 ):
     gray_images = rgb_to_grayscale(rgb_images)
     if not isinstance(gray_images, torch.Tensor):

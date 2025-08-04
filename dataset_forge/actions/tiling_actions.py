@@ -22,7 +22,15 @@ from dataset_forge.utils.memory_utils import (
 )
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # Lazy imports for heavy libraries
@@ -321,7 +329,7 @@ class IC9600Complexity(BaseComplexity):
             ] = -1.0
             return img_tile, complexity, score
         except Exception as e:
-            print(f"Error in get_tile_comp_score: {e}")
+            print_error(f"Error in get_tile_comp_score: {e}")
             raise
 
     @torch.inference_mode()
@@ -339,7 +347,7 @@ class IC9600Complexity(BaseComplexity):
             x_cat, cly_map = result
             return cly_map.detach().cpu().squeeze().numpy(), x_cat
         except Exception as e:
-            print(f"Error in IC9600Complexity.__call__: {e}")
+            print_error(f"Error in IC9600Complexity.__call__: {e}")
             raise
 
 
@@ -511,7 +519,7 @@ class BestTile:
         if h > self.max_image_size or w > self.max_image_size:
             scale_factor = min(self.max_image_size / h, self.max_image_size / w)
             new_h, new_w = int(h * scale_factor), int(w * scale_factor)
-            print(f"Resizing image from {h}x{w} to {new_h}x{new_w} to prevent timeout")
+            print_info(f"Resizing image from {h}x{w} to {new_h}x{new_w} to prevent timeout")
             return resize(img, (new_w, new_h), ResizeFilter.Linear)
         return img
 
@@ -551,7 +559,7 @@ class BestTile:
                 img_tile, complexity, score = result
             return img_tile, complexity, score
         except Exception as e:
-            print(f"Error in get_tile: {e}")
+            print_error(f"Error in get_tile: {e}")
             raise
 
     def read_img(self, img_name):
@@ -568,11 +576,11 @@ class BestTile:
                 return
             img = self.read_img(img_name)
             if img is None:
-                print(f"Warning: Could not read image {img_name}. Skipping.")
+                print_warning(f"Could not read image {img_name}. Skipping.")
                 return
             img_shape = img.shape
             if img_shape[0] < self.tile_size or img_shape[1] < self.tile_size:
-                print(
+                print_warning(
                     f"Skipping {img_name}: Image too small ({img_shape[0]}x{img_shape[1]})"
                 )
                 return
@@ -589,7 +597,7 @@ class BestTile:
             try:
                 complexity = self.func(img)
             except Exception as e:
-                print(f"Error computing complexity for {img_name}: {e}")
+                print_error(f"Error computing complexity for {img_name}: {e}")
                 return
 
             if (
@@ -606,7 +614,7 @@ class BestTile:
                             tile, ".".join(img_name.split(".")[:-1]) + f"_{i}" + ".png"
                         )
                     except Exception as e:
-                        print(f"Error processing tile {i} for {img_name}: {e}")
+                        print_error(f"Error processing tile {i} for {img_name}: {e}")
                         break
             else:
                 try:
@@ -615,9 +623,9 @@ class BestTile:
                         return
                     self.save_result(tile, result_name)
                 except Exception as e:
-                    print(f"Error processing single tile for {img_name}: {e}")
+                    print_error(f"Error processing single tile for {img_name}: {e}")
         except Exception as e:
-            print(f"Error processing {img_name}: {e}")
+            print_error(f"Error processing {img_name}: {e}")
 
     @monitor_all("BestTile.run", critical_on_error=True)
     def run(self):

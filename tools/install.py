@@ -1,33 +1,36 @@
+#!/usr/bin/env python3
+"""
+Installation script for Dataset Forge.
+
+This script creates a virtual environment and installs all required dependencies.
+"""
+
 import os
 import sys
 import subprocess
-import shutil
+from pathlib import Path
 
-# Compute project root as parent of this script's directory
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, os.pardir))
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
 
-VENV_DIR = os.path.join(PROJECT_ROOT, "venv312")
+from dataset_forge.utils.printing import print_info, print_success, print_error
+
+# Configuration
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+VENV_DIR = "venv312"
 PYTHON_EXE = sys.executable
 
-CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu121"
+# PyTorch packages for CUDA 12.1
 TORCH_PACKAGES = [
     "torch",
     "torchvision",
     "torchaudio",
 ]
+CUDA_INDEX_URL = "https://download.pytorch.org/whl/cu121"
 
 
-def print_info(msg: str):
-    print(f"[INFO] {msg}")
-
-
-def print_success(msg: str):
-    print(f"\033[92m[SUCCESS]\033[0m {msg}")
-
-
-def print_error(msg: str):
-    print(f"\033[91m[ERROR]\033[0m {msg}")
+# Use imported print functions directly
 
 
 def check_python_version():

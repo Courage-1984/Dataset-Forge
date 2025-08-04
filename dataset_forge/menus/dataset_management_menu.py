@@ -11,7 +11,11 @@ from dataset_forge.utils.printing import (
 )
 from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
-from dataset_forge.utils.input_utils import get_folder_path, get_path_with_history
+from dataset_forge.utils.input_utils import (
+    get_folder_path,
+    get_path_with_history,
+    ask_yes_no,
+)
 from dataset_forge.utils import monitoring
 from dataset_forge.utils.menu import lazy_menu
 
@@ -203,12 +207,43 @@ def hq_lq_pairs_menu():
 def clean_organize_menu():
     """Sub-menu for cleaning and organizing datasets."""
     from dataset_forge.actions import dataset_actions
+    from dataset_forge.actions import imagededup_actions
+
+    def find_duplicates_wrapper():
+        """Wrapper function to prompt for image directory and call find_duplicates."""
+        image_dir = get_folder_path("📁 Enter image directory path: ")
+        if image_dir:
+            imagededup_actions.find_duplicates(image_dir)
+
+    def remove_duplicates_wrapper():
+        """Wrapper function to prompt for image directory and call remove_duplicates."""
+        image_dir = get_folder_path("📁 Enter image directory path: ")
+        if image_dir:
+            dry_run = ask_yes_no(
+                "Run in dry-run mode (show what would be done without actually doing it)?",
+                default=True,
+            )
+            imagededup_actions.remove_duplicates(image_dir, dry_run=dry_run)
+
+    def move_duplicates_wrapper():
+        """Wrapper function to prompt for image directory and destination, then call move_duplicates."""
+        image_dir = get_folder_path("📁 Enter image directory path: ")
+        if image_dir:
+            destination_dir = get_folder_path("📁 Enter destination directory path: ")
+            if destination_dir:
+                dry_run = ask_yes_no(
+                    "Run in dry-run mode (show what would be done without actually doing it)?",
+                    default=True,
+                )
+                imagededup_actions.move_duplicates(
+                    image_dir, destination_dir, dry_run=dry_run
+                )
 
     def dedupe_menu():
         options = {
-            "1": ("🔍 Find Duplicates", dataset_actions.find_duplicates),
-            "2": ("🗑️ Remove Duplicates", dataset_actions.remove_duplicates),
-            "3": ("📁 Move Duplicates", dataset_actions.move_duplicates),
+            "1": ("🔍 Find Duplicates", find_duplicates_wrapper),
+            "2": ("🗑️ Remove Duplicates", remove_duplicates_wrapper),
+            "3": ("📁 Move Duplicates", move_duplicates_wrapper),
             "0": ("⬅️  Back", None),
         }
 
