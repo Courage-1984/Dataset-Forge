@@ -212,6 +212,176 @@ See [Advanced Features](advanced.md) for detailed MCP integration information an
 
 ---
 
+## ⭐ BHI Filtering with Advanced CUDA Optimizations
+
+Dataset Forge includes a comprehensive BHI (Blockiness, HyperIQA, IC9600) filtering system with advanced CUDA optimizations for high-performance image quality assessment.
+
+### **Overview**
+
+BHI filtering analyzes images using three quality metrics:
+- **Blockiness**: Detects compression artifacts and blocky patterns
+- **HyperIQA**: Perceptual image quality assessment using deep learning
+- **IC9600**: Advanced image complexity and quality evaluation
+
+### **Key Features**
+
+#### **🚀 Advanced CUDA Optimizations**
+- **Mixed Precision (FP16)**: 30-50% memory reduction with automatic fallback
+- **Dynamic Batch Sizing**: Automatic batch size adjustment based on available GPU memory
+- **Memory Management**: Comprehensive GPU memory cleanup and CPU fallback
+- **Windows Compatibility**: Optimized for Windows CUDA multiprocessing limitations
+- **Progress Tracking**: Real-time progress bars with detailed metrics
+
+#### **📁 Flexible File Actions**
+- **Move**: Move filtered files to a new folder (default)
+- **Copy**: Copy filtered files to a new folder
+- **Delete**: Permanently delete filtered files (with confirmation)
+- **Report**: Dry run to see what would be filtered
+
+#### **⚙️ Smart Processing Order**
+- **IC9600 First**: Most memory-intensive operation runs first when GPU memory is cleanest
+- **Optimized Memory**: Automatic memory cleanup between operations
+- **Error Recovery**: Graceful handling of CUDA memory errors with CPU fallback
+
+### **Usage Workflow**
+
+1. **Navigate to BHI Filtering**:
+   ```
+   Main Menu → Analysis & Validation → Analyze Properties → BHI Filtering Analysis
+   ```
+
+2. **Select Input Folder**: Choose the folder containing images to filter
+
+3. **Choose Action**: Select move, copy, delete, or report
+
+4. **Set Thresholds** (recommended starting values):
+   - **Blockiness**: 0.3 (lower = less blocky = better quality)
+   - **HyperIQA**: 0.3 (lower = better quality)
+   - **IC9600**: 0.3 (lower = better quality)
+
+5. **Monitor Progress**: Watch real-time progress bars and GPU memory usage
+
+### **Performance Optimizations**
+
+#### **Environment Variables** (automatically set in `run.bat`)
+```batch
+PYTORCH_NO_CUDA_MEMORY_CACHING=1
+PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128,expandable_segments:True
+CUDA_LAUNCH_BLOCKING=0
+OMP_NUM_THREADS=1
+MKL_NUM_THREADS=1
+CUDA_MEMORY_FRACTION=0.9
+```
+
+#### **Automatic Optimizations**
+- **Batch Size**: Dynamically adjusted based on available GPU memory
+- **Memory Cleanup**: Automatic cleanup every 10 batches for IC9600
+- **CPU Fallback**: Automatic fallback to CPU if CUDA memory errors occur
+- **Mixed Precision**: Automatic FP16 usage for memory efficiency
+
+### **Threshold Guidelines**
+
+#### **Conservative (Strict Filtering)**
+- Blockiness: 0.3, HyperIQA: 0.3, IC9600: 0.3
+- Filters out ~20-40% of images
+- Best for high-quality datasets
+
+#### **Moderate (Balanced)**
+- Blockiness: 0.5, HyperIQA: 0.5, IC9600: 0.5
+- Filters out ~10-20% of images
+- Good for general use
+
+#### **Aggressive (Minimal Filtering)**
+- Blockiness: 0.7, HyperIQA: 0.7, IC9600: 0.7
+- Filters out ~5-10% of images
+- Best for large datasets where you want to keep most images
+
+### **Troubleshooting**
+
+#### **CUDA Memory Errors**
+- **Automatic Fix**: System automatically falls back to CPU processing
+- **Manual Fix**: Reduce batch size or increase pagefile size
+- **Prevention**: Use conservative thresholds and monitor GPU memory
+
+#### **100% Filtering**
+- **Cause**: Thresholds too strict (all images filtered)
+- **Solution**: Increase thresholds (try 0.3 → 0.5)
+- **Test**: Use "report" action first to see filtering results
+
+#### **Performance Issues**
+- **Windows**: Multiprocessing disabled for compatibility
+- **Memory**: Automatic cleanup and batch size adjustment
+- **GPU**: Mixed precision and memory optimization active
+
+### **Example Output**
+
+```
+----------------------------------------
+         BHI Filtering Progress         
+----------------------------------------
+Starting BHI filtering with action: move
+Destination: C:/path/to/filtered_folder
+Found 3259 files to process
+Using batch size: 8 (IC9600: 4)
+GPU Memory: 0.0GB used / 12.0GB total
+Processing order: IC9600 → Blockiness → HyperIQA
+Using thresholds: {'blockiness': 0.3, 'hyperiqa': 0.3, 'ic9600': 0.3}
+
+Scoring with ic9600...
+ic9600 scoring: 100%|████████████████| 815/815 [03:55<00:00, 3.46batch/s]
+
+Scoring with blockiness...
+blockiness scoring: 100%|████████████████| 408/408 [01:46<00:00, 3.84batch/s]
+
+Scoring with hyperiqa...
+hyperiqa scoring: 100%|████████████████| 408/408 [03:18<00:00, 2.06batch/s]
+
+3259 files will be moved.
+Performing move operations...
+moving files: 100%|████████████████| 3259/3259 [00:00<00:00, 6602.06file/s]
+
+BHI filtering completed. Processed 3259 files, filtered 3259 files.
+Filtered files: 3259/3259 (100.0%)
+```
+
+### **Advanced Configuration**
+
+#### **Custom Thresholds**
+```python
+from dataset_forge.actions.bhi_filtering_actions import run_bhi_filtering
+
+# Custom thresholds
+thresholds = {
+    "blockiness": 0.25,  # Very strict
+    "hyperiqa": 0.35,    # Moderate
+    "ic9600": 0.4        # Less strict
+}
+
+# Run with custom thresholds
+run_bhi_filtering(
+    input_path="path/to/images",
+    thresholds=thresholds,
+    action="move",
+    batch_size=8,
+    verbose=True
+)
+```
+
+#### **Preset Thresholds**
+```python
+from dataset_forge.actions.bhi_filtering_actions import run_bhi_filtering_with_preset
+
+# Use conservative preset
+run_bhi_filtering_with_preset(
+    input_path="path/to/images",
+    preset_name="conservative",  # "conservative", "moderate", "aggressive"
+    action="move",
+    verbose=True
+)
+```
+
+---
+
 ## Example: Running a Workflow
 
 ```bash

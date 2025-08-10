@@ -129,7 +129,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 - **⭐ Quality Scoring**: Automated dataset quality assessment (NIQE, etc.)
 - **🔧 Issue Detection**: Corruption detection, misalignment detection, outlier detection. alpha channel detection
 - **🧪 Property Analysis**: Consistency checks, aspect ratio testing, dimension reporting
-- **⭐ BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment
+- **⭐ BHI Filtering**: Blockiness, HyperIQA, IC9600 quality assessment with advanced CUDA optimizations, progress tracking, and flexible file actions (move/copy/delete/report)
 - **🔍 Scale Detection**: Find and test HQ/LQ scale relationships
 - **🎯 Find Native Resolution**: Find image native resolution using [getnative](https://github.com/Infiziert90/getnative) or [resdet](https://github.com/0x09/resdet)
 

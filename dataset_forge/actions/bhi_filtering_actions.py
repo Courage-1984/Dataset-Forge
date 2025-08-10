@@ -76,6 +76,10 @@ class ImageDataset(Dataset):
         # Only include files, not directories, and skip _bhi_filtered folder
         all_items = os.listdir(image_dir)
         self.image_files = []
+
+        # Add progress tracking for file validation
+        print(f"Validating {len(all_items)} files in {image_dir}...")
+
         for item in all_items:
             item_path = os.path.join(image_dir, item)
             if os.path.isfile(item_path) and not item.startswith("_bhi_filtered"):
@@ -91,6 +95,8 @@ class ImageDataset(Dataset):
                 except Exception as e:
                     print(f"Skipping {item} during initialization: {e}")
                     continue
+
+        print(f"Found {len(self.image_files)} valid image files")
         self.device = device
 
     def __len__(self):
@@ -153,25 +159,42 @@ class IQANode:
         move_folder: str | None = None,
         transform=None,
         reverse=False,
+        dataset=None,  # Allow passing a pre-created dataset
     ):
-        self.device = (
-            torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-        )
-        dataset = ImageDataset(img_dir, self.device, transform)
-        self.data_loader = DataLoader(
-            dataset, batch_size=batch_size, collate_fn=collate_fn_safe
-        )
-        self.img_dir: str = img_dir
+        self.img_dir = img_dir
+        self.batch_size = batch_size
         self.thread = thread
-        self.reverse = reverse
+        self.median_thread = median_thread
         self.move_folder = move_folder
-        if move_folder is not None:
-            os.makedirs(move_folder, exist_ok=True)
-        if median_thread:
-            self.median_thread = median_thread
-            self.thread_list = ThreadList()
+        self.transform = transform
+        self.reverse = reverse
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        # Use shared dataset if provided, otherwise create new one
+        if dataset is not None:
+            self.dataset = dataset
         else:
-            self.thread_list = None
+            self.dataset = ImageDataset(img_dir, self.device, transform)
+
+        # Optimized DataLoader with pinned memory and multiple workers for better CUDA performance
+        # Note: Using num_workers=0 on Windows to avoid CUDA tensor sharing issues
+        num_workers = (
+            0  # Disable multiprocessing on Windows to avoid CUDA tensor sharing issues
+        )
+
+        # Disable pin_memory when using CUDA tensors (pin_memory only works with CPU tensors)
+        use_pin_memory = self.device.type == "cpu"
+
+        self.data_loader = DataLoader(
+            self.dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=num_workers,
+            pin_memory=use_pin_memory,  # Only use pin_memory for CPU tensors
+            persistent_workers=False,  # Disable persistent workers when num_workers=0
+            collate_fn=collate_fn_safe,
+            prefetch_factor=None,  # Disable prefetch when num_workers=0
+        )
 
     def forward(self, images):
         raise NotImplementedError(
@@ -437,9 +460,17 @@ class BlockinessThread(IQANode):
         thread: float = 0.5,
         median_thread=0,
         move_folder: str | None = None,
+        dataset=None,
     ):
         super().__init__(
-            img_dir, batch_size, thread, median_thread, move_folder, None, reverse=True
+            img_dir,
+            batch_size,
+            thread,
+            median_thread,
+            move_folder,
+            None,
+            reverse=True,
+            dataset=dataset,
         )
         self.model = calculate_image_blockiness
 
@@ -459,8 +490,17 @@ class HyperThread(IQANode):
         thread: float = 0.5,
         median_thread=0,
         move_folder: str | None = None,
+        dataset=None,
     ):
-        super().__init__(img_dir, batch_size, thread, median_thread, move_folder, None)
+        super().__init__(
+            img_dir,
+            batch_size,
+            thread,
+            median_thread,
+            move_folder,
+            None,
+            dataset=dataset,
+        )
         self.model = create_metric("hyperiqa", device=self.device)
 
     def forward(self, images):
@@ -630,13 +670,22 @@ class ICNet(nn.Module):
 
 def ic9600(device=None):
     try:
+        import time
+
+        start_time = time.time()
+
+        # Load model without timeout (timeout parameter not supported in all PyTorch versions)
         state = torch.hub.load_state_dict_from_url(
             url="https://github.com/umzi2/Dataset_Preprocessing/releases/download/IC9600_duplicate/ic9600.pth",
             map_location=device if device is not None else "cpu",
             weights_only=True,
         )
+
         model = ICNet(device=device).eval()
         model.load_state_dict(state)
+
+        load_time = time.time() - start_time
+        print(f"IC9600 model loaded successfully in {load_time:.2f}s")
         return model
     except Exception as e:
         print(f"Warning: Failed to load IC9600 model: {e}")
@@ -652,29 +701,86 @@ class IC9600Thread(IQANode):
         thread: float = 0.5,
         median_thread=0,
         move_folder: str | None = None,
+        dataset=None,
     ):
-        super().__init__(img_dir, batch_size, thread, median_thread, move_folder, None)
-        self.model = ic9600(device=self.device)
-        if self.model is not None:
-            from dataset_forge.utils.memory_utils import to_device_safe
+        super().__init__(
+            img_dir,
+            batch_size,
+            thread,
+            median_thread,
+            move_folder,
+            None,
+            dataset=dataset,
+        )
+        # Load IC9600 model with progress indication
+        try:
+            self.model = ic9600(device=self.device)
+            if self.model is not None:
+                from dataset_forge.utils.memory_utils import to_device_safe
 
-            self.model = to_device_safe(self.model, self.device)
-        else:
+                self.model = to_device_safe(self.model, self.device)
+            else:
+                self.model = None
+        except Exception as e:
+            print(f"Warning: Failed to load IC9600 model: {e}")
             self.model = None
 
     def forward(self, images):
         if self.model is None:
             # Return placeholder scores if model failed to load
             return torch.ones(images.shape[0], device=self.device) * 0.5
+
         try:
-            scores = self.model.get_onlu_score(images)
-            # Ensure we have a proper batch dimension
-            if scores.dim() == 0:
-                scores = scores.unsqueeze(0)
-            elif scores.dim() == 1 and scores.shape[0] != images.shape[0]:
-                # If we got a single score for a batch, repeat it
-                scores = scores.repeat(images.shape[0])
-            return scores
+            # Try GPU processing with mixed precision for better memory efficiency
+            with torch.amp.autocast("cuda", enabled=True):
+                scores = self.model.get_onlu_score(images)
+                # Ensure we have a proper batch dimension
+                if scores.dim() == 0:
+                    scores = scores.unsqueeze(0)
+                elif scores.dim() == 1 and scores.shape[0] != images.shape[0]:
+                    # If we got a single score for a batch, repeat it
+                    scores = scores.repeat(images.shape[0])
+                return scores
+
+        except RuntimeError as e:
+            if "out of memory" in str(e).lower() or "cuda" in str(e).lower():
+                # CUDA memory error - fallback to CPU processing
+                print(f"CUDA memory error in IC9600, falling back to CPU processing...")
+                try:
+                    from dataset_forge.utils.memory_utils import clear_cuda_cache
+
+                    clear_cuda_cache()
+
+                    # Move model and images to CPU
+                    cpu_model = self.model.cpu()
+                    cpu_images = images.cpu()
+
+                    # Process on CPU
+                    with torch.no_grad():
+                        scores = cpu_model.get_onlu_score(cpu_images)
+
+                    # Move back to original device
+                    cpu_model.to(self.device)
+
+                    # Ensure we have a proper batch dimension
+                    if scores.dim() == 0:
+                        scores = scores.unsqueeze(0)
+                    elif scores.dim() == 1 and scores.shape[0] != images.shape[0]:
+                        scores = scores.repeat(images.shape[0])
+
+                    # Move scores to original device
+                    scores = scores.to(self.device)
+                    return scores
+
+                except Exception as cpu_error:
+                    print(f"CPU fallback also failed: {cpu_error}")
+                    # Return placeholder scores on error
+                    return torch.ones(images.shape[0], device=self.device) * 0.5
+            else:
+                # Other runtime error
+                print(f"Warning: Error in IC9600 forward pass: {e}")
+                return torch.ones(images.shape[0], device=self.device) * 0.5
+
         except Exception as e:
             print(f"Warning: Error in IC9600 forward pass: {e}")
             # Return placeholder scores on error
@@ -682,6 +788,35 @@ class IC9600Thread(IQANode):
 
 
 # ===================== End Inlined IQA Threads and Dependencies =====================
+
+
+def get_optimal_batch_size(base_batch_size: int, device: str = "cuda") -> int:
+    """Dynamically determine optimal batch size based on available GPU memory."""
+    if device != "cuda" or not torch.cuda.is_available():
+        return base_batch_size
+
+    try:
+        # Get GPU memory info
+        total_memory = torch.cuda.get_device_properties(0).total_memory
+        allocated_memory = torch.cuda.memory_allocated(0)
+        free_memory = total_memory - allocated_memory
+
+        # Convert to GB for easier calculation
+        free_memory_gb = free_memory / (1024**3)
+
+        # Adjust batch size based on available memory
+        if free_memory_gb > 8:
+            return min(base_batch_size, 16)  # Large memory: up to 16
+        elif free_memory_gb > 4:
+            return min(base_batch_size, 8)  # Medium memory: up to 8
+        elif free_memory_gb > 2:
+            return min(base_batch_size, 4)  # Low memory: up to 4
+        else:
+            return min(base_batch_size, 2)  # Very low memory: up to 2
+
+    except Exception as e:
+        print(f"Warning: Could not determine optimal batch size: {e}")
+        return min(base_batch_size, 4)  # Conservative fallback
 
 
 # Helper for paired folder logic
@@ -826,7 +961,7 @@ def run_bhi_filtering_with_defaults(
 def run_bhi_filtering(
     input_path: str,
     thresholds: Optional[Dict[str, float]] = None,
-    action: str = "move",  # 'move', 'delete', or 'report'
+    action: str = "move",  # 'move', 'copy', 'delete', or 'report'
     output_folder: Optional[str] = None,
     batch_size: int = 8,
     paired: bool = False,
@@ -839,16 +974,16 @@ def run_bhi_filtering(
     Run BHI filtering (Blockiness, HyperIQA, IC9600) on a folder or paired HQ/LQ folders.
     - input_path: single folder or HQ folder if paired=True
     - thresholds: dict with keys 'blockiness', 'hyperiqa', 'ic9600' (uses defaults if None)
-    - action: 'move', 'delete', or 'report'
-    - output_folder: where to move files (if action=='move')
+    - action: 'move', 'copy', 'delete', or 'report'
+    - output_folder: where to move/copy files (if action=='move' or 'copy')
     - batch_size: batch size for IQA threads
     - paired: if True, expects HQ/LQ folders
     - lq_folder: path to LQ folder (if paired)
-    - move_folder: destination for moved files (if action=='move')
+    - move_folder: destination for moved/copied files (if action=='move' or 'copy')
     - dry_run: if True, only report what would happen
     - verbose: print progress
     """
-    assert action in ("move", "delete", "report"), "Invalid action."
+    assert action in ("move", "copy", "delete", "report"), "Invalid action."
 
     # Use default thresholds if none provided
     if thresholds is None:
@@ -862,10 +997,14 @@ def run_bhi_filtering(
 
     if paired:
         assert lq_folder is not None, "lq_folder required for paired mode."
+        if verbose:
+            print("Scanning paired folders for files...")
         files = paired_filenames(input_path, lq_folder)
         hq_folder = input_path
     else:
         # Only include files, not directories, and skip _bhi_filtered folder
+        if verbose:
+            print("Scanning input folder for files...")
         all_items = os.listdir(input_path)
         files = []
         for item in all_items:
@@ -875,8 +1014,11 @@ def run_bhi_filtering(
         files = sorted(files)
         hq_folder = input_path
 
-    # Prepare move folders if needed
-    if action == "move":
+    if verbose:
+        print(f"Found {len(files)} files to process")
+
+    # Prepare move/copy folders if needed
+    if action in ("move", "copy"):
         # Use output_folder if provided, otherwise use move_folder, otherwise create timestamped folder
         if output_folder:
             move_folder = output_folder
@@ -897,24 +1039,69 @@ def run_bhi_filtering(
         move_folder = None
         lq_move_folder = None
 
-    # Prepare IQA threads
-    blockiness_thread = BlockinessThread(
-        hq_folder, batch_size=batch_size, thread=thresholds["blockiness"]
+    # Create shared dataset to avoid multiple file validations
+    if verbose:
+        print("Creating shared dataset...")
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    shared_dataset = ImageDataset(hq_folder, device)
+
+    # Get optimal batch sizes based on available memory
+    optimal_batch_size = get_optimal_batch_size(
+        batch_size, "cuda" if torch.cuda.is_available() else "cpu"
     )
-    hyper_thread = HyperThread(
-        hq_folder, batch_size=batch_size, thread=thresholds["hyperiqa"]
-    )
+    ic9600_batch_size = min(optimal_batch_size, 4)  # Cap at 4 for IC9600
+
+    if verbose:
+        print(f"Using batch size: {optimal_batch_size} (IC9600: {ic9600_batch_size})")
+        if torch.cuda.is_available():
+            total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
+            allocated_memory = torch.cuda.memory_allocated(0) / (1024**3)
+            print(
+                f"GPU Memory: {allocated_memory:.1f}GB used / {total_memory:.1f}GB total"
+            )
+
+    # Prepare IQA threads with shared dataset
+    if verbose:
+        print("Initializing IQA models...")
+
     ic9600_thread = IC9600Thread(
-        hq_folder, batch_size=batch_size, thread=thresholds["ic9600"]
+        hq_folder,
+        batch_size=ic9600_batch_size,
+        thread=thresholds["ic9600"],
+        dataset=shared_dataset,
     )
+    if verbose:
+        print("✓ IC9600 model initialized")
+
+    blockiness_thread = BlockinessThread(
+        hq_folder,
+        batch_size=optimal_batch_size,
+        thread=thresholds["blockiness"],
+        dataset=shared_dataset,
+    )
+    if verbose:
+        print("✓ Blockiness model initialized")
+
+    hyper_thread = HyperThread(
+        hq_folder,
+        batch_size=optimal_batch_size,
+        thread=thresholds["hyperiqa"],
+        dataset=shared_dataset,
+    )
+    if verbose:
+        print("✓ HyperIQA model initialized")
 
     # Collect scores for all files
     results = {}
     metrics_and_threads = [
+        ("ic9600", ic9600_thread),
         ("blockiness", blockiness_thread),
         ("hyperiqa", hyper_thread),
-        ("ic9600", ic9600_thread),
     ]
+
+    if verbose:
+        print(f"Processing order: IC9600 → Blockiness → HyperIQA")
+        print(f"Using thresholds: {thresholds}")
 
     for metric, thread in metrics_and_threads:
         if verbose:
@@ -931,12 +1118,53 @@ def run_bhi_filtering(
             continue
 
         scores = {}
-        for images, filenames in tqdm(
-            thread.data_loader, disable=not verbose, desc=metric
+        # Calculate total batches for proper progress tracking
+        total_batches = len(thread.data_loader)
+        if verbose:
+            print(f"Processing {total_batches} batches for {metric}...")
+
+        for batch_idx, (images, filenames) in enumerate(
+            tqdm(
+                thread.data_loader,
+                disable=not verbose,
+                desc=f"{metric} scoring",
+                total=total_batches,
+                unit="batch",
+            )
         ):
-            iqa = thread.forward(images)
-            for idx, fname in enumerate(filenames):
-                scores[fname] = safe_tensor_to_float(iqa[idx])
+            try:
+                iqa = thread.forward(images)
+                for idx, fname in enumerate(filenames):
+                    scores[fname] = safe_tensor_to_float(iqa[idx])
+
+                # Clear memory after each batch to prevent accumulation
+                if (
+                    metric == "ic9600" and batch_idx % 10 == 0
+                ):  # Every 10 batches for IC9600
+                    from dataset_forge.utils.memory_utils import (
+                        clear_memory,
+                        clear_cuda_cache,
+                    )
+
+                    clear_memory()
+                    clear_cuda_cache()
+
+            except Exception as e:
+                if verbose:
+                    print(f"Error processing batch {batch_idx} for {metric}: {e}")
+                # Clear memory on error
+                try:
+                    from dataset_forge.utils.memory_utils import (
+                        clear_memory,
+                        clear_cuda_cache,
+                    )
+
+                    clear_memory()
+                    clear_cuda_cache()
+                except:
+                    pass
+                continue
+
         for fname in files:
             if fname not in results:
                 results[fname] = {}
@@ -961,38 +1189,88 @@ def run_bhi_filtering(
 
     # Perform action
     if verbose:
-        print(f"{len(to_filter)} files will be {action}d.")
+        # Fix action text for better display
+        action_text = {
+            "move": "moved",
+            "copy": "copied",
+            "delete": "deleted",
+            "report": "reported",
+        }.get(action, f"{action}d")
+        print(f"{len(to_filter)} files will be {action_text}.")
     if action == "report" or dry_run:
         for fname in to_filter:
             print(f"Would {action} {fname} (scores: {results[fname]})")
         return results
-    for fname in to_filter:
-        src_hq = os.path.join(hq_folder, fname)
-        if paired:
-            src_lq = os.path.join(lq_folder, fname)
-        try:
-            if action == "move":
-                dst_hq = os.path.join(move_folder, fname)
-                shutil.move(src_hq, dst_hq)
-                if paired:
-                    dst_lq = os.path.join(lq_move_folder, fname)
-                    shutil.move(src_lq, dst_lq)
+
+    # Add progress tracking for file operations
+    if verbose and len(to_filter) > 0:
+        print(f"Performing {action} operations...")
+        # Fix action text for progress bar
+        action_ing = {"move": "moving", "copy": "copying", "delete": "deleting"}.get(
+            action, f"{action}ing"
+        )
+        for fname in tqdm(to_filter, desc=f"{action_ing} files", unit="file"):
+            src_hq = os.path.join(hq_folder, fname)
+            if paired:
+                src_lq = os.path.join(lq_folder, fname)
+            try:
+                if action == "move":
+                    dst_hq = os.path.join(move_folder, fname)
+                    shutil.move(src_hq, dst_hq)
+                    if paired:
+                        dst_lq = os.path.join(lq_move_folder, fname)
+                        shutil.move(src_lq, dst_lq)
+                elif action == "copy":
+                    dst_hq = os.path.join(move_folder, fname)
+                    shutil.copy2(src_hq, dst_hq)
+                    if paired:
+                        dst_lq = os.path.join(lq_move_folder, fname)
+                        shutil.copy2(src_lq, dst_lq)
+                elif action == "delete":
+                    os.remove(src_hq)
+                    if paired:
+                        os.remove(src_lq)
+            except Exception as e:
                 if verbose:
-                    print(f"Moved {fname}")
-            elif action == "delete":
-                os.remove(src_hq)
-                if paired:
-                    os.remove(src_lq)
+                    print(f"Error processing {fname}: {e}")
+                continue
+    else:
+        # Non-verbose processing
+        for fname in to_filter:
+            src_hq = os.path.join(hq_folder, fname)
+            if paired:
+                src_lq = os.path.join(lq_folder, fname)
+            try:
+                if action == "move":
+                    dst_hq = os.path.join(move_folder, fname)
+                    shutil.move(src_hq, dst_hq)
+                    if paired:
+                        dst_lq = os.path.join(lq_move_folder, fname)
+                        shutil.move(src_lq, dst_lq)
+                elif action == "copy":
+                    dst_hq = os.path.join(move_folder, fname)
+                    shutil.copy2(src_hq, dst_hq)
+                    if paired:
+                        dst_lq = os.path.join(lq_move_folder, fname)
+                        shutil.copy2(src_lq, dst_lq)
+                elif action == "delete":
+                    os.remove(src_hq)
+                    if paired:
+                        os.remove(src_lq)
+            except Exception as e:
                 if verbose:
-                    print(f"Deleted {fname}")
-        except Exception as e:
-            if verbose:
-                print(f"Error processing {fname}: {e}")
-            continue
+                    print(f"Error processing {fname}: {e}")
+                continue
 
     if verbose:
         print(
             f"\nBHI filtering completed. Processed {len(files)} files, filtered {len(to_filter)} files."
         )
+        if len(to_filter) > 0:
+            print(
+                f"Filtered files: {len(to_filter)}/{len(files)} ({len(to_filter)/len(files)*100:.1f}%)"
+            )
+        else:
+            print("No files were filtered (all passed quality thresholds)")
 
     return results

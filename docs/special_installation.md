@@ -471,6 +471,7 @@ resdet.exe
 steghide.exe
 zsteg.exe
 pyiqa.exe
+imagededup.exe
 ```
 
 ### Step 2: Windows dll dump
