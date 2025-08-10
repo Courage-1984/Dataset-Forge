@@ -50,6 +50,26 @@ def is_image_file(filename):
     return any(filename.lower().endswith(image_type) for image_type in IMAGE_TYPES)
 
 
+def get_image_files(folder_path: str) -> List[str]:
+    """Get all image files from a folder.
+    
+    Args:
+        folder_path: Path to the folder to scan
+        
+    Returns:
+        List of image file paths
+    """
+    if not os.path.exists(folder_path):
+        return []
+    
+    image_files = []
+    for filename in os.listdir(folder_path):
+        if is_image_file(filename):
+            image_files.append(os.path.join(folder_path, filename))
+    
+    return sorted(image_files)
+
+
 def align_image_pairs_stub(hq_path, lq_path):
     # TODO: Implement image pair alignment logic
     return []

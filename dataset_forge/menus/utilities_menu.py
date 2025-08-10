@@ -29,9 +29,7 @@ def require_hq_lq(func):
 def lazy_action(module_path, func_name):
     @monitoring.time_and_record_menu_load(func_name)
     def _action(*args, **kwargs):
-        return getattr(importlib.import_module(module_path), func_name)(
-            *args, **kwargs
-        )
+        return getattr(importlib.import_module(module_path), func_name)(*args, **kwargs)
 
     return _action
 
@@ -78,19 +76,11 @@ def utilities_menu():
             ),
         ),
         "7": (
-            "👁️ Visual De-duplication",
-            lazy_action("dataset_forge.menus.visual_dedup_menu", "visual_dedup_menu"),
+            "🔍 Fuzzy Matching De-duplication",
+            lazy_action("dataset_forge.menus.fuzzy_dedup_menu", "fuzzy_dedup_menu"),
         ),
-        "8": (
-            "🔐 De-Duplicate (File Hash)",
-            lazy_action("dataset_forge.menus.de_dupe_menu", "de_dupe_menu"),
-        ),
+        "8": ("🧹 Filter non-Images", lazy_action(__name__, "filter_non_images_menu")),
         "9": (
-            "🔍 ImageDedup - Advanced Duplicate Detection",
-            lazy_action("dataset_forge.menus.imagededup_menu", "imagededup_menu"),
-        ),
-        "10": ("🧹 Filter non-Images", lazy_action(__name__, "filter_non_images_menu")),
-        "11": (
             "🌳 Enhanced Directory Tree",
             lazy_action(
                 "dataset_forge.menus.directory_tree_menu", "directory_tree_menu"
@@ -100,14 +90,14 @@ def utilities_menu():
     }
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Access various utility functions and tools including de-duplication",
-        "Total Options": "11 utility categories",
-        "Navigation": "Use numbers 1-11 to select, 0 to go back",
+        "Purpose": "Access various utility functions and tools including comprehensive de-duplication",
+        "Total Options": "9 utility categories",
+        "Navigation": "Use numbers 1-9 to select, 0 to go back",
         "Key Features": [
             "Path management, file operations, directory trees, filtering",
-            "👁️ Visual De-duplication - CLIP/LPIPS based duplicate detection",
-            "🔐 De-Duplicate (File Hash) - Perceptual hash based deduplication",
-            "🔍 ImageDedup - Advanced duplicate detection with multiple hash methods"
+            "🔍 Fuzzy Matching De-duplication - Multi-algorithm fuzzy matching with configurable thresholds",
+            "Comprehensive duplicate detection using multiple perceptual hashing algorithms",
+            "Support for single folder and HQ/LQ paired folders"
         ],
     }
 
@@ -203,4 +193,5 @@ def directory_tree_menu():
     """Directory tree menu integration."""
     # Lazy import for directory tree menu
     from dataset_forge.utils.menu import lazy_menu
+
     return lazy_menu("dataset_forge.menus.directory_tree_menu", "directory_tree_menu")()

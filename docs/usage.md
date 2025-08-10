@@ -61,7 +61,7 @@ The global command system is built on:
 ### 📂 Dataset Management
 
 - **Create, combine, split, and shuffle datasets** from the Dataset Management menu.
-- **Deduplicate, batch rename, and filter images** using Clean & Organize.
+- **Deduplicate, batch rename, and filter images** using Clean & Organize and **🔍 Fuzzy Matching De-duplication**.
 - **Align images** (Batch Projective Alignment) for HQ/LQ pairs or multi-source datasets.
 
 ### 🔍 Analysis & Validation
@@ -377,6 +377,126 @@ run_bhi_filtering_with_preset(
     preset_name="conservative",  # "conservative", "moderate", "aggressive"
     action="move",
     verbose=True
+)
+```
+
+---
+
+## 🔍 Fuzzy Matching De-duplication
+
+The Fuzzy Matching De-duplication feature provides advanced duplicate detection using multiple perceptual hashing algorithms with configurable similarity thresholds. This feature consolidates all duplicate detection methods into a single, comprehensive menu.
+
+### **Quick Start**
+
+1. **Navigate to the menu**: Main Menu → 🛠️ Utilities → 🔍 Fuzzy Matching De-duplication
+2. **Choose operation type**: Single folder or HQ/LQ paired folders
+3. **Select hash methods**: Choose from pHash, dHash, aHash, wHash, Color Hash
+4. **Configure thresholds**: Set similarity thresholds for each hash method
+5. **Choose operation mode**: Show, Copy, Move, or Delete duplicates
+
+### **Hash Algorithms**
+
+- **pHash (Perceptual Hash)**: Detects duplicates based on image content and structure
+- **dHash (Difference Hash)**: Detects duplicates based on edge differences
+- **aHash (Average Hash)**: Detects duplicates based on average pixel values
+- **wHash (Wavelet Hash)**: Detects duplicates based on wavelet transform
+- **Color Hash**: Detects duplicates based on color distribution
+
+### **Threshold Guidelines**
+
+#### **Conservative (High Accuracy)**
+- pHash: 95%, dHash: 90%, aHash: 85%, wHash: 90%, Color Hash: 80%
+
+#### **Balanced (Recommended)**
+- pHash: 90%, dHash: 85%, aHash: 80%, wHash: 85%, Color Hash: 75%
+
+#### **Aggressive (More Duplicates)**
+- pHash: 80%, dHash: 75%, aHash: 70%, wHash: 75%, Color Hash: 65%
+
+### **Example Workflow**
+
+```
+# Navigate to Fuzzy Matching De-duplication
+Main Menu → 🛠️ Utilities → 🔍 Fuzzy Matching De-duplication
+
+# Select operation
+1. 📁 Single Folder Fuzzy De-duplication
+
+# Enter folder path
+C:/path/to/your/images
+
+# Choose hash methods (comma-separated)
+pHash, dHash, aHash
+
+# Set thresholds
+pHash: 90
+dHash: 85
+aHash: 80
+
+# Choose operation mode
+1. Show duplicates (preview only)
+```
+
+#### **Expected Output**
+```
+Found 1000 images in C:/path/to/images
+Computing perceptual hashes...
+Computing hashes: 100%|████████████████| 1000/1000 [00:05<00:00, 200.00it/s]
+Finding fuzzy duplicates...
+✅ Fuzzy deduplication workflow completed successfully!
+📊 Results:
+  - Total files processed: 1000
+  - Duplicate groups found: 15
+  - Total duplicates: 45
+🔍 Duplicate groups:
+  Group 1:
+    - image1.jpg (similarity: 95.2%, method: pHash)
+    - image2.jpg (similarity: 94.8%, method: pHash)
+    - image3.jpg (similarity: 93.1%, method: dHash)
+```
+
+### **Best Practices**
+
+1. **Start with Show Mode**: Always preview duplicates before taking action
+2. **Use Conservative Thresholds**: Begin with higher thresholds to avoid false positives
+3. **Test with Small Datasets**: Verify results before processing large datasets
+4. **Combine Hash Methods**: Use multiple algorithms for better accuracy
+5. **Backup Important Data**: Always backup before using delete operations
+6. **Monitor Memory Usage**: Use appropriate batch sizes for your system
+
+### **Advanced Configuration**
+
+#### **Custom Hash Combinations**
+```python
+from dataset_forge.actions.fuzzy_dedup_actions import fuzzy_matching_workflow
+
+# Custom hash methods and thresholds
+hash_methods = ["pHash", "dHash", "wHash"]
+thresholds = {
+    "pHash": 92,
+    "dHash": 88,
+    "wHash": 85
+}
+
+# Run fuzzy deduplication
+results = fuzzy_matching_workflow(
+    folder="path/to/images",
+    hash_methods=hash_methods,
+    thresholds=thresholds,
+    operation="show"
+)
+```
+
+#### **HQ/LQ Paired Folders**
+```python
+# For HQ/LQ paired folders
+results = fuzzy_matching_workflow(
+    hq_folder="path/to/hq",
+    lq_folder="path/to/lq",
+    hash_methods=["pHash", "dHash"],
+    thresholds={"pHash": 90, "dHash": 85},
+    operation="copy",
+    dest_dir="path/to/duplicates"
 )
 ```
 
