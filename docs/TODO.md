@@ -1,83 +1,116 @@
-# 📝 TODO / Planned Features
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
 
-> This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place and keep being inspired.
+# TODO / Planned Features
+
+> **Project Roadmap**  
+> This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place and maintain project inspiration.
 
 ---
 
-- [ ] **Debug Mode**: I want to add a _Debug Mode_ to my project, which when used, activates the showing of more verbose output and debug output/print
-- [ ] **tl;dr**: Create a '# Features (tl;dr)' section in ./docs/features.md
-- [ ] **_Packaging_**: "Compile Dataset-Forge" AND/OR "Create docker file/container"
-- [ ] **Automated Documentation**
-- [ ] **Augmentation**: Document augmentation operations, and degradations and implement 'Advanced Data Augmentation'
-- [x] **Dataset Health Scoring**: Add a "Dataset Health Scoring" workflow and menu option
+## 🚀 High Priority Features
+
+### Core System Enhancements
+
+- [ ] **Debug Mode**: Add a comprehensive _Debug Mode_ to the project, which when activated, shows verbose output and debug information throughout the CLI
+- [ ] **Packaging & Distribution**:
+  - [ ] Compile Dataset-Forge into standalone executable
+  - [ ] Create Docker container/containerization
+  - [ ] Automated build pipeline for releases
+- [ ] **Automated Documentation**: Implement automated documentation generation and maintenance
 - [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
-- [ ] **Phhofm's sisr**: Investigate Phhofm's [sisr](https://github.com/Phhofm/sisr) for stuff i can add to DF
-- [x] **the-database's img-ab**: Fork and improve.
-- [ ] **Links .json's**: Further customize, add metadata, description, etc/
+- [ ] **Global Search Functionality**: Implement comprehensive search across all menus and features
+- [ ] **Path Sanitization**: Add robust path validation and sanitization throughout the application
+
+### Advanced Data Processing
+
+- [ ] **Advanced Data Augmentation**: Expand augmentation capabilities with model-aware techniques
+  - [ ] Compositional Augmentations: Integrate Albumentations for complex augmentation pipelines
+  - [ ] Mixing Augmentations: Implement Mixup and CutMix techniques
+  - [ ] GAN-based Augmentations: Integrate with pre-trained StyleGAN for synthetic data generation
 - [ ] **Advanced Filtering / AI-Powered Features**:
+  - [ ] Semantic Filtering: Filter by image content/semantics
+  - [ ] Style-Based Filtering: Filter by artistic style
+  - [ ] Quality-Based Filtering: Advanced quality assessment filters
+  - [ ] Custom Filter Plugins: User-defined filtering logic
+  - [ ] Auto-Labeling: Automatic image labeling and classification
+  - [ ] Style Transfer: Apply artistic styles to datasets
+  - [ ] Content-Aware Cropping: Intelligent image cropping
 
-<details>
-<summary>Expand for details ^^</summary>
+### Performance & Optimization
 
-```
-Semantic Filtering: Filter by image content/semantics
-Style-Based Filtering: Filter by artistic style
-Quality-Based Filtering: Advanced quality assessment filters
-Custom Filter Plugins: User-defined filtering logic
-Auto-Labeling: Automatic image labeling and classification
-Style Transfer: Apply artistic styles to datasets
-Content-Aware Cropping: Intelligent image cropping
-```
-
-</details>
-
-- [ ] **Advanced Data Augmentation**:
-
-<details>
-<summary>Expand for details ^^</summary>
-
-```
-What: Expand the augmentation capabilities to include more complex, model-aware techniques.
-
-Why: Your current augmentations are great for general image processing. Adding advanced techniques can significantly improve model generalization during training.
-
-Suggestions:
-- Compositional Augmentations: Integrate a library like Albumentations to create complex augmentation pipelines.
-- Mixing Augmentations: Implement Mixup (linearly interpolating images and their labels) and CutMix (pasting a patch from one image onto another).
-- GAN-based Augmentations: For advanced users, integrate with a pre-trained StyleGAN to generate synthetic data variations.
-
-```
-
-</details>
-
-- [ ] **Onboarding**: Add 'onboarding' doc/flow
-- [ ] **Build**: Release a stable build at some point
-
-- [ ] Advanced options for Align Images (SIFT/FLANN parameters, etc.).
-- [ ] Further modularization and extensibility for new workflows.
-- [ ] More advanced analytics and monitoring.
-- [ ] AI-powered dataset analysis and recommendations.
-- [ ] Cloud integration for distributed processing and storage.
-- [ ] Web interface for dataset management and visualization.
 - [ ] **Parallel Import Loading**: Load multiple modules in parallel with threading
 - [ ] **Smart Caching**: Predictive loading of frequently used modules
 - [ ] **Import Optimization**: Compile-time import analysis and automatic conversion
 - [ ] **Performance Monitoring**: Real-time metrics and automated regression detection
+- [ ] **Lazy Imports**: Ensure lazy imports everywhere to speed up CLI startup
 
-**NEW TODO:**
+---
 
-- [ ] **dedicated de dupe menu**
-- [ ] **global search functionality**
-- [ ] **path sanitization**
+## 🔧 Development & Infrastructure
 
-- [ ] **validate code that's from other repos**
-- [ ] **title**
-- [ ] **title**
-- [ ] **title**
-- [ ] **speed up cli**: lazy imports AND????
-- [x] **find_code_issues.py**: test and improve
-- [x] **Fix critical menu system errors**: Resolved 'str' object is not callable and 'module' object is not callable errors in dataset_management_menu.py - Fixed lazy_action vs lazy_menu usage, pepedp lazy imports, and ProcessType enum access
+### Code Quality & Testing
+
+- [ ] **Validate Code from Other Repos**: Review and validate all code imported from external repositories
+- [ ] **Improve Unit and Integration Tests**: Enhance test coverage and quality
+- [ ] **Test Dataset Improvements**: Enhance test datasets for better coverage
+- [ ] **Code Validation**: Implement comprehensive code validation and quality checks
+
+### External Tool Integration
+
+- [ ] **Phhofm's SISR**: Investigate [Phhofm's SISR](https://github.com/Phhofm/sisr) for potential integration
+- [ ] **Links .json Customization**: Further customize links with metadata, descriptions, and enhanced information
+- [ ] **External Tool Validation**: Validate and improve all external tool integrations
+
+### Documentation & User Experience
+
+- [ ] **Onboarding**: Create comprehensive onboarding documentation and flow
+- [ ] **Features TL;DR**: Create a '# Features (tl;dr)' section in `./docs/features.md`
+- [ ] **User Experience Enhancements**: Improve overall user experience and workflow
+
+---
+
+## 🎯 Specific Feature Implementations
+
+### Image Processing & Analysis
+
+- [ ] **Advanced Align Images Options**: Add SIFT/FLANN parameters and advanced alignment options
+- [ ] **AI-Powered Dataset Analysis**: Implement AI-powered dataset analysis and recommendations
+- [ ] **Advanced Analytics**: More advanced analytics and monitoring capabilities
+
+### System Architecture
+
+- [ ] **Modularization**: Further modularization and extensibility for new workflows
+- [ ] **Cloud Integration**: Cloud integration for distributed processing and storage
+- [ ] **Web Interface**: Web interface for dataset management and visualization
+- [ ] **Dataset Versioning**: Implement comprehensive dataset versioning system
+
+### Deduplication Enhancements
+
+- [ ] **Dedicated De-dupe Menu**: Create a comprehensive dedicated deduplication menu
+- [ ] **Enhanced Deduplication**: Improve existing deduplication features and workflows
+
+---
+
+## ✅ Completed Features
+
+### Core System Features
+
+- [x] **Dataset Health Scoring**: Comprehensive dataset health scoring workflow and menu option
+- [x] **the-database's img-ab**: Successfully forked and improved
+- [x] **find_code_issues.py**: Comprehensive static analysis tool implemented and tested
+- [x] **create .exe & dll dump**: Successfully created executable and DLL dump
+
+### Critical Bug Fixes
+
+- [x] **Fix Critical Menu System Errors**: Resolved 'str' object is not callable and 'module' object is not callable errors
+
+  - **Problem**: Critical menu system errors causing application crashes
+  - **Solution**: Fixed lazy_action vs lazy_menu usage, pepedp lazy imports, and ProcessType enum access
+  - **Files**: `dataset_management_menu.py` and related menu files
+  - **Result**: Stable menu system with proper error handling
+
 - [x] **Audio System Investigation & Fix**: Resolved CLI hanging issues and implemented robust multi-library audio system
+
   - **Problem**: CLI was hanging during exit due to audio playback issues
   - **Investigation**: Tested audio files, pygame mixer, winsound, and alternative libraries
   - **Solution**: Implemented robust audio system with multiple fallback libraries
@@ -86,7 +119,9 @@ Suggestions:
   - **Testing**: All 4 audio files (done.wav, error.mp3, startup.mp3, shutdown.mp3) working perfectly
   - **Dependencies**: Added playsound==1.2.2 and pydub to requirements.txt
   - **Result**: CLI exits cleanly with full audio functionality restored
+
 - [x] **Comprehensive Audio Implementation**: Add audio feedback throughout the entire application
+
   - **Status**: ✅ COMPLETED - Audio feedback added to all major action functions
   - **Files Updated**:
     - `augmentation_actions.py` - Added completion audio to `apply_augmentation_pipeline` and `create_augmentation_variations`
@@ -101,11 +136,8 @@ Suggestions:
     - `frames_actions.py` - Already had completion audio in `extract_frames_menu`
   - **Audio Files**: Successfully moved to `./assets/audio/` directory for better organization
   - **Result**: Complete audio feedback throughout the application with success sounds for all major operations
-  - **Files to Update**: All action files, menu files, utility functions
-  - **Testing**: Ensure audio doesn't interfere with CLI operations
-  - **Result**: Complete audio feedback throughout the application
-- [x] **Fix Test Failures**: Resolved 3 critical test failures in performance optimization module
 
+- [x] **Fix Test Failures**: Resolved 3 critical test failures in performance optimization module
   - **Problem**: 3 tests failing in `test_performance_optimization.py`:
     1. `test_gpu_image_analysis` - RuntimeError due to RGB vs grayscale tensor mismatch
     2. `test_prioritize_samples` - NameError due to missing `time` import
@@ -120,8 +152,9 @@ Suggestions:
   - **Testing**: All 306 tests now passing (298 passed, 7 skipped, 1 xfailed)
   - **Result**: Complete test suite stability restored
 
-- [x] **MCP Integration Implementation**: Comprehensive MCP (Model Context Protocol) integration for enhanced development
+### Advanced Features
 
+- [x] **MCP Integration Implementation**: Comprehensive MCP (Model Context Protocol) integration for enhanced development
   - **Status**: ✅ COMPLETED - MCP tools integration fully implemented and documented
   - **MCP Tools Configured**:
     1. **Brave Search Tools** - Primary research for latest libraries, best practices, and solutions
@@ -141,24 +174,44 @@ Suggestions:
     - **Integration Requirements**: Specific requirements for MCP tool usage
   - **Result**: Enhanced development workflow with comprehensive research and analysis capabilities
 
-- [ ] **dedicated de dupe menu**
-- [ ] **global search functionality**
-- [ ] **validate code that's from other repos**
-- [ ] **path sanitization**
-- [ ] **improve: test_datasets**
-- [ ] **implement: Dataset Versioning**
-- [ ] **improve unit and integration tests**
-- [ ] **onboarding**
-- [x] **create .exe & dll dump**
-- [ ] **title**
-- [ ] **title**
-- [ ] **title**
-- [ ] **title**
+---
 
-- [ ] **lazy imports**: ensure lazy imports everywhere to speed up cli
-- [ ] **title**: lorem_ipsum
-- [ ] **title**: lorem_ipsum
-- [ ] **title**: lorem_ipsum
-- [ ] **title**: lorem_ipsum
+## 📋 Future Considerations
+
+### Long-term Goals
+
+- [ ] **Stable Release**: Release a stable build with comprehensive testing
+- [ ] **Community Features**: Enhanced community features and collaboration tools
+- [ ] **Enterprise Features**: Enterprise-grade features for large-scale deployments
+- [ ] **API Development**: RESTful API for programmatic access
+- [ ] **Plugin System**: Extensible plugin system for custom functionality
+
+### Research & Investigation
+
+- [ ] **New Technologies**: Investigate emerging technologies for potential integration
+- [ ] **Performance Research**: Research new performance optimization techniques
+- [ ] **User Experience Research**: Study user workflows and optimize accordingly
+- [ ] **Community Feedback**: Gather and implement community feedback and suggestions
 
 ---
+
+## 🔄 Maintenance & Updates
+
+### Regular Tasks
+
+- [ ] **Dependency Updates**: Regular dependency updates and security patches
+- [ ] **Documentation Updates**: Keep documentation current with feature changes
+- [ ] **Test Maintenance**: Maintain and expand test coverage
+- [ ] **Performance Monitoring**: Continuous performance monitoring and optimization
+- [ ] **Bug Tracking**: Comprehensive bug tracking and resolution
+
+### Quality Assurance
+
+- [ ] **Code Review**: Implement comprehensive code review processes
+- [ ] **Automated Testing**: Expand automated testing coverage
+- [ ] **Static Analysis**: Regular static analysis and code quality checks
+- [ ] **Security Audits**: Regular security audits and vulnerability assessments
+
+---
+
+> **Note**: This TODO list is a living document that should be updated as features are completed and new ideas are added. All completed features should be moved to the "Completed Features" section with detailed implementation notes.

@@ -30,9 +30,7 @@ def require_hq_lq(func):
 def lazy_action(module_path, func_name):
     @monitoring.time_and_record_menu_load(func_name)
     def _action(*args, **kwargs):
-        return getattr(importlib.import_module(module_path), func_name)(
-            *args, **kwargs
-        )
+        return getattr(importlib.import_module(module_path), func_name)(*args, **kwargs)
 
     return _action
 
@@ -337,8 +335,36 @@ def analyze_properties_menu():
             find_extreme_dimensions,
         )
 
-        report_dimensions(hq, lq)
-        find_extreme_dimensions(hq, lq)
+        # Report dimensions for HQ folder
+        print_section("HQ Folder Dimensions", char="-", color=Mocha.lavender)
+        hq_results = report_dimensions(hq, "HQ", verbose=True)
+
+        # Report dimensions for LQ folder
+        print_section("LQ Folder Dimensions", char="-", color=Mocha.lavender)
+        lq_results = report_dimensions(lq, "LQ", verbose=True)
+
+        # Find extreme dimensions for both folders
+        print_section("Extreme Dimensions Analysis", char="-", color=Mocha.lavender)
+        hq_extreme = find_extreme_dimensions(hq, "HQ", verbose=True)
+        lq_extreme = find_extreme_dimensions(lq, "LQ", verbose=True)
+
+        # Summary
+        print_section("Summary", char="-", color=Mocha.lavender)
+        total_hq = len(hq_results["dimensions"]) if hq_results["dimensions"] else 0
+        total_lq = len(lq_results["dimensions"]) if lq_results["dimensions"] else 0
+        print_success(
+            f"✅ Successfully analyzed {total_hq} HQ images and {total_lq} LQ images"
+        )
+
+        if hq_results["errors"] or lq_results["errors"]:
+            total_errors = len(hq_results["errors"]) + len(lq_results["errors"])
+            print_warning(f"⚠️  {total_errors} files had processing errors")
+
+        # Play completion sound
+        from dataset_forge.utils.audio_utils import play_done_sound
+
+        play_done_sound()
+
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 

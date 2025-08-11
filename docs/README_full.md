@@ -154,6 +154,25 @@
       - [**Aggressive (More Duplicates)**](#aggressive-more-duplicates)
     - [**Integration Benefits**](#integration-benefits)
     - [**Best Practices**](#best-practices)
+    - [**Performance Considerations**](#performance-considerations)
+      - [**Memory Usage**](#memory-usage)
+      - [**Processing Speed**](#processing-speed)
+      - [**Accuracy vs Speed Trade-offs**](#accuracy-vs-speed-trade-offs)
+    - [**Troubleshooting**](#troubleshooting)
+      - [**Common Issues**](#common-issues)
+      - [**Error Messages**](#error-messages)
+    - [**Integration with Other Features**](#integration-with-other-features)
+      - [**Visual De-duplication**](#visual-de-duplication)
+      - [**File Hash De-duplication**](#file-hash-de-duplication)
+      - [**ImageDedup**](#imagededup)
+    - [**Technical Details**](#technical-details)
+      - [**Hash Computation**](#hash-computation)
+      - [**Memory Management**](#memory-management)
+      - [**Error Handling**](#error-handling)
+    - [**Future Enhancements**](#future-enhancements)
+      - [**Planned Features**](#planned-features)
+      - [**Performance Improvements**](#performance-improvements)
+    - [**Dependencies**](#dependencies)
 
 ## Usage
 
@@ -240,6 +259,22 @@
 - [Run fuzzy deduplication](#run-fuzzy-deduplication)
       - [**HQ/LQ Paired Folders**](#hqlq-paired-folders)
 - [For HQ/LQ paired folders](#for-hqlq-paired-folders)
+    - [**Performance Considerations**](#performance-considerations)
+      - [**Memory Usage Guidelines**](#memory-usage-guidelines)
+      - [**Processing Speed Characteristics**](#processing-speed-characteristics)
+      - [**Accuracy vs Speed Trade-offs**](#accuracy-vs-speed-trade-offs)
+    - [**Troubleshooting**](#troubleshooting)
+      - [**Common Issues and Solutions**](#common-issues-and-solutions)
+      - [**Error Messages**](#error-messages)
+    - [**Integration with Other Features**](#integration-with-other-features)
+      - [**Visual De-duplication**](#visual-de-duplication)
+      - [**File Hash De-duplication**](#file-hash-de-duplication)
+      - [**ImageDedup**](#imagededup)
+    - [**Technical Details**](#technical-details)
+      - [**Hash Computation**](#hash-computation)
+      - [**Memory Management**](#memory-management)
+      - [**Error Handling**](#error-handling)
+    - [**Dependencies**](#dependencies)
   - [Example: Running a Workflow](#example-running-a-workflow)
 - [or](#or)
   - [Tips & Best Practices](#tips-best-practices)
@@ -434,9 +469,39 @@
     - [Image Loading Issues](#image-loading-issues)
     - [Expected Behavior](#expected-behavior)
     - [Best Practices](#best-practices)
+  - [Fuzzy Deduplication Issues](#fuzzy-deduplication-issues)
+    - [Common Problems](#common-problems)
+    - [Performance Optimization](#performance-optimization)
+    - [Best Practices for Fuzzy Deduplication](#best-practices-for-fuzzy-deduplication)
     - [Getting Help](#getting-help)
   - [FAQ](#faq)
   - [See Also](#see-also)
+
+## Todo
+
+- [TODO / Planned Features](#todo-planned-features)
+  - [🚀 High Priority Features](#high-priority-features)
+    - [Core System Enhancements](#core-system-enhancements)
+    - [Advanced Data Processing](#advanced-data-processing)
+    - [Performance & Optimization](#performance-optimization)
+  - [🔧 Development & Infrastructure](#development-infrastructure)
+    - [Code Quality & Testing](#code-quality-testing)
+    - [External Tool Integration](#external-tool-integration)
+    - [Documentation & User Experience](#documentation-user-experience)
+  - [🎯 Specific Feature Implementations](#specific-feature-implementations)
+    - [Image Processing & Analysis](#image-processing-analysis)
+    - [System Architecture](#system-architecture)
+    - [Deduplication Enhancements](#deduplication-enhancements)
+  - [✅ Completed Features](#completed-features)
+    - [Core System Features](#core-system-features)
+    - [Critical Bug Fixes](#critical-bug-fixes)
+    - [Advanced Features](#advanced-features)
+  - [📋 Future Considerations](#future-considerations)
+    - [Long-term Goals](#long-term-goals)
+    - [Research & Investigation](#research-investigation)
+  - [🔄 Maintenance & Updates](#maintenance-updates)
+    - [Regular Tasks](#regular-tasks)
+    - [Quality Assurance](#quality-assurance)
 
 ## Special Installation
 
@@ -1692,6 +1757,117 @@ Finding fuzzy duplicates...
 5. **Backup Data**: Always backup before using delete operations
 6. **Monitor Memory**: Use appropriate batch sizes for your system
 
+### **Performance Considerations**
+
+#### **Memory Usage**
+- **Small Datasets** (< 1,000 images): Use batch size of 100-500
+- **Medium Datasets** (1,000-10,000 images): Use batch size of 50-200
+- **Large Datasets** (> 10,000 images): Use batch size of 20-100
+
+#### **Processing Speed**
+- **pHash**: Fastest, good for initial screening
+- **dHash**: Fast, good for edge-based detection
+- **aHash**: Very fast, good for brightness-based detection
+- **wHash**: Slower, good for texture-based detection
+- **Color Hash**: Medium speed, good for color-based detection
+
+#### **Accuracy vs Speed Trade-offs**
+- **High Accuracy**: Use all hash methods with high thresholds
+- **Fast Processing**: Use pHash + dHash only
+- **Balanced**: Use pHash + dHash + aHash with medium thresholds
+
+### **Troubleshooting**
+
+#### **Common Issues**
+
+**No Duplicates Found**
+- **Cause**: Thresholds too high
+- **Solution**: Lower the similarity thresholds
+- **Alternative**: Try different hash method combinations
+
+**Too Many False Positives**
+- **Cause**: Thresholds too low
+- **Solution**: Increase the similarity thresholds
+- **Alternative**: Use fewer hash methods
+
+**Memory Errors**
+- **Cause**: Batch size too large
+- **Solution**: Reduce the batch size
+- **Alternative**: Process smaller subsets
+
+**Slow Processing**
+- **Cause**: Too many hash methods or large batch size
+- **Solution**: Use fewer hash methods or smaller batch size
+- **Alternative**: Process in smaller chunks
+
+#### **Error Messages**
+
+**"No image files found"**
+- **Cause**: Folder doesn't contain supported image files
+- **Solution**: Check folder path and file types
+
+**"Invalid threshold value"**
+- **Cause**: Threshold not between 0 and 100
+- **Solution**: Use values between 0 and 100
+
+**"Operation cancelled"**
+- **Cause**: User cancelled the operation
+- **Solution**: Re-run the operation
+
+### **Integration with Other Features**
+
+#### **Visual De-duplication**
+- Use fuzzy matching for initial screening
+- Use visual de-duplication for final verification
+
+#### **File Hash De-duplication**
+- Use fuzzy matching for content-based duplicates
+- Use file hash for exact duplicates
+
+#### **ImageDedup**
+- Use fuzzy matching for perceptual duplicates
+- Use ImageDedup for advanced duplicate detection
+
+### **Technical Details**
+
+#### **Hash Computation**
+- All hashes are computed using the `imagehash` library
+- Hashes are normalized to 64-bit values
+- Similarity is calculated using Hamming distance
+
+#### **Memory Management**
+- Images are processed in batches to manage memory usage
+- Hash values are cached to avoid recomputation
+- Memory is cleared after each batch
+
+#### **Error Handling**
+- Invalid images are skipped with warnings
+- Processing continues even if some images fail
+- Comprehensive error reporting and logging
+
+### **Future Enhancements**
+
+#### **Planned Features**
+- **Machine Learning Integration**: Use ML models for better duplicate detection
+- **Batch Processing**: Process multiple folders simultaneously
+- **Cloud Integration**: Support for cloud storage providers
+- **Advanced Filtering**: Filter duplicates by size, date, or other criteria
+
+#### **Performance Improvements**
+- **GPU Acceleration**: Use GPU for hash computation
+- **Parallel Processing**: Process multiple images simultaneously
+- **Caching**: Persistent cache for hash values
+
+### **Dependencies**
+
+The Fuzzy Matching De-duplication feature requires:
+- **imagehash**: For perceptual hash computation
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
+
 This feature provides a comprehensive solution for fuzzy duplicate detection, combining multiple perceptual hashing algorithms with flexible configuration options and safe operation modes.
 
 ---
@@ -2199,6 +2375,104 @@ results = fuzzy_matching_workflow(
     dest_dir="path/to/duplicates"
 )
 ```
+
+### **Performance Considerations**
+
+#### **Memory Usage Guidelines**
+- **Small Datasets** (< 1,000 images): Use batch size of 100-500
+- **Medium Datasets** (1,000-10,000 images): Use batch size of 50-200
+- **Large Datasets** (> 10,000 images): Use batch size of 20-100
+
+#### **Processing Speed Characteristics**
+- **pHash**: Fastest, good for initial screening
+- **dHash**: Fast, good for edge-based detection
+- **aHash**: Very fast, good for brightness-based detection
+- **wHash**: Slower, good for texture-based detection
+- **Color Hash**: Medium speed, good for color-based detection
+
+#### **Accuracy vs Speed Trade-offs**
+- **High Accuracy**: Use all hash methods with high thresholds
+- **Fast Processing**: Use pHash + dHash only
+- **Balanced**: Use pHash + dHash + aHash with medium thresholds
+
+### **Troubleshooting**
+
+#### **Common Issues and Solutions**
+
+**No Duplicates Found**
+- **Cause**: Thresholds too high
+- **Solution**: Lower the similarity thresholds
+- **Alternative**: Try different hash method combinations
+
+**Too Many False Positives**
+- **Cause**: Thresholds too low
+- **Solution**: Increase the similarity thresholds
+- **Alternative**: Use fewer hash methods
+
+**Memory Errors**
+- **Cause**: Batch size too large
+- **Solution**: Reduce the batch size
+- **Alternative**: Process smaller subsets
+
+**Slow Processing**
+- **Cause**: Too many hash methods or large batch size
+- **Solution**: Use fewer hash methods or smaller batch size
+- **Alternative**: Process in smaller chunks
+
+#### **Error Messages**
+
+**"No image files found"**
+- **Cause**: Folder doesn't contain supported image files
+- **Solution**: Check folder path and file types
+
+**"Invalid threshold value"**
+- **Cause**: Threshold not between 0 and 100
+- **Solution**: Use values between 0 and 100
+
+**"Operation cancelled"**
+- **Cause**: User cancelled the operation
+- **Solution**: Re-run the operation
+
+### **Integration with Other Features**
+
+#### **Visual De-duplication**
+- Use fuzzy matching for initial screening
+- Use visual de-duplication for final verification
+
+#### **File Hash De-duplication**
+- Use fuzzy matching for content-based duplicates
+- Use file hash for exact duplicates
+
+#### **ImageDedup**
+- Use fuzzy matching for perceptual duplicates
+- Use ImageDedup for advanced duplicate detection
+
+### **Technical Details**
+
+#### **Hash Computation**
+- All hashes are computed using the `imagehash` library
+- Hashes are normalized to 64-bit values
+- Similarity is calculated using Hamming distance
+
+#### **Memory Management**
+- Images are processed in batches to manage memory usage
+- Hash values are cached to avoid recomputation
+- Memory is cleared after each batch
+
+#### **Error Handling**
+- Invalid images are skipped with warnings
+- Processing continues even if some images fail
+- Comprehensive error reporting and logging
+
+### **Dependencies**
+
+The Fuzzy Matching De-duplication feature requires:
+- **imagehash**: For perceptual hash computation
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
 
 ---
 
@@ -4411,6 +4685,66 @@ No duplicate groups found.
 5. **Check File Permissions**: Ensure read access to image folders
 6. **Validate Images**: Use image validation tools before deduplication
 
+## Fuzzy Deduplication Issues
+
+### Common Problems
+
+**No Duplicates Found**
+- **Cause**: Thresholds too high
+- **Solution**: Lower the similarity thresholds (try 80-85% instead of 90-95%)
+- **Alternative**: Try different hash method combinations (pHash + dHash)
+
+**Too Many False Positives**
+- **Cause**: Thresholds too low
+- **Solution**: Increase the similarity thresholds (try 90-95% instead of 70-80%)
+- **Alternative**: Use fewer hash methods (pHash only)
+
+**Memory Errors During Processing**
+- **Cause**: Batch size too large for available memory
+- **Solution**: Reduce batch size (try 20-50 instead of 100-500)
+- **Alternative**: Process smaller subsets of images
+
+**Slow Processing**
+- **Cause**: Too many hash methods or large batch size
+- **Solution**: Use fewer hash methods (pHash + dHash only)
+- **Alternative**: Reduce batch size and process in smaller chunks
+
+**"No image files found" Error**
+- **Cause**: Folder doesn't contain supported image files
+- **Solution**: Check folder path and ensure it contains .jpg, .png, .bmp, .tiff files
+- **Alternative**: Use image validation tools to check file integrity
+
+**"Invalid threshold value" Error**
+- **Cause**: Threshold not between 0 and 100
+- **Solution**: Use values between 0 and 100 (e.g., 85 for 85%)
+- **Alternative**: Use default thresholds if unsure
+
+### Performance Optimization
+
+**For Large Datasets (> 10,000 images)**
+- Use batch size of 20-100
+- Use only 2-3 hash methods (pHash + dHash + aHash)
+- Process in smaller chunks if memory is limited
+
+**For Medium Datasets (1,000-10,000 images)**
+- Use batch size of 50-200
+- Use 3-4 hash methods for better accuracy
+- Monitor memory usage during processing
+
+**For Small Datasets (< 1,000 images)**
+- Use batch size of 100-500
+- Can use all hash methods for maximum accuracy
+- Test different threshold combinations
+
+### Best Practices for Fuzzy Deduplication
+
+1. **Start with Show Mode**: Always preview duplicates before taking action
+2. **Use Conservative Thresholds**: Begin with 90-95% thresholds to avoid false positives
+3. **Test with Small Subsets**: Verify results with 100-500 images before processing large datasets
+4. **Combine Hash Methods**: Use pHash + dHash for balanced accuracy and speed
+5. **Backup Important Data**: Always backup before using delete operations
+6. **Monitor Memory Usage**: Use System Monitoring to track memory consumption
+
 ### Getting Help
 
 If you encounter issues not covered here:
@@ -4484,6 +4818,228 @@ See below for frequently asked questions. For more, visit the [Discussion Board]
 - [Style Guide](style_guide.md)
 
 If your question is not answered here, check the [usage guide](usage.md), [troubleshooting guide](troubleshooting.md), or open an issue.
+
+---
+
+# Todo
+
+[← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
+
+# TODO / Planned Features
+
+> **Project Roadmap**  
+> This section collects all future feature/functionality ideas, goals, and implementation notes for Dataset Forge. Add new ideas here to keep the roadmap in one place and maintain project inspiration.
+
+---
+
+## 🚀 High Priority Features
+
+### Core System Enhancements
+
+- [ ] **Debug Mode**: Add a comprehensive _Debug Mode_ to the project, which when activated, shows verbose output and debug information throughout the CLI
+- [ ] **Packaging & Distribution**:
+  - [ ] Compile Dataset-Forge into standalone executable
+  - [ ] Create Docker container/containerization
+  - [ ] Automated build pipeline for releases
+- [ ] **Automated Documentation**: Implement automated documentation generation and maintenance
+- [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
+- [ ] **Global Search Functionality**: Implement comprehensive search across all menus and features
+- [ ] **Path Sanitization**: Add robust path validation and sanitization throughout the application
+
+### Advanced Data Processing
+
+- [ ] **Advanced Data Augmentation**: Expand augmentation capabilities with model-aware techniques
+  - [ ] Compositional Augmentations: Integrate Albumentations for complex augmentation pipelines
+  - [ ] Mixing Augmentations: Implement Mixup and CutMix techniques
+  - [ ] GAN-based Augmentations: Integrate with pre-trained StyleGAN for synthetic data generation
+- [ ] **Advanced Filtering / AI-Powered Features**:
+  - [ ] Semantic Filtering: Filter by image content/semantics
+  - [ ] Style-Based Filtering: Filter by artistic style
+  - [ ] Quality-Based Filtering: Advanced quality assessment filters
+  - [ ] Custom Filter Plugins: User-defined filtering logic
+  - [ ] Auto-Labeling: Automatic image labeling and classification
+  - [ ] Style Transfer: Apply artistic styles to datasets
+  - [ ] Content-Aware Cropping: Intelligent image cropping
+
+### Performance & Optimization
+
+- [ ] **Parallel Import Loading**: Load multiple modules in parallel with threading
+- [ ] **Smart Caching**: Predictive loading of frequently used modules
+- [ ] **Import Optimization**: Compile-time import analysis and automatic conversion
+- [ ] **Performance Monitoring**: Real-time metrics and automated regression detection
+- [ ] **Lazy Imports**: Ensure lazy imports everywhere to speed up CLI startup
+
+---
+
+## 🔧 Development & Infrastructure
+
+### Code Quality & Testing
+
+- [ ] **Validate Code from Other Repos**: Review and validate all code imported from external repositories
+- [ ] **Improve Unit and Integration Tests**: Enhance test coverage and quality
+- [ ] **Test Dataset Improvements**: Enhance test datasets for better coverage
+- [ ] **Code Validation**: Implement comprehensive code validation and quality checks
+
+### External Tool Integration
+
+- [ ] **Phhofm's SISR**: Investigate [Phhofm's SISR](https://github.com/Phhofm/sisr) for potential integration
+- [ ] **Links .json Customization**: Further customize links with metadata, descriptions, and enhanced information
+- [ ] **External Tool Validation**: Validate and improve all external tool integrations
+
+### Documentation & User Experience
+
+- [ ] **Onboarding**: Create comprehensive onboarding documentation and flow
+- [ ] **Features TL;DR**: Create a '# Features (tl;dr)' section in `./docs/features.md`
+- [ ] **User Experience Enhancements**: Improve overall user experience and workflow
+
+---
+
+## 🎯 Specific Feature Implementations
+
+### Image Processing & Analysis
+
+- [ ] **Advanced Align Images Options**: Add SIFT/FLANN parameters and advanced alignment options
+- [ ] **AI-Powered Dataset Analysis**: Implement AI-powered dataset analysis and recommendations
+- [ ] **Advanced Analytics**: More advanced analytics and monitoring capabilities
+
+### System Architecture
+
+- [ ] **Modularization**: Further modularization and extensibility for new workflows
+- [ ] **Cloud Integration**: Cloud integration for distributed processing and storage
+- [ ] **Web Interface**: Web interface for dataset management and visualization
+- [ ] **Dataset Versioning**: Implement comprehensive dataset versioning system
+
+### Deduplication Enhancements
+
+- [ ] **Dedicated De-dupe Menu**: Create a comprehensive dedicated deduplication menu
+- [ ] **Enhanced Deduplication**: Improve existing deduplication features and workflows
+
+---
+
+## ✅ Completed Features
+
+### Core System Features
+
+- [x] **Dataset Health Scoring**: Comprehensive dataset health scoring workflow and menu option
+- [x] **the-database's img-ab**: Successfully forked and improved
+- [x] **find_code_issues.py**: Comprehensive static analysis tool implemented and tested
+- [x] **create .exe & dll dump**: Successfully created executable and DLL dump
+
+### Critical Bug Fixes
+
+- [x] **Fix Critical Menu System Errors**: Resolved 'str' object is not callable and 'module' object is not callable errors
+
+  - **Problem**: Critical menu system errors causing application crashes
+  - **Solution**: Fixed lazy_action vs lazy_menu usage, pepedp lazy imports, and ProcessType enum access
+  - **Files**: `dataset_management_menu.py` and related menu files
+  - **Result**: Stable menu system with proper error handling
+
+- [x] **Audio System Investigation & Fix**: Resolved CLI hanging issues and implemented robust multi-library audio system
+
+  - **Problem**: CLI was hanging during exit due to audio playback issues
+  - **Investigation**: Tested audio files, pygame mixer, winsound, and alternative libraries
+  - **Solution**: Implemented robust audio system with multiple fallback libraries
+  - **Libraries**: playsound (primary), winsound (Windows WAV), pydub (various formats), pygame (fallback)
+  - **Features**: System-specific audio handling, format-specific optimizations, graceful error handling
+  - **Testing**: All 4 audio files (done.wav, error.mp3, startup.mp3, shutdown.mp3) working perfectly
+  - **Dependencies**: Added playsound==1.2.2 and pydub to requirements.txt
+  - **Result**: CLI exits cleanly with full audio functionality restored
+
+- [x] **Comprehensive Audio Implementation**: Add audio feedback throughout the entire application
+
+  - **Status**: ✅ COMPLETED - Audio feedback added to all major action functions
+  - **Files Updated**:
+    - `augmentation_actions.py` - Added completion audio to `apply_augmentation_pipeline` and `create_augmentation_variations`
+    - `metadata_actions.py` - Added completion audio to `exif_scrubber_menu` and `icc_to_srgb_menu`
+    - `quality_scoring_actions.py` - Added completion audio to `score_images_with_pyiqa` and `score_hq_lq_folders`
+    - `report_actions.py` - Added completion audio to `generate_rich_report`
+    - `resave_images_actions.py` - Added completion audio to `resave_images_workflow`
+    - `exif_scrubber_actions.py` - Added completion audio to `scrub_exif_single_folder` and `scrub_exif_hq_lq_folders`
+    - `orientation_organizer_actions.py` - Added completion audio to `organize_images_by_orientation` and `organize_hq_lq_by_orientation`
+    - `batch_rename_actions.py` - Added completion audio to `batch_rename_single_folder` and `batch_rename_hq_lq_folders`
+    - `hue_adjustment_actions.py` - Added completion audio to `process_folder`
+    - `frames_actions.py` - Already had completion audio in `extract_frames_menu`
+  - **Audio Files**: Successfully moved to `./assets/audio/` directory for better organization
+  - **Result**: Complete audio feedback throughout the application with success sounds for all major operations
+
+- [x] **Fix Test Failures**: Resolved 3 critical test failures in performance optimization module
+  - **Problem**: 3 tests failing in `test_performance_optimization.py`:
+    1. `test_gpu_image_analysis` - RuntimeError due to RGB vs grayscale tensor mismatch
+    2. `test_prioritize_samples` - NameError due to missing `time` import
+    3. `test_end_to_end_optimization_pipeline` - NameError due to missing `time` import
+  - **Solution**:
+    1. Fixed GPU image analysis by properly converting RGB to grayscale for Sobel edge detection
+    2. Added missing `import time` to `sample_prioritization.py`
+    3. Added "size" key to GPU image analysis results to match test expectations
+  - **Files Modified**:
+    - `dataset_forge/utils/sample_prioritization.py` - Added time import
+    - `dataset_forge/utils/gpu_acceleration.py` - Fixed RGB/grayscale conversion and added size field
+  - **Testing**: All 306 tests now passing (298 passed, 7 skipped, 1 xfailed)
+  - **Result**: Complete test suite stability restored
+
+### Advanced Features
+
+- [x] **MCP Integration Implementation**: Comprehensive MCP (Model Context Protocol) integration for enhanced development
+  - **Status**: ✅ COMPLETED - MCP tools integration fully implemented and documented
+  - **MCP Tools Configured**:
+    1. **Brave Search Tools** - Primary research for latest libraries, best practices, and solutions
+    2. **Firecrawl Tools** - Deep web scraping for documentation and content extraction
+    3. **Filesystem Tools** - Project analysis and file management
+    4. **GitHub Integration Tools** - Code examples and repository documentation
+  - **Files Updated**:
+    - `.cursorrules` - Added comprehensive MCP Integration (MANDATORY) section with tool usage patterns
+    - `docs/style_guide.md` - Added MCP Integration Requirements section
+    - `docs/contributing.md` - Enhanced MCP Integration Development section with mandatory requirements
+    - `docs/TODO.md` - Added completion status for MCP Integration
+  - **Key Features**:
+    - **Mandatory MCP Tool Usage**: All contributors must use MCP tools before implementing solutions
+    - **Tool Usage Patterns**: Clear workflows for different development scenarios
+    - **Priority Order**: Brave Search → Firecrawl → Filesystem → GitHub Integration
+    - **Usage Examples**: Practical code examples for each tool category
+    - **Integration Requirements**: Specific requirements for MCP tool usage
+  - **Result**: Enhanced development workflow with comprehensive research and analysis capabilities
+
+---
+
+## 📋 Future Considerations
+
+### Long-term Goals
+
+- [ ] **Stable Release**: Release a stable build with comprehensive testing
+- [ ] **Community Features**: Enhanced community features and collaboration tools
+- [ ] **Enterprise Features**: Enterprise-grade features for large-scale deployments
+- [ ] **API Development**: RESTful API for programmatic access
+- [ ] **Plugin System**: Extensible plugin system for custom functionality
+
+### Research & Investigation
+
+- [ ] **New Technologies**: Investigate emerging technologies for potential integration
+- [ ] **Performance Research**: Research new performance optimization techniques
+- [ ] **User Experience Research**: Study user workflows and optimize accordingly
+- [ ] **Community Feedback**: Gather and implement community feedback and suggestions
+
+---
+
+## 🔄 Maintenance & Updates
+
+### Regular Tasks
+
+- [ ] **Dependency Updates**: Regular dependency updates and security patches
+- [ ] **Documentation Updates**: Keep documentation current with feature changes
+- [ ] **Test Maintenance**: Maintain and expand test coverage
+- [ ] **Performance Monitoring**: Continuous performance monitoring and optimization
+- [ ] **Bug Tracking**: Comprehensive bug tracking and resolution
+
+### Quality Assurance
+
+- [ ] **Code Review**: Implement comprehensive code review processes
+- [ ] **Automated Testing**: Expand automated testing coverage
+- [ ] **Static Analysis**: Regular static analysis and code quality checks
+- [ ] **Security Audits**: Regular security audits and vulnerability assessments
+
+---
+
+> **Note**: This TODO list is a living document that should be updated as features are completed and new ideas are added. All completed features should be moved to the "Completed Features" section with detailed implementation notes.
 
 ---
 

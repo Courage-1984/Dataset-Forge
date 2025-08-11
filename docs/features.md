@@ -1036,4 +1036,115 @@ Finding fuzzy duplicates...
 5. **Backup Data**: Always backup before using delete operations
 6. **Monitor Memory**: Use appropriate batch sizes for your system
 
+### **Performance Considerations**
+
+#### **Memory Usage**
+- **Small Datasets** (< 1,000 images): Use batch size of 100-500
+- **Medium Datasets** (1,000-10,000 images): Use batch size of 50-200
+- **Large Datasets** (> 10,000 images): Use batch size of 20-100
+
+#### **Processing Speed**
+- **pHash**: Fastest, good for initial screening
+- **dHash**: Fast, good for edge-based detection
+- **aHash**: Very fast, good for brightness-based detection
+- **wHash**: Slower, good for texture-based detection
+- **Color Hash**: Medium speed, good for color-based detection
+
+#### **Accuracy vs Speed Trade-offs**
+- **High Accuracy**: Use all hash methods with high thresholds
+- **Fast Processing**: Use pHash + dHash only
+- **Balanced**: Use pHash + dHash + aHash with medium thresholds
+
+### **Troubleshooting**
+
+#### **Common Issues**
+
+**No Duplicates Found**
+- **Cause**: Thresholds too high
+- **Solution**: Lower the similarity thresholds
+- **Alternative**: Try different hash method combinations
+
+**Too Many False Positives**
+- **Cause**: Thresholds too low
+- **Solution**: Increase the similarity thresholds
+- **Alternative**: Use fewer hash methods
+
+**Memory Errors**
+- **Cause**: Batch size too large
+- **Solution**: Reduce the batch size
+- **Alternative**: Process smaller subsets
+
+**Slow Processing**
+- **Cause**: Too many hash methods or large batch size
+- **Solution**: Use fewer hash methods or smaller batch size
+- **Alternative**: Process in smaller chunks
+
+#### **Error Messages**
+
+**"No image files found"**
+- **Cause**: Folder doesn't contain supported image files
+- **Solution**: Check folder path and file types
+
+**"Invalid threshold value"**
+- **Cause**: Threshold not between 0 and 100
+- **Solution**: Use values between 0 and 100
+
+**"Operation cancelled"**
+- **Cause**: User cancelled the operation
+- **Solution**: Re-run the operation
+
+### **Integration with Other Features**
+
+#### **Visual De-duplication**
+- Use fuzzy matching for initial screening
+- Use visual de-duplication for final verification
+
+#### **File Hash De-duplication**
+- Use fuzzy matching for content-based duplicates
+- Use file hash for exact duplicates
+
+#### **ImageDedup**
+- Use fuzzy matching for perceptual duplicates
+- Use ImageDedup for advanced duplicate detection
+
+### **Technical Details**
+
+#### **Hash Computation**
+- All hashes are computed using the `imagehash` library
+- Hashes are normalized to 64-bit values
+- Similarity is calculated using Hamming distance
+
+#### **Memory Management**
+- Images are processed in batches to manage memory usage
+- Hash values are cached to avoid recomputation
+- Memory is cleared after each batch
+
+#### **Error Handling**
+- Invalid images are skipped with warnings
+- Processing continues even if some images fail
+- Comprehensive error reporting and logging
+
+### **Future Enhancements**
+
+#### **Planned Features**
+- **Machine Learning Integration**: Use ML models for better duplicate detection
+- **Batch Processing**: Process multiple folders simultaneously
+- **Cloud Integration**: Support for cloud storage providers
+- **Advanced Filtering**: Filter duplicates by size, date, or other criteria
+
+#### **Performance Improvements**
+- **GPU Acceleration**: Use GPU for hash computation
+- **Parallel Processing**: Process multiple images simultaneously
+- **Caching**: Persistent cache for hash values
+
+### **Dependencies**
+
+The Fuzzy Matching De-duplication feature requires:
+- **imagehash**: For perceptual hash computation
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
+
 This feature provides a comprehensive solution for fuzzy duplicate detection, combining multiple perceptual hashing algorithms with flexible configuration options and safe operation modes.

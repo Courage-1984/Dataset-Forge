@@ -25,8 +25,12 @@ from dataset_forge.utils.monitoring import monitor_all
 from dataset_forge.utils.cache_utils import in_memory_cache
 from dataset_forge.utils.audio_utils import play_done_sound
 from dataset_forge.utils.printing import (
-    print_info, print_success, print_warning, print_error,
-    print_header, print_section
+    print_info,
+    print_success,
+    print_warning,
+    print_error,
+    print_header,
+    print_section,
 )
 from dataset_forge.utils.color import Mocha
 
@@ -76,7 +80,7 @@ def analyze_image_batch(image_paths: list) -> list:
 def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     print_header("HQ/LQ DATASET REPORT", char="=", color=Mocha.sapphire)
     print_section("Overall Dataset Information", char="-", color=Mocha.lavender)
-    
+
     try:
         hq_files_list = sorted(
             [
@@ -106,7 +110,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     print_info(f"LQ Folder: {lq_folder}")
     print_info(f"Total HQ Images (root): {len(hq_files_list)}")
     print_info(f"Total LQ Images (root): {len(lq_files_list)}")
-    print_info(f"Matching HQ/LQ Pairs (based on root filenames): {len(matching_pairs_list)}")
+    print_info(
+        f"Matching HQ/LQ Pairs (based on root filenames): {len(matching_pairs_list)}"
+    )
 
     hq_unique_files = [f for f in hq_files_list if f not in lq_files_list]
     lq_unique_files = [f for f in lq_files_list if f not in hq_files_list]
@@ -122,7 +128,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     elif lq_unique_files:
         print_info(f"  (e.g., {', '.join(lq_unique_files[:3])} ...)")
 
-    print_section("Scale Analysis (based on root filenames)", char="-", color=Mocha.lavender)
+    print_section(
+        "Scale Analysis (based on root filenames)", char="-", color=Mocha.lavender
+    )
     scale_results = find_hq_lq_scale(
         hq_folder, lq_folder, verbose=False
     )  # verbose=False for report summary
@@ -167,7 +175,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     else:
         print_warning("HQ Color Modes: No image files found or processed.")
     if hq_consistency["errors"]:
-        print_warning(f"HQ files with processing errors: {len(hq_consistency['errors'])}")
+        print_warning(
+            f"HQ files with processing errors: {len(hq_consistency['errors'])}"
+        )
 
     print_section("Consistency Check (LQ)", char="-", color=Mocha.lavender)
     lq_consistency = check_consistency(lq_folder, "LQ", verbose=False)
@@ -184,7 +194,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     else:
         print_warning("LQ Color Modes: No image files found or processed.")
     if lq_consistency["errors"]:
-        print_warning(f"LQ files with processing errors: {len(lq_consistency['errors'])}")
+        print_warning(
+            f"LQ files with processing errors: {len(lq_consistency['errors'])}"
+        )
 
     print_section("Dimension Report (HQ)", char="-", color=Mocha.lavender)
     hq_dimensions_report = report_dimensions(hq_folder, "HQ", verbose=False)
@@ -205,7 +217,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     else:
         print_warning("HQ Dimensions: No images successfully processed for dimensions.")
     if hq_dimensions_report["errors"]:
-        print_warning(f"HQ dimension processing errors: {len(hq_dimensions_report['errors'])}")
+        print_warning(
+            f"HQ dimension processing errors: {len(hq_dimensions_report['errors'])}"
+        )
 
     print_section("Dimension Report (LQ)", char="-", color=Mocha.lavender)
     lq_dimensions_report = report_dimensions(lq_folder, "LQ", verbose=False)
@@ -226,7 +240,9 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     else:
         print_warning("LQ Dimensions: No images successfully processed for dimensions.")
     if lq_dimensions_report["errors"]:
-        print_warning(f"LQ dimension processing errors: {len(lq_dimensions_report['errors'])}")
+        print_warning(
+            f"LQ dimension processing errors: {len(lq_dimensions_report['errors'])}"
+        )
 
     print_section("Extreme Dimensions (HQ)", char="-", color=Mocha.lavender)
     hq_extreme_dims = find_extreme_dimensions(hq_folder, "HQ", verbose=False)
@@ -239,12 +255,16 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
             f"HQ Biggest Dimension (pixels): {bd_hq[0]}x{bd_hq[1]} (Area: {bd_hq[0]*bd_hq[1]})"
         )
         if bf_hq:
-            print_info(f"  Files: {', '.join(bf_hq[:2])}{'...' if len(bf_hq) > 2 else ''}")
+            print_info(
+                f"  Files: {', '.join(bf_hq[:2])}{'...' if len(bf_hq) > 2 else ''}"
+            )
         print_info(
             f"HQ Smallest Dimension (pixels): {sd_hq[0]}x{sd_hq[1]} (Area: {sd_hq[0]*sd_hq[1]})"
         )
         if sf_hq:
-            print_info(f"  Files: {', '.join(sf_hq[:2])}{'...' if len(sf_hq) > 2 else ''}")
+            print_info(
+                f"  Files: {', '.join(sf_hq[:2])}{'...' if len(sf_hq) > 2 else ''}"
+            )
     else:
         print_warning("HQ Extreme Dimensions: No images successfully processed.")
     if hq_extreme_dims["errors"]:
@@ -263,12 +283,16 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
             f"LQ Biggest Dimension (pixels): {bd_lq[0]}x{bd_lq[1]} (Area: {bd_lq[0]*bd_lq[1]})"
         )
         if bf_lq:
-            print_info(f"  Files: {', '.join(bf_lq[:2])}{'...' if len(bf_lq) > 2 else ''}")
+            print_info(
+                f"  Files: {', '.join(bf_lq[:2])}{'...' if len(bf_lq) > 2 else ''}"
+            )
         print_info(
             f"LQ Smallest Dimension (pixels): {sd_lq[0]}x{sd_lq[1]} (Area: {sd_lq[0]*sd_lq[1]})"
         )
         if sf_lq:
-            print_info(f"  Files: {', '.join(sf_lq[:2])}{'...' if len(sf_lq) > 2 else ''}")
+            print_info(
+                f"  Files: {', '.join(sf_lq[:2])}{'...' if len(sf_lq) > 2 else ''}"
+            )
     else:
         print_warning("LQ Extreme Dimensions: No images successfully processed.")
     if lq_extreme_dims["errors"]:
@@ -297,6 +321,39 @@ def generate_hq_lq_dataset_report(hq_folder, lq_folder):
     play_done_sound()
 
 
+def _analyze_pair_worker(args):
+    """Worker function for analyzing HQ/LQ pairs (module-level for pickling)."""
+    filename, hq_folder, lq_folder = args
+    try:
+        hq_path = os.path.join(hq_folder, filename)
+        lq_path = os.path.join(lq_folder, filename)
+
+        hq_width, hq_height = get_image_size(hq_path)
+        lq_width, lq_height = get_image_size(lq_path)
+
+        if hq_width and lq_width and hq_height and lq_height:
+            width_scale = hq_width / lq_width
+            height_scale = hq_height / lq_height
+
+            # Check if scales are consistent (within 1% tolerance)
+            if abs(width_scale - height_scale) / width_scale < 0.01:
+                return {"success": True, "scale": width_scale, "filename": filename}
+            else:
+                return {
+                    "success": False,
+                    "inconsistent": True,
+                    "filename": filename,
+                }
+        else:
+            return {
+                "success": False,
+                "error": "Could not read dimensions",
+                "filename": filename,
+            }
+    except Exception as e:
+        return {"success": False, "error": str(e), "filename": filename}
+
+
 def find_hq_lq_scale(hq_folder, lq_folder, verbose=True):
     """Find HQ/LQ scale relationships with parallel processing."""
     hq_files = {f for f in os.listdir(hq_folder) if is_image_file(f)}
@@ -312,36 +369,8 @@ def find_hq_lq_scale(hq_folder, lq_folder, verbose=True):
             "missing_hq": [],
         }
 
-    def analyze_pair(filename):
-        """Analyze a single HQ/LQ pair."""
-        try:
-            hq_path = os.path.join(hq_folder, filename)
-            lq_path = os.path.join(lq_folder, filename)
-
-            hq_width, hq_height = get_image_size(hq_path)
-            lq_width, lq_height = get_image_size(lq_path)
-
-            if hq_width and lq_width and hq_height and lq_height:
-                width_scale = hq_width / lq_width
-                height_scale = hq_height / lq_height
-
-                # Check if scales are consistent (within 1% tolerance)
-                if abs(width_scale - height_scale) / width_scale < 0.01:
-                    return {"success": True, "scale": width_scale, "filename": filename}
-                else:
-                    return {
-                        "success": False,
-                        "inconsistent": True,
-                        "filename": filename,
-                    }
-            else:
-                return {
-                    "success": False,
-                    "error": "Could not read dimensions",
-                    "filename": filename,
-                }
-        except Exception as e:
-            return {"success": False, "error": str(e), "filename": filename}
+    # Prepare arguments for worker function
+    worker_args = [(filename, hq_folder, lq_folder) for filename in matching_files]
 
     # Setup parallel processing
     config = ParallelConfig(
@@ -352,8 +381,8 @@ def find_hq_lq_scale(hq_folder, lq_folder, verbose=True):
 
     # Process pairs in parallel
     results = smart_map(
-        analyze_pair,
-        matching_files,
+        _analyze_pair_worker,
+        worker_args,
         desc="Analyzing HQ/LQ scales",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
@@ -402,15 +431,33 @@ def test_hq_lq_scale(hq_folder, lq_folder):
             for filename in scale_results["inconsistent_scales"][:5]:
                 print_warning(f"  {filename}")
             if len(scale_results["inconsistent_scales"]) > 5:
-                print_warning(f"  ... and {len(scale_results['inconsistent_scales']) - 5} more")
+                print_warning(
+                    f"  ... and {len(scale_results['inconsistent_scales']) - 5} more"
+                )
 
     if scale_results["missing_lq"]:
         print_warning(f"HQ files missing LQ: {len(scale_results['missing_lq'])}")
     if scale_results["missing_hq"]:
         print_warning(f"LQ files missing HQ: {len(scale_results['missing_hq'])}")
-    
+
     print_success("HQ/LQ scale analysis complete!")
     play_done_sound()
+
+
+def _analyze_image_worker(args):
+    """Worker function for analyzing image consistency (module-level for pickling)."""
+    filename, folder_path = args
+    try:
+        image_path = os.path.join(folder_path, filename)
+        with Image.open(image_path) as img:
+            return {
+                "success": True,
+                "format": img.format,
+                "mode": img.mode,
+                "filename": filename,
+            }
+    except Exception as e:
+        return {"success": False, "error": str(e), "filename": filename}
 
 
 def check_consistency(folder_path, folder_name, verbose=True):
@@ -420,19 +467,8 @@ def check_consistency(folder_path, folder_name, verbose=True):
     if not image_files:
         return {"formats": {}, "modes": {}, "errors": []}
 
-    def analyze_image(filename):
-        """Analyze a single image for consistency."""
-        try:
-            image_path = os.path.join(folder_path, filename)
-            with Image.open(image_path) as img:
-                return {
-                    "success": True,
-                    "format": img.format,
-                    "mode": img.mode,
-                    "filename": filename,
-                }
-        except Exception as e:
-            return {"success": False, "error": str(e), "filename": filename}
+    # Prepare arguments for worker function
+    worker_args = [(filename, folder_path) for filename in image_files]
 
     # Setup parallel processing
     config = ParallelConfig(
@@ -443,8 +479,8 @@ def check_consistency(folder_path, folder_name, verbose=True):
 
     # Process images in parallel
     results = smart_map(
-        analyze_image,
-        image_files,
+        _analyze_image_worker,
+        worker_args,
         desc=f"Checking {folder_name} consistency",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
@@ -472,6 +508,28 @@ def check_consistency(folder_path, folder_name, verbose=True):
     return {"formats": formats, "modes": modes, "errors": errors}
 
 
+def _get_dimensions_worker(args):
+    """Worker function for getting image dimensions (module-level for pickling)."""
+    filename, folder_path = args
+    try:
+        image_path = os.path.join(folder_path, filename)
+        width, height = get_image_size(image_path)
+        if width and height:
+            return {
+                "success": True,
+                "dimensions": (width, height),
+                "filename": filename,
+            }
+        else:
+            return {
+                "success": False,
+                "error": "Could not read dimensions",
+                "filename": filename,
+            }
+    except Exception as e:
+        return {"success": False, "error": str(e), "filename": filename}
+
+
 def report_dimensions(folder_path, folder_name, verbose=True):
     """Report image dimensions with parallel processing."""
     image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
@@ -479,25 +537,8 @@ def report_dimensions(folder_path, folder_name, verbose=True):
     if not image_files:
         return {"dimensions": [], "errors": []}
 
-    def get_dimensions(filename):
-        """Get dimensions of a single image."""
-        try:
-            image_path = os.path.join(folder_path, filename)
-            width, height = get_image_size(image_path)
-            if width and height:
-                return {
-                    "success": True,
-                    "dimensions": (width, height),
-                    "filename": filename,
-                }
-            else:
-                return {
-                    "success": False,
-                    "error": "Could not read dimensions",
-                    "filename": filename,
-                }
-        except Exception as e:
-            return {"success": False, "error": str(e), "filename": filename}
+    # Prepare arguments for worker function
+    worker_args = [(filename, folder_path) for filename in image_files]
 
     # Setup parallel processing
     config = ParallelConfig(
@@ -508,8 +549,8 @@ def report_dimensions(folder_path, folder_name, verbose=True):
 
     # Process images in parallel
     results = smart_map(
-        get_dimensions,
-        image_files,
+        _get_dimensions_worker,
+        worker_args,
         desc=f"Getting {folder_name} dimensions",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
@@ -523,6 +564,38 @@ def report_dimensions(folder_path, folder_name, verbose=True):
             dimensions.append(result["dimensions"])
         else:
             errors.append(result["filename"])
+
+    # Display results if verbose is True
+    if verbose and dimensions:
+        print_section(f"{folder_name} Dimension Report", char="-", color=Mocha.lavender)
+
+        # Calculate statistics
+        widths = [dim[0] for dim in dimensions]
+        heights = [dim[1] for dim in dimensions]
+        areas = [w * h for w, h in dimensions]
+
+        print_info(f"  Total images processed: {len(dimensions)}")
+        print_info(f"  Width range: {min(widths)} - {max(widths)} pixels")
+        print_info(f"  Height range: {min(heights)} - {max(heights)} pixels")
+        print_info(f"  Area range: {min(areas):,} - {max(areas):,} pixels²")
+        print_info(f"  Average width: {sum(widths)/len(widths):.1f} pixels")
+        print_info(f"  Average height: {sum(heights)/len(heights):.1f} pixels")
+        print_info(f"  Average area: {sum(areas)/len(areas):,.0f} pixels²")
+
+        # Show unique dimensions
+        unique_dims = sorted(list(set(dimensions)))
+        print_info(f"  Unique dimensions: {len(unique_dims)}")
+        if len(unique_dims) <= 10:
+            print_info(f"    {unique_dims}")
+        else:
+            print_info(f"    First 5: {unique_dims[:5]}")
+            print_info(f"    Last 5: {unique_dims[-5:]}")
+
+        if errors:
+            print_warning(f"  Errors: {len(errors)} files failed to process")
+
+    elif verbose and not dimensions:
+        print_warning(f"No valid images found in {folder_name} folder")
 
     return {"dimensions": dimensions, "errors": errors}
 
@@ -577,6 +650,40 @@ def find_extreme_dimensions(folder_path, folder_name, verbose=True):
     biggest_files = find_files_with_dimension(biggest_dimension)
     smallest_files = find_files_with_dimension(smallest_dimension)
 
+    # Display results if verbose is True
+    if verbose and dimension_results["dimensions"]:
+        print_section(
+            f"{folder_name} Extreme Dimensions", char="-", color=Mocha.lavender
+        )
+
+        print_info(
+            f"  Biggest dimension: {biggest_dimension[0]}x{biggest_dimension[1]} pixels"
+        )
+        print_info(f"    Area: {biggest_dimension[0] * biggest_dimension[1]:,} pixels²")
+        if biggest_files:
+            print_info(
+                f"    Files: {', '.join(biggest_files[:3])}{'...' if len(biggest_files) > 3 else ''}"
+            )
+
+        print_info(
+            f"  Smallest dimension: {smallest_dimension[0]}x{smallest_dimension[1]} pixels"
+        )
+        print_info(
+            f"    Area: {smallest_dimension[0] * smallest_dimension[1]:,} pixels²"
+        )
+        if smallest_files:
+            print_info(
+                f"    Files: {', '.join(smallest_files[:3])}{'...' if len(smallest_files) > 3 else ''}"
+            )
+
+        if dimension_results["errors"]:
+            print_warning(
+                f"  Errors: {len(dimension_results['errors'])} files failed to process"
+            )
+
+    elif verbose and not dimension_results["dimensions"]:
+        print_warning(f"No valid images found in {folder_name} folder")
+
     return {
         "successfully_processed": len(dimension_results["dimensions"]),
         "biggest_dimension": biggest_dimension,
@@ -587,6 +694,18 @@ def find_extreme_dimensions(folder_path, folder_name, verbose=True):
     }
 
 
+def _get_file_size_worker(args):
+    """Worker function for getting file sizes (module-level for pickling)."""
+    filename, folder_path = args
+    try:
+        image_path = os.path.join(folder_path, filename)
+        size_bytes = os.path.getsize(image_path)
+        size_mb = size_bytes / (1024 * 1024)  # Convert to MB
+        return {"success": True, "size_mb": size_mb, "filename": filename}
+    except Exception as e:
+        return {"success": False, "error": str(e), "filename": filename}
+
+
 def analyze_file_sizes(folder_path, folder_name, verbose=True):
     """Analyze file sizes with parallel processing."""
     image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
@@ -594,15 +713,8 @@ def analyze_file_sizes(folder_path, folder_name, verbose=True):
     if not image_files:
         return {"sizes": [], "errors": []}
 
-    def get_file_size(filename):
-        """Get file size of a single image."""
-        try:
-            image_path = os.path.join(folder_path, filename)
-            size_bytes = os.path.getsize(image_path)
-            size_mb = size_bytes / (1024 * 1024)  # Convert to MB
-            return {"success": True, "size_mb": size_mb, "filename": filename}
-        except Exception as e:
-            return {"success": False, "error": str(e), "filename": filename}
+    # Prepare arguments for worker function
+    worker_args = [(filename, folder_path) for filename in image_files]
 
     # Setup parallel processing
     config = ParallelConfig(
@@ -613,8 +725,8 @@ def analyze_file_sizes(folder_path, folder_name, verbose=True):
 
     # Process files in parallel
     results = smart_map(
-        get_file_size,
-        image_files,
+        _get_file_size_worker,
+        worker_args,
         desc=f"Analyzing {folder_name} file sizes",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
@@ -632,6 +744,22 @@ def analyze_file_sizes(folder_path, folder_name, verbose=True):
     return {"sizes": sizes, "errors": errors}
 
 
+def _verify_single_image_worker(file_info):
+    """Worker function for verifying single images (module-level for pickling)."""
+    folder_type, file_path = file_info
+    try:
+        with Image.open(file_path) as img:
+            img.verify()
+        return {"success": True, "folder": folder_type, "path": file_path}
+    except Exception as e:
+        return {
+            "success": False,
+            "folder": folder_type,
+            "path": file_path,
+            "error": str(e),
+        }
+
+
 # Keep existing functions that don't need parallel processing
 @monitor_all("verify_images", critical_on_error=True)
 def verify_images(hq_folder, lq_folder):
@@ -645,21 +773,6 @@ def verify_images(hq_folder, lq_folder):
     for filename in lq_files:
         all_files.append(("lq", os.path.join(lq_folder, filename)))
 
-    def verify_single_image(file_info):
-        """Verify a single image."""
-        folder_type, file_path = file_info
-        try:
-            with Image.open(file_path) as img:
-                img.verify()
-            return {"success": True, "folder": folder_type, "path": file_path}
-        except Exception as e:
-            return {
-                "success": False,
-                "folder": folder_type,
-                "path": file_path,
-                "error": str(e),
-            }
-
     # Setup parallel processing
     config = ParallelConfig(
         max_workers=parallel_config.get("max_workers"),
@@ -669,7 +782,7 @@ def verify_images(hq_folder, lq_folder):
 
     # Process images in parallel
     results = smart_map(
-        verify_single_image,
+        _verify_single_image_worker,
         all_files,
         desc="Verifying images",
         max_workers=config.max_workers,
@@ -719,6 +832,40 @@ def fix_corrupted_images(*args, **kwargs):
     return fix_corrupted(*args, **kwargs)
 
 
+def _check_alignment_worker(args):
+    """Worker function for checking image alignment (module-level for pickling)."""
+    filename, hq_folder, lq_folder = args
+    try:
+        hq_path = os.path.join(hq_folder, filename)
+        lq_path = os.path.join(lq_folder, filename)
+
+        hq_width, hq_height = get_image_size(hq_path)
+        lq_width, lq_height = get_image_size(lq_path)
+
+        if hq_width and lq_width and hq_height and lq_height:
+            width_scale = hq_width / lq_width
+            height_scale = hq_height / lq_height
+
+            # Check if scales are consistent (within 1% tolerance)
+            if abs(width_scale - height_scale) / width_scale < 0.01:
+                return {"aligned": True, "filename": filename}
+            else:
+                return {
+                    "aligned": False,
+                    "filename": filename,
+                    "width_scale": width_scale,
+                    "height_scale": height_scale,
+                }
+        else:
+            return {
+                "aligned": False,
+                "filename": filename,
+                "error": "Could not read dimensions",
+            }
+    except Exception as e:
+        return {"aligned": False, "filename": filename, "error": str(e)}
+
+
 def find_misaligned_images(hq_folder, lq_folder):
     """Find misaligned image pairs with parallel processing."""
     hq_files = {f for f in os.listdir(hq_folder) if is_image_file(f)}
@@ -729,37 +876,8 @@ def find_misaligned_images(hq_folder, lq_folder):
         print_warning("No matching files found.")
         return
 
-    def check_alignment(filename):
-        """Check alignment of a single pair."""
-        try:
-            hq_path = os.path.join(hq_folder, filename)
-            lq_path = os.path.join(lq_folder, filename)
-
-            hq_width, hq_height = get_image_size(hq_path)
-            lq_width, lq_height = get_image_size(lq_path)
-
-            if hq_width and lq_width and hq_height and lq_height:
-                width_scale = hq_width / lq_width
-                height_scale = hq_height / lq_height
-
-                # Check if scales are consistent (within 1% tolerance)
-                if abs(width_scale - height_scale) / width_scale < 0.01:
-                    return {"aligned": True, "filename": filename}
-                else:
-                    return {
-                        "aligned": False,
-                        "filename": filename,
-                        "width_scale": width_scale,
-                        "height_scale": height_scale,
-                    }
-            else:
-                return {
-                    "aligned": False,
-                    "filename": filename,
-                    "error": "Could not read dimensions",
-                }
-        except Exception as e:
-            return {"aligned": False, "filename": filename, "error": str(e)}
+    # Prepare arguments for worker function
+    worker_args = [(filename, hq_folder, lq_folder) for filename in matching_files]
 
     # Setup parallel processing
     config = ParallelConfig(
@@ -770,8 +888,8 @@ def find_misaligned_images(hq_folder, lq_folder):
 
     # Process pairs in parallel
     results = smart_map(
-        check_alignment,
-        matching_files,
+        _check_alignment_worker,
+        worker_args,
         desc="Checking alignment",
         max_workers=config.max_workers,
         processing_type=ProcessingType.THREAD,
@@ -836,6 +954,64 @@ def bhi_filtering(*args, **kwargs):
     return bhi_filter(*args, **kwargs)
 
 
+def _get_aspect_ratio_worker(args):
+    """Worker function for getting aspect ratios (module-level for pickling)."""
+    filename, folder_path = args
+    try:
+        image_path = os.path.join(folder_path, filename)
+        width, height = get_image_size(image_path)
+        if width and height:
+            aspect = width / height
+            return {"success": True, "aspect": aspect, "filename": filename}
+        else:
+            return {
+                "success": False,
+                "error": "Could not read dimensions",
+                "filename": filename,
+            }
+    except Exception as e:
+        return {"success": False, "error": str(e), "filename": filename}
+
+
+def _analyze_aspect_ratios_worker(folder_info):
+    """Worker function for analyzing aspect ratios (module-level for pickling)."""
+    folder_path, folder_name = folder_info
+    image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
+
+    if not image_files:
+        return {"folder": folder_name, "aspects": [], "errors": []}
+
+    # Prepare arguments for worker function
+    worker_args = [(filename, folder_path) for filename in image_files]
+
+    # Setup parallel processing
+    config = ParallelConfig(
+        max_workers=parallel_config.get("max_workers"),
+        processing_type=ProcessingType.THREAD,
+        use_gpu=False,
+    )
+
+    # Process images in parallel
+    results = smart_map(
+        _get_aspect_ratio_worker,
+        worker_args,
+        desc=f"Analyzing {folder_name} aspect ratios",
+        max_workers=config.max_workers,
+        processing_type=ProcessingType.THREAD,
+    )
+
+    aspects = []
+    errors = []
+
+    for result in results:
+        if result["success"]:
+            aspects.append(result["aspect"])
+        else:
+            errors.append(result["filename"])
+
+    return {"folder": folder_name, "aspects": aspects, "errors": errors}
+
+
 def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, tolerance=0.01):
     """Test aspect ratio consistency with parallel processing."""
     if single_path:
@@ -845,60 +1021,10 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
         folders = [hq_folder, lq_folder]
         folder_names = ["HQ", "LQ"]
     else:
-        print_error("Please provide either single_path or both hq_folder and lq_folder.")
+        print_error(
+            "Please provide either single_path or both hq_folder and lq_folder."
+        )
         return
-
-    def analyze_aspect_ratios(folder_info):
-        """Analyze aspect ratios for a single folder."""
-        folder_path, folder_name = folder_info
-        image_files = [f for f in os.listdir(folder_path) if is_image_file(f)]
-
-        if not image_files:
-            return {"folder": folder_name, "aspects": [], "errors": []}
-
-        def get_aspect_ratio(filename):
-            """Get aspect ratio of a single image."""
-            try:
-                image_path = os.path.join(folder_path, filename)
-                width, height = get_image_size(image_path)
-                if width and height:
-                    aspect = width / height
-                    return {"success": True, "aspect": aspect, "filename": filename}
-                else:
-                    return {
-                        "success": False,
-                        "error": "Could not read dimensions",
-                        "filename": filename,
-                    }
-            except Exception as e:
-                return {"success": False, "error": str(e), "filename": filename}
-
-        # Setup parallel processing
-        config = ParallelConfig(
-            max_workers=parallel_config.get("max_workers"),
-            processing_type=ProcessingType.THREAD,
-            use_gpu=False,
-        )
-
-        # Process images in parallel
-        results = smart_map(
-            get_aspect_ratio,
-            image_files,
-            desc=f"Analyzing {folder_name} aspect ratios",
-            max_workers=config.max_workers,
-            processing_type=ProcessingType.THREAD,
-        )
-
-        aspects = []
-        errors = []
-
-        for result in results:
-            if result["success"]:
-                aspects.append(result["aspect"])
-            else:
-                errors.append(result["filename"])
-
-        return {"folder": folder_name, "aspects": aspects, "errors": errors}
 
     # Setup parallel processing for folders
     config = ParallelConfig(
@@ -907,7 +1033,7 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
 
     # Process folders in parallel
     folder_results = smart_map(
-        analyze_aspect_ratios,
+        _analyze_aspect_ratios_worker,
         list(zip(folders, folder_names)),
         desc="Analyzing aspect ratios",
         max_workers=config.max_workers,
@@ -920,7 +1046,9 @@ def test_aspect_ratio(hq_folder=None, lq_folder=None, single_path=None, toleranc
         errors = result["errors"]
 
         if aspects:
-            print_section(f"{folder_name} Aspect Ratios", char="-", color=Mocha.lavender)
+            print_section(
+                f"{folder_name} Aspect Ratios", char="-", color=Mocha.lavender
+            )
             print_info(f"  Count: {len(aspects)}")
             print_info(f"  Min: {min(aspects):.3f}")
             print_info(f"  Max: {max(aspects):.3f}")

@@ -71,7 +71,9 @@ class MenuAuditor:
         if menus_dir.exists():
             for file_path in menus_dir.glob("*.py"):
                 if file_path.name != "__init__.py":
-                    menu_files.append(str(file_path))
+                    # Return relative path from project root
+                    relative_path = file_path.relative_to(project_root)
+                    menu_files.append(str(relative_path))
 
         return menu_files
 
@@ -89,29 +91,28 @@ class MenuAuditor:
             # Get the source code of the function
             source = inspect.getsource(menu_func)
 
-            # Check if this is a path input scenario
-            if self.is_path_input_scenario(source):
-                return {
-                    "type": "path_input",
-                    "source": source,
-                    "description": "Menu contains path input scenarios",
-                    "function_name": menu_func.__name__,
-                    "module": menu_func.__module__,
-                }
-
-            # Extract menu options from the source code
+            # Extract menu options from the source code (always do this)
             options = self.extract_menu_options_advanced(source)
 
-            # Extract menu title and other metadata
+            # Extract menu title and other metadata (always do this)
             metadata = self.extract_menu_metadata(source)
 
+            # Check if this is a path input scenario
+            has_path_input = self.is_path_input_scenario(source)
+
             return {
-                "type": "menu",
+                "type": "menu",  # Always treat as menu to allow submenu exploration
                 "options": options,
                 "metadata": metadata,
                 "source": source,
                 "function_name": menu_func.__name__,
                 "module": menu_func.__module__,
+                "has_path_input": has_path_input,  # Flag for path input detection
+                "description": (
+                    "Menu contains path input scenarios"
+                    if has_path_input
+                    else "Standard menu"
+                ),
             }
 
         except Exception as e:
@@ -189,8 +190,7 @@ class MenuAuditor:
         """Extract string literal from AST node."""
         if isinstance(node, ast.Constant):
             return str(node.value)
-        elif isinstance(node, ast.Str):  # Python < 3.8
-            return node.s
+        # Remove deprecated ast.Str handling for Python 3.8+
         return None
 
     def extract_function_reference(self, node) -> Optional[str]:
@@ -329,12 +329,9 @@ class MenuAuditor:
         # Analyze the menu function
         menu_info = self.analyze_menu_function(menu_func)
 
-        if menu_info["type"] == "path_input":
-            return menu_info
-
         # Explore submenus
         submenus = {}
-        if "options" in menu_info:
+        if "options" in menu_info and menu_info["options"]:
             for key, (option_text, function_ref) in menu_info["options"].items():
                 if key == "0":  # Skip exit/back options
                     continue
@@ -352,6 +349,16 @@ class MenuAuditor:
                         "option_text": option_text,
                         "function_ref": function_ref,
                         "submenu": submenu_info,
+                    }
+                else:
+                    # If we can't resolve the function, still record it for analysis
+                    submenus[key] = {
+                        "option_text": option_text,
+                        "function_ref": function_ref,
+                        "submenu": {
+                            "type": "unresolved_function",
+                            "function_ref": function_ref,
+                        },
                     }
 
         menu_info["submenus"] = submenus
@@ -376,12 +383,30 @@ class MenuAuditor:
                 if match:
                     module_path = match.group(1)
                     func_name = match.group(2)
+
+                    # Handle __name__ references
+                    if module_path == "__name__":
+                        module_path = current_module
+
                     try:
                         module = importlib.import_module(module_path)
-                        return getattr(module, func_name, None)
-                    except ImportError:
-                        print_warning(f"Could not import module {module_path}")
-                        return None
+                        func = getattr(module, func_name, None)
+                        if func:
+                            print_info(
+                                f"  ✓ Resolved lazy_menu: {module_path}.{func_name}"
+                            )
+                            return func
+                        else:
+                            print_warning(
+                                f"  ✗ Function {func_name} not found in {module_path}"
+                            )
+                    except ImportError as e:
+                        print_warning(f"  ✗ Could not import module {module_path}: {e}")
+                    except Exception as e:
+                        print_warning(
+                            f"  ✗ Error resolving lazy_menu {module_path}.{func_name}: {e}"
+                        )
+                    return None
 
             # Handle lazy_action calls
             elif "lazy_action(" in function_ref:
@@ -393,76 +418,194 @@ class MenuAuditor:
                 if match:
                     module_path = match.group(1)
                     func_name = match.group(2)
+
+                    # Handle __name__ references
+                    if module_path == "__name__":
+                        module_path = current_module
+
                     try:
                         module = importlib.import_module(module_path)
-                        return getattr(module, func_name, None)
-                    except ImportError:
-                        print_warning(f"Could not import module {module_path}")
-                        return None
+                        func = getattr(module, func_name, None)
+                        if func:
+                            print_info(
+                                f"  ✓ Resolved lazy_action: {module_path}.{func_name}"
+                            )
+                            return func
+                        else:
+                            print_warning(
+                                f"  ✗ Function {func_name} not found in {module_path}"
+                            )
+                    except ImportError as e:
+                        print_warning(f"  ✗ Could not import module {module_path}: {e}")
+                    except Exception as e:
+                        print_warning(
+                            f"  ✗ Error resolving lazy_action {module_path}.{func_name}: {e}"
+                        )
+                    return None
 
             # Handle require_hq_lq calls (these are function wrappers, not module imports)
             elif "require_hq_lq(" in function_ref:
-                # This is a function wrapper, not a module import
-                # Extract the inner function call if possible
-                lambda_match = re.search(r'lambda:\s*([^(]+)\(', function_ref)
-                if lambda_match:
-                    func_name = lambda_match.group(1).strip()
-                    # Try to find the function in the current module or common action modules
+                # Extract the inner lazy_action call
+                lazy_action_match = re.search(
+                    r'lazy_action\s*\(\s*["\']([^"\']+)["\'],\s*["\']([^"\']+)["\']',
+                    function_ref,
+                )
+                if lazy_action_match:
+                    module_path = lazy_action_match.group(1)
+                    func_name = lazy_action_match.group(2)
+
+                    # Handle __name__ references
+                    if module_path == "__name__":
+                        module_path = current_module
+
                     try:
-                        # First try current module
-                        module = importlib.import_module(current_module)
+                        module = importlib.import_module(module_path)
                         func = getattr(module, func_name, None)
                         if func:
+                            print_info(
+                                f"  ✓ Resolved require_hq_lq: {module_path}.{func_name}"
+                            )
                             return func
-                        
-                        # Try common action modules
-                        action_modules = [
-                            "dataset_forge.actions.transform_actions",
-                            "dataset_forge.actions.comparison_actions",
-                            "dataset_forge.actions.analysis_actions",
-                        ]
-                        for action_module in action_modules:
-                            try:
-                                module = importlib.import_module(action_module)
-                                func = getattr(module, func_name, None)
-                                if func:
-                                    return func
-                            except ImportError:
-                                continue
-                    except ImportError:
-                        pass
-                # If we can't resolve it, just return None (don't print warning)
-                return None
-
-            # Handle direct function references
-            elif "." in function_ref and not function_ref.startswith("<"):
-                try:
-                    module_path, func_name = function_ref.rsplit(".", 1)
-                    module = importlib.import_module(module_path)
-                    return getattr(module, func_name, None)
-                except ImportError:
-                    print_warning(f"Could not import module {module_path}")
+                        else:
+                            print_warning(
+                                f"  ✗ Function {func_name} not found in {module_path}"
+                            )
+                    except ImportError as e:
+                        print_warning(f"  ✗ Could not import module {module_path}: {e}")
+                    except Exception as e:
+                        print_warning(
+                            f"  ✗ Error resolving require_hq_lq {module_path}.{func_name}: {e}"
+                        )
                     return None
 
-            # Handle local function references (simple names)
-            elif function_ref.isidentifier() and not function_ref.startswith("<"):
+            # Handle direct function references (e.g., "function_name")
+            elif re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", function_ref.strip()):
+                func_name = function_ref.strip()
                 try:
-                    # Try to get from current module
+                    # Try current module first
                     module = importlib.import_module(current_module)
-                    return getattr(module, function_ref, None)
-                except ImportError:
+                    func = getattr(module, func_name, None)
+                    if func:
+                        print_info(
+                            f"  ✓ Resolved direct reference: {current_module}.{func_name}"
+                        )
+                        return func
+
+                    # Try common action modules
+                    action_modules = [
+                        "dataset_forge.actions.transform_actions",
+                        "dataset_forge.actions.comparison_actions",
+                        "dataset_forge.actions.analysis_actions",
+                        "dataset_forge.actions.dataset_actions",
+                        "dataset_forge.actions.cleanup_actions",
+                        "dataset_forge.actions.quality_scoring_actions",
+                        "dataset_forge.actions.metadata_actions",
+                        "dataset_forge.actions.augmentation_actions",
+                        "dataset_forge.actions.bhi_filtering_actions",
+                        "dataset_forge.actions.visual_dedup_actions",
+                        "dataset_forge.actions.fuzzy_dedup_actions",
+                        "dataset_forge.actions.imagededup_actions",
+                        "dataset_forge.actions.exif_scrubber_actions",
+                        "dataset_forge.actions.orientation_organizer_actions",
+                        "dataset_forge.actions.batch_rename_actions",
+                        "dataset_forge.actions.hue_adjustment_actions",
+                        "dataset_forge.actions.frames_actions",
+                        "dataset_forge.actions.report_actions",
+                        "dataset_forge.actions.resave_images_actions",
+                        "dataset_forge.actions.umzi_dataset_preprocessing_actions",
+                        "dataset_forge.actions.align_images_actions",
+                        "dataset_forge.actions.openmodeldb_actions",
+                        "dataset_forge.actions.model_management_actions",
+                        "dataset_forge.actions.settings_actions",
+                        "dataset_forge.actions.user_profile_actions",
+                        "dataset_forge.actions.enhanced_metadata_actions",
+                        "dataset_forge.actions.performance_optimization_actions",
+                        "dataset_forge.actions.cache_utils",
+                        "dataset_forge.actions.monitoring",
+                        "dataset_forge.actions.history_log",
+                        "dataset_forge.actions.session_state",
+                        # Add menu modules
+                        "dataset_forge.menus.dataset_management_menu",
+                        "dataset_forge.menus.analysis_menu",
+                        "dataset_forge.menus.image_processing_menu",
+                        "dataset_forge.menus.training_inference_menu",
+                        "dataset_forge.menus.utilities_menu",
+                        "dataset_forge.menus.system_settings_menu",
+                        "dataset_forge.menus.links_menu",
+                        "dataset_forge.menus.monitoring_menu",
+                        "dataset_forge.menus.enhanced_metadata_menu",
+                        "dataset_forge.menus.performance_optimization_menu",
+                    ]
+
+                    for action_module in action_modules:
+                        try:
+                            module = importlib.import_module(action_module)
+                            func = getattr(module, func_name, None)
+                            if func:
+                                print_info(
+                                    f"  ✓ Resolved in {action_module}: {func_name}"
+                                )
+                                return func
+                        except ImportError:
+                            continue
+                        except Exception as e:
+                            print_warning(f"  ✗ Error checking {action_module}: {e}")
+                            continue
+
+                    print_warning(
+                        f"  ✗ Could not resolve direct reference: {func_name}"
+                    )
+
+                except Exception as e:
+                    print_warning(
+                        f"  ✗ Error resolving direct reference {func_name}: {e}"
+                    )
+                return None
+
+            # Handle module.function references (e.g., "dataset_actions.combine_datasets")
+            elif "." in function_ref and not function_ref.startswith("lazy_"):
+                parts = function_ref.split(".")
+                if len(parts) == 2:
+                    module_name, func_name = parts
+                    try:
+                        # Try to import the module
+                        module = importlib.import_module(module_name)
+                        func = getattr(module, func_name, None)
+                        if func:
+                            print_info(
+                                f"  ✓ Resolved module.function: {module_name}.{func_name}"
+                            )
+                            return func
+                        else:
+                            print_warning(
+                                f"  ✗ Function {func_name} not found in {module_name}"
+                            )
+                    except ImportError as e:
+                        print_warning(f"  ✗ Could not import module {module_name}: {e}")
+                    except Exception as e:
+                        print_warning(
+                            f"  ✗ Error resolving {module_name}.{func_name}: {e}"
+                        )
                     return None
 
-            # Handle special cases
-            elif function_ref.startswith("<"):
-                # This is an AST object representation, skip it
+            # Handle lambda functions (these are usually simple wrappers)
+            elif function_ref.strip() == "<lambda>":
+                print_info("  ℹ Lambda function detected (usually a simple wrapper)")
                 return None
+
+            # Handle None references
+            elif function_ref.strip() == "None":
+                print_info("  ℹ None reference detected (exit option)")
+                return None
+
             else:
-                # Unknown format, skip it
+                print_warning(
+                    f"  ✗ Unhandled function reference pattern: {function_ref}"
+                )
                 return None
 
         except Exception as e:
-            print_warning(f"Could not resolve function reference {function_ref}: {e}")
+            print_error(f"  ✗ Error in resolve_function_reference: {e}")
             return None
 
     def generate_markdown_report(self, menu_hierarchy: Dict[str, Any]) -> str:
@@ -495,14 +638,6 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
         report += "\n## Detailed Menu Analysis\n\n"
         report += self.generate_detailed_analysis(menu_hierarchy)
 
-        # Generate recommendations
-        report += "\n## Recommendations for Improvement\n\n"
-        report += self.generate_recommendations(menu_hierarchy)
-
-        # Generate statistics
-        report += "\n## Menu Statistics\n\n"
-        report += self.generate_statistics(menu_hierarchy)
-
         return report
 
     def generate_menu_tree(self, menu_info: Dict[str, Any], indent: int = 0) -> str:
@@ -517,14 +652,17 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
         indent_str = "  " * indent
         tree = ""
 
-        if menu_info.get("type") == "path_input":
-            tree += f"{indent_str}🔗 **{menu_info.get('function_name', 'Unknown')}** (Path Input)\n"
+        if menu_info.get("type") == "unresolved_function":
+            tree += f"{indent_str}❓ **Unresolved Function** ({menu_info.get('function_ref', 'Unknown')})\n"
             return tree
 
         title = menu_info.get("metadata", {}).get(
             "title", menu_info.get("function_name", "Unknown")
         )
-        tree += f"{indent_str}📋 **{title}**\n"
+
+        # Add path input indicator if this menu has path input
+        path_indicator = " 🔗" if menu_info.get("has_path_input", False) else ""
+        tree += f"{indent_str}📋 **{title}**{path_indicator}\n"
 
         if "options" in menu_info:
             for key, (option_text, function_ref) in menu_info["options"].items():
@@ -548,24 +686,19 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
 
         analysis = ""
 
-        if menu_info.get("type") == "path_input":
-            analysis += (
-                f"### 🔗 {menu_info.get('function_name', 'Unknown')} (Path Input)\n\n"
-            )
-            analysis += f"**Module:** {menu_info.get('module', 'Unknown')}\n\n"
-            analysis += (
-                f"**Description:** {menu_info.get('description', 'No description')}\n\n"
-            )
-            analysis += "**Source Code:**\n```python\n"
-            source = menu_info.get("source", "No source available")
-            analysis += source[:500] + ("..." if len(source) > 500 else "") + "\n"
-            analysis += "```\n\n"
+        if menu_info.get("type") == "unresolved_function":
+            analysis += f"### ❓ Unresolved Function\n\n"
+            analysis += f"**Function Reference:** `{menu_info.get('function_ref', 'Unknown')}`\n\n"
+            analysis += "**Issue:** This function reference could not be resolved during analysis.\n\n"
             return analysis
 
         title = menu_info.get("metadata", {}).get(
             "title", menu_info.get("function_name", "Unknown")
         )
-        analysis += f"### 📋 {title}\n\n"
+
+        # Add path input indicator if this menu has path input
+        path_indicator = " 🔗" if menu_info.get("has_path_input", False) else ""
+        analysis += f"### 📋 {title}{path_indicator}\n\n"
 
         # Menu metadata
         metadata = menu_info.get("metadata", {})
@@ -575,8 +708,12 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
                 analysis += f"- **{key}:** {value}\n"
             analysis += "\n"
 
+        # Show path input status
+        if menu_info.get("has_path_input", False):
+            analysis += "**Path Input:** This menu contains path input scenarios.\n\n"
+
         # Menu options
-        if "options" in menu_info:
+        if "options" in menu_info and menu_info["options"]:
             analysis += "**Options:**\n"
             for key, (option_text, function_ref) in menu_info["options"].items():
                 analysis += f"- **{key}:** {option_text} → `{function_ref}`\n"
@@ -683,7 +820,7 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
         if not menu_info:
             return count
 
-        if menu_info.get("type") == "path_input":
+        if menu_info.get("has_path_input", False):
             count += 1
 
         if "submenus" in menu_info:
@@ -714,7 +851,7 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
             print_info("📝 Generating markdown report...")
             report = self.generate_markdown_report(main_hierarchy)
 
-            # Add comprehensive menu listing
+            # Add comprehensive menu listing BEFORE the recommendations and statistics
             report += "\n## All Discovered Menus\n\n"
             for menu_name, menu_info in all_menus.items():
                 if menu_name != "main_menu":
@@ -727,6 +864,14 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
                     elif menu_info.get("type") == "path_input":
                         report += "**Type:** Path Input\n"
                     report += "\n"
+
+            # Add recommendations and statistics sections
+            report += "\n## Recommendations for Improvement\n\n"
+            report += self.generate_recommendations(main_hierarchy)
+
+            # Generate statistics
+            report += "\n## Menu Statistics\n\n"
+            report += self.generate_statistics(main_hierarchy)
 
             # Write the report to file
             # Ensure the menu_system directory exists
@@ -770,35 +915,160 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
         print_info("🔍 Discovering and analyzing all menu files...")
         for menu_file in self.menu_files:
             try:
-                # Convert file path to module path
-                relative_path = Path(menu_file).relative_to(project_root)
-                module_path = (
-                    str(relative_path)
-                    .replace("/", ".")
-                    .replace("\\", ".")
-                    .replace(".py", "")
-                )
+                # Debug: print the actual path we're getting
+                print_info(f"Processing menu file: {menu_file}")
 
-                # Find menu functions in this module
+                # Convert file path to module path properly
+                # Handle both forward slashes and backslashes
+                normalized_path = menu_file.replace("\\", "/")
+
+                # Remove the dataset_forge/menus/ prefix and .py extension
+                if normalized_path.startswith("dataset_forge/menus/"):
+                    module_name = normalized_path[
+                        19:-3
+                    ]  # Remove "dataset_forge/menus/" and ".py"
+                elif normalized_path.startswith("/dataset_forge/menus/"):
+                    module_name = normalized_path[
+                        20:-3
+                    ]  # Remove "/dataset_forge/menus/" and ".py"
+                elif normalized_path.startswith("./dataset_forge/menus/"):
+                    module_name = normalized_path[
+                        21:-3
+                    ]  # Remove "./dataset_forge/menus/" and ".py"
+                else:
+                    module_name = normalized_path.replace("/", ".").replace(".py", "")
+
+                # Remove any leading slash from module_name
+                if module_name.startswith("/"):
+                    module_name = module_name[1:]
+
+                module_path = f"dataset_forge.menus.{module_name}"
+                print_info(f"Module path: {module_path}")
+
+                # Find all menu functions in the module
                 menu_functions = self.find_menu_functions(module_path)
 
-                for func_name, func_obj in menu_functions:
-                    if func_name not in all_menus:  # Avoid duplicates
-                        print_info(f"🔍 Analyzing {module_path}.{func_name}...")
-                        menu_info = self.analyze_menu_function(func_obj)
-                        if menu_info["type"] == "menu":
-                            # Try to explore submenus
-                            submenu_info = self.explore_menu_recursively(
-                                func_obj, func_name, 0
+                for func_name, func in menu_functions:
+                    if func_name not in all_menus:
+                        try:
+                            print_info(f"🔍 Analyzing {module_path}.{func_name}...")
+                            menu_info = self.explore_menu_recursively(
+                                func, func_name, 0
                             )
-                            all_menus[func_name] = submenu_info
-                        else:
                             all_menus[func_name] = menu_info
+                        except Exception as e:
+                            print_error(
+                                f"Failed to analyze {module_path}.{func_name}: {e}"
+                            )
+                            all_menus[func_name] = {"type": "error", "error": str(e)}
 
             except Exception as e:
-                print_warning(f"Failed to analyze {menu_file}: {e}")
+                print_error(f"Failed to process menu file {menu_file}: {e}")
+
+        # Second pass: look for any missed menus by scanning all discovered menus
+        print_info("🔍 Second pass: scanning for missed menus...")
+        self.second_pass_exploration(all_menus)
 
         return all_menus
+
+    def second_pass_exploration(self, all_menus: Dict[str, Any]) -> None:
+        """Second pass to ensure all menus are explored."""
+        print_info("🔍 Second pass: scanning for missed menus...")
+
+        # Collect all function references from all menus
+        all_references = set()
+
+        def collect_references(menu_info: Dict[str, Any]) -> None:
+            """Collect all function references from a menu."""
+            if not menu_info or menu_info.get("type") in [
+                "error",
+                "max_depth_reached",
+                "already_visited",
+            ]:
+                return
+
+            if "options" in menu_info:
+                for option_data in menu_info["options"].values():
+                    if isinstance(option_data, tuple) and len(option_data) > 1:
+                        func_ref = str(option_data[1])
+                        if func_ref and func_ref != "None":
+                            all_references.add(func_ref)
+
+            if "submenus" in menu_info:
+                for submenu_data in menu_info["submenus"].values():
+                    if "submenu" in submenu_data:
+                        collect_references(submenu_data["submenu"])
+
+        # Collect all references
+        for menu_info in all_menus.values():
+            collect_references(menu_info)
+
+        print_info(f"🔍 Found {len(all_references)} function references to check...")
+
+        # Try to resolve and explore any missed menus
+        for func_ref in all_references:
+            try:
+                # Try to resolve the function reference
+                func = self.resolve_function_reference(
+                    func_ref, "dataset_forge.menus.main_menu"
+                )
+                if func and callable(func):
+                    # Check if this function is a menu function
+                    func_name = func.__name__
+                    if (
+                        func_name not in all_menus
+                        and func_name not in self.visited_menus
+                    ):
+                        try:
+                            print_info(f"🔍 Second pass: analyzing {func_name}...")
+                            menu_info = self.explore_menu_recursively(
+                                func, func_name, 0
+                            )
+                            all_menus[func_name] = menu_info
+                        except Exception as e:
+                            print_warning(
+                                f"Failed to analyze {func_name} in second pass: {e}"
+                            )
+            except Exception as e:
+                # Skip if we can't resolve it
+                continue
+
+        # Third pass: scan all menu files for any missed menu functions
+        print_info("🔍 Third pass: scanning all menu files for missed functions...")
+        for menu_file in self.menu_files:
+            try:
+                # Convert file path to module path
+                normalized_path = menu_file.replace("\\", "/")
+                
+                if normalized_path.startswith("dataset_forge/menus/"):
+                    module_name = normalized_path[19:-3]
+                elif normalized_path.startswith("/dataset_forge/menus/"):
+                    module_name = normalized_path[20:-3]
+                elif normalized_path.startswith("./dataset_forge/menus/"):
+                    module_name = normalized_path[21:-3]
+                else:
+                    module_name = normalized_path.replace("/", ".").replace(".py", "")
+                
+                if module_name.startswith("/"):
+                    module_name = module_name[1:]
+                
+                module_path = f"dataset_forge.menus.{module_name}"
+                
+                # Find all menu functions in the module
+                menu_functions = self.find_menu_functions(module_path)
+                
+                for func_name, func in menu_functions:
+                    if func_name not in all_menus and func_name not in self.visited_menus:
+                        try:
+                            print_info(f"🔍 Third pass: analyzing {module_path}.{func_name}...")
+                            menu_info = self.explore_menu_recursively(func, func_name, 0)
+                            all_menus[func_name] = menu_info
+                        except Exception as e:
+                            print_warning(f"Failed to analyze {module_path}.{func_name} in third pass: {e}")
+                            
+            except Exception as e:
+                print_warning(f"Failed to process {menu_file} in third pass: {e}")
+                continue
 
 
 def main():

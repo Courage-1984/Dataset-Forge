@@ -372,6 +372,66 @@ No duplicate groups found.
 5. **Check File Permissions**: Ensure read access to image folders
 6. **Validate Images**: Use image validation tools before deduplication
 
+## Fuzzy Deduplication Issues
+
+### Common Problems
+
+**No Duplicates Found**
+- **Cause**: Thresholds too high
+- **Solution**: Lower the similarity thresholds (try 80-85% instead of 90-95%)
+- **Alternative**: Try different hash method combinations (pHash + dHash)
+
+**Too Many False Positives**
+- **Cause**: Thresholds too low
+- **Solution**: Increase the similarity thresholds (try 90-95% instead of 70-80%)
+- **Alternative**: Use fewer hash methods (pHash only)
+
+**Memory Errors During Processing**
+- **Cause**: Batch size too large for available memory
+- **Solution**: Reduce batch size (try 20-50 instead of 100-500)
+- **Alternative**: Process smaller subsets of images
+
+**Slow Processing**
+- **Cause**: Too many hash methods or large batch size
+- **Solution**: Use fewer hash methods (pHash + dHash only)
+- **Alternative**: Reduce batch size and process in smaller chunks
+
+**"No image files found" Error**
+- **Cause**: Folder doesn't contain supported image files
+- **Solution**: Check folder path and ensure it contains .jpg, .png, .bmp, .tiff files
+- **Alternative**: Use image validation tools to check file integrity
+
+**"Invalid threshold value" Error**
+- **Cause**: Threshold not between 0 and 100
+- **Solution**: Use values between 0 and 100 (e.g., 85 for 85%)
+- **Alternative**: Use default thresholds if unsure
+
+### Performance Optimization
+
+**For Large Datasets (> 10,000 images)**
+- Use batch size of 20-100
+- Use only 2-3 hash methods (pHash + dHash + aHash)
+- Process in smaller chunks if memory is limited
+
+**For Medium Datasets (1,000-10,000 images)**
+- Use batch size of 50-200
+- Use 3-4 hash methods for better accuracy
+- Monitor memory usage during processing
+
+**For Small Datasets (< 1,000 images)**
+- Use batch size of 100-500
+- Can use all hash methods for maximum accuracy
+- Test different threshold combinations
+
+### Best Practices for Fuzzy Deduplication
+
+1. **Start with Show Mode**: Always preview duplicates before taking action
+2. **Use Conservative Thresholds**: Begin with 90-95% thresholds to avoid false positives
+3. **Test with Small Subsets**: Verify results with 100-500 images before processing large datasets
+4. **Combine Hash Methods**: Use pHash + dHash for balanced accuracy and speed
+5. **Backup Important Data**: Always backup before using delete operations
+6. **Monitor Memory Usage**: Use System Monitoring to track memory consumption
+
 ### Getting Help
 
 If you encounter issues not covered here:
