@@ -16,6 +16,7 @@ from dataset_forge.utils.color import Mocha
 def bhi_filtering_menu():
     """Lazy import wrapper for bhi_filtering_menu."""
     from dataset_forge.utils.menu import lazy_menu
+
     return lazy_menu("dataset_forge.menus.bhi_filtering_menu", "bhi_filtering_menu")()
 
 
@@ -56,24 +57,7 @@ def analysis_menu():
     from dataset_forge.actions import analysis_actions
     from dataset_forge.actions import alpha_actions
     from dataset_forge.menus import bhi_filtering_menu
-
-    def require_hq_lq(func):
-        def wrapper(*args, **kwargs):
-            hq_folder = get_folder_path("📁 Enter HQ folder path: ")
-            lq_folder = get_folder_path(
-                "📁 Enter LQ folder path: ", allow_blank=True, allow_hq_lq_options=False
-            )
-            return func(hq_folder, lq_folder, *args, **kwargs)
-
-        return wrapper
-
-    def lazy_action(module_path, func_name):
-        def _action(*args, **kwargs):
-            module = importlib.import_module(module_path)
-            func = getattr(module, func_name)
-            return func(*args, **kwargs)
-
-        return _action
+    from dataset_forge.utils.input_utils import get_folder_path
 
     options = {
         "1": (

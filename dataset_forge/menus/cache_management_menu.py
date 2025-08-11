@@ -96,7 +96,7 @@ def view_cache_statistics():
         size_info = cache_size_info()
 
         print_info("Cache Hit/Miss Statistics:")
-        print("-" * 50)
+        print_section("Cache Statistics", char="-", color=Mocha.lavender)
 
         for cache_type, data in stats.items():
             hits = data.get("hits", 0)
@@ -104,24 +104,24 @@ def view_cache_statistics():
             total = hits + misses
             hit_rate = (hits / total * 100) if total > 0 else 0
 
-            print(f"{cache_type.upper()}:")
-            print(f"  Hits: {hits:,}")
-            print(f"  Misses: {misses:,}")
-            print(f"  Hit Rate: {hit_rate:.1f}%")
-            print(f"  Evictions: {data.get('evictions', 0):,}")
-            print()
+            print_info(f"{cache_type.upper()}:")
+            print_info(f"  Hits: {hits:,}")
+            print_info(f"  Misses: {misses:,}")
+            print_info(f"  Hit Rate: {hit_rate:.1f}%")
+            print_info(f"  Evictions: {data.get('evictions', 0):,}")
+            print_info("")
 
         print_info("Cache Size Information:")
-        print("-" * 50)
+        print_section("Cache Size Info", char="-", color=Mocha.lavender)
 
         for cache_type, info in size_info.items():
             if cache_type == "disk" or cache_type == "model":
                 files = info.get("files", 0)
                 size_mb = info.get("size_mb", 0)
-                print(f"{cache_type.upper()}:")
-                print(f"  Files: {files:,}")
-                print(f"  Size: {size_mb:.2f} MB")
-                print()
+                print_info(f"{cache_type.upper()}:")
+                print_info(f"  Files: {files:,}")
+                print_info(f"  Size: {size_mb:.2f} MB")
+                print_info("")
 
         # Show performance score
         analysis = analyze_cache_performance()
@@ -265,10 +265,10 @@ def cache_performance_analysis():
         analysis = analyze_cache_performance()
 
         print_info("Performance Metrics:")
-        print("-" * 50)
+        print_section("Performance Metrics", char="-", color=Mocha.lavender)
 
         performance_score = analysis.get("performance_score", 0)
-        print(f"Overall Performance Score: {performance_score:.1%}")
+        print_info(f"Overall Performance Score: {performance_score:.1%}")
 
         stats = analysis.get("statistics", {})
         total_hits = sum(stats[cache_type]["hits"] for cache_type in stats)
@@ -276,33 +276,33 @@ def cache_performance_analysis():
         total_requests = total_hits + total_misses
 
         if total_requests > 0:
-            print(f"Total Cache Requests: {total_requests:,}")
-            print(f"Total Cache Hits: {total_hits:,}")
-            print(f"Total Cache Misses: {total_misses:,}")
-            print(f"Overall Hit Rate: {total_hits/total_requests:.1%}")
+            print_info(f"Total Cache Requests: {total_requests:,}")
+            print_info(f"Total Cache Hits: {total_hits:,}")
+            print_info(f"Total Cache Misses: {total_misses:,}")
+            print_info(f"Overall Hit Rate: {total_hits/total_requests:.1%}")
 
-        print()
+        print_info("")
         print_info("Recommendations:")
-        print("-" * 50)
+        print_section("Recommendations", char="-", color=Mocha.lavender)
 
         recommendations = analysis.get("recommendations", [])
         if recommendations:
             for i, rec in enumerate(recommendations, 1):
-                print(f"{i}. {rec}")
+                print_info(f"{i}. {rec}")
         else:
-            print("No specific recommendations at this time.")
+            print_info("No specific recommendations at this time.")
 
         # Show cache size analysis
         size_info = analysis.get("size_info", {})
-        print()
+        print_info("")
         print_info("Cache Size Analysis:")
-        print("-" * 50)
+        print_section("Cache Size Analysis", char="-", color=Mocha.lavender)
 
         for cache_type, info in size_info.items():
             if cache_type in ["disk", "model"]:
                 size_mb = info.get("size_mb", 0)
                 files = info.get("files", 0)
-                print(f"{cache_type.upper()}: {size_mb:.2f} MB ({files:,} files)")
+                print_info(f"{cache_type.upper()}: {size_mb:.2f} MB ({files:,} files)")
 
                 if size_mb > 1000:  # 1GB
                     print_warning(f"  ⚠️ Large {cache_type} cache detected")
@@ -353,13 +353,13 @@ def export_cache_data():
                 with open(export_path, "r") as f:
                     data = json.load(f)
 
-                print()
+                print_info("")
                 print_info("Exported Data Preview:")
-                print("-" * 30)
-                print(f"Timestamp: {datetime.fromtimestamp(data.get('timestamp', 0))}")
-                print(f"Statistics: {len(data.get('statistics', {}))} cache types")
-                print(f"Size Info: {len(data.get('size_info', {}))} cache types")
-                print(f"Analysis: {len(data.get('analysis', {}))} metrics")
+                print_section("Data Preview", char="-", color=Mocha.lavender)
+                print_info(f"Timestamp: {datetime.fromtimestamp(data.get('timestamp', 0))}")
+                print_info(f"Statistics: {len(data.get('statistics', {}))} cache types")
+                print_info(f"Size Info: {len(data.get('size_info', {}))} cache types")
+                print_info(f"Analysis: {len(data.get('analysis', {}))} metrics")
 
             except Exception as e:
                 print_warning(f"Could not preview exported data: {e}")
@@ -417,12 +417,12 @@ def validate_cache_integrity_action():
         results = validate_cache_integrity()
 
         print_info("Validation Results:")
-        print("-" * 50)
+        print_section("Validation Results", char="-", color=Mocha.lavender)
 
         all_valid = True
         for cache_type, is_valid in results.items():
             status = "✅ Valid" if is_valid else "❌ Issues Found"
-            print(f"{cache_type.replace('_', ' ').title()}: {status}")
+            print_info(f"{cache_type.replace('_', ' ').title()}: {status}")
             if not is_valid:
                 all_valid = False
 
@@ -471,7 +471,7 @@ def cache_health_check():
         analysis = analyze_cache_performance()
 
         print_info("Cache Health Report:")
-        print("=" * 60)
+        print_header("Cache Health Report", char="=", color=Mocha.lavender)
 
         # Overall health score
         performance_score = analysis.get("performance_score", 0)
@@ -484,8 +484,8 @@ def cache_health_check():
         else:
             health_status = "🔴 Poor"
 
-        print(f"Overall Health: {health_status} ({performance_score:.1%})")
-        print()
+        print_info(f"Overall Health: {health_status} ({performance_score:.1%})")
+        print_info("")
 
         # Check each cache type
         for cache_type in ["in_memory", "disk", "model"]:
@@ -503,11 +503,11 @@ def cache_health_check():
                 else:
                     status = "🔴 Poor"
 
-                print(f"{cache_type.upper()}: {status} ({hit_rate:.1%} hit rate)")
+                print_info(f"{cache_type.upper()}: {status} ({hit_rate:.1%} hit rate)")
             else:
-                print(f"{cache_type.upper()}: ⚪ No Data")
+                print_info(f"{cache_type.upper()}: ⚪ No Data")
 
-        print()
+        print_info("")
 
         # Size analysis
         print_info("Storage Analysis:")
@@ -525,21 +525,21 @@ def cache_health_check():
                 else:
                     status = "🟢 Healthy"
 
-                print(
+                print_info(
                     f"{cache_type.upper()}: {status} ({size_mb:.1f} MB, {files:,} files)"
                 )
 
-        print(f"Total Cache Size: {total_size_mb:.1f} MB")
+        print_info(f"Total Cache Size: {total_size_mb:.1f} MB")
 
         # Recommendations
-        print()
+        print_info("")
         print_info("Health Recommendations:")
         recommendations = analysis.get("recommendations", [])
         if recommendations:
             for i, rec in enumerate(recommendations, 1):
-                print(f"{i}. {rec}")
+                print_info(f"{i}. {rec}")
         else:
-            print("✅ Cache health is good!")
+            print_info("✅ Cache health is good!")
 
     except Exception as e:
         print_error(f"Failed to perform health check: {e}")

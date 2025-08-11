@@ -425,12 +425,32 @@ def resave_images_menu():
             "0": ("🚪 Back", None),
         }
 
+        # Define menu context for help system
+        menu_context = {
+            "Purpose": "Resave images in different formats with optional grayscale conversion",
+            "Options": "4 main options available",
+            "Navigation": "Use numbers 1-4 to select, 0 to go back",
+            "Key Features": [
+                "Interactive resave with user prompts",
+                "Single folder processing",
+                "Recursive directory processing",
+                "Grayscale conversion",
+            ],
+            "Tips": [
+                "Use interactive mode for full control",
+                "Recursive mode processes subdirectories",
+                "Grayscale conversion reduces file size",
+            ],
+        }
+
         while True:
             try:
                 key = show_menu(
                     "🔄 Resave Images",
                     options,
                     Mocha.lavender,
+                    current_menu="Resave Images",
+                    menu_context=menu_context,
                 )
                 if key is None or key == "0":
                     return

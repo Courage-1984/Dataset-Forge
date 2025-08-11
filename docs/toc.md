@@ -503,7 +503,7 @@
   - [1. PyTorch with CUDA (GPU Acceleration)](#1-pytorch-with-cuda-gpu-acceleration)
   - [2. VapourSynth & getnative](#2-vapoursynth-getnative)
     - [Method 1: Windows (Quick)](#method-1-windows-quick)
-    - [Method 2: Windows (Better; but *TRICKY*...)](#method-2-windows-better-but-tricky)
+    - [Method 2: Windows (Better; but _TRICKY_...)](#method-2-windows-better-but-_tricky_)
     - [Method 3: Windows (try building `getnative.exe` yourself)](#method-3-windows-try-building-getnativeexe-yourself)
   - [3. python-magic (for `Enhanced Directory Tree`)](#3-python-magic-for-enhanced-directory-tree)
   - [4. Using resdet for Native Resolution Detection](#4-using-resdet-for-native-resolution-detection)
@@ -534,6 +534,12 @@
     - [Step 1: Windows binary dump](#step-1-windows-binary-dump)
     - [Step 2: Windows dll dump](#step-2-windows-dll-dump)
     - [Step 3: Test the implementations](#step-3-test-the-implementations)
+  - [10. CUDA & GPU Performance Steps](#10-cuda-gpu-performance-steps)
+    - [Step 1: Always use ./run.bat/](#step-1-always-use-runbat)
+    - [Step 2: Be Sure `venv312` has cuda torch installed](#step-2-be-sure-venv312-has-cuda-torch-installed)
+    - [Step 3: Windows Pagefile](#step-3-windows-pagefile)
+    - [Step 4: NVIDIA Control Panel](#step-4-nvidia-control-panel)
+    - [Step 5: `venv312`'s `python.exe`](#step-5-venv312s-pythonexe)
 
 ## Changelog
 

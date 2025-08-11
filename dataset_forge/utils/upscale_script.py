@@ -274,9 +274,9 @@ def batch_upscale(
                     output_format=output_format,
                 )
                 results.append((input_path, out_path, True))
-    except Exception as e:
+            except Exception as e:
                 print_error(f"Error upscaling {input_path}: {e}")
-        traceback.print_exc()
+                traceback.print_exc()
                 results.append((input_path, out_path, False))
             if progress_bar:
                 pbar.update(1)

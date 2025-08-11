@@ -1407,7 +1407,7 @@ def remove_small_image_pairs(hq_folder, lq_folder):
         if len(errors) > 5:
             print_error(f"  ... and {len(errors) - 5} more errors.")
     print_info("-" * 30)
-    print("=" * 30)
+    print_info("=" * 30)
 
 
 # --- Function from extract_val_random.py ---
@@ -1958,14 +1958,14 @@ def transform_dataset(hq_folder, lq_folder):
             f"Transformed pairs will be {operation}d to respective subfolders in {output_base_dir}"
         )
     else:
-        print(
+        print_info(
             f"Performing '{selected_transform}' transformation in-place on {num_selected_for_transform} selected pairs."
         )
 
     processed_count = 0
     errors = []
 
-    print(
+    print_info(
         f"\nApplying transformation ({selected_transform}) to {num_selected_for_transform} randomly selected and ordered pairs..."
     )
 
@@ -2260,7 +2260,7 @@ def remove_small_image_pairs(hq_folder, lq_folder):
         if len(errors) > 5:
             print_error(f"  ... and {len(errors) - 5} more errors.")
     print_info("-" * 30)
-    print("=" * 30)
+    print_info("=" * 30)
 
 
 def split_adjust_dataset(hq_folder, lq_folder):
@@ -2312,7 +2312,7 @@ def split_adjust_dataset(hq_folder, lq_folder):
                 if not (0 < scale < 1):
                     raise ValueError
             except Exception:
-                print("Invalid scale factor.")
+                print_warning("Invalid scale factor.")
                 return
             lambd = (
                 input("Enter DPID lambda (0=smooth, 1=detail, default 0.5): ").strip()
@@ -2358,7 +2358,7 @@ def split_adjust_dataset(hq_folder, lq_folder):
                 if not (0 < scale < 1):
                     raise ValueError
             except Exception:
-                print("Invalid scale factor.")
+                print_warning("Invalid scale factor.")
                 return
             lambd = (
                 input("Enter DPID lambda (0=smooth, 1=detail, default 0.5): ").strip()
@@ -2403,23 +2403,23 @@ def optimize_png_menu(hq_folder, lq_folder):
     import sys
     import os
 
-    print("\n" + "=" * 30)
-    print("  Optimize PNG Images")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Optimize PNG Images")
+    print_info("=" * 30)
 
     if not hq_folder and not lq_folder:
-        print("No HQ or LQ folder set. Please set folders first.")
+        print_warning("No HQ or LQ folder set. Please set folders first.")
         return
 
-    print("Which folder(s) do you want to optimize?")
-    print("  1. HQ folder only")
-    print("  2. LQ folder only")
-    print("  3. Both HQ and LQ folders")
+    print_info("Which folder(s) do you want to optimize?")
+    print_info("  1. HQ folder only")
+    print_info("  2. LQ folder only")
+    print_info("  3. Both HQ and LQ folders")
     while True:
         choice = input("Enter choice (1/2/3): ").strip()
         if choice in ["1", "2", "3"]:
             break
-        print("Invalid choice. Please enter 1, 2, or 3.")
+        print_warning("Invalid choice. Please enter 1, 2, or 3.")
 
     folders = []
     if choice == "1":
@@ -2431,9 +2431,9 @@ def optimize_png_menu(hq_folder, lq_folder):
 
     for folder, label in folders:
         if not folder or not os.path.isdir(folder):
-            print(f"{label} folder not set or does not exist. Skipping.")
+            print_warning(f"{label} folder not set or does not exist. Skipping.")
             continue
-        print(f"\nProcessing {label} folder: {folder}")
+        print_info(f"\nProcessing {label} folder: {folder}")
         image_files = [
             f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))
         ]
@@ -2453,22 +2453,24 @@ def optimize_png_menu(hq_folder, lq_folder):
                 # Optionally, remove the original file (ask user)
                 # os.remove(src_path)
             except Exception as e:
-                print(f"Failed to convert {fname} to PNG: {e}")
+                print_error(f"Failed to convert {fname} to PNG: {e}")
         if not png_files:
-            print(f"No PNG files to optimize in {label} folder.")
+            print_warning(f"No PNG files to optimize in {label} folder.")
             continue
         # Run oxipng
-        print(f"Optimizing {len(png_files)} PNG files in {label} folder with oxipng...")
+        print_info(
+            f"Optimizing {len(png_files)} PNG files in {label} folder with oxipng..."
+        )
         try:
             # Check if oxipng is installed
             result = subprocess.run(["oxipng", "--version"], capture_output=True)
             if result.returncode != 0:
-                print(
+                print_warning(
                     "oxipng is not installed or not found in PATH. Please install oxipng."
                 )
                 continue
         except FileNotFoundError:
-            print(
+            print_warning(
                 "oxipng is not installed or not found in PATH. Please install oxipng."
             )
             continue
@@ -2477,36 +2479,36 @@ def optimize_png_menu(hq_folder, lq_folder):
             # Use -o 4 --strip safe --alpha
             cmd = ["oxipng", "-o", "4", "--strip", "safe", "--alpha"] + png_files
             subprocess.run(cmd, check=True)
-            print(f"oxipng optimization complete for {label} folder.")
+            print_success(f"oxipng optimization complete for {label} folder.")
         except CalledProcessError as e:
-            print(f"oxipng failed: {e}")
+            print_error(f"oxipng failed: {e}")
         except Exception as e:
-            print(f"Error running oxipng: {e}")
-    print("\nPNG optimization finished.")
-    print("=" * 30)
+            print_error(f"Error running oxipng: {e}")
+    print_info("\nPNG optimization finished.")
+    print_info("=" * 30)
 
 
 def convert_to_webp_menu(hq_folder, lq_folder):
     import os
     from PIL import Image
 
-    print("\n" + "=" * 30)
-    print("  Convert Images to WebP")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Convert Images to WebP")
+    print_info("=" * 30)
 
     if not hq_folder and not lq_folder:
-        print("No HQ or LQ folder set. Please set folders first.")
+        print_warning("No HQ or LQ folder set. Please set folders first.")
         return
 
-    print("Which folder(s) do you want to convert?")
-    print("  1. HQ folder only")
-    print("  2. LQ folder only")
-    print("  3. Both HQ and LQ folders")
+    print_info("Which folder(s) do you want to convert?")
+    print_info("  1. HQ folder only")
+    print_info("  2. LQ folder only")
+    print_info("  3. Both HQ and LQ folders")
     while True:
         choice = input("Enter choice (1/2/3): ").strip()
         if choice in ["1", "2", "3"]:
             break
-        print("Invalid choice. Please enter 1, 2, or 3.")
+        print_warning("Invalid choice. Please enter 1, 2, or 3.")
 
     folders = []
     if choice == "1":
@@ -2524,9 +2526,9 @@ def convert_to_webp_menu(hq_folder, lq_folder):
 
     for folder, label in folders:
         if not folder or not os.path.isdir(folder):
-            print(f"{label} folder not set or does not exist. Skipping.")
+            print_warning(f"{label} folder not set or does not exist. Skipping.")
             continue
-        print(f"\nProcessing {label} folder: {folder}")
+        print_info(f"\nProcessing {label} folder: {folder}")
         image_files = [
             f for f in os.listdir(folder) if os.path.isfile(os.path.join(folder, f))
         ]
@@ -2545,13 +2547,13 @@ def convert_to_webp_menu(hq_folder, lq_folder):
                     os.remove(src_path)
                 converted += 1
             except Exception as e:
-                print(f"Failed to convert {fname} to WebP: {e}")
+                print_error(f"Failed to convert {fname} to WebP: {e}")
                 errors += 1
-        print(
+        print_info(
             f"Converted {converted} images to WebP in {label} folder. Errors: {errors}"
         )
-    print("\nWebP conversion finished.")
-    print("=" * 30)
+    print_info("\nWebP conversion finished.")
+    print_info("=" * 30)
 
 
 # --- DPID Implementation: BasicSR ---
@@ -2566,28 +2568,28 @@ def dpid_openmmlab(*args, **kwargs):
 
 # --- Downsampling Menu ---
 def downsample_images_menu():
-    print("\n=== Downsample Images (Batch/Single, Multiple Methods) ===")
-    print("Select downsampling implementation:")
-    print("  1. DPID (BasicSR)")
-    print("  2. DPID (OpenMMLab)")
-    print("  3. OpenCV INTER_AREA")
-    print("  4. OpenCV INTER_LANCZOS4")
-    print("  5. OpenCV INTER_CUBIC")
-    print("  6. PIL LANCZOS")
-    print("  7. Phhofm's DPID Downscaler (pepedpid)")
-    print("  8. Umzi's DPID Downscaler (pepedpid)")
+    print_info("\n=== Downsample Images (Batch/Single, Multiple Methods) ===")
+    print_info("Select downsampling implementation:")
+    print_info("  1. DPID (BasicSR)")
+    print_info("  2. DPID (OpenMMLab)")
+    print_info("  3. OpenCV INTER_AREA")
+    print_info("  4. OpenCV INTER_LANCZOS4")
+    print_info("  5. OpenCV INTER_CUBIC")
+    print_info("  6. PIL LANCZOS")
+    print_info("  7. Phhofm's DPID Downscaler (pepedpid)")
+    print_info("  8. Umzi's DPID Downscaler (pepedpid)")
     method = input("Enter method number (default 1): ").strip() or "1"
     if method != "7" and method != "8":
         # ... existing code for other methods ...
         input_folder = input("Enter path to HR (100%) images folder: ").strip()
         if not os.path.isdir(input_folder):
-            print(f"Input folder '{input_folder}' does not exist.")
+            print_warning(f"Input folder '{input_folder}' does not exist.")
             return
         output_folder = input(
             "Enter base output folder (subfolders will be created for each scale): "
         ).strip()
         if not output_folder:
-            print("Output folder is required.")
+            print_warning("Output folder is required.")
             return
         os.makedirs(output_folder, exist_ok=True)
         # Scales
@@ -2597,10 +2599,10 @@ def downsample_images_menu():
         try:
             scales = [float(s) for s in scale_str.split(",") if 0 < float(s) < 1]
         except Exception:
-            print("Invalid scale factors.")
+            print_warning("Invalid scale factors.")
             return
         if not scales:
-            print("No valid scales provided.")
+            print_warning("No valid scales provided.")
             return
         dpid_lambda = 0.5
         if method in ["1", "2"]:
@@ -2621,10 +2623,10 @@ def downsample_images_menu():
     # --- Phhofm's DPID Downscaler integration ---
     from dataset_forge import dpid_phhofm
 
-    print("Phhofm's DPID Downscaler selected.")
-    print("Choose mode:")
-    print("  1. Single folder")
-    print("  2. HQ/LQ paired folders (preserve alignment)")
+    print_info("Phhofm's DPID Downscaler selected.")
+    print_info("Choose mode:")
+    print_info("  1. Single folder")
+    print_info("  2. HQ/LQ paired folders (preserve alignment)")
     mode = input("Select mode (1=single, 2=pair): ").strip()
     if mode == "2":
         hq_folder = input("Enter HQ folder path: ").strip()
@@ -2637,7 +2639,7 @@ def downsample_images_menu():
             if scale < 2:
                 raise ValueError
         except Exception:
-            print("Invalid scale factor.")
+            print_warning("Invalid scale factor.")
             return
         output_ext = (
             input("Output extension (.png/.jpg/.webp, default .png): ").strip()
@@ -2663,12 +2665,12 @@ def downsample_images_menu():
             skip_existing=skip_existing,
             verbose=verbose,
         )
-        print(f"\nOperation complete:")
-        print(f"  Processed: {processed} pairs")
-        print(f"  Skipped:   {skipped} pairs")
-        print(f"  Failed:    {failed} pairs")
-        print(f"  Output HQ: {out_hq_folder}")
-        print(f"  Output LQ: {out_lq_folder}")
+        print_info(f"\nOperation complete:")
+        print_info(f"  Processed: {processed} pairs")
+        print_info(f"  Skipped:   {skipped} pairs")
+        print_info(f"  Failed:    {failed} pairs")
+        print_info(f"  Output HQ: {out_hq_folder}")
+        print_info(f"  Output LQ: {out_lq_folder}")
     else:
         input_folder = input("Enter input folder path: ").strip()
         output_folder = input("Enter output folder path: ").strip()
@@ -2678,7 +2680,7 @@ def downsample_images_menu():
             if scale < 2:
                 raise ValueError
         except Exception:
-            print("Invalid scale factor.")
+            print_warning("Invalid scale factor.")
             return
         output_ext = (
             input("Output extension (.png/.jpg/.webp, default .png): ").strip()
@@ -2709,11 +2711,11 @@ def downsample_images_menu():
             skip_existing=skip_existing,
             verbose=verbose,
         )
-        print(f"\nOperation complete:")
-        print(f"  Processed: {processed} images")
-        print(f"  Skipped:   {skipped} images")
-        print(f"  Failed:    {failed} images")
-        print(f"  Output:    {output_folder}")
+        print_info(f"\nOperation complete:")
+        print_info(f"  Processed: {processed} images")
+        print_info(f"  Skipped:   {skipped} images")
+        print_info(f"  Failed:    {failed} images")
+        print_info(f"  Output:    {output_folder}")
 
 
 class ToneMapper:
@@ -2743,29 +2745,29 @@ class ToneMapper:
 
     def run(self, input_path, output_path):
         cmd = self.ffmpeg_command(input_path, output_path)
-        print("\nRunning ffmpeg command:")
-        print(" ".join(cmd))
+        print_info("\nRunning ffmpeg command:")
+        print_info(" ".join(cmd))
         try:
             subprocess.run(cmd, check=True)
-            print(f"\nTone mapping complete! Output: {output_path}")
+            print_success(f"\nTone mapping complete! Output: {output_path}")
         except subprocess.CalledProcessError as e:
-            print(f"Error running ffmpeg: {e}")
+            print_error(f"Error running ffmpeg: {e}")
 
 
 def hdr_to_sdr_menu():
-    print("\n=== HDR to SDR Tone Mapping ===")
+    print_info("\n=== HDR to SDR Tone Mapping ===")
     input_path = input("Enter path to input HDR video: ").strip()
     if not input_path or not os.path.isfile(input_path):
-        print(f"Input file '{input_path}' does not exist.")
+        print_warning(f"Input file '{input_path}' does not exist.")
         return
     output_path = input("Enter path for output SDR video: ").strip()
     if not output_path:
-        print("Output path is required.")
+        print_warning("Output path is required.")
         return
-    print("Select tone mapping algorithm:")
-    print("  1. hable (default)")
-    print("  2. reinhard")
-    print("  3. mobius")
+    print_info("Select tone mapping algorithm:")
+    print_info("  1. hable (default)")
+    print_info("  2. reinhard")
+    print_info("  3. mobius")
     algo_choice = input("Enter algorithm number (1/2/3): ").strip() or "1"
     algo_map = {"1": "hable", "2": "reinhard", "3": "mobius"}
     algorithm = algo_map.get(algo_choice, "hable")
@@ -2774,9 +2776,9 @@ def hdr_to_sdr_menu():
 
 
 def split_single_folder_in_sets(folder):
-    print("\n" + "=" * 30)
-    print("  Splitting Single Folder Dataset")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Splitting Single Folder Dataset")
+    print_info("=" * 30)
 
     files = sorted(
         [
@@ -2787,8 +2789,8 @@ def split_single_folder_in_sets(folder):
     )
 
     if not files:
-        print("No images found in the folder.")
-        print("=" * 30)
+        print_warning("No images found in the folder.")
+        print_info("=" * 30)
         return
 
     num_files = len(files)
@@ -2803,9 +2805,9 @@ def split_single_folder_in_sets(folder):
             if n_splits >= 2:
                 break
             else:
-                print("Please enter a number >= 2.")
+                print_warning("Please enter a number >= 2.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_warning("Invalid input. Please enter a number.")
 
     # Ask user for split ratios
     while True:
@@ -2824,20 +2826,20 @@ def split_single_folder_in_sets(folder):
                     split_ratios = [split_val / 100.0, 1 - (split_val / 100.0)]
                     break
                 else:
-                    print("Please enter a value between 1 and 99.")
+                    print_warning("Please enter a value between 1 and 99.")
             else:
                 parts = [float(x.strip()) for x in split_input.split(",") if x.strip()]
                 if len(parts) != n_splits:
-                    print(f"Please enter {n_splits} values.")
+                    print_warning(f"Please enter {n_splits} values.")
                     continue
                 total = sum(parts)
                 if abs(total - 100.0) > 1e-3:
-                    print("Split ratios must sum to 100.")
+                    print_warning("Split ratios must sum to 100.")
                     continue
                 split_ratios = [x / 100.0 for x in parts]
                 break
         except ValueError:
-            print("Invalid input. Please enter numbers.")
+            print_warning("Invalid input. Please enter numbers.")
 
     # Shuffle before splitting to ensure random distribution if desired
     shuffle_choice = (
@@ -2861,7 +2863,7 @@ def split_single_folder_in_sets(folder):
         files[split_indices[i] : split_indices[i + 1]] for i in range(n_splits)
     ]
 
-    print(
+    print_info(
         f"Found {num_files} images. Splitting into {[len(lst) for lst in split_file_lists]} for each set."
     )
 
@@ -2872,14 +2874,14 @@ def split_single_folder_in_sets(folder):
         )
         if operation in ("copy", "move"):
             break
-        print("Invalid operation. Please enter 'copy' or 'move'.")
+        print_warning("Invalid operation. Please enter 'copy' or 'move'.")
 
     # Ask for destination folder
     while True:
         output_base_dir = input("Enter destination folder for split output: ").strip()
         if output_base_dir:
             break
-        print("Destination folder is required.")
+        print_warning("Destination folder is required.")
 
     output_dirs = []
     for i in range(n_splits):
@@ -2891,7 +2893,9 @@ def split_single_folder_in_sets(folder):
     error_lists = [[] for _ in range(n_splits)]
 
     for i, file_list in enumerate(split_file_lists):
-        print(f"\nProcessing set {i+1} ({len(file_list)} images) using {operation}...")
+        print_info(
+            f"\nProcessing set {i+1} ({len(file_list)} images) using {operation}..."
+        )
         for filename in tqdm(file_list, desc=f"{operation.capitalize()}ing Set {i+1}"):
             src = os.path.join(folder, filename)
             try:
@@ -2914,13 +2918,13 @@ def split_single_folder_in_sets(folder):
                     f"Error {operation}ing file {filename} to split_{i+1}: {e}"
                 )
 
-    print("\nSplit operation complete.")
+    print_success("\nSplit operation complete.")
     for i, count in enumerate(processed_counts):
-        print(f"Total processed into set {i+1}: {count}")
+        print_info(f"Total processed into set {i+1}: {count}")
     any_errors = any(error_lists)
     if any_errors:
-        print("Errors encountered during split:")
+        print_warning("Errors encountered during split:")
         for i, errors in enumerate(error_lists):
             for e in errors:
-                print(f"  [Set {i+1}] {e}")
-    print("=" * 30)
+                print_error(f"  [Set {i+1}] {e}")
+    print_info("=" * 30)

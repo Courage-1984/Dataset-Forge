@@ -40,15 +40,15 @@ def community_links_menu():
     categories = {str(i + 1): (cat, cat) for i, cat in enumerate(links_data.keys())}
     categories["0"] = ("Back", None)
     while True:
-        cat_sel = show_menu(
+        key = show_menu(
             "Community Links - Categories", categories, header_color=Mocha.lavender
         )
-        if cat_sel is None or cat_sel == "0":
+        if key is None or key == "0":
             break
-        if cat_sel in categories:
-            cat_name = categories[cat_sel][1]
+        if key in categories:
+            cat_name = categories[key][1]
         else:
-            cat_name = cat_sel
+            cat_name = key
         links = links_data.get(cat_name, [])
         # Build ordered menu options (list of (key, (label, value)))
         menu_options = []
@@ -68,17 +68,17 @@ def community_links_menu():
         # Build dict for show_menu
         show_menu_dict = {k: (label, val) for k, (label, val) in menu_options}
         while True:
-            link_sel = show_menu(
+            key = show_menu(
                 f"{cat_name} Links", show_menu_dict, header_color=Mocha.lavender
             )
-            if link_sel is None or link_sel == "0":
+            if key is None or key == "0":
                 break
             sel_key = None
-            if isinstance(link_sel, str) and link_sel in show_menu_dict:
-                sel_key = link_sel
-            elif isinstance(link_sel, tuple):
+            if isinstance(key, str) and key in show_menu_dict:
+                sel_key = key
+            elif isinstance(key, tuple):
                 for k, v in show_menu_dict.items():
-                    if isinstance(v, tuple) and v[1] == link_sel:
+                    if isinstance(v, tuple) and v[1] == key:
                         sel_key = k
                         break
             if sel_key is None or sel_key == "0":
@@ -102,27 +102,27 @@ def community_links_menu():
                 }
                 sublink_options["0"] = ("Back", None)
                 while True:
-                    sub_sel = show_menu(
+                    key = show_menu(
                         f"{subcat} Links",
                         sublink_options,
                         header_color=Mocha.lavender,
                     )
-                    if sub_sel is None or sub_sel == "0":
+                    if key is None or key == "0":
                         break
                     sub_key = None
-                    if isinstance(sub_sel, str) and sub_sel in sublink_options:
-                        sub_key = sub_sel
-                    elif isinstance(sub_sel, str):
+                    if isinstance(key, str) and key in sublink_options:
+                        sub_key = key
+                    elif isinstance(key, str):
                         for k, v in sublink_options.items():
-                            if v[1] == sub_sel:
-                                open_link(sub_sel)
+                            if v[1] == key:
+                                open_link(key)
                                 sub_key = k
                                 break
                         if sub_key is not None:
                             continue
-                    elif isinstance(sub_sel, tuple):
+                    elif isinstance(key, tuple):
                         for k, v in sublink_options.items():
-                            if v == sub_sel:
+                            if v == key:
                                 sub_key = k
                                 break
                     if sub_key is None or sub_key == "0":
@@ -188,11 +188,9 @@ def links_menu():
 
     while True:
         key = show_menu("🔗 Links", options, header_color=Mocha.lavender, current_menu="Links", menu_context=menu_context)
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:

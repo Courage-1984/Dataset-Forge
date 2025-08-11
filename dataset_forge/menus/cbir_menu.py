@@ -20,9 +20,9 @@ def cbir_menu():
             "🧠 CBIR (Semantic Duplicate Detection) - Input/Output Selection",
             color=Mocha.yellow,
         )
-        print("1. HQ/LQ parent_path workflow")
-        print("2. Single-folder workflow")
-        print("0. Return to previous menu")
+        print_info("1. HQ/LQ parent_path workflow")
+        print_info("2. Single-folder workflow")
+        print_info("0. Return to previous menu")
         choice = input("Select workflow: ").strip()
         if choice == "0" or choice == "":
             return
@@ -46,10 +46,11 @@ def cbir_menu():
             "🧠 CBIR (Semantic Duplicate Detection) - Model Selection",
             color=Mocha.yellow,
         )
-        print("\nSelect embedding model:")
-        print("1. CLIP (semantic, recommended)")
-        print("2. ResNet (classic CNN)")
-        print("3. VGG (classic CNN)")
+        print_info("")
+        print_info("Select embedding model:")
+        print_info("1. CLIP (semantic, recommended)")
+        print_info("2. ResNet (classic CNN)")
+        print_info("3. VGG (classic CNN)")
         model_choice = input("Model [1]: ").strip() or "1"
         if model_choice == "2":
             model = "resnet"
@@ -65,11 +66,12 @@ def cbir_menu():
             threshold = float(input("Similarity threshold? [0.98]: ") or "0.98")
         except ValueError:
             threshold = 0.98
-        print("\nOperations:")
-        print("1. Find duplicates (show only)")
-        print("2. Remove duplicates")
-        print("3. Move duplicates to separate folder")
-        print("4. Copy duplicates to separate folder")
+        print_info("")
+        print_info("Operations:")
+        print_info("1. Find duplicates (show only)")
+        print_info("2. Remove duplicates")
+        print_info("3. Move duplicates to separate folder")
+        print_info("4. Copy duplicates to separate folder")
         op_choice = input("Select operation [1]: ").strip() or "1"
         # Determine metric
         if model == "clip":
@@ -99,7 +101,7 @@ def cbir_menu():
                 for i, group in enumerate(groups, 1):
                     print_info(f"Group {i} ({len(group)} images):")
                     for img in group:
-                        print(f"  {img}")
+                        print_info(f"  {img}")
         elif op_choice == "2":
             confirm = (
                 input(
@@ -125,7 +127,7 @@ def cbir_menu():
                     if not removed:
                         print_info("No files removed.")
                     for img in removed:
-                        print(f"  Removed: {img}")
+                        print_info(f"  Removed: {img}")
             else:
                 print_info("Remove operation cancelled.")
         elif op_choice == "3":
@@ -149,7 +151,7 @@ def cbir_menu():
                 if not moved:
                     print_info("No files moved.")
                 for msg in moved:
-                    print(f"  {msg}")
+                    print_info(f"  {msg}")
         elif op_choice == "4":
             dest_dir = get_path_with_history(
                 "Enter destination folder for copied duplicates:"
@@ -171,7 +173,7 @@ def cbir_menu():
                 if not copied:
                     print_info("No files copied.")
                 for msg in copied:
-                    print(f"  {msg}")
+                    print_info(f"  {msg}")
         else:
             print_warning("Invalid operation selected.")
         # At the end of the workflow, after all processing:

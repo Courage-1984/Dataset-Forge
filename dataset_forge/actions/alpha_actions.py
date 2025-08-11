@@ -322,7 +322,6 @@ def remove_alpha_channels_menu():
         print_error,
         print_success,
     )
-    from dataset_forge.utils.color import Mocha
 
     print_header("Remove Alpha Channels (Recursive)", color=Mocha.lavender)
     print_info(

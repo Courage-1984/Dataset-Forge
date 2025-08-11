@@ -32,11 +32,17 @@ def compress_menu():
         "Navigation": "Use numbers 1-2 to select, 0 to cancel",
     }
 
-    mode = show_menu("Select Input Mode", mode_options, header_color=Mocha.sapphire, current_menu="Select Input Mode", menu_context=menu_context)
-    if mode is None:
+    key = show_menu(
+        "Select Input Mode",
+        mode_options,
+        header_color=Mocha.sapphire,
+        current_menu="Select Input Mode",
+        menu_context=menu_context,
+    )
+    if key is None:
         print_info("Cancelled.")
         return
-    if mode == "paired":
+    if key == "1":  # paired
         hq_path = get_folder_path("Enter HQ folder path: ")
         lq_path = get_folder_path("Enter LQ folder path: ")
         single_folder = None
@@ -58,13 +64,19 @@ def compress_menu():
         "Navigation": "Use numbers 1-3 to select, 0 to cancel",
     }
 
-    fmt = show_menu("Select Output Format", fmt_options, header_color=Mocha.sapphire, current_menu="Select Output Format", menu_context=menu_context)
-    if fmt is None:
+    key = show_menu(
+        "Select Output Format",
+        fmt_options,
+        header_color=Mocha.sapphire,
+        current_menu="Select Output Format",
+        menu_context=menu_context,
+    )
+    if key is None:
         print_info("Cancelled.")
         return
 
     quality = 85
-    if fmt in ["jpeg", "webp"]:
+    if key == "2" or key == "3":  # jpeg or webp
         try:
             quality = int(input("Enter quality (1-100, default 85): ").strip() or "85")
             if not (1 <= quality <= 100):
@@ -75,7 +87,7 @@ def compress_menu():
             quality = 85
 
     use_oxipng = False
-    if fmt == "png":
+    if key == "1":  # png
         use_oxipng = (
             input("Use Oxipng for additional compression? (y/N): ").strip().lower()
             == "y"
@@ -95,11 +107,15 @@ def compress_menu():
 
     print_section("Compress Images Progress", color=Mocha.lavender)
     try:
+        # Map key to format
+        format_map = {"1": "png", "2": "jpeg", "3": "webp"}
+        output_format = format_map.get(key, "png")
+        
         compress_images(
             hq_path=hq_path,
             lq_path=lq_path,
             single_folder=single_folder,
-            output_format=fmt,
+            output_format=output_format,
             quality=quality,
             use_oxipng=use_oxipng,
             operation=operation,

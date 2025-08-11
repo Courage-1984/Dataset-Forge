@@ -39,7 +39,13 @@ def utilities_menu():
 
     options = {
         "1": (
-            "🖼️  Create Comparison Images (Side-by-side)",
+            "🔍 Comparison Tools",
+            lazy_action(
+                "dataset_forge.actions.comparison_actions", "compare_folders_menu"
+            ),
+        ),
+        "2": (
+            "🖼️ Visual Comparisons",
             require_hq_lq(
                 lazy_action(
                     "dataset_forge.actions.comparison_actions",
@@ -47,81 +53,91 @@ def utilities_menu():
                 )
             ),
         ),
-        "2": (
-            "🎬 Create GIF Comparison",
+        "3": (
+            "🎬 GIF Comparisons",
             require_hq_lq(
                 lazy_action(
-                    "dataset_forge.actions.comparison_actions", "create_gif_comparison"
+                    "dataset_forge.actions.comparison_actions",
+                    "create_comparison_gifs",
                 )
             ),
         ),
-        "3": (
-            "🔍 Compare Folder Contents",
-            lazy_action(
-                "dataset_forge.actions.comparison_actions", "compare_folders_menu"
+        "4": (
+            "🔍 Consolidated De-duplication",
+            lazy_menu(
+                "dataset_forge.menus.consolidated_dedup_menu", "consolidated_dedup_menu"
             ),
         ),
-        "4": (
-            "🗜️  Compress Images",
-            lazy_action("dataset_forge.menus.compress_menu", "compress_menu"),
-        ),
         "5": (
-            "📦 Compress Directory",
-            lazy_action("dataset_forge.menus.compress_dir_menu", "compress_dir_menu"),
+            "🗜️ Consolidated Compression",
+            lazy_menu(
+                "dataset_forge.menus.consolidated_compression_menu",
+                "consolidated_compression_menu",
+            ),
         ),
         "6": (
-            "🧹 Sanitize Images",
-            lazy_action(
+            "🧹 Sanitization Tools",
+            lazy_menu(
                 "dataset_forge.menus.sanitize_images_menu", "sanitize_images_menu"
             ),
         ),
         "7": (
-            "🔍 Fuzzy Matching De-duplication",
-            lazy_action("dataset_forge.menus.fuzzy_dedup_menu", "fuzzy_dedup_menu"),
+            "🌳 Directory Tools",
+            lazy_menu("dataset_forge.menus.directory_tree_menu", "directory_tree_menu"),
         ),
-        "8": ("🧹 Filter non-Images", lazy_action(__name__, "filter_non_images_menu")),
-        "9": (
-            "🌳 Enhanced Directory Tree",
-            lazy_action(
-                "dataset_forge.menus.directory_tree_menu", "directory_tree_menu"
-            ),
+        "8": (
+            "📁 File Filtering",
+            filter_non_images_menu,
         ),
-        "0": ("⬅️  Back to Main Menu", None),
+        "0": ("⬅️ Back to Main Menu", None),
     }
+
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Access various utility functions and tools including comprehensive de-duplication",
-        "Total Options": "9 utility categories",
-        "Navigation": "Use numbers 1-9 to select, 0 to go back",
+        "Purpose": "Helper tools and utilities for dataset management and analysis",
+        "Total Options": "8 utility categories",
+        "Navigation": "Use numbers 1-8 to select, 0 to go back",
         "Key Features": [
-            "Path management, file operations, directory trees, filtering",
-            "🔍 Fuzzy Matching De-duplication - Multi-algorithm fuzzy matching with configurable thresholds",
-            "Comprehensive duplicate detection using multiple perceptual hashing algorithms",
-            "Support for single folder and HQ/LQ paired folders"
+            "🔍 Comparison Tools - Compare folders and analyze differences",
+            "🖼️ Visual Comparisons - Create side-by-side comparison images",
+            "🎬 GIF Comparisons - Generate animated comparison GIFs",
+            "🔍 Consolidated De-duplication - Comprehensive duplicate detection and removal",
+            "🗜️ Consolidated Compression - Compress individual images and directories",
+            "🧹 Sanitization Tools - Clean and sanitize image files",
+            "🌳 Directory Tools - Enhanced directory tree visualization",
+            "📁 File Filtering - Filter and manage non-image files",
+        ],
+        "Tips": [
+            "Comparison tools help identify differences between datasets",
+            "Visual comparisons are great for quality assessment",
+            "Consolidated De-duplication combines all duplicate detection methods",
+            "Consolidated Compression handles both individual and batch compression",
+            "Sanitization tools ensure image file integrity",
+            "Directory tools provide detailed folder structure analysis",
         ],
     }
 
     while True:
-        key = show_menu(
-            "🛠️  Utilities",
-            options,
-            header_color=Mocha.sapphire,
-            char="-",
-            current_menu="Utilities",
-            menu_context=menu_context,
-        )
-        if key is None or key == "0":
-            break
-        action = options.get(key, (None, None))[1]
-        if callable(action):
-            action()
-        else:
-            print_error(
-                f"Selected action is not callable: {action!r} (type={type(action)})"
+        try:
+            key = show_menu(
+                "🛠️ Utilities",
+                options,
+                Mocha.lavender,
+                current_menu="Utilities",
+                menu_context=menu_context,
             )
+            if key is None or key == "0":
+                return
+            action = options[key][1]
+            if callable(action):
+                action()
+        except (KeyboardInterrupt, EOFError):
+            print_info("\nExiting...")
+            break
 
 
 def filter_non_images_menu():
+    """Filter non-images menu with standardized pattern."""
     from dataset_forge.actions.dataset_actions import filter_non_images
     from dataset_forge.utils.input_utils import (
         get_path_with_history,
@@ -133,28 +149,46 @@ def filter_non_images_menu():
         print_success,
         print_warning,
         print_error,
+        print_header,
+        print_section,
     )
+    from dataset_forge.utils.color import Mocha
     import os
 
-    print_info("\n=== Filter non-Images ===")
-    print_info("1. Single folder")
-    print_info("2. HQ/LQ paired folders")
-    print_info("0. Back")
-    mode = input("Select mode [1-2, 0]: ").strip()
-    if mode == "0":
-        return
-    if mode not in ("1", "2"):
-        print_warning("Invalid selection.")
-        return
-    if mode == "1":
+    def run_single_folder_filter():
+        """Run single folder filter workflow."""
         folder = get_path_with_history(
             "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
         )
         if not folder or not os.path.isdir(folder):
             print_error("Folder does not exist.")
             return
-        hq = lq = None
-    else:
+
+        operation = get_file_operation_choice()
+        dest_dir = None
+        if operation in ("move", "copy"):
+            dest_dir = get_destination_path()
+            if not dest_dir:
+                print_error("Destination directory is required for move/copy.")
+                return
+
+        dry_run = input("Dry run (no changes)? [y/N]: ").strip().lower() == "y"
+
+        try:
+            result = filter_non_images(
+                folder=folder,
+                hq_folder=None,
+                lq_folder=None,
+                operation=operation,
+                dest_dir=dest_dir,
+                dry_run=dry_run,
+            )
+            print_success(f"Filter non-Images complete. Results: {result}")
+        except Exception as e:
+            print_error(f"Error: {e}")
+
+    def run_hq_lq_filter():
+        """Run HQ/LQ paired folders filter workflow."""
         hq = get_path_with_history(
             "Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
         )
@@ -164,27 +198,67 @@ def filter_non_images_menu():
         if not os.path.isdir(hq) or not os.path.isdir(lq):
             print_error("Both HQ and LQ folders must exist.")
             return
-        folder = None
-    operation = get_file_operation_choice()
-    dest_dir = None
-    if operation in ("move", "copy"):
-        dest_dir = get_destination_path()
-        if not dest_dir:
-            print_error("Destination directory is required for move/copy.")
-            return
-    dry_run = input("Dry run (no changes)? [y/N]: ").strip().lower() == "y"
-    try:
-        result = filter_non_images(
-            folder=folder,
-            hq_folder=hq,
-            lq_folder=lq,
-            operation=operation,
-            dest_dir=dest_dir,
-            dry_run=dry_run,
+
+        operation = get_file_operation_choice()
+        dest_dir = None
+        if operation in ("move", "copy"):
+            dest_dir = get_destination_path()
+            if not dest_dir:
+                print_error("Destination directory is required for move/copy.")
+                return
+
+        dry_run = input("Dry run (no changes)? [y/N]: ").strip().strip().lower() == "y"
+
+        try:
+            result = filter_non_images(
+                folder=None,
+                hq_folder=hq,
+                lq_folder=lq,
+                operation=operation,
+                dest_dir=dest_dir,
+                dry_run=dry_run,
+            )
+            print_success(f"Filter non-Images complete. Results: {result}")
+        except Exception as e:
+            print_error(f"Error: {e}")
+
+    options = {
+        "1": ("Single folder", run_single_folder_filter),
+        "2": ("HQ/LQ paired folders", run_hq_lq_filter),
+        "0": ("⬅️ Back", None),
+    }
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Filter non-image files from folders",
+        "Total Options": "2 filtering modes",
+        "Navigation": "Use numbers 1-2 to select, 0 to go back",
+        "Key Features": [
+            "Single folder filtering - Remove non-image files from a single folder",
+            "HQ/LQ paired folders filtering - Remove non-image files from paired folders",
+            "Support for move, copy, delete operations",
+            "Dry run mode for safe testing",
+        ],
+        "Tips": [
+            "Use dry run mode first to preview changes",
+            "Choose appropriate operation based on your needs",
+            "Ensure backup before using delete operation",
+        ],
+    }
+
+    while True:
+        key = show_menu(
+            "🧹 Filter non-Images",
+            options,
+            Mocha.lavender,
+            current_menu="Filter non-Images",
+            menu_context=menu_context,
         )
-        print_success(f"Filter non-Images complete. Results: {result}")
-    except Exception as e:
-        print_error(f"Error: {e}")
+        if key is None or key == "0":
+            return
+        action = options[key][1]
+        if callable(action):
+            action()
 
 
 def directory_tree_menu():

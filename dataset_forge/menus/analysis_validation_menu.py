@@ -59,8 +59,6 @@ def comprehensive_validation_menu():
 
         print_section("Progressive Validation Progress", color=Mocha.teal)
         progressive_dataset_validation(hq, lq)
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
     def rich_reports_workflow():
         print_header(
@@ -68,9 +66,9 @@ def comprehensive_validation_menu():
             color=Mocha.peach,
         )
         print_info("Generate a detailed report with plots and sample images.")
-        print("1. 📂 HQ/LQ parent_path workflow")
-        print("2. 📁 Single-folder workflow")
-        print("0. ⬅️ Return to main menu")
+        print_info("1. 📂 HQ/LQ parent_path workflow")
+        print_info("2. 📁 Single-folder workflow")
+        print_info("0. ⬅️ Return to main menu")
         choice = input("🎯 Select workflow: ")
         if choice == "1":
             hq = input("📁 Enter HQ folder path: ")
@@ -110,17 +108,15 @@ def comprehensive_validation_menu():
             sample_count=sample_count,
             max_quality_images=max_quality_images,
         )
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
     def quality_scoring_workflow():
         print_header(
             "⭐ Automated Dataset Quality Scoring - Input/Output Selection",
             color=Mocha.yellow,
         )
-        print("1. 📊 Score HQ/LQ folders")
-        print("2. 📁 Score single folder")
-        print("0. ⬅️ Return to main menu")
+        print_info("1. 📊 Score HQ/LQ folders")
+        print_info("2. 📁 Score single folder")
+        print_info("0. ⬅️ Return to main menu")
         choice = input("🎯 Select workflow: ")
         if choice == "1":
             hq = get_path_with_history(
@@ -145,8 +141,6 @@ def comprehensive_validation_menu():
 
             print_section("Quality Scoring Progress", color=Mocha.yellow)
             score_images_with_pyiqa(folder)
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
     options = {
         "1": ("🔍 Run Comprehensive Validation Suite", progressive_validation_workflow),
@@ -212,8 +206,6 @@ def find_fix_issues_menu():
             from dataset_forge.actions.corruption_actions import fix_corrupted_images
 
             fix_corrupted_images(hq)
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
     def find_misaligned_workflow():
         print_header("🔍 Find Misaligned Images", color=Mocha.peach)
@@ -231,8 +223,8 @@ def find_fix_issues_menu():
 
     def find_outliers_workflow():
         print_header("🎯 Find Outliers & Anomalies", color=Mocha.maroon)
-        print("1. 📂 HQ/LQ folder pair")
-        print("2. 📁 Single folder")
+        print_info("1. 📂 HQ/LQ folder pair")
+        print_info("2. 📁 Single folder")
         choice = input("🎯 Select mode: ")
         if choice == "1":
             hq = get_path_with_history(
@@ -279,11 +271,9 @@ def find_fix_issues_menu():
             header_color=Mocha.sapphire,
             char="-",
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:
@@ -384,11 +374,8 @@ def analyze_properties_menu():
 
         play_done_sound()
 
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
-
     def find_native_resolution_workflow():
-        print("DEBUG: Entered find_native_resolution_workflow")
+        """Find native resolution of images."""
         print_header("🎯 Find Native Resolution", color=Mocha.yellow)
         from dataset_forge.utils.input_utils import (
             get_path_with_history,
@@ -404,14 +391,12 @@ def analyze_properties_menu():
             "0": ("⬅️  Back", None),
         }
         while True:
-            input_type = show_menu(
+            key = show_menu(
                 "Select input type", input_type_options, Mocha.lavender
             )
-            print(f"DEBUG: input_type selected: {input_type}")
-            if input_type is None or input_type == "0":
-                print("DEBUG: input_type is None or 0, returning")
+            if key is None or key == "0":
                 return
-            if input_type == "1":
+            if key == "1":
                 hq = get_path_with_history(
                     "📁 Enter HQ folder path:",
                     allow_hq_lq=True,
@@ -448,16 +433,14 @@ def analyze_properties_menu():
             "0": ("⬅️  Back", None),
         }
         while True:
-            method = show_menu(
+            key = show_menu(
                 "Choose native resolution detection method",
                 method_options,
                 Mocha.lavender,
             )
-            print(f"DEBUG: method selected: {method}")
-            if method is None or method == "0":
-                print("DEBUG: method is None or 0, returning")
+            if key is None or key == "0":
                 return
-            if method == "1":
+            if key == "1":
                 from dataset_forge.actions.getnative_actions import (
                     find_native_resolution,
                 )

@@ -26,9 +26,28 @@ def main_menu():
 
     # Define menu context for help system
     menu_context = {
+        "Purpose": "Main navigation hub for all Dataset Forge features",
         "Total Options": "10 main categories",
-        "Purpose": "Main navigation hub",
         "Navigation": "Use numbers 1-10 to select, 0 to exit",
+        "Key Features": [
+            "📂 Dataset Management - Core dataset creation and organization tools",
+            "✨ Image Processing & Augmentation - Most frequently used operations",
+            "🔍 Analysis & Validation - Quality assurance and dataset analysis",
+            "🛠️ Utilities - Helper tools and utilities",
+            "🚀 Training & Inference - Advanced machine learning workflows",
+            "🗂️ Enhanced Metadata Management - Specialized metadata operations",
+            "⚙️ System & Settings - Configuration and preferences",
+            "🩺 System Monitoring & Health - System maintenance and monitoring",
+            "🚀 Performance Optimization - Advanced performance tuning",
+            "🔗 Links - Reference materials and external resources",
+        ],
+        "Tips": [
+            "Start with Dataset Management if you're new to Dataset Forge",
+            "Use Image Processing & Augmentation for most common operations",
+            "Analysis & Validation helps ensure dataset quality",
+            "System Monitoring helps track resource usage during operations",
+            "Use 'help' in any menu for context-aware assistance",
+        ],
     }
 
     while True:
@@ -42,40 +61,43 @@ def main_menu():
                     ),
                 ),
                 "2": (
-                    "🔍 Analysis & Validation",
-                    lazy_menu(
-                        "dataset_forge.menus.analysis_validation_menu",
-                        "analysis_validation_menu",
-                    ),
-                ),
-                "3": (
                     "✨ Image Processing & Augmentation",
                     lazy_menu(
                         "dataset_forge.menus.image_processing_menu",
                         "image_processing_menu",
                     ),
                 ),
+                "3": (
+                    "🔍 Analysis & Validation",
+                    lazy_menu(
+                        "dataset_forge.menus.analysis_validation_menu",
+                        "analysis_validation_menu",
+                    ),
+                ),
                 "4": (
+                    "🛠️ Utilities",
+                    lazy_menu("dataset_forge.menus.utilities_menu", "utilities_menu"),
+                ),
+                "5": (
                     "🚀 Training & Inference",
                     lazy_menu(
                         "dataset_forge.menus.training_inference_menu",
                         "training_inference_menu",
                     ),
                 ),
-                "5": (
-                    "🛠️  Utilities",
-                    lazy_menu("dataset_forge.menus.utilities_menu", "utilities_menu"),
-                ),
                 "6": (
-                    "⚙️  System & Settings",
+                    "🗂️ Enhanced Metadata Management",
+                    lazy_menu(
+                        "dataset_forge.menus.enhanced_metadata_menu",
+                        "enhanced_metadata_menu",
+                    ),
+                ),
+                "7": (
+                    "⚙️ System & Settings",
                     lazy_menu(
                         "dataset_forge.menus.system_settings_menu",
                         "system_settings_menu",
                     ),
-                ),
-                "7": (
-                    "🔗 Links",
-                    lazy_menu("dataset_forge.menus.links_menu", "links_menu"),
                 ),
                 "8": (
                     "🩺 System Monitoring & Health",
@@ -85,18 +107,15 @@ def main_menu():
                     ),
                 ),
                 "9": (
-                    "🗂️  Enhanced Metadata Management",
-                    lazy_menu(
-                        "dataset_forge.menus.enhanced_metadata_menu",
-                        "enhanced_metadata_menu",
-                    ),
-                ),
-                "10": (
                     "🚀 Performance Optimization",
                     lazy_menu(
                         "dataset_forge.menus.performance_optimization_menu",
                         "performance_optimization_menu",
                     ),
+                ),
+                "10": (
+                    "🔗 Links",
+                    lazy_menu("dataset_forge.menus.links_menu", "links_menu"),
                 ),
                 "0": ("🚪 Exit", None),
             }

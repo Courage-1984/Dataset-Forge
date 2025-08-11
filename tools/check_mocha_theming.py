@@ -240,14 +240,25 @@ class MochaThemingChecker:
                         ):
                             has_mocha_import = True
                 elif isinstance(node, ast.ImportFrom):
-                    module_name = getattr(node.module, "value", "")
-                    if "dataset_forge.utils.color" in module_name:
+                    module_name = node.module or ""
+                    # Check for both absolute and relative imports
+                    if (
+                        "dataset_forge.utils.color" in module_name
+                        or "utils.color" in module_name
+                        or ".utils.color" in module_name
+                        or ".color" in module_name
+                        or module_name == "color"
+                    ):
                         has_mocha_import = True
                         # Also check if Mocha is specifically imported
                         for alias in node.names:
                             if alias.name == "Mocha":
                                 has_mocha_import = True
-                    elif "dataset_forge.utils.printing" in module_name:
+                    elif (
+                        "dataset_forge.utils.printing" in module_name
+                        or "utils.printing" in module_name
+                        or ".utils.printing" in module_name
+                    ):
                         has_printing_imports = True
         except SyntaxError:
             issues.append(
@@ -272,18 +283,26 @@ class MochaThemingChecker:
 
             # Check for raw print statements
             if re.search(r"^\s*print\s*\(", line):
-                raw_print_count += 1
-                issues.append(
-                    ThemingIssue(
-                        file_path=str(file_path),
-                        line_number=line_num,
-                        issue_type="raw_print_statement",
-                        description="Raw print statement found",
-                        severity="error",
-                        suggestion="Replace with centralized printing utility (print_info, print_success, etc.)",
-                        code_snippet=line,
+                # Skip core printing utilities and test files that appropriately use raw print
+                file_str = str(file_path)
+                if (
+                    not file_str.endswith("printing.py")  # Core printing utility
+                    and not file_str.endswith("launcher.py")  # Tool launcher
+                    and not "/test" in file_str  # Test files
+                    and not "\\test" in file_str
+                ):  # Test files (Windows)
+                    raw_print_count += 1
+                    issues.append(
+                        ThemingIssue(
+                            file_path=str(file_path),
+                            line_number=line_num,
+                            issue_type="raw_print_statement",
+                            description="Raw print statement found",
+                            severity="error",
+                            suggestion="Replace with centralized printing utility (print_info, print_success, etc.)",
+                            code_snippet=line,
+                        )
                     )
-                )
 
             # Check for centralized printing usage
             for util in self.centralized_printing_utils:
@@ -340,22 +359,43 @@ class MochaThemingChecker:
         has_mocha_usage = "Mocha." in content
 
         if has_show_menu:
-            # Check for proper menu pattern
-            if not re.search(r"key\s*=\s*show_menu\s*\(", content):
-                issues.append(
-                    ThemingIssue(
-                        file_path=str(file_path),
-                        line_number=0,
-                        issue_type="incorrect_menu_pattern",
-                        description="Menu does not use standardized key-based pattern",
-                        severity="error",
-                        suggestion="Use 'key = show_menu(...)' pattern, not 'action = show_menu(...)'",
-                        code_snippet="",
-                    )
-                )
+            # Skip test files from incorrect menu pattern check
+            file_str = str(file_path)
+            if "test" in file_str.lower():
+                pass  # Skip test files for menu pattern check
+            else:
+                # Check for proper menu pattern - only flag if there's an actual menu implementation
+                # Look for show_menu calls, not just imports or references
+                show_menu_calls = re.findall(r"(\w+)\s*=\s*show_menu\s*\(", content)
+                if show_menu_calls:
+                    # Check if any of the calls use the incorrect pattern
+                    has_incorrect_pattern = False
+                    for call in show_menu_calls:
+                        if call != "key":
+                            has_incorrect_pattern = True
+                            break
+
+                    if has_incorrect_pattern:
+                        issues.append(
+                            ThemingIssue(
+                                file_path=str(file_path),
+                                line_number=0,
+                                issue_type="incorrect_menu_pattern",
+                                description="Menu does not use standardized key-based pattern",
+                                severity="error",
+                                suggestion="Use 'key = show_menu(...)' pattern, not 'action = show_menu(...)'",
+                                code_snippet="",
+                            )
+                        )
 
             # Check for current_menu and menu_context parameters
-            if "show_menu(" in content:
+            # Skip core menu utility file and test files
+            file_str = str(file_path)
+            if "menu.py" in file_str and "utils" in file_str:
+                pass  # Skip core menu utility file
+            elif "test" in file_str.lower():
+                pass  # Skip test files
+            elif "show_menu(" in content:
                 if "current_menu=" not in content:
                     issues.append(
                         ThemingIssue(

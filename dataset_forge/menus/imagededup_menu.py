@@ -30,11 +30,12 @@ def imagededup_menu():
         print_header(
             "🖼️ Image Deduplication - Hash Method Selection", color=Mocha.yellow
         )
-        print("\nHash methods:")
-        print("1. PHash (Perceptual Hash) - Recommended")
-        print("2. DHash (Difference Hash)")
-        print("3. AHash (Average Hash)")
-        print("4. WHash (Wavelet Hash)")
+        print_info("")
+        print_info("Hash methods:")
+        print_info("1. PHash (Perceptual Hash) - Recommended")
+        print_info("2. DHash (Difference Hash)")
+        print_info("3. AHash (Average Hash)")
+        print_info("4. WHash (Wavelet Hash)")
         hash_choice = input("Select hash method [1]: ").strip() or "1"
         hash_methods = {"1": "phash", "2": "dhash", "3": "ahash", "4": "whash"}
         hash_method = hash_methods.get(hash_choice, "phash")
@@ -45,12 +46,13 @@ def imagededup_menu():
             threshold = 10
         # Get operation
         print_header("🖼️ Image Deduplication - Operation Selection", color=Mocha.yellow)
-        print("\nOperations:")
-        print("1. Find duplicates (show only)")
-        print("2. Remove duplicates")
-        print("3. Move duplicates to separate folder")
-        print("4. Generate duplicate report")
-        print("5. Debug directory contents")
+        print_info("")
+        print_info("Operations:")
+        print_info("1. Find duplicates (show only)")
+        print_info("2. Remove duplicates")
+        print_info("3. Move duplicates to separate folder")
+        print_info("4. Generate duplicate report")
+        print_info("5. Debug directory contents")
         op_choice = input("Select operation [1]: ").strip() or "1"
         operations = {
             "1": "find",
@@ -121,13 +123,15 @@ def imagededup_menu():
                     f"Found {len(duplicates)} duplicate groups with {total_duplicates} total duplicate files."
                 )
                 if duplicates:
-                    print("\nDuplicate groups:")
+                    print_info("")
+                    print_info("Duplicate groups:")
                     for i, (original, dups) in enumerate(duplicates.items(), 1):
-                        print(f"\nGroup {i}:")
-                        print(f"  Original: {original}")
-                        print(f"  Duplicates ({len(dups)}):")
+                        print_info("")
+                        print_info(f"Group {i}:")
+                        print_info(f"  Original: {original}")
+                        print_info(f"  Duplicates ({len(dups)}):")
                         for dup in dups:
-                            print(f"    - {dup}")
+                            print_info(f"    - {dup}")
         except Exception as e:
             print_error(f"Error during deduplication: {e}")
 
@@ -142,11 +146,12 @@ def imagededup_menu():
         lq_folder = get_folder_path("Enter LQ folder path: ")
 
         # Get hash method
-        print("\nHash methods:")
-        print("1. PHash (Perceptual Hash) - Recommended")
-        print("2. DHash (Difference Hash)")
-        print("3. AHash (Average Hash)")
-        print("4. WHash (Wavelet Hash)")
+        print_info("")
+        print_info("Hash methods:")
+        print_info("1. PHash (Perceptual Hash) - Recommended")
+        print_info("2. DHash (Difference Hash)")
+        print_info("3. AHash (Average Hash)")
+        print_info("4. WHash (Wavelet Hash)")
 
         hash_choice = input("Select hash method [1]: ").strip() or "1"
         hash_methods = {"1": "phash", "2": "dhash", "3": "ahash", "4": "whash"}
@@ -159,10 +164,11 @@ def imagededup_menu():
             threshold = 10
 
         # Get operation
-        print("\nOperations:")
-        print("1. Find duplicates (show only)")
-        print("2. Remove duplicates")
-        print("3. Move duplicates to separate folder")
+        print_info("")
+        print_info("Operations:")
+        print_info("1. Find duplicates (show only)")
+        print_info("2. Remove duplicates")
+        print_info("3. Move duplicates to separate folder")
 
         op_choice = input("Select operation [1]: ").strip() or "1"
         operations = {"1": "find", "2": "remove", "3": "move"}
@@ -214,15 +220,17 @@ def imagededup_menu():
                 )
 
                 if hq_duplicates:
-                    print("\nDuplicate groups:")
+                    print_info("")
+                    print_info("Duplicate groups:")
                     for i, (hq_original, hq_dups) in enumerate(
                         hq_duplicates.items(), 1
                     ):
-                        print(f"\nGroup {i}:")
-                        print(f"  HQ Original: {hq_original}")
-                        print(f"  HQ Duplicates ({len(hq_dups)}):")
+                        print_info("")
+                        print_info(f"Group {i}:")
+                        print_info(f"  HQ Original: {hq_original}")
+                        print_info(f"  HQ Duplicates ({len(hq_dups)}):")
                         for hq_dup in hq_dups:
-                            print(f"    - {hq_dup}")
+                            print_info(f"    - {hq_dup}")
 
                         # Show corresponding LQ duplicates
                         lq_original = os.path.join(
@@ -230,9 +238,9 @@ def imagededup_menu():
                         )
                         if lq_original in lq_duplicates:
                             lq_dups = lq_duplicates[lq_original]
-                            print(f"  LQ Duplicates ({len(lq_dups)}):")
+                            print_info(f"  LQ Duplicates ({len(lq_dups)}):")
                             for lq_dup in lq_dups:
-                                print(f"    - {lq_dup}")
+                                print_info(f"    - {lq_dup}")
 
         except Exception as e:
             print_error(f"Error during HQ/LQ deduplication: {e}")

@@ -1,13 +1,11 @@
 from dataset_forge.utils.menu import show_menu
-from dataset_forge.utils.printing import print_info, print_warning, print_prompt
+from dataset_forge.utils.printing import print_info, print_warning, print_prompt, print_header, print_section
 from dataset_forge.utils.color import Mocha
 from dataset_forge.actions.outlier_detection_actions import detect_outliers
 from dataset_forge.utils.input_utils import get_path_with_history
 
 
 def outlier_detection_menu():
-    from dataset_forge.utils.printing import print_header, print_section
-    from dataset_forge.utils.color import Mocha
 
     print_header(
         "🔎 Outlier & Anomaly Detection - Input/Output Selection", color=Mocha.maroon

@@ -78,7 +78,7 @@ def basic_transformations_menu():
             "💾 Resave Images",
             lazy_action("dataset_forge.menus.resave_images_menu", "resave_images_menu"),
         ),
-        "0": ("⬅️  Back", None),
+        "0": ("⬅️ Back", None),
     }
 
     # Define menu context for help system
@@ -86,15 +86,31 @@ def basic_transformations_menu():
         "Purpose": "Apply basic geometric transformations to images",
         "Options": "6 transformation types available",
         "Navigation": "Use numbers 1-6 to select, 0 to go back",
+        "Key Features": [
+            "🔄 Resize Images - Change image dimensions while maintaining aspect ratio",
+            "✂️ Crop Images - Remove unwanted areas from images",
+            "🔄 Rotate Images - Rotate images by specified angles",
+            "🔄 Flip Images - Mirror images horizontally or vertically",
+            "🔄 Shuffle Images - Randomize image order for training",
+            "💾 Resave Images - Convert image formats and optimize file sizes",
+        ],
+        "Tips": [
+            "Resize is useful for standardizing image dimensions",
+            "Crop helps focus on important image regions",
+            "Rotation corrects image orientation issues",
+            "Flipping creates additional training variations",
+            "Shuffling improves training randomization",
+            "Resaving optimizes file formats and compression",
+        ],
     }
 
     while True:
         key = show_menu(
-            "🔄 Basic Transformations",
+            "🔄 Geometric Transformations",
             options,
             header_color=Mocha.sapphire,
             char="-",
-            current_menu="Basic Transformations",
+            current_menu="Geometric Transformations",
             menu_context=menu_context,
         )
         if key is None or key == "0":
@@ -102,17 +118,15 @@ def basic_transformations_menu():
         action = options.get(key, (None, None))[1]
         if callable(action):
             action()
-        else:
-            print_error(
-                f"Selected action is not callable: {action!r} (type={type(action)})"
-            )
 
 
 def not_implemented_menu():
-    from dataset_forge.utils.printing import print_warning
+    """Placeholder for unimplemented features."""
+    from dataset_forge.utils.printing import print_warning, print_info
 
     print_warning("This feature is not implemented yet.")
-    input("Press Enter to return to the menu...")
+    print_info("Press Enter to return to the menu...")
+    input()
 
 
 def colour_tone_levels_menu():
@@ -168,13 +182,13 @@ def colour_tone_levels_menu():
         )()
 
     options = {
-        "1": ("☀️  Adjust Brightness", brightness_adjustment_menu),
+        "1": ("☀️ Adjust Brightness", brightness_adjustment_menu),
         "2": ("🌓 Adjust Contrast", contrast_adjustment_menu),
         "3": ("🌈 Adjust Hue", hue_adjustment_menu),
-        "4": ("🎨 Adjust Saturation (Not implemented)", saturation_adjustment_menu),
+        "4": ("🎨 Adjust Saturation", saturation_adjustment_menu),
         "5": ("🌅 Convert HDR to SDR", hdr_to_sdr_menu),
         "6": ("⚫️ Convert to Grayscale", grayscale_conversion_menu),
-        "0": ("⬅️  Back", None),
+        "0": ("⬅️ Back", None),
     }
 
     # Define menu context for help system
@@ -182,11 +196,27 @@ def colour_tone_levels_menu():
         "Purpose": "Adjust color, tone, and level properties of images",
         "Options": "6 adjustment types available",
         "Navigation": "Use numbers 1-6 to select, 0 to go back",
+        "Key Features": [
+            "☀️ Adjust Brightness - Increase or decrease image brightness levels",
+            "🌓 Adjust Contrast - Enhance or reduce image contrast",
+            "🌈 Adjust Hue - Shift image color hues",
+            "🎨 Adjust Saturation - Modify color intensity and vibrancy",
+            "🌅 Convert HDR to SDR - Convert high dynamic range to standard range",
+            "⚫️ Convert to Grayscale - Remove color information for monochrome processing",
+        ],
+        "Tips": [
+            "Brightness adjustments help normalize lighting conditions",
+            "Contrast adjustments improve image clarity and definition",
+            "Hue adjustments can correct color temperature issues",
+            "Saturation adjustments control color intensity",
+            "HDR to SDR conversion is useful for compatibility",
+            "Grayscale conversion reduces data complexity for certain models",
+        ],
     }
 
     while True:
         key = show_menu(
-            "🎨 Colour, Tone & Levels Adjustments",
+            "🎨 Color & Tone Adjustments",
             options,
             header_color=Mocha.sapphire,
             char="-",
@@ -198,7 +228,6 @@ def colour_tone_levels_menu():
         action = options.get(key, (None, None))[1]
         if callable(action):
             action()
-        input("Press Enter to return to the menu...")
 
 
 def metadata_menu():
@@ -217,23 +246,34 @@ def metadata_menu():
             "🎯 Convert ICC Profile to sRGB",
             lazy_action("dataset_forge.actions.metadata_actions", "icc_to_srgb_menu"),
         ),
-        "0": ("⬅️  Back", None),
+        "0": ("⬅️ Back", None),
     }
 
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Manage image metadata and color profiles",
+        "Purpose": "Manage image metadata and color profiles for standardization",
         "Options": "2 metadata operations available",
         "Navigation": "Use numbers 1-2 to select, 0 to go back",
+        "Key Features": [
+            "🧹 Scrub EXIF Data - Remove camera and location metadata from images",
+            "🎯 Convert ICC Profile to sRGB - Standardize color profiles for consistency",
+        ],
+        "Tips": [
+            "EXIF scrubbing removes privacy-sensitive metadata",
+            "ICC profile conversion ensures consistent color reproduction",
+            "Metadata management is important for dataset standardization",
+            "Clean metadata improves model training consistency",
+            "Always backup original images before metadata operations",
+        ],
     }
 
     while True:
         key = show_menu(
-            "📋 Metadata Operations",
+            "📋 Metadata Management",
             options,
             header_color=Mocha.sapphire,
             char="-",
-            current_menu="Metadata Operations",
+            current_menu="Metadata Management",
             menu_context=menu_context,
         )
         if key is None or key == "0":
@@ -272,20 +312,34 @@ def extract_sketches_menu():
 def image_processing_menu():
     """Main image processing menu."""
     options = {
-        "1": ("🔄 Basic Transformations", basic_transformations_menu),
-        "2": ("🎨 Colour, Tone & Levels", colour_tone_levels_menu),
-        "3": ("📋 Metadata Operations", metadata_menu),
-        "4": ("✨ Augmentation", augmentation_submenu),
-        "5": ("✏️ Extract Sketches", extract_sketches_menu),
-        "0": ("⬅️  Back", None),
+        "1": ("🔄 Geometric Transformations", basic_transformations_menu),
+        "2": ("🎨 Color & Tone Adjustments", colour_tone_levels_menu),
+        "3": ("✨ Image Augmentation", augmentation_submenu),
+        "4": ("📋 Metadata Management", metadata_menu),
+        "5": ("✏️ Sketch Extraction", extract_sketches_menu),
+        "0": ("⬅️ Back", None),
     }
 
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Transform, enhance, and augment images for ML training",
+        "Purpose": "Transform, enhance, and augment images for machine learning training",
         "Total Options": "5 processing categories",
         "Navigation": "Use numbers 1-5 to select, 0 to go back",
-        "Key Features": "Geometric transformations, color adjustments, metadata management, augmentation, resave images",
+        "Key Features": [
+            "🔄 Geometric Transformations - Resize, crop, rotate, flip, and shuffle images",
+            "🎨 Color & Tone Adjustments - Brightness, contrast, hue, saturation, and grayscale",
+            "✨ Image Augmentation - Advanced augmentation techniques for training",
+            "📋 Metadata Management - EXIF data scrubbing and color profile conversion",
+            "✏️ Sketch Extraction - Extract sketch-like features from images",
+        ],
+        "Tips": [
+            "Start with Geometric Transformations for basic image modifications",
+            "Color adjustments help normalize image appearance",
+            "Augmentation increases training dataset diversity",
+            "Metadata management ensures clean, standardized images",
+            "Sketch extraction creates specialized training data",
+            "Always backup original images before processing",
+        ],
     }
 
     while True:

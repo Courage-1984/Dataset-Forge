@@ -598,7 +598,8 @@ def quick_tree_generation():
         generator = EnhancedDirectoryTreeGenerator()
         tree_output, stats = generator.generate_tree(root_path)
 
-        print("\n" + tree_output)
+        print_info("")
+        print_info(tree_output)
         print_success("✅ Quick tree generation completed!")
 
     except KeyboardInterrupt:
@@ -646,9 +647,9 @@ def advanced_tree_generation():
 
         # Get output format
         print_info("\n📤 Output Format:")
-        print("1. Console (display only)")
-        print("2. Markdown file")
-        print("3. JSON file")
+        print_info("1. Console (display only)")
+        print_info("2. Markdown file")
+        print_info("3. JSON file")
         format_choice = input("Select format [1-3]: ").strip() or "1"
 
         format_map = {"1": "console", "2": "markdown", "3": "json"}
@@ -1273,10 +1274,12 @@ def advanced_tree_generation():
 
             # Display results
             if output_format == "console":
-                print("\n" + tree_output)
+                print_info("")
+                print_info(tree_output)
 
                 if include_stats and stats:
-                    print("\n" + generator.generate_statistics_report(stats))
+                    print_info("")
+                    print_info(generator.generate_statistics_report(stats))
 
             print_success("✅ Advanced tree generation completed!")
 
@@ -1747,7 +1750,8 @@ def tree_statistics_analysis():
         stats = analyzer.analyze_directory(root_path)
 
         # Display the statistics report
-        print("\n" + analyzer.generate_statistics_report(stats))
+        print_info("")
+        print_info(analyzer.generate_statistics_report(stats))
 
         print_success("✅ Statistics analysis completed!")
 
@@ -2207,7 +2211,8 @@ def compare_directories():
             all_stats.append(stats)
 
         # Display the comparison report
-        print("\n" + comparator.generate_comparison_report(paths, all_stats))
+        print_info("")
+        print_info(comparator.generate_comparison_report(paths, all_stats))
 
         print_success("✅ Directory comparison completed!")
 
@@ -2431,27 +2436,29 @@ def enhanced_statistics_analysis():
         stats["recent_files"] = stats["recent_files"][:10]
 
         # Display enhanced report
-        print("\n" + "=" * 60)
-        print("📊 ENHANCED DIRECTORY STATISTICS REPORT")
-        print("=" * 60)
-        print(f"📁 Directory: {root_path}")
-        print(f"🕒 Analyzed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"📄 Total Files: {stats['total_files']:,}")
-        print(
+        print_header(
+            "📊 ENHANCED DIRECTORY STATISTICS REPORT", char="=", color=Mocha.lavender
+        )
+        print_info(f"📁 Directory: {root_path}")
+        print_info(f"🕒 Analyzed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print_info(f"📄 Total Files: {stats['total_files']:,}")
+        print_info(
             f"💾 Total Size: {stats['total_size']:,} bytes ({stats['total_size']/1024/1024:.1f} MB)"
         )
 
         if stats["file_types"]:
-            print("\n📋 File Type Breakdown:")
+            print_info("")
+            print_info("📋 File Type Breakdown:")
             sorted_types = sorted(
                 stats["file_types"].items(), key=lambda x: x[1], reverse=True
             )
             for ext, count in sorted_types[:10]:
                 percentage = (count / stats["total_files"]) * 100
-                print(f"  {ext}: {count:,} ({percentage:.1f}%)")
+                print_info(f"  {ext}: {count:,} ({percentage:.1f}%)")
 
         # Export options
-        print("\n💾 Export Options:")
+        print_info("")
+        print_info("💾 Export Options:")
         export_choice = (
             input("Export report? (json/csv/txt/none) [none]: ").strip().lower()
         )
@@ -2722,40 +2729,42 @@ def advanced_insights_analysis():
         insights["recommendations"] = recommendations
 
         # Display insights
-        print("\n" + "=" * 60)
-        print("🔍 ADVANCED INSIGHTS REPORT")
-        print("=" * 60)
+        print_header("🔍 ADVANCED INSIGHTS REPORT", char="=", color=Mocha.lavender)
 
-        print(f"\n📊 Size Analysis:")
+        print_info("")
+        print_info("📊 Size Analysis:")
         size_analysis = insights["size_analysis"]
-        print(
+        print_info(
             f"  Total Size: {size_analysis['total_size']:,} bytes ({size_analysis['total_size']/1024/1024:.1f} MB)"
         )
-        print(f"  Average File Size: {size_analysis['average_size']:,.0f} bytes")
-        print(f"  Largest File: {size_analysis['largest_file']:,} bytes")
+        print_info(f"  Average File Size: {size_analysis['average_size']:,.0f} bytes")
+        print_info(f"  Largest File: {size_analysis['largest_file']:,} bytes")
 
-        print(f"\n📅 Age Analysis:")
+        print_info("")
+        print_info("📅 Age Analysis:")
         age_analysis = insights["age_analysis"]
-        print(f"  Average Age: {age_analysis['average_age_days']:.1f} days")
-        print(f"  Recent Files (24h): {age_analysis['recent_files']}")
-        print(f"  Old Files (>30 days): {age_analysis['old_files']}")
+        print_info(f"  Average Age: {age_analysis['average_age_days']:.1f} days")
+        print_info(f"  Recent Files (24h): {age_analysis['recent_files']}")
+        print_info(f"  Old Files (>30 days): {age_analysis['old_files']}")
 
-        print(f"\n📋 File Patterns:")
+        print_info("")
+        print_info("📋 File Patterns:")
         patterns = insights["file_patterns"]
-        print(f"  Unique Extensions: {patterns['total_extensions']}")
+        print_info(f"  Unique Extensions: {patterns['total_extensions']}")
         if patterns["most_common_extension"]:
             ext, count = patterns["most_common_extension"]
-            print(f"  Most Common: {ext} ({count} files)")
+            print_info(f"  Most Common: {ext} ({count} files)")
 
         if patterns["potential_duplicates"]:
-            print(
+            print_info(
                 f"  Potential Duplicates: {len(patterns['potential_duplicates'])} base names"
             )
 
         if recommendations:
-            print(f"\n💡 Recommendations:")
+            print_info("")
+            print_info("💡 Recommendations:")
             for rec in recommendations:
-                print(f"  {rec}")
+                print_info(f"  {rec}")
 
         # Export insights
         export_choice = input("\n💾 Export insights? (y/n) [n]: ").strip().lower()
@@ -2794,11 +2803,38 @@ def directory_tree_menu():
         "0": ("⬅️  Back to Main Menu", None),
     }
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Generate enhanced directory trees with statistics and analysis",
+        "Options": "8 main options available",
+        "Navigation": "Use numbers 1-8 to select, 0 to go back",
+        "Key Features": [
+            "Quick tree generation for basic overview",
+            "Advanced tree generation with detailed options",
+            "Batch tree generation for multiple directories",
+            "Statistics analysis with comprehensive metrics",
+            "Directory comparison tools",
+            "Enhanced statistics with visual charts",
+            "Batch export analysis for multiple directories",
+            "Advanced insights analysis with recommendations",
+        ],
+        "Tips": [
+            "Use quick generation for basic overview",
+            "Advanced generation offers more customization",
+            "Statistics analysis provides detailed metrics",
+            "Compare directories to identify differences",
+        ],
+    }
+
     while True:
         try:
             print_section("Directory Tree Generation Progress", color=Mocha.peach)
             key = show_menu(
-                "🌳 Enhanced Directory Tree Generator", options, Mocha.lavender
+                "🌳 Enhanced Directory Tree Generator",
+                options,
+                Mocha.lavender,
+                current_menu="Directory Tree Generator",
+                menu_context=menu_context,
             )
             if key is None or key == "0":
                 return

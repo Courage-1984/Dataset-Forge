@@ -40,7 +40,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 2. Add the `getnative.exe` file's path to your PATH.
 
-### Method 2: Windows (Better; but *TRICKY*...)
+### Method 2: Windows (Better; but _TRICKY_...)
 
 **VapourSynth must be installed _before_ [getnative](https://github.com/Infiziert90/getnative).**
 
@@ -330,7 +330,7 @@ For users who need a standalone `zsteg.exe` executable:
 
 3. Remove old OCRA and install OCRAN
 
--  Remove the old OCRA then install the newer OCRAN (maintained fork)
+- Remove the old OCRA then install the newer OCRAN (maintained fork)
 
 ```bash
 gem uninstall ocra
@@ -401,11 +401,11 @@ gem install ocran
 
    - `ffmpeg-2025-07-31-git-119d127d05-full_build`
 
- - Note that this^ folder contains a `bin` folder which contains:
+- Note that this^ folder contains a `bin` folder which contains:
 
-   - `ffmpeg.exe`
-   - `ffplay.exe`
-   - `ffprobe.exe`
+  - `ffmpeg.exe`
+  - `ffplay.exe`
+  - `ffprobe.exe`
 
 2. Add the path to the `bin` folder to your PATH.
 
@@ -429,27 +429,21 @@ gem install ocran
 
 2. Extract the contents of the downloaded archive.
 
- - Note that this^ folder should contain a `bin` folder which contains:
+- Note that this^ folder should contain a `bin` folder which contains:
 
-   - `ffmpeg.exe`
-   - `ffplay.exe`
-   - `ffprobe.exe`
+  - `ffmpeg.exe`
+  - `ffplay.exe`
+  - `ffprobe.exe`
 
 3. Add the path to the `bin` folder to your PATH.
 
 ---
 
-
-
-
-
-
-
 ## 9. Special mass implementation of above^^
 
 > shortcut that implements multiple special installations from above
 
-*might, might not work*
+_might, might not work_
 
 ### Step 1: Windows binary dump
 
@@ -460,6 +454,7 @@ gem install ocran
 2. Add the path to the `_win_binary_dump` folder path to your PATH.
 
 **this includes**:
+
 ```txt
 exiftool.exe
 ffmpeg.exe
@@ -483,6 +478,7 @@ imagededup.exe
 2. Add the path to the `_win_dll_dump` folder path to your PATH.
 
 **this includes ddl's for**:
+
 ```txt
 VapourSynth's plugins
 python-magic's dll's & .mgc magicfile
@@ -494,6 +490,69 @@ python-magic's dll's & .mgc magicfile
 
 ---
 
+---
+
+## 10. CUDA & GPU Performance Steps
+
+> a guide on optimizing performance
+
+### Step 1: Always use ./run.bat/
+
+1. When Using Dataset-Forge always start is using:
+
+```bs
+   ./run.bat
+```
+
+_run.bat contains CUDA & Pytorch optimization settings_
+
+### Step 2: Be Sure `venv312` has cuda torch installed
+
+1. See [Getting Started](getting_started.md#-installation) for:
+
+   `CUDA-enabled torch/torchvision/torchaudio` installation instruction.
+
+### Step 3: Windows Pagefile
+
+1. lorem ipsum
+2. lorem ipsum
+3. lorem ipsum
+
+Press the Windows key + R to open the Run dialog box.
+
+Type SystemPropertiesAdvanced.exe and press Enter.
+
+Performance section
+click
+Settings...
+Advanced tab
+Virtual Memory section
+click
+Change
+check
+Custom Size
+radio button
+Initial size
+1.5 x your totall RAM
+Maximum size
+3 x your totall RAM
+click OK
+Restart Windows
+
+### Step 4: NVIDIA Control Panel
+
+1. Right Click Desktop
+click
+NVIDIA Control Panel
+Manage 3D settings
+
+2. lorem ipsum
+3. lorem ipsum
+
+### Step 5: `venv312`'s `python.exe`
+
+1. lorem ipsum
+
+---
+
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
-
-

@@ -88,8 +88,6 @@ def memory_management_submenu():
         action = options[key][1]
         if callable(action):
             action()
-        print_prompt("\n⏸️ Press Enter to return to the menu...")
-        input()
 
 
 def show_memory_optimization():
@@ -131,11 +129,15 @@ def show_memory_optimization():
 
 def cache_management_submenu():
     """Sub-menu for cache management."""
+
     # Lazy import for cache management menu
     def get_cache_management_menu():
         from dataset_forge.utils.menu import lazy_menu
-        return lazy_menu("dataset_forge.menus.cache_management_menu", "cache_management_menu")
-    
+
+        return lazy_menu(
+            "dataset_forge.menus.cache_management_menu", "cache_management_menu"
+        )
+
     options = {
         "1": ("📊 View Cache Statistics", lambda: get_cache_management_menu()()),
         "2": ("🧹 Clear Caches", lambda: get_cache_management_menu()()),
@@ -207,26 +209,25 @@ def system_settings_menu():
 
 
 def set_hq_folder():
+    """Set HQ folder path."""
     print_header("📁 Set HQ Folder", color=Mocha.sapphire)
     folder = get_folder_path("📁 Enter HQ folder path: ")
     if folder:
         session_state.hq_folder = folder
         print_success(f"✅ HQ folder set to: {folder}")
-    print_prompt("\n⏸️ Press Enter to continue...")
-    input()
 
 
 def set_lq_folder():
+    """Set LQ folder path."""
     print_header("📁 Set LQ Folder", color=Mocha.sapphire)
     folder = get_folder_path("📁 Enter LQ folder path: ")
     if folder:
         session_state.lq_folder = folder
         print_success(f"✅ LQ folder set to: {folder}")
-    print_prompt("\n⏸️ Press Enter to continue...")
-    input()
 
 
 def view_settings():
+    """Display current system settings."""
     print_header("📊 Current Settings", color=Mocha.sapphire)
     print_info(f"📁 HQ Folder: {session_state.hq_folder or '❌ Not set'}")
     print_info(f"📁 LQ Folder: {session_state.lq_folder or '❌ Not set'}")
@@ -239,11 +240,10 @@ def view_settings():
     print_info(
         f"🎮 Use GPU: {'✅ Yes' if session_state.parallel_config.get('use_gpu', True) else '❌ No'}"
     )
-    print_prompt("\n⏸️ Press Enter to continue...")
-    input()
 
 
 def configure_parallel():
+    """Configure parallel processing settings."""
     print_header("⚡ Configure Parallel Processing", color=Mocha.sapphire)
     try:
         max_workers = input("👥 Max workers (leave blank for auto): ").strip()
@@ -263,11 +263,10 @@ def configure_parallel():
         print_success("✅ Parallel processing settings updated!")
     except ValueError:
         print_error("❌ Invalid input. Settings not changed.")
-    print_prompt("\n⏸️ Press Enter to continue...")
-    input()
 
 
 def reset_settings():
+    """Reset all system settings to defaults."""
     print_header("🔄 Reset Settings", color=Mocha.sapphire)
     confirm = (
         input("⚠️ Are you sure you want to reset all settings? (y/n): ").strip().lower()
@@ -285,5 +284,3 @@ def reset_settings():
             "cpu_only": False,
         }
         print_success("✅ Settings reset to defaults!")
-    print_prompt("\n⏸️ Press Enter to continue...")
-    input()

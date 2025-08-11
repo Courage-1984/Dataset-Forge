@@ -13,7 +13,7 @@ def view_most_recent_log():
     print_header("Most Recent Change/History Log", color=Mocha.mauve)
     log = read_most_recent_log()
     if log:
-        print(log)
+        print_info(log)
     else:
         print_info("No logs found.")
     input("\nPress Enter to return...")
@@ -27,7 +27,7 @@ def select_log_to_view():
         return
     print_section("Available Logs", color=Mocha.sapphire)
     for idx, fname in enumerate(logs, 1):
-        print(f"[{idx}] {fname}")
+        print_info(f"[{idx}] {fname}")
     print_info("")
     try:
         choice = int(input("Enter log number to view (0 to cancel): ").strip())
@@ -36,7 +36,7 @@ def select_log_to_view():
         if 1 <= choice <= len(logs):
             log = read_log(logs[choice - 1])
             print_header(f"Log: {logs[choice - 1]}", color=Mocha.mauve)
-            print(log if log else "(Empty log)")
+            print_info(log if log else "(Empty log)")
         else:
             print_error("Invalid choice.")
     except Exception:

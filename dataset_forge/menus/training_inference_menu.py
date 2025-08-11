@@ -89,15 +89,15 @@ def openmodeldb_model_browser_mode_menu():
     }
 
     while True:
-        choice = show_menu(
+        key = show_menu(
             "OpenModelDB Model Browser - Choose Mode",
             options,
             Mocha.lavender,
             current_menu="OpenModelDB Model Browser Mode",
             menu_context=menu_context,
         )
-        if choice is None or choice == "0":
+        if key is None or key == "0":
             break
-        action = options[choice][1]
+        action = options[key][1]
         if action:
             action()
