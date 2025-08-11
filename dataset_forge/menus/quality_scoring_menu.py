@@ -14,6 +14,14 @@ def quality_scoring_menu():
     from dataset_forge.utils.printing import print_error, print_header, print_section
     from dataset_forge.utils.color import Mocha
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Automated dataset quality scoring and analysis",
+        "Total Options": "1 quality scoring operation",
+        "Navigation": "Use number 1 to select, 0 to go back",
+        "Key Features": "Quality scoring workflow, automated analysis",
+    }
+
     options = quality_scoring_menu.__menu_options__
     while True:
         print_header(
@@ -25,12 +33,12 @@ def quality_scoring_menu():
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Quality Scoring",
+            menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             print_section("Quality Scoring Progress", color=Mocha.sapphire)
             action()

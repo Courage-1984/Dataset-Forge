@@ -103,11 +103,9 @@ def user_profile_menu():
             current_menu="User Profile Management",
             menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None:
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:
@@ -123,11 +121,11 @@ def profile_management_menu():
         print_info("\nUser Profiles:")
         for idx, name in enumerate(profiles, 1):
             marker = "*" if name == active else " "
-            print(f"[{idx}] {name} {marker}")
-        print("[C] Create Profile")
-        print("[L] Load Profile")
-        print("[D] Delete Profile")
-        print("[0] Back")
+            print_info(f"[{idx}] {name} {marker}")
+        print_info("[C] Create Profile")
+        print_info("[L] Load Profile")
+        print_info("[D] Delete Profile")
+        print_info("[0] Back")
         choice = input("Choice: ").strip().upper()
         if choice == "0":
             break
@@ -159,10 +157,10 @@ def favorites_menu():
         favorites = profile["favorites"]
         print_info("\nFavorite Menu Items:")
         for idx, fav in enumerate(favorites, 1):
-            print(f"[{idx}] {fav}")
-        print("[A] Add Favorite")
-        print("[R] Remove Favorite")
-        print("[0] Back")
+            print_info(f"[{idx}] {fav}")
+        print_info("[A] Add Favorite")
+        print_info("[R] Remove Favorite")
+        print_info("[0] Back")
         choice = input("Choice: ").strip().upper()
         if choice == "0":
             break
@@ -170,7 +168,7 @@ def favorites_menu():
             menu_tree = extract_menu_tree()
             print_info("\nAll Menu Items:")
             for idx, (label, _) in enumerate(menu_tree, 1):
-                print(f"[{idx}] {label}")
+                print_info(f"[{idx}] {label}")
             sel = input("Enter number(s) to add (comma-separated): ").strip()
             for s in sel.split(","):
                 s = s.strip()
@@ -197,10 +195,10 @@ def presets_menu():
         presets = profile["presets"]
         print_info("\nPresets:")
         for idx, preset in enumerate(presets, 1):
-            print(f"[{idx}] {preset}")
-        print("[A] Add Preset")
-        print("[R] Remove Preset")
-        print("[0] Back")
+            print_info(f"[{idx}] {preset}")
+        print_info("[A] Add Preset")
+        print_info("[R] Remove Preset")
+        print_info("[0] Back")
         choice = input("Choice: ").strip().upper()
         if choice == "0":
             break
@@ -221,10 +219,10 @@ def favorite_paths_menu():
         paths = profile["favorite_paths"]
         print_info("\nFavorite Paths:")
         for idx, path in enumerate(paths, 1):
-            print(f"[{idx}] {path}")
-        print("[A] Add Path")
-        print("[R] Remove Path")
-        print("[0] Back")
+            print_info(f"[{idx}] {path}")
+        print_info("[A] Add Path")
+        print_info("[R] Remove Path")
+        print_info("[0] Back")
         choice = input("Choice: ").strip().upper()
         if choice == "0":
             break
@@ -244,9 +242,9 @@ def settings_menu():
         settings = profile["settings"]
         print_info("\nUser Settings:")
         for k, v in settings.items():
-            print(f"{k}: {v}")
-        print("[U] Update Setting")
-        print("[0] Back")
+            print_info(f"{k}: {v}")
+        print_info("[U] Update Setting")
+        print_info("[0] Back")
         choice = input("Choice: ").strip().upper()
         if choice == "0":
             break

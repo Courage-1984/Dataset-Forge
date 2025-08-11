@@ -12,7 +12,14 @@ from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.image_ops import AlphaRemover
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_success,
+    print_info,
+    print_error,
+    print_header,
+    print_section,
+)
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -20,9 +27,7 @@ class AlphaAnalyzer:
     @staticmethod
     def find_alpha_channels(hq_folder=None, lq_folder=None, single_folder=None):
         """Find images with alpha channels in folders. Supports both single folder and HQ/LQ pair workflows."""
-        print("\n" + "=" * 30)
-        print("  Finding Images with Alpha Channels")
-        print("=" * 30)
+        print_header("Finding Images with Alpha Channels")
 
         def check_alpha_in_folder(folder_path, folder_name):
             images_with_alpha = []
@@ -77,7 +82,7 @@ class AlphaAnalyzer:
             workflow_type = "paired"
             folders_to_check = [(hq_folder, "HQ"), (lq_folder, "LQ")]
         else:
-            print("Error: Invalid folder configuration.")
+            print_error("Invalid folder configuration.")
             return None
 
         results = {}
@@ -86,10 +91,8 @@ class AlphaAnalyzer:
             results[f"{folder_name.lower()}_alpha"] = alpha_images
             results[f"{folder_name.lower()}_errors"] = errors
 
-        print("\n" + "-" * 30)
-        print("  Alpha Channel Analysis Summary")
-        print("-" * 30)
-        print(f"Workflow: {workflow_type.upper()}")
+        print_section("Alpha Channel Analysis Summary")
+        print_info(f"Workflow: {workflow_type.upper()}")
 
         if workflow_type == "paired":
             hq_alpha_images = results.get("hq_alpha", [])
@@ -97,54 +100,53 @@ class AlphaAnalyzer:
             hq_errors = results.get("hq_errors", [])
             lq_errors = results.get("lq_errors", [])
 
-            print(f"\nHQ Folder Results:")
-            print(f"Found {len(hq_alpha_images)} images with alpha channels")
+            print_info(f"\nHQ Folder Results:")
+            print_info(f"Found {len(hq_alpha_images)} images with alpha channels")
             if hq_alpha_images:
-                print("\nExample HQ files with alpha:")
+                print_info("\nExample HQ files with alpha:")
                 for f in hq_alpha_images[:5]:
-                    print(f"  - {f}")
+                    print_info(f"  - {f}")
                 if len(hq_alpha_images) > 5:
-                    print(f"  ... and {len(hq_alpha_images) - 5} more")
+                    print_info(f"  ... and {len(hq_alpha_images) - 5} more")
 
-            print(f"\nLQ Folder Results:")
-            print(f"Found {len(lq_alpha_images)} images with alpha channels")
+            print_info(f"\nLQ Folder Results:")
+            print_info(f"Found {len(lq_alpha_images)} images with alpha channels")
             if lq_alpha_images:
-                print("\nExample LQ files with alpha:")
+                print_info("\nExample LQ files with alpha:")
                 for f in lq_alpha_images[:5]:
-                    print(f"  - {f}")
+                    print_info(f"  - {f}")
                 if len(lq_alpha_images) > 5:
-                    print(f"  ... and {len(lq_alpha_images) - 5} more")
+                    print_info(f"  ... and {len(lq_alpha_images) - 5} more")
 
             if hq_errors or lq_errors:
-                print("\nErrors encountered:")
+                print_error("\nErrors encountered:")
                 for filename, error in (hq_errors + lq_errors)[:5]:
-                    print(f"  - {filename}: {error}")
+                    print_error(f"  - {filename}: {error}")
                 if len(hq_errors) + len(lq_errors) > 5:
-                    print(
+                    print_error(
                         f"  ... and {len(hq_errors) + len(lq_errors) - 5} more errors"
                     )
         else:
             single_alpha_images = results.get("single_alpha", [])
             single_errors = results.get("single_errors", [])
 
-            print(f"\nSingle Folder Results:")
-            print(f"Found {len(single_alpha_images)} images with alpha channels")
+            print_info(f"\nSingle Folder Results:")
+            print_info(f"Found {len(single_alpha_images)} images with alpha channels")
             if single_alpha_images:
-                print("\nExample files with alpha:")
+                print_info("\nExample files with alpha:")
                 for f in single_alpha_images[:5]:
-                    print(f"  - {f}")
+                    print_info(f"  - {f}")
                 if len(single_alpha_images) > 5:
-                    print(f"  ... and {len(single_alpha_images) - 5} more")
+                    print_info(f"  ... and {len(single_alpha_images) - 5} more")
 
             if single_errors:
-                print("\nErrors encountered:")
+                print_error("\nErrors encountered:")
                 for filename, error in single_errors[:5]:
-                    print(f"  - {filename}: {error}")
+                    print_error(f"  - {filename}: {error}")
                 if len(single_errors) > 5:
-                    print(f"  ... and {len(single_errors) - 5} more errors")
+                    print_error(f"  ... and {len(single_errors) - 5} more errors")
 
-        print("-" * 30)
-        print("=" * 30)
+        print_section("Analysis Complete")
 
         # Play completion sound
         play_done_sound()
@@ -160,11 +162,11 @@ def find_alpha_channels(hq_folder=None, lq_folder=None, single_folder=None):
 
 def find_alpha_channels_menu():
     """Menu for finding alpha channels with workflow choice."""
-    print("\n=== Find Images with Alpha Channels ===")
-    print("Choose input mode:")
-    print("  1. HQ/LQ paired folders")
-    print("  2. Single folder")
-    print("  0. Cancel")
+    print_header("Find Images with Alpha Channels")
+    print_info("Choose input mode:")
+    print_info("  1. HQ/LQ paired folders")
+    print_info("  2. Single folder")
+    print_info("  0. Cancel")
 
     choice = input("Select mode: ").strip()
 
@@ -178,11 +180,11 @@ def find_alpha_channels_menu():
         )
 
         if not hq_folder or not lq_folder:
-            print("Error: Both HQ and LQ paths are required.")
+            print_error("Both HQ and LQ paths are required.")
             return
 
         if not os.path.isdir(hq_folder) or not os.path.isdir(lq_folder):
-            print("Error: Both HQ and LQ paths must be valid directories.")
+            print_error("Both HQ and LQ paths must be valid directories.")
             return
 
         find_alpha_channels(hq_folder=hq_folder, lq_folder=lq_folder)
@@ -194,32 +196,30 @@ def find_alpha_channels_menu():
         )
 
         if not single_folder:
-            print("Error: Folder path is required.")
+            print_error("Folder path is required.")
             return
 
         if not os.path.isdir(single_folder):
-            print("Error: Folder path must be a valid directory.")
+            print_error("Folder path must be a valid directory.")
             return
 
         find_alpha_channels(single_folder=single_folder)
 
     elif choice == "0":
-        print("Operation cancelled.")
+        print_info("Operation cancelled.")
         return
 
     else:
-        print("Invalid choice. Operation cancelled.")
+        print_error("Invalid choice. Operation cancelled.")
 
 
 def remove_alpha_channels(hq_folder, lq_folder):
     """Remove alpha channels from images in HQ/LQ folders using AlphaRemover class."""
-    print("\n" + "=" * 30)
-    print("  Removing Alpha Channels")
-    print("=" * 30)
+    print_header("Removing Alpha Channels")
 
     alpha_results = AlphaAnalyzer.find_alpha_channels(hq_folder, lq_folder)
     if not (alpha_results["hq_alpha"] or alpha_results["lq_alpha"]):
-        print("\nNo images with alpha channels found to process.")
+        print_info("\nNo images with alpha channels found to process.")
         return
 
     operation = get_file_operation_choice()
@@ -227,7 +227,7 @@ def remove_alpha_channels(hq_folder, lq_folder):
     if operation != "inplace":
         destination = get_destination_path()
         if not destination:
-            print(
+            print_error(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -290,18 +290,15 @@ def remove_alpha_channels(hq_folder, lq_folder):
         except Exception as e:
             errors.append(f"Error processing LQ {rel_path}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Remove Alpha Channels Summary")
-    print("-" * 30)
-    print(f"Successfully processed: {processed_count} images")
+    print_section("Remove Alpha Channels Summary")
+    print_success(f"Successfully processed: {processed_count} images")
     if errors:
-        print(f"\nErrors encountered: {len(errors)}")
+        print_error(f"\nErrors encountered: {len(errors)}")
         for error in errors[:5]:
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors")
+    print_section("Operation Complete")
 
     # Play completion sound
     play_done_sound()

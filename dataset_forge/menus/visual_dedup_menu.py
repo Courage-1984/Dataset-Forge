@@ -17,9 +17,9 @@ def visual_dedup_menu():
             "🖼️ Visual Duplicate & Near-Duplicate Detection - Input/Output Selection",
             color=Mocha.yellow,
         )
-        print("1. HQ/LQ parent_path workflow")
-        print("2. Single-folder workflow")
-        print("0. Return to main menu")
+        print_info("1. HQ/LQ parent_path workflow")
+        print_info("2. Single-folder workflow")
+        print_info("0. Return to main menu")
         choice = input("Select workflow: ")
         if choice == "0" or choice.strip() == "":
             return
@@ -43,9 +43,9 @@ def visual_dedup_menu():
             "🖼️ Visual Duplicate & Near-Duplicate Detection - Method Selection",
             color=Mocha.yellow,
         )
-        print("\nSelect method:")
-        print("1. CLIP Embedding (fast, semantic)")
-        print("2. LPIPS (slow, perceptual)")
+        print_info("\nSelect method:")
+        print_info("1. CLIP Embedding (fast, semantic)")
+        print_info("2. LPIPS (slow, perceptual)")
         method_choice = input("Method [1]: ").strip() or "1"
         if method_choice == "2":
             method = "lpips"
@@ -79,10 +79,10 @@ def visual_dedup_menu():
                 print_section("Duplicate Groups Found", color=Mocha.peach)
                 print_info(f"Found {len(all_groups)} duplicate groups.")
                 print_info("What would you like to do with the duplicates?")
-                print("[1] Move to folder")
-                print("[2] Copy to folder")
-                print("[3] Delete in-place")
-                print("[0] Do nothing")
+                print_info("[1] Move to folder")
+                print_info("[2] Copy to folder")
+                print_info("[3] Delete in-place")
+                print_info("[0] Do nothing")
                 action = input("Select action: ").strip()
                 if action == "1":
                     dest = get_path_with_history(

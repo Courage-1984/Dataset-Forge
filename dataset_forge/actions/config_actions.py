@@ -8,7 +8,14 @@ from dataset_forge.actions.alpha_actions import find_alpha_channels
 # Helper functions from config_menu.py
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_success,
+    print_info,
+    print_error,
+    print_warning,
+    print_header,
+    print_section,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # Lazy imports for heavy libraries
@@ -37,7 +44,7 @@ def extract_val_paths_from_yml(yml_path):
                 val_lq = lq
         return val_hq, val_lq
     except Exception as e:
-        print(f"Warning: Could not parse .yml for Val Dataset paths: {e}")
+        print_warning(f"Could not parse .yml for Val Dataset paths: {e}")
         return None, None
 
 
@@ -67,12 +74,12 @@ def extract_model_dir_from_yml(yml_path):
                     model_files.append(os.path.join(models_subdir, f))
         return name, model_dir, model_files
     except Exception as e:
-        print(f"Warning: Could not parse .yml for model dir: {e}")
+        print_warning(f"Could not parse .yml for model dir: {e}")
         return None, None, []
 
 
 def add_config_file():
-    print("\n=== Add Config File ===")
+    print_header("Add Config File")
     model_name = input("Enter model name (used as config filename): ").strip()
     scale = input("Enter scale (e.g., 2, 4): ").strip()
     hq_path = input("Enter path to HQ dataset: ").strip()
@@ -122,13 +129,15 @@ def add_config_file():
             if global_block:
                 config_data["hcl_global"] = global_block
         except Exception as e:
-            print(f"Warning: Failed to parse .hcl file for extra info: {e}")
+            print_warning(f"Failed to parse .hcl file for extra info: {e}")
     # Parse .yml for Val Dataset paths
     val_hq, val_lq = extract_val_paths_from_yml(yml_path)
     if val_hq and val_lq:
         config_data["val_hq_path"] = val_hq
         config_data["val_lq_path"] = val_lq
-        print(f"Extracted Val Dataset HQ: {val_hq}\nExtracted Val Dataset LQ: {val_lq}")
+        print_info(
+            f"Extracted Val Dataset HQ: {val_hq}\nExtracted Val Dataset LQ: {val_lq}"
+        )
     else:
         add_val = (
             input(
@@ -147,8 +156,8 @@ def add_config_file():
     if model_dir:
         config_data["model_dir"] = model_dir
         config_data["model_files"] = model_files if model_files is not None else []
-        print(f"Model directory: {model_dir}")
-        print(
+        print_info(f"Model directory: {model_dir}")
+        print_info(
             f"Found {len(model_files) if model_files is not None else 0} model(s) in models subfolder."
         )
     config_dir = "configs"
@@ -156,23 +165,23 @@ def add_config_file():
     config_filename = os.path.join(config_dir, f"{model_name}_config.json")
     with open(config_filename, "w") as f:
         json.dump(config_data, f, indent=2)
-    print(f"Config saved as {config_filename}")
+    print_success(f"Config saved as {config_filename}")
 
 
 def load_config_file():
     global config, config_path, hq_folder, lq_folder
-    print("\n=== Load Config File ===")
+    print_header("Load Config File")
     config_dir = "configs"
     if not os.path.isdir(config_dir):
-        print("No configs directory found. No configs to load.")
+        print_warning("No configs directory found. No configs to load.")
         return
     config_files = [f for f in os.listdir(config_dir) if f.endswith("_config.json")]
     if not config_files:
-        print("No config files found in 'configs' directory.")
+        print_warning("No config files found in 'configs' directory.")
         return
-    print("Available config files:")
+    print_info("Available config files:")
     for idx, fname in enumerate(config_files, 1):
-        print(f"  {idx}. {fname}")
+        print_info(f"  {idx}. {fname}")
     while True:
         choice = input(
             f"Select config file [1-{len(config_files)}] or 'cancel': "
@@ -181,10 +190,10 @@ def load_config_file():
             selected = config_files[int(choice) - 1]
             break
         elif choice.lower() in ("cancel", "back", "c"):
-            print("Returning to previous menu...")
+            print_info("Returning to previous menu...")
             return
         else:
-            print("Invalid selection. Please enter a valid number or 'cancel'.")
+            print_error("Invalid selection. Please enter a valid number or 'cancel'.")
     path = os.path.join(config_dir, selected)
     try:
         with open(path, "r") as f:
@@ -192,32 +201,32 @@ def load_config_file():
         config_path = path
         hq_folder = config.get("hq_path", "")
         lq_folder = config.get("lq_path", "")
-        print(f"Loaded config from {path}")
+        print_success(f"Loaded config from {path}")
     except Exception as e:
-        print(f"Failed to load config: {e}")
+        print_error(f"Failed to load config: {e}")
 
 
 def view_config_info():
     global config
-    print("\n=== Config Info ===")
+    print_header("Config Info")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
-    print(json.dumps(config, indent=2))
+    print_info(json.dumps(config, indent=2))
 
 
 def validate_dataset_from_config():
     global config
-    print("\n=== Validate HQ/LQ Dataset from Config ===")
+    print_header("Validate HQ/LQ Dataset from Config")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     hq_path = config.get("hq_path")
     lq_path = config.get("lq_path")
     if not hq_path or not lq_path:
-        print("HQ/LQ paths not set in config.")
+        print_warning("HQ/LQ paths not set in config.")
         return
-    print(f"Validating HQ: {hq_path}\nValidating LQ: {lq_path}")
+    print_info(f"Validating HQ: {hq_path}\nValidating LQ: {lq_path}")
     find_hq_lq_scale(hq_path, lq_path)
     report_dimensions(hq_path, "HQ")
     report_dimensions(lq_path, "LQ")
@@ -226,16 +235,16 @@ def validate_dataset_from_config():
 
 def validate_val_dataset_from_config():
     global config
-    print("\n=== Validate Val HQ/LQ Dataset from Config ===")
+    print_header("Validate Val HQ/LQ Dataset from Config")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     val_hq = config.get("val_hq_path")
     val_lq = config.get("val_lq_path")
     if not val_hq or not val_lq:
-        print("Val HQ/LQ paths not set in config.")
+        print_warning("Val HQ/LQ paths not set in config.")
         return
-    print(f"Validating Val HQ: {val_hq}\nValidating Val LQ: {val_lq}")
+    print_info(f"Validating Val HQ: {val_hq}\nValidating Val LQ: {val_lq}")
     find_hq_lq_scale(val_hq, val_lq)
     report_dimensions(val_hq, "Val HQ")
     report_dimensions(val_lq, "Val LQ")
@@ -244,86 +253,86 @@ def validate_val_dataset_from_config():
 
 def run_wtp_dataset_destroyer():
     global config
-    print("\n=== Run wtp_dataset_destroyer ===")
+    print_header("Run wtp_dataset_destroyer")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     hcl_path = config.get("hcl_path")
     if not hcl_path or not os.path.isfile(hcl_path):
-        print(".hcl config file not set or does not exist in config.")
+        print_warning(".hcl config file not set or does not exist in config.")
         return
     try:
         subprocess.run(["wtp_dataset_destroyer", hcl_path], check=True)
-        print("wtp_dataset_destroyer completed successfully.")
+        print_success("wtp_dataset_destroyer completed successfully.")
     except Exception as e:
-        print(f"Error running wtp_dataset_destroyer: {e}")
+        print_error(f"Error running wtp_dataset_destroyer: {e}")
 
 
 def run_trainner_redux():
     global config
-    print("\n=== Run traiNNer-redux ===")
+    print_header("Run traiNNer-redux")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     yml_path = config.get("yml_path")
     if not yml_path or not os.path.isfile(yml_path):
-        print(".yml config file not set or does not exist in config.")
+        print_warning(".yml config file not set or does not exist in config.")
         return
     try:
         subprocess.run(["python", "train.py", "-opt", yml_path], check=True)
-        print("traiNNer-redux training started.")
+        print_success("traiNNer-redux training started.")
     except Exception as e:
-        print(f"Error running traiNNer-redux: {e}")
+        print_error(f"Error running traiNNer-redux: {e}")
 
 
 def edit_hcl_file():
     global config
-    print("\n=== Edit .hcl Config File ===")
+    print_header("Edit .hcl Config File")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     hcl_path = config.get("hcl_path")
     if not hcl_path or not os.path.isfile(hcl_path):
-        print(".hcl config file not set or does not exist in config.")
+        print_warning(".hcl config file not set or does not exist in config.")
         return
     editor = os.environ.get("EDITOR", "notepad" if os.name == "nt" else "nano")
     try:
         subprocess.run([editor, hcl_path])
     except Exception as e:
-        print(f"Error opening .hcl file: {e}")
+        print_error(f"Error opening .hcl file: {e}")
 
 
 def edit_yml_file():
     global config
-    print("\n=== Edit .yml Config File ===")
+    print_header("Edit .yml Config File")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     yml_path = config.get("yml_path")
     if not yml_path or not os.path.isfile(yml_path):
-        print(".yml config file not set or does not exist in config.")
+        print_warning(".yml config file not set or does not exist in config.")
         return
     editor = os.environ.get("EDITOR", "notepad" if os.name == "nt" else "nano")
     try:
         subprocess.run([editor, yml_path])
     except Exception as e:
-        print(f"Error opening .yml file: {e}")
+        print_error(f"Error opening .yml file: {e}")
 
 
 def list_and_upscale_with_model():
     global config
-    print("\n=== List/Run Upscale with Model ===")
+    print_header("List/Run Upscale with Model")
     if not config:
-        print("No config loaded.")
+        print_warning("No config loaded.")
         return
     model_dir = config.get("model_dir")
     model_files = config.get("model_files", [])
     if not model_dir or not model_files:
-        print("Model directory or model files not set in config.")
+        print_warning("Model directory or model files not set in config.")
         return
-    print(f"Model directory: {model_dir}")
-    print("Available models:")
+    print_info(f"Model directory: {model_dir}")
+    print_info("Available models:")
     for idx, f in enumerate(model_files, 1):
-        print(f"  {idx}. {os.path.basename(f)}")
+        print_info(f"  {idx}. {os.path.basename(f)}")
     # TODO: Implement actual upscaling logic or integration with upscaling tool
-    print("[TODO] Actual upscaling logic not yet implemented.")
+    print_warning("[TODO] Actual upscaling logic not yet implemented.")

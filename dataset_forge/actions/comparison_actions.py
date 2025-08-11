@@ -12,7 +12,14 @@ from dataset_forge.utils.memory_utils import (
     auto_cleanup,
 )
 from dataset_forge.utils.monitoring import monitor_all, task_registry
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_success,
+    print_info,
+    print_error,
+    print_warning,
+    print_header,
+    print_section,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # Lazy imports for heavy libraries
@@ -32,12 +39,10 @@ def release_memory():
 
 def create_comparison_images(hq_folder, lq_folder):
     """Create side-by-side comparison images of HQ/LQ pairs."""
-    print("\n" + "=" * 30)
-    print("  Creating HQ/LQ Comparison Images")
-    print("=" * 30)
+    print_header("Creating HQ/LQ Comparison Images")
     output_dir = get_destination_path()
     if not output_dir:
-        print("Operation aborted as no destination path was provided.")
+        print_error("Operation aborted as no destination path was provided.")
         return
     os.makedirs(output_dir, exist_ok=True)
     lq_label = "LQ"
@@ -57,7 +62,7 @@ def create_comparison_images(hq_folder, lq_folder):
                     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", font_size
                 )
             except IOError:
-                print("Warning: Could not load TrueType fonts. Using default PIL font.")
+                print_warning("Warning: Could not load TrueType fonts. Using default PIL font.")
                 font = ImageFont.load_default()
     hq_files = sorted(
         [
@@ -70,16 +75,16 @@ def create_comparison_images(hq_folder, lq_folder):
         f for f in hq_files if os.path.isfile(os.path.join(lq_folder, f))
     ]
     if not available_pairs:
-        print("No matching HQ/LQ pairs found.")
+        print_info("No matching HQ/LQ pairs found.")
         return
     while True:
         try:
             num_pairs_str = input("Enter the number of pairs to compare: ").strip()
             num_pairs = int(num_pairs_str)
             if num_pairs <= 0:
-                print("Please enter a positive number.")
+                print_error("Please enter a positive number.")
             elif num_pairs > len(available_pairs):
-                print(
+                print_info(
                     f"Only {len(available_pairs)} pairs available. Will use all of them."
                 )
                 num_pairs = len(available_pairs)
@@ -87,7 +92,7 @@ def create_comparison_images(hq_folder, lq_folder):
             else:
                 break
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
     selected_pairs = random.sample(available_pairs, num_pairs)
     processed_count = 0
     errors = []
@@ -151,27 +156,22 @@ def create_comparison_images(hq_folder, lq_folder):
             processed_count += 1
         except Exception as e:
             errors.append(f"Error processing {filename}: {e}")
-    print("\n" + "-" * 30)
-    print(" Create Comparisons Summary")
-    print("-" * 30)
-    print(f"Total pairs to process: {num_pairs}")
-    print(f"Successfully created: {processed_count} comparisons")
+    print_section("Create Comparisons Summary")
+    print_info(f"Total pairs to process: {num_pairs}")
+    print_info(f"Successfully created: {processed_count} comparisons")
     if errors:
-        print(f"\nErrors encountered: {len(errors)}")
+        print_error(f"\nErrors encountered: {len(errors)}")
         for error in errors[:5]:
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors")
+    print_section("Operation Complete")
     release_memory()
 
 
 def create_gif_comparison(hq_folder, lq_folder):
     """Create animated GIF/WebP comparisons of HQ/LQ pairs with transition effects."""
-    print("\n" + "=" * 30)
-    print("  Creating HQ/LQ Animated Comparisons")
-    print("=" * 30)
+    print_header("Creating HQ/LQ Animated Comparisons")
 
     # --- New: Allow user to set HQ/LQ input paths for this operation ---
     def get_folder_with_default(prompt, default):
@@ -186,12 +186,12 @@ def create_gif_comparison(hq_folder, lq_folder):
         format_choice = input("Select output format (gif/webp): ").strip().lower()
         if format_choice in ["gif", "webp"]:
             break
-        print("Invalid format. Please enter 'gif' or 'webp'.")
+        print_error("Invalid format. Please enter 'gif' or 'webp'.")
 
     # Get destination path
     output_dir = get_destination_path()
     if not output_dir:
-        print("Operation aborted as no destination path was provided.")
+        print_error("Operation aborted as no destination path was provided.")
         return
     os.makedirs(output_dir, exist_ok=True)
 
@@ -208,7 +208,7 @@ def create_gif_comparison(hq_folder, lq_folder):
     ]
 
     if not available_pairs:
-        print("No matching HQ/LQ pairs found.")
+        print_warning("No matching HQ/LQ pairs found.")
         return
 
     # Get number of pairs to process
@@ -219,9 +219,9 @@ def create_gif_comparison(hq_folder, lq_folder):
             )
             num_pairs = int(num_pairs_str)
             if num_pairs <= 0:
-                print("Please enter a positive number.")
+                print_error("Please enter a positive number.")
             elif num_pairs > len(available_pairs):
-                print(
+                print_info(
                     f"Only {len(available_pairs)} pairs available. Will use all of them."
                 )
                 num_pairs = len(available_pairs)
@@ -229,7 +229,7 @@ def create_gif_comparison(hq_folder, lq_folder):
             else:
                 break
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
 
     # Get FPS
     while True:
@@ -239,9 +239,9 @@ def create_gif_comparison(hq_folder, lq_folder):
             )
             if fps > 0:
                 break
-            print("FPS must be positive.")
+            print_error("FPS must be positive.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
 
     # Get transition duration percentage
     while True:
@@ -254,9 +254,9 @@ def create_gif_comparison(hq_folder, lq_folder):
             )
             if 10 <= transition_percent <= 90:
                 break
-            print("Percentage must be between 10 and 90.")
+            print_error("Percentage must be between 10 and 90.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
 
     # Get transition speed multiplier
     while True:
@@ -269,23 +269,23 @@ def create_gif_comparison(hq_folder, lq_folder):
             )
             if speed_multiplier > 0:
                 break
-            print("Speed multiplier must be positive.")
+            print_error("Speed multiplier must be positive.")
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_error("Invalid input. Please enter a number.")
 
     # Get transition type
-    print("\nSelect transition type:")
-    print("1. Fade")
-    print("2. Slide (Left to Right)")
-    print("3. Slide (Right to Left)")
-    print("4. Zoom")
-    print("5. Cut")
-    print("6. Special")
+    print_info("\nSelect transition type:")
+    print_info("1. Fade")
+    print_info("2. Slide (Left to Right)")
+    print_info("3. Slide (Right to Left)")
+    print_info("4. Zoom")
+    print_info("5. Cut")
+    print_info("6. Special")
     while True:
         transition = input("Enter choice (1-6): ").strip()
         if transition in ["1", "2", "3", "4", "5", "6"]:
             break
-        print("Invalid choice. Please enter 1-6.")
+        print_error("Invalid choice. Please enter 1-6.")
 
     # Calculate frames based on FPS and transition percentage
     total_duration = 2.0  # Total animation duration in seconds
@@ -497,8 +497,8 @@ def create_gif_comparison(hq_folder, lq_folder):
             MIN_GIF_FRAME_DELAY = 0.04  # 40ms per frame (25 FPS), widely supported
             gif_duration = adjusted_duration
             if format_choice == "gif" and adjusted_duration < MIN_GIF_FRAME_DELAY:
-                print(
-                    f"[Warning] Requested frame delay ({adjusted_duration:.3f}s) is too short for many GIF viewers. Using minimum supported delay: {MIN_GIF_FRAME_DELAY:.3f}s per frame."
+                print_warning(
+                    f"Requested frame delay ({adjusted_duration:.3f}s) is too short for many GIF viewers. Using minimum supported delay: {MIN_GIF_FRAME_DELAY:.3f}s per frame."
                 )
                 gif_duration = MIN_GIF_FRAME_DELAY
 
@@ -522,33 +522,30 @@ def create_gif_comparison(hq_folder, lq_folder):
         except Exception as e:
             errors.append(f"Error processing {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print(" Create Animated Comparison Summary")
-    print("-" * 30)
-    print(f"Format: {format_choice.upper()}")
-    print(f"FPS: {fps}")
-    print(f"Transition Duration: {transition_percent}% of total")
-    print(f"Speed Multiplier: {speed_multiplier}x")
-    print(f"Successfully created: {processed_count} animations")
+    print_section("Create Animated Comparison Summary")
+    print_info(f"Format: {format_choice.upper()}")
+    print_info(f"FPS: {fps}")
+    print_info(f"Transition Duration: {transition_percent}% of total")
+    print_info(f"Speed Multiplier: {speed_multiplier}x")
+    print_info(f"Successfully created: {processed_count} animations")
 
     if errors:
-        print(f"\nErrors encountered: {len(errors)}")
+        print_error(f"\nErrors encountered: {len(errors)}")
         for error in errors[:5]:
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors")
+    print_section("Operation Complete")
     release_memory()
 
 
 def compare_folders_menu():
     """Compare two folders and report missing files in each."""
-    print("\n=== Compare Folders ===")
+    print_header("Compare Folders")
     folder1 = input("Enter path to first folder: ").strip()
     folder2 = input("Enter path to second folder: ").strip()
     if not os.path.isdir(folder1) or not os.path.isdir(folder2):
-        print("Both paths must be valid directories.")
+        print_error("Both paths must be valid directories.")
         return
     ext_input = input(
         "Filter by file extensions (comma-separated, blank for all): "
@@ -570,17 +567,17 @@ def compare_folders_menu():
         folder1, folder2, extensions
     )
     if not missing1 and not missing2:
-        print(
+        print_info(
             "Both folders contain the same files"
             + (f" (filtered by {', '.join(extensions)})" if extensions else "")
             + "."
         )
     else:
         if missing1:
-            print(f"Files missing in {folder1}:")
+            print_info(f"Files missing in {folder1}:")
             for f in missing1:
-                print(f"  {f}")
+                print_info(f"  {f}")
         if missing2:
-            print(f"Files missing in {folder2}:")
+            print_info(f"Files missing in {folder2}:")
             for f in missing2:
-                print(f"  {f}")
+                print_info(f"  {f}")

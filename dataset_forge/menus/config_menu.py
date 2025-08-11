@@ -27,6 +27,14 @@ def config_menu():
     from dataset_forge.utils.printing import print_error, print_header, print_section
     from dataset_forge.utils.color import Mocha
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Configuration and model management tools",
+        "Total Options": "10 configuration operations",
+        "Navigation": "Use numbers 1-10 to select, 0 to go back",
+        "Key Features": "Config file management, model validation, dataset validation, file editing",
+    }
+
     options = config_menu.__menu_options__
     while True:
         print_header(
@@ -38,12 +46,12 @@ def config_menu():
             options,
             header_color=Mocha.mauve,
             char="=",
+            current_menu="Configuration & Model Management",
+            menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             print_section("Configuration Progress", color=Mocha.mauve)
             action()

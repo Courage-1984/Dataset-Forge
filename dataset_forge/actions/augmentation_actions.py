@@ -14,7 +14,12 @@ from dataset_forge.menus.session_state import parallel_config, user_preferences
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all
 from dataset_forge.utils.audio_utils import play_done_sound
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_success,
+    print_info,
+    print_error,
+    print_warning,
+)
 import json
 
 
@@ -249,7 +254,7 @@ def augment_single_image(
             return True
 
     except Exception as e:
-        print(f"Error augmenting {image_path}: {e}")
+        print_error(f"Error augmenting {image_path}: {e}")
         return False
 
 
@@ -328,7 +333,7 @@ def apply_augmentation_pipeline(
         ]
 
         if len(files) < 2:
-            print("Need at least 2 images for mixup augmentation.")
+            print_warning("Need at least 2 images for mixup augmentation.")
             return
 
         # Shuffle files for random pairing
@@ -345,7 +350,7 @@ def apply_augmentation_pipeline(
                 mixed.save(out_path)
                 return True
             except Exception as e:
-                print(f"Error processing mixup pair {file1}, {file2}: {e}")
+                print_error(f"Error processing mixup pair {file1}, {file2}: {e}")
                 return False
 
         # Create pairs
@@ -370,7 +375,7 @@ def apply_augmentation_pipeline(
         )
 
         successful = sum(1 for result in results if result)
-        print(
+        print_info(
             f"Mixup augmentation complete: {successful}/{len(pairs)} pairs successful"
         )
         print_success("Mixup augmentation pipeline complete!")
@@ -404,7 +409,7 @@ def apply_augmentation_pipeline(
         matching_files = sorted(set(hq_files) & set(lq_files))
 
         if not matching_files:
-            print("No matching HQ/LQ pairs found.")
+            print_warning("No matching HQ/LQ pairs found.")
             return
 
         # Prepare pair information
@@ -433,7 +438,7 @@ def apply_augmentation_pipeline(
         )
 
         successful = sum(1 for result in results if result)
-        print(
+        print_info(
             f"HQ/LQ augmentation complete: {successful}/{len(pairs)} pairs successful"
         )
 
@@ -446,7 +451,7 @@ def apply_augmentation_pipeline(
         ]
 
         if not files:
-            print("No image files found in input directory.")
+            print_warning("No image files found in input directory.")
             return
 
         # Prepare file paths
@@ -468,7 +473,7 @@ def apply_augmentation_pipeline(
         )
 
         successful = sum(1 for result in results if result)
-        print(f"Augmentation complete: {successful}/{len(files)} images successful")
+        print_info(f"Augmentation complete: {successful}/{len(files)} images successful")
 
     # Log operation
     log_operation(
@@ -539,7 +544,7 @@ def create_augmentation_variations(
         matching_files = sorted(set(hq_files) & set(lq_files))
 
         if not matching_files:
-            print("No matching HQ/LQ pairs found.")
+            print_warning("No matching HQ/LQ pairs found.")
             return
 
         def create_variations_for_pair(pair_info):
@@ -581,7 +586,7 @@ def create_augmentation_variations(
 
         successful = sum(1 for result in results if result)
         total_expected = len(matching_files) * num_variations
-        print(
+        print_info(
             f"Variation creation complete: {successful}/{total_expected} variations successful"
         )
         print_success("HQ/LQ augmentation variations complete!")
@@ -596,7 +601,7 @@ def create_augmentation_variations(
         ]
 
         if not files:
-            print("No image files found in input directory.")
+            print_warning("No image files found in input directory.")
             return
 
         def create_variations_for_image(image_info):
@@ -633,7 +638,7 @@ def create_augmentation_variations(
 
         successful = sum(1 for result in results if result)
         total_expected = len(files) * num_variations
-        print(
+        print_info(
             f"Variation creation complete: {successful}/{total_expected} variations successful"
         )
         print_success("Single folder augmentation variations complete!")

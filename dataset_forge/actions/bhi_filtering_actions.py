@@ -6,7 +6,14 @@ from dataset_forge.utils.progress_utils import tqdm
 # ===================== Inlined IQA Threads and Dependencies (from src.scripts.iqa and dependencies) =====================
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_success,
+    print_info,
+    print_error,
+    print_header,
+    print_section,
+    print_warning,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 
 # Lazy imports for heavy libraries
@@ -61,8 +68,8 @@ def collate_fn_safe(batch):
         # Try the resize approach first
         return collate_fn_resize(batch)
     except Exception as e:
-        print(
-            f"Warning: Resize collate failed ({e}), falling back to individual processing"
+        print_warning(
+            f"Resize collate failed ({e}), falling back to individual processing"
         )
         # Fall back to individual processing
         return collate_fn_individual(batch)
@@ -78,7 +85,7 @@ class ImageDataset(Dataset):
         self.image_files = []
 
         # Add progress tracking for file validation
-        print(f"Validating {len(all_items)} files in {image_dir}...")
+        print_info(f"Validating {len(all_items)} files in {image_dir}...")
 
         for item in all_items:
             item_path = os.path.join(image_dir, item)
@@ -93,10 +100,10 @@ class ImageDataset(Dataset):
                         if img_array is not None and len(img_array.shape) == 3:
                             self.image_files.append(item)
                 except Exception as e:
-                    print(f"Skipping {item} during initialization: {e}")
+                    print_warning(f"Skipping {item} during initialization: {e}")
                     continue
 
-        print(f"Found {len(self.image_files)} valid image files")
+        print_info(f"Found {len(self.image_files)} valid image files")
         self.device = device
 
     def __len__(self):
@@ -244,8 +251,8 @@ class IQANode:
                                 os.remove(os.path.join(self.img_dir, file_name))
 
             except Exception as e:
-                print(f"Error processing batch: {e}")
-                print("Continuing with next batch...")
+                print_error(f"Error processing batch: {e}")
+                print_info("Continuing with next batch...")
                 continue
 
         if self.thread_list:
@@ -685,11 +692,11 @@ def ic9600(device=None):
         model.load_state_dict(state)
 
         load_time = time.time() - start_time
-        print(f"IC9600 model loaded successfully in {load_time:.2f}s")
+        print_success(f"IC9600 model loaded successfully in {load_time:.2f}s")
         return model
     except Exception as e:
-        print(f"Warning: Failed to load IC9600 model: {e}")
-        print("IC9600 scoring will be skipped.")
+        print_warning(f"Failed to load IC9600 model: {e}")
+        print_warning("IC9600 scoring will be skipped.")
         return None
 
 
@@ -722,7 +729,7 @@ class IC9600Thread(IQANode):
             else:
                 self.model = None
         except Exception as e:
-            print(f"Warning: Failed to load IC9600 model: {e}")
+            print_warning(f"Failed to load IC9600 model: {e}")
             self.model = None
 
     def forward(self, images):
@@ -745,7 +752,9 @@ class IC9600Thread(IQANode):
         except RuntimeError as e:
             if "out of memory" in str(e).lower() or "cuda" in str(e).lower():
                 # CUDA memory error - fallback to CPU processing
-                print(f"CUDA memory error in IC9600, falling back to CPU processing...")
+                print_warning(
+                    f"CUDA memory error in IC9600, falling back to CPU processing..."
+                )
                 try:
                     from dataset_forge.utils.memory_utils import clear_cuda_cache
 
@@ -773,16 +782,16 @@ class IC9600Thread(IQANode):
                     return scores
 
                 except Exception as cpu_error:
-                    print(f"CPU fallback also failed: {cpu_error}")
+                    print_error(f"CPU fallback also failed: {cpu_error}")
                     # Return placeholder scores on error
                     return torch.ones(images.shape[0], device=self.device) * 0.5
             else:
                 # Other runtime error
-                print(f"Warning: Error in IC9600 forward pass: {e}")
+                print_warning(f"Error in IC9600 forward pass: {e}")
                 return torch.ones(images.shape[0], device=self.device) * 0.5
 
         except Exception as e:
-            print(f"Warning: Error in IC9600 forward pass: {e}")
+            print_warning(f"Error in IC9600 forward pass: {e}")
             # Return placeholder scores on error
             return torch.ones(images.shape[0], device=self.device) * 0.5
 
@@ -815,7 +824,7 @@ def get_optimal_batch_size(base_batch_size: int, device: str = "cuda") -> int:
             return min(base_batch_size, 2)  # Very low memory: up to 2
 
     except Exception as e:
-        print(f"Warning: Could not determine optimal batch size: {e}")
+        print_warning(f"Could not determine optimal batch size: {e}")
         return min(base_batch_size, 4)  # Conservative fallback
 
 
@@ -989,7 +998,7 @@ def run_bhi_filtering(
     if thresholds is None:
         thresholds = get_default_bhi_thresholds()
         if verbose:
-            print(f"Using default thresholds: {thresholds}")
+            print_info(f"Using default thresholds: {thresholds}")
 
     assert all(
         k in thresholds for k in ("blockiness", "hyperiqa", "ic9600")
@@ -998,13 +1007,13 @@ def run_bhi_filtering(
     if paired:
         assert lq_folder is not None, "lq_folder required for paired mode."
         if verbose:
-            print("Scanning paired folders for files...")
+            print_info("Scanning paired folders for files...")
         files = paired_filenames(input_path, lq_folder)
         hq_folder = input_path
     else:
         # Only include files, not directories, and skip _bhi_filtered folder
         if verbose:
-            print("Scanning input folder for files...")
+            print_info("Scanning input folder for files...")
         all_items = os.listdir(input_path)
         files = []
         for item in all_items:
@@ -1015,7 +1024,7 @@ def run_bhi_filtering(
         hq_folder = input_path
 
     if verbose:
-        print(f"Found {len(files)} files to process")
+        print_info(f"Found {len(files)} files to process")
 
     # Prepare move/copy folders if needed
     if action in ("move", "copy"):
@@ -1041,7 +1050,7 @@ def run_bhi_filtering(
 
     # Create shared dataset to avoid multiple file validations
     if verbose:
-        print("Creating shared dataset...")
+        print_info("Creating shared dataset...")
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     shared_dataset = ImageDataset(hq_folder, device)
 
@@ -1052,17 +1061,19 @@ def run_bhi_filtering(
     ic9600_batch_size = min(optimal_batch_size, 4)  # Cap at 4 for IC9600
 
     if verbose:
-        print(f"Using batch size: {optimal_batch_size} (IC9600: {ic9600_batch_size})")
+        print_info(
+            f"Using batch size: {optimal_batch_size} (IC9600: {ic9600_batch_size})"
+        )
         if torch.cuda.is_available():
             total_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
             allocated_memory = torch.cuda.memory_allocated(0) / (1024**3)
-            print(
+            print_info(
                 f"GPU Memory: {allocated_memory:.1f}GB used / {total_memory:.1f}GB total"
             )
 
     # Prepare IQA threads with shared dataset
     if verbose:
-        print("Initializing IQA models...")
+        print_info("Initializing IQA models...")
 
     ic9600_thread = IC9600Thread(
         hq_folder,
@@ -1071,7 +1082,7 @@ def run_bhi_filtering(
         dataset=shared_dataset,
     )
     if verbose:
-        print("✓ IC9600 model initialized")
+        print_success("✓ IC9600 model initialized")
 
     blockiness_thread = BlockinessThread(
         hq_folder,
@@ -1080,7 +1091,7 @@ def run_bhi_filtering(
         dataset=shared_dataset,
     )
     if verbose:
-        print("✓ Blockiness model initialized")
+        print_success("✓ Blockiness model initialized")
 
     hyper_thread = HyperThread(
         hq_folder,
@@ -1089,7 +1100,7 @@ def run_bhi_filtering(
         dataset=shared_dataset,
     )
     if verbose:
-        print("✓ HyperIQA model initialized")
+        print_success("✓ HyperIQA model initialized")
 
     # Collect scores for all files
     results = {}
@@ -1100,17 +1111,17 @@ def run_bhi_filtering(
     ]
 
     if verbose:
-        print(f"Processing order: IC9600 → Blockiness → HyperIQA")
-        print(f"Using thresholds: {thresholds}")
+        print_info(f"Processing order: IC9600 → Blockiness → HyperIQA")
+        print_info(f"Using thresholds: {thresholds}")
 
     for metric, thread in metrics_and_threads:
         if verbose:
-            print(f"Scoring with {metric}...")
+            print_info(f"Scoring with {metric}...")
 
         # Skip IC9600 if model failed to load
         if metric == "ic9600" and hasattr(thread, "model") and thread.model is None:
             if verbose:
-                print("Skipping IC9600 scoring (model failed to load)")
+                print_warning("Skipping IC9600 scoring (model failed to load)")
             for fname in files:
                 if fname not in results:
                     results[fname] = {}
@@ -1121,7 +1132,7 @@ def run_bhi_filtering(
         # Calculate total batches for proper progress tracking
         total_batches = len(thread.data_loader)
         if verbose:
-            print(f"Processing {total_batches} batches for {metric}...")
+            print_info(f"Processing {total_batches} batches for {metric}...")
 
         for batch_idx, (images, filenames) in enumerate(
             tqdm(
@@ -1151,7 +1162,7 @@ def run_bhi_filtering(
 
             except Exception as e:
                 if verbose:
-                    print(f"Error processing batch {batch_idx} for {metric}: {e}")
+                    print_error(f"Error processing batch {batch_idx} for {metric}: {e}")
                 # Clear memory on error
                 try:
                     from dataset_forge.utils.memory_utils import (
@@ -1196,15 +1207,15 @@ def run_bhi_filtering(
             "delete": "deleted",
             "report": "reported",
         }.get(action, f"{action}d")
-        print(f"{len(to_filter)} files will be {action_text}.")
+        print_info(f"{len(to_filter)} files will be {action_text}.")
     if action == "report" or dry_run:
         for fname in to_filter:
-            print(f"Would {action} {fname} (scores: {results[fname]})")
+            print_info(f"Would {action} {fname} (scores: {results[fname]})")
         return results
 
     # Add progress tracking for file operations
     if verbose and len(to_filter) > 0:
-        print(f"Performing {action} operations...")
+        print_info(f"Performing {action} operations...")
         # Fix action text for progress bar
         action_ing = {"move": "moving", "copy": "copying", "delete": "deleting"}.get(
             action, f"{action}ing"
@@ -1232,7 +1243,7 @@ def run_bhi_filtering(
                         os.remove(src_lq)
             except Exception as e:
                 if verbose:
-                    print(f"Error processing {fname}: {e}")
+                    print_error(f"Error processing {fname}: {e}")
                 continue
     else:
         # Non-verbose processing
@@ -1259,18 +1270,18 @@ def run_bhi_filtering(
                         os.remove(src_lq)
             except Exception as e:
                 if verbose:
-                    print(f"Error processing {fname}: {e}")
+                    print_error(f"Error processing {fname}: {e}")
                 continue
 
     if verbose:
-        print(
+        print_success(
             f"\nBHI filtering completed. Processed {len(files)} files, filtered {len(to_filter)} files."
         )
         if len(to_filter) > 0:
-            print(
+            print_info(
                 f"Filtered files: {len(to_filter)}/{len(files)} ({len(to_filter)/len(files)*100:.1f}%)"
             )
         else:
-            print("No files were filtered (all passed quality thresholds)")
+            print_info("No files were filtered (all passed quality thresholds)")
 
     return results

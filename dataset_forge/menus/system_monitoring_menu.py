@@ -55,9 +55,9 @@ def manage_background_tasks():
     if not tasks:
         print_info("No background tasks registered.")
         return
-    print("\n--- Background Tasks ---")
+    print_info("\n--- Background Tasks ---")
     for i, t in enumerate(tasks):
-        print(
+        print_info(
             f"{i+1}. ID: {t['id']} | Type: {t['type']} | Status: {t['status']} | Alive: {t.get('alive', '?')}"
         )
     try:
@@ -71,7 +71,7 @@ def manage_background_tasks():
         print_info("Invalid selection.")
         return
     task_id = tasks[idx - 1]["id"]
-    print("Options: [p]ause, [r]esume, [k]ill, [c]ancel")
+    print_info("Options: [p]ause, [r]esume, [k]ill, [c]ancel")
     action = input("Action: ").strip().lower()
     if action == "p":
         try:

@@ -4,29 +4,35 @@ import uuid
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import (
+    print_success,
+    print_info,
+    print_error,
+    print_header,
+    print_section,
+)
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
 def batch_rename_menu():
     """Batch rename files in a folder or paired HQ/LQ folders with sequential numbers or custom prefix."""
-    print("\n=== Batch Renaming Utility ===")
+    print_header("Batch Renaming Utility")
     input_path = input(
         "Enter input folder path (single folder or parent of hq/lq): "
     ).strip()
     if not os.path.exists(input_path):
-        print(f"Input path does not exist: {input_path}")
+        print_error(f"Input path does not exist: {input_path}")
         return
     hq_path = os.path.join(input_path, "hq")
     lq_path = os.path.join(input_path, "lq")
     is_pair = os.path.isdir(hq_path) and os.path.isdir(lq_path)
     if is_pair:
-        print(f"Detected HQ/LQ folders: {hq_path}, {lq_path}")
+        print_info(f"Detected HQ/LQ folders: {hq_path}, {lq_path}")
     else:
-        print(f"Detected single folder: {input_path}")
-    print("Choose naming scheme:")
-    print("  1. Sequential numbers (e.g., 00001, 00002)")
-    print("  2. Custom prefix (e.g., my_dataset_00001)")
+        print_info(f"Detected single folder: {input_path}")
+    print_info("Choose naming scheme:")
+    print_info("  1. Sequential numbers (e.g., 00001, 00002)")
+    print_info("  2. Custom prefix (e.g., my_dataset_00001)")
     scheme = input("Select scheme [1-2]: ").strip()
     if scheme == "2":
         prefix = input("Enter custom prefix: ").strip()
@@ -60,14 +66,14 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
             if os.path.isfile(os.path.join(folder_path, f))
         ]
     )
-    print(f"Found {len(files)} files in {folder_path}.")
+    print_info(f"Found {len(files)} files in {folder_path}.")
 
     if dry_run:
         for idx, filename in enumerate(files, 1):
             ext = os.path.splitext(filename)[1]
             new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
-            print(f"Would rename: {filename} -> {new_name}")
-        print("Dry run complete. No files were renamed.")
+            print_info(f"Would rename: {filename} -> {new_name}")
+        print_info("Dry run complete. No files were renamed.")
         return
 
     # Two-phase approach: first rename all to temporary names, then to final names
@@ -88,7 +94,7 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
         final_renames.append((temp_path, final_path))
 
     # Phase 2: Execute temporary renames
-    print("Phase 1: Renaming to temporary names...")
+    print_info("Phase 1: Renaming to temporary names...")
     for src, temp_path in temp_renames:
         try:
             os.rename(src, temp_path)
@@ -104,7 +110,7 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
             log_operation("rename_temp", f"{src} -> {temp_path} (unique)")
 
     # Phase 3: Execute final renames
-    print("Phase 2: Renaming to final names...")
+    print_info("Phase 2: Renaming to final names...")
     for temp_path, final_path in final_renames:
         try:
             os.rename(temp_path, final_path)
@@ -119,7 +125,6 @@ def batch_rename_single_folder(folder_path, prefix="", padding=5, dry_run=True):
             os.rename(temp_path, final_path)
             log_operation("rename_final", f"{temp_path} -> {final_path} (unique)")
 
-    print("Batch renaming complete.")
     print_success(f"Batch renaming complete! Renamed {len(files)} files.")
     play_done_sound()
 
@@ -133,14 +138,14 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
         [f for f in os.listdir(lq_path) if os.path.isfile(os.path.join(lq_path, f))]
     )
     matching_files = [f for f in hq_files if f in lq_files]
-    print(f"Found {len(matching_files)} matching HQ/LQ pairs.")
+    print_info(f"Found {len(matching_files)} matching HQ/LQ pairs.")
 
     if dry_run:
         for idx, filename in enumerate(matching_files, 1):
             ext = os.path.splitext(filename)[1]
             new_name = f"{prefix}{str(idx).zfill(padding)}{ext}"
-            print(f"Would rename: {filename} -> {new_name}")
-        print("Dry run complete. No files were renamed.")
+            print_info(f"Would rename: {filename} -> {new_name}")
+        print_info("Dry run complete. No files were renamed.")
         return
 
     # Two-phase approach for HQ/LQ folders
@@ -168,7 +173,7 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
         lq_final_renames.append((lq_temp_path, lq_final_path))
 
     # Phase 2: Execute temporary renames
-    print("Phase 1: Renaming to temporary names...")
+    print_info("Phase 1: Renaming to temporary names...")
     for hq_src, hq_temp_path in hq_temp_renames:
         try:
             os.rename(hq_src, hq_temp_path)
@@ -182,7 +187,7 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
                 counter += 1
             os.rename(hq_src, hq_temp_path)
             log_operation("rename_temp_hq", f"{hq_src} -> {hq_temp_path} (unique)")
-    
+
     for lq_src, lq_temp_path in lq_temp_renames:
         try:
             os.rename(lq_src, lq_temp_path)
@@ -198,7 +203,7 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
             log_operation("rename_temp_lq", f"{lq_src} -> {lq_temp_path} (unique)")
 
     # Phase 3: Execute final renames
-    print("Phase 2: Renaming to final names...")
+    print_info("Phase 2: Renaming to final names...")
     for hq_temp_path, hq_final_path in hq_final_renames:
         try:
             os.rename(hq_temp_path, hq_final_path)
@@ -211,8 +216,10 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
                 hq_final_path = os.path.join(hq_path, f"{base}_{counter}{ext}")
                 counter += 1
             os.rename(hq_temp_path, hq_final_path)
-            log_operation("rename_final_hq", f"{hq_temp_path} -> {hq_final_path} (unique)")
-    
+            log_operation(
+                "rename_final_hq", f"{hq_temp_path} -> {hq_final_path} (unique)"
+            )
+
     for lq_temp_path, lq_final_path in lq_final_renames:
         try:
             os.rename(lq_temp_path, lq_final_path)
@@ -225,8 +232,11 @@ def batch_rename_hq_lq_folders(hq_path, lq_path, prefix="", padding=5, dry_run=T
                 lq_final_path = os.path.join(lq_path, f"{base}_{counter}{ext}")
                 counter += 1
             os.rename(lq_temp_path, lq_final_path)
-            log_operation("rename_final_lq", f"{lq_temp_path} -> {lq_final_path} (unique)")
+            log_operation(
+                "rename_final_lq", f"{lq_temp_path} -> {lq_final_path} (unique)"
+            )
 
-    print("Batch renaming complete.")
-    print_success(f"HQ/LQ batch renaming complete! Renamed {len(matching_files)} pairs.")
+    print_success(
+        f"HQ/LQ batch renaming complete! Renamed {len(matching_files)} pairs."
+    )
     play_done_sound()
