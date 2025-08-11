@@ -67,6 +67,11 @@ cd Dataset-Forge
 - [MCP Integration Guide](docs/mcp_integration_guide.md) - Enhanced development with AI assistance
 - [Full Documentation Index](docs/index.md)
 
+## 🚀 Beta Releases
+
+- [Quick Beta Release Guide](docs/QUICK_BETA_RELEASE.md) - Fast reference for creating beta releases
+- [Complete Beta Release Guide](docs/BETA_RELEASE_GUIDE.md) - Comprehensive beta release documentation
+
 ---
 
 ## 🖥️ Requirements
@@ -221,5 +226,3 @@ flowchart TD
 ---
 
 > For the full roadmap and advanced usage, see the [Documentation Home](docs/index.md).
-
-

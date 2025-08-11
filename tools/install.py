@@ -17,7 +17,7 @@ sys.path.insert(0, str(project_root))
 from dataset_forge.utils.printing import print_info, print_success, print_error
 
 # Configuration
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = project_root  # Use the project root we calculated above
 VENV_DIR = "venv312"
 PYTHON_EXE = sys.executable
 

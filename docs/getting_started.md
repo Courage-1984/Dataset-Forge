@@ -28,6 +28,23 @@ This guide will help you install and launch Dataset Forge for the first time.
    ```
 
 2. **Set up the environment:**
+
+   **Option A: Automated Installation (Recommended)**
+
+   ```bash
+   # Windows (easiest)
+   install.bat
+   # or
+   tools\install.bat
+
+   # Or manually
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   python tools\install.py
+   ```
+
+   **Option B: Manual Installation**
+
    ```bash
    py -3.12 -m venv venv312
    venv312\Scripts\activate
@@ -35,7 +52,17 @@ This guide will help you install and launch Dataset Forge for the first time.
    # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
    pip install -r requirements.txt
+   pip install -e .
    ```
+
+   **Option C: Using setup.py directly**
+
+   ```bash
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   python setup.py install
+   ```
+
    > **Note:** For other CUDA versions, see [PyTorch Get Started](https://pytorch.org/get-started/locally/).
 
 ---

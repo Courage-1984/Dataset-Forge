@@ -13,9 +13,10 @@
 
 - [ ] **Debug Mode**: Add a comprehensive _Debug Mode_ to the project, which when activated, shows verbose output and debug information throughout the CLI
 - [ ] **Packaging & Distribution**:
-  - [ ] Compile Dataset-Forge into standalone executable
+  - [x] Compile Dataset-Forge into standalone executable (PyInstaller support)
   - [ ] Create Docker container/containerization
-  - [ ] Automated build pipeline for releases
+  - [x] Automated build pipeline for releases (GitHub Actions workflow)
+  - [x] Beta release process and tools (create_beta_release.py script)
 - [ ] **Automated Documentation**: Implement automated documentation generation and maintenance
 - [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
 - [ ] **Global Search Functionality**: Implement comprehensive search across all menus and features
@@ -226,4 +227,3 @@
 - [ ] **lorem**: lorem
 - [ ] **lorem**: lorem
 - [ ] **lorem**: lorem
-
