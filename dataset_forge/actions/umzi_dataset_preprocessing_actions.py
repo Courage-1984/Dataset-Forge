@@ -761,7 +761,10 @@ def iqa_filtering_action(
             )
         if batch_size is None:
             print_info("DEBUG: batch_size missing, prompting user...")
-            batch_size = ask_int("Batch size", default=8, min_value=1)
+            batch_size = ask_int("Batch size", default=1, min_value=1)
+            print_info(
+                "Note: Using batch size 1 to avoid tensor size mismatch errors with different image dimensions"
+            )
         if threshold is None:
             print_info("DEBUG: threshold missing, prompting user...")
             threshold = ask_float("IQA threshold (0-1 typical)", default=0.5)
@@ -771,7 +774,26 @@ def iqa_filtering_action(
         if in_folder is None:
             print_info("DEBUG: in_folder missing, prompting user...")
             in_folder = get_folder_path("Input folder")
-        # out_folder is optional: if None, low-quality images are deleted
+
+        # Prompt for output folder with options
+        if out_folder is None:
+            print_info("DEBUG: out_folder missing, prompting user...")
+            print_info("What would you like to do with low-quality images?")
+            print_info("1. Move to output folder")
+            print_info("2. Delete them (no output folder)")
+
+            choice = input("Enter choice (1-2, default: 1): ").strip() or "1"
+
+            if choice == "1":
+                out_folder = get_folder_path("Output folder for low-quality images")
+                if not out_folder:
+                    print_warning(
+                        "No output folder specified. Low-quality images will be deleted."
+                    )
+                    out_folder = None
+            else:
+                print_warning("Low-quality images will be deleted.")
+                out_folder = None
 
         # Initialize IQA algorithm with progress tracking
         print_header("🔧 Initializing IQA Filtering")
@@ -800,15 +822,46 @@ def iqa_filtering_action(
         try:
             alg()
         except Exception as e:
-            print_error(f"Error during IQA Filtering: {e}")
-            print_info("This may be due to file access conflicts. Try:")
-            print_info("1. Close any applications that might be accessing the images")
-            print_info(
-                "2. Ensure the output folder is not being accessed by other programs"
-            )
-            print_info("3. Try running with a different output location")
-            log_operation("iqa_filtering", f"Failed: {e}")
-            return
+            error_msg = str(e)
+            if "stack expects each tensor to be equal size" in error_msg:
+                print_error(f"Tensor size mismatch error: {e}")
+                print_info(
+                    "This error occurs when processing images of different sizes in the same batch."
+                )
+                print_info("Attempting to retry with batch size 1...")
+
+                # Retry with batch size 1
+                try:
+                    alg_retry = alg_enum.value(
+                        img_dir=in_folder,
+                        batch_size=1,  # Force batch size 1
+                        threshold=threshold,
+                        median_threshold=median_threshold,
+                        move_folder=out_folder,
+                    )
+                    print_info("Retrying with batch size 1...")
+                    alg_retry()
+                except Exception as e2:
+                    print_error(f"Error during IQA Filtering (batch size 1): {e2}")
+                    print_info("Troubleshooting tips:")
+                    print_info("1. Ensure all images are valid and not corrupted")
+                    print_info("2. Try processing a smaller subset of images")
+                    print_info("3. Check available GPU memory")
+                    print_info("4. Close other applications using GPU")
+                    log_operation("iqa_filtering", f"Failed with batch size 1: {e2}")
+                    return
+            else:
+                print_error(f"Error during IQA Filtering: {e}")
+                print_info("This may be due to file access conflicts. Try:")
+                print_info(
+                    "1. Close any applications that might be accessing the images"
+                )
+                print_info(
+                    "2. Ensure the output folder is not being accessed by other programs"
+                )
+                print_info("3. Try running with a different output location")
+                log_operation("iqa_filtering", f"Failed: {e}")
+                return
 
         print_info("DEBUG: IQA filtering complete.")
         print_success("IQA filtering complete.")

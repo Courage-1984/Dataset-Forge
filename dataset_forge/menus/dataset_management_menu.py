@@ -1,4 +1,5 @@
 import importlib
+import os
 from dataset_forge.utils.menu import show_menu, lazy_action
 from dataset_forge.utils.printing import (
     print_header,
@@ -52,7 +53,14 @@ def dataset_creation_menu():
         dataset_actions.create_dataset_from_source(source_folder, output_folder)
 
     def create_dataset_from_video():
-        video_path = get_folder_path("🎬 Enter video file path: ")
+        # Use get_path_with_history for video file path since it's a file, not a folder
+        video_path = get_path_with_history("🎬 Enter video file path: ")
+        if not video_path:
+            print_error("No video file path provided.")
+            return
+        if not os.path.isfile(video_path):
+            print_error(f"Video file does not exist: {video_path}")
+            return
         output_folder = get_folder_path("📁 Enter output folder path: ")
         dataset_actions.create_dataset_from_video(video_path, output_folder)
 
@@ -64,7 +72,7 @@ def dataset_creation_menu():
     options = {
         "1": ("📁 Create from Source Folder", create_dataset_from_source),
         "2": ("🎬 Create from Video", create_dataset_from_video),
-        "3": ("🖼️ Create from Images", create_dataset_from_images),
+        "3": ("🖼️  Create from Images", create_dataset_from_images),
         "4": (
             "⚡ Advanced Preprocessing",
             lazy_menu(
@@ -72,7 +80,7 @@ def dataset_creation_menu():
                 "umzi_dataset_preprocessing_menu",
             ),
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -141,8 +149,8 @@ def combine_split_menu():
 
     options = {
         "1": ("🔗 Combine Multiple Datasets", dataset_actions.combine_datasets),
-        "2": ("✂️ Split and Adjust Dataset", split_adjust_dataset_menu),
-        "0": ("⬅️ Back", None),
+        "2": ("✂️  Split and Adjust Dataset", split_adjust_dataset_menu),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -208,7 +216,7 @@ def hq_lq_pairs_menu():
         ),
         "3": ("🎲 Extract Random Pairs", extract_random_pairs),
         "4": ("🔄 Shuffle Image Pairs", shuffle_image_pairs),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -291,7 +299,7 @@ def clean_organize_menu():
             "1": ("🔍 Find Duplicates", find_duplicates_wrapper),
             "2": ("🗑️ Remove Duplicates", remove_duplicates_wrapper),
             "3": ("📁 Move Duplicates", move_duplicates_wrapper),
-            "0": ("⬅️ Back", None),
+            "0": ("⬅️  Back", None),
         }
 
         # Define menu context for help system
@@ -349,7 +357,7 @@ def clean_organize_menu():
         options = {
             "1": ("📁 Single Folder", dataset_actions.batch_rename_single_folder),
             "2": ("🔗 HQ/LQ Folders", dataset_actions.batch_rename_hq_lq_folders),
-            "0": ("⬅️ Back", None),
+            "0": ("⬅️  Back", None),
         }
 
         # Define menu context for help system
@@ -393,7 +401,7 @@ def clean_organize_menu():
         "2": ("📏 Remove Small Pairs", remove_small_pairs),
         "3": ("📐 Organize by Orientation", organize_by_orientation),
         "4": ("📝 Batch Rename", batch_rename_menu),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -463,7 +471,7 @@ def dataset_management_menu():
                 "umzi_dataset_preprocessing_menu",
             ),
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system

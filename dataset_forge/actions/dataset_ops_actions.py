@@ -8,7 +8,7 @@ from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success, print_info, print_warning, print_error
+from dataset_forge.utils.printing import print_success, print_info, print_warning, print_error, print_prompt
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -79,7 +79,7 @@ class DatasetCombiner(DatasetOperation):
 
         # Get destination root for the NEW combined dataset
         dest_root_prompt = "Enter path for the NEW combined dataset root directory: "
-        print_info(dest_root_prompt, end="")
+        print_prompt(dest_root_prompt)
         dest_root = get_destination_path()
 
         if not dest_root:  # User left it blank or path creation failed

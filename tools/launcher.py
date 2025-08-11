@@ -324,7 +324,7 @@ class ToolsLauncher:
         for i, (tool_name, tool_info) in enumerate(self.tools.items(), 1):
             options[str(i)] = (f"📋 {tool_name}", tool_name)
 
-        options["0"] = ("⬅️ Back", None)
+        options["0"] = ("⬅️  Back", None)
 
         menu_context = {
             "Purpose": "View detailed information about development tools",

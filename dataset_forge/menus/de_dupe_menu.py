@@ -50,7 +50,7 @@ def de_dupe_menu():
             "1": ("🔍 Find Exact Duplicates", find_exact_duplicates),
             "2": ("🔍 Find Near-Duplicates", find_near_duplicates_menu),
             "3": ("ℹ️ About File Hash De-duplication", about_file_hash_dedup),
-            "0": ("⬅️ Back to Utilities", None),
+            "0": ("⬅️  Back to Utilities", None),
         }
 
         key = show_menu(

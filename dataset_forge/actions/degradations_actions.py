@@ -709,6 +709,7 @@ def apply_screentone_degradation(
     )
     clear_memory()
 
+
 @auto_cleanup
 def apply_halo_degradation(
     input_folder: str,
@@ -724,6 +725,7 @@ def apply_halo_degradation(
     Apply halo (unsharp mask) degradation to all images in a folder.
     """
     from PIL import ImageFilter, ImageEnhance
+
     if not os.path.isdir(input_folder):
         print_error(f"Input folder does not exist: {input_folder}")
         raise FileNotFoundError(f"Input folder does not exist: {input_folder}")
@@ -747,18 +749,40 @@ def apply_halo_degradation(
                     continue
                 with Image.open(img_path) as img:
                     if type_halo == "unsharp_mask":
-                        haloed = img.filter(ImageFilter.UnsharpMask(radius=kernel, percent=int(amount*150), threshold=int(threshold*255)))
+                        haloed = img.filter(
+                            ImageFilter.UnsharpMask(
+                                radius=kernel,
+                                percent=int(amount * 150),
+                                threshold=int(threshold * 255),
+                            )
+                        )
                     elif type_halo == "unsharp_halo":
                         # Simulate by boosting contrast after unsharp mask
-                        haloed = img.filter(ImageFilter.UnsharpMask(radius=kernel, percent=int(amount*150), threshold=int(threshold*255)))
+                        haloed = img.filter(
+                            ImageFilter.UnsharpMask(
+                                radius=kernel,
+                                percent=int(amount * 150),
+                                threshold=int(threshold * 255),
+                            )
+                        )
                         enhancer = ImageEnhance.Contrast(haloed)
                         haloed = enhancer.enhance(1.5)
                     elif type_halo == "unsharp_gray":
-                        haloed = img.convert("L").filter(ImageFilter.UnsharpMask(radius=kernel, percent=int(amount*150), threshold=int(threshold*255)))
+                        haloed = img.convert("L").filter(
+                            ImageFilter.UnsharpMask(
+                                radius=kernel,
+                                percent=int(amount * 150),
+                                threshold=int(threshold * 255),
+                            )
+                        )
                     else:
-                        print_error(f"Unknown halo type: {type_halo}. Skipping {img_name}.")
+                        print_error(
+                            f"Unknown halo type: {type_halo}. Skipping {img_name}."
+                        )
                         continue
-                    out_path = img_path if in_place else os.path.join(output_folder, img_name)
+                    out_path = (
+                        img_path if in_place else os.path.join(output_folder, img_name)
+                    )
                     haloed.save(out_path)
                     processed += 1
             except Exception as e:
@@ -767,6 +791,7 @@ def apply_halo_degradation(
     print_success(f"Halo degradation applied to {processed} images.")
     log_operation("halo_degradation", f"Processed {processed} images in {input_folder}")
     clear_memory()
+
 
 @auto_cleanup
 def apply_sin_degradation(
@@ -821,7 +846,9 @@ def apply_sin_degradation(
                     else:
                         arr = np.clip(arr + pattern, 0, 255)
                     out_img = Image.fromarray(arr.astype(np.uint8))
-                    out_path = img_path if in_place else os.path.join(output_folder, img_name)
+                    out_path = (
+                        img_path if in_place else os.path.join(output_folder, img_name)
+                    )
                     out_img.save(out_path)
                     processed += 1
             except Exception as e:
@@ -830,6 +857,7 @@ def apply_sin_degradation(
     print_success(f"Sin degradation applied to {processed} images.")
     log_operation("sin_degradation", f"Processed {processed} images in {input_folder}")
     clear_memory()
+
 
 @auto_cleanup
 def apply_shift_degradation(
@@ -869,19 +897,26 @@ def apply_shift_degradation(
                     arr = np.array(img)
                     if shift_type == "rgb" and arr.ndim == 3:
                         for c in range(3):
-                            shift = int(amount if not percent else arr.shape[1] * amount / 100)
+                            shift = int(
+                                amount if not percent else arr.shape[1] * amount / 100
+                            )
                             arr[..., c] = np.roll(arr[..., c], shift, axis=1)
                     # For simplicity, only implement RGB shift here
                     out_img = Image.fromarray(arr)
-                    out_path = img_path if in_place else os.path.join(output_folder, img_name)
+                    out_path = (
+                        img_path if in_place else os.path.join(output_folder, img_name)
+                    )
                     out_img.save(out_path)
                     processed += 1
             except Exception as e:
                 print_error(f"Failed to process {img_name}: {e}")
                 log_operation("shift_degradation", f"Failed: {img_name}: {e}")
     print_success(f"Shift degradation applied to {processed} images.")
-    log_operation("shift_degradation", f"Processed {processed} images in {input_folder}")
+    log_operation(
+        "shift_degradation", f"Processed {processed} images in {input_folder}"
+    )
     clear_memory()
+
 
 @auto_cleanup
 def apply_canny_degradation(
@@ -899,6 +934,7 @@ def apply_canny_degradation(
     Apply Canny edge detection degradation to all images in a folder.
     """
     import cv2
+
     if not os.path.isdir(input_folder):
         print_error(f"Input folder does not exist: {input_folder}")
         raise FileNotFoundError(f"Input folder does not exist: {input_folder}")
@@ -928,18 +964,25 @@ def apply_canny_degradation(
                 if scale > 0:
                     k = int(scale * 5)
                     if k > 1:
-                        edges = cv2.dilate(edges, np.ones((k, k), np.uint8), iterations=1)
+                        edges = cv2.dilate(
+                            edges, np.ones((k, k), np.uint8), iterations=1
+                        )
                 if white >= 0.5:
                     edges = 255 - edges
-                out_path = img_path if in_place else os.path.join(output_folder, img_name)
+                out_path = (
+                    img_path if in_place else os.path.join(output_folder, img_name)
+                )
                 cv2.imwrite(out_path, edges)
                 processed += 1
             except Exception as e:
                 print_error(f"Failed to process {img_name}: {e}")
                 log_operation("canny_degradation", f"Failed: {img_name}: {e}")
     print_success(f"Canny degradation applied to {processed} images.")
-    log_operation("canny_degradation", f"Processed {processed} images in {input_folder}")
+    log_operation(
+        "canny_degradation", f"Processed {processed} images in {input_folder}"
+    )
     clear_memory()
+
 
 @auto_cleanup
 def apply_resize_degradation(
@@ -996,19 +1039,26 @@ def apply_resize_degradation(
                     elif alg_lq == "gauss":
                         resized = img.resize((new_w, new_h), Image.BILINEAR)
                     else:
-                        print_error(f"Unknown resize algorithm: {alg_lq}. Skipping {img_name}.")
+                        print_error(
+                            f"Unknown resize algorithm: {alg_lq}. Skipping {img_name}."
+                        )
                         continue
                     # Optionally resize back to original size to simulate LQ/HQ pair
                     resized = resized.resize((w, h), Image.BILINEAR)
-                    out_path = img_path if in_place else os.path.join(output_folder, img_name)
+                    out_path = (
+                        img_path if in_place else os.path.join(output_folder, img_name)
+                    )
                     resized.save(out_path)
                     processed += 1
             except Exception as e:
                 print_error(f"Failed to process {img_name}: {e}")
                 log_operation("resize_degradation", f"Failed: {img_name}: {e}")
     print_success(f"Resize degradation applied to {processed} images.")
-    log_operation("resize_degradation", f"Processed {processed} images in {input_folder}")
+    log_operation(
+        "resize_degradation", f"Processed {processed} images in {input_folder}"
+    )
     clear_memory()
+
 
 # Menu functions for degradations menu
 def blur_degradation_menu():
@@ -1017,48 +1067,62 @@ def blur_degradation_menu():
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🌀 Blur Degradation Menu")
     print_info("Apply blur effects to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     options = {
         "1": ("Gaussian Blur", "gauss"),
         "2": ("Box Blur", "box"),
         "3": ("Median Blur", "median"),
-        "0": ("⬅️ Back", None)
+        "0": ("⬅️  Back", None),
     }
-    
+
     menu_context = {
         "Purpose": "Configure blur degradation settings",
         "Options": "3 blur types available",
         "Navigation": "Use numbers 1-3 to select, 0 to go back",
-        "Key Features": ["Gaussian blur for natural blur", "Box blur for uniform blur", "Median blur for noise reduction"]
+        "Key Features": [
+            "Gaussian blur for natural blur",
+            "Box blur for uniform blur",
+            "Median blur for noise reduction",
+        ],
     }
-    
+
     while True:
-        key = show_menu("Blur Type Selection", options, Mocha.lavender, current_menu="Blur Degradation", menu_context=menu_context)
+        key = show_menu(
+            "Blur Type Selection",
+            options,
+            Mocha.lavender,
+            current_menu="Blur Degradation",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         blur_type = options[key][1]
         if blur_type:
             try:
                 kernel_size = int(input("Enter kernel size (1-10, default 3): ") or "3")
-                probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-                
+                probability = float(
+                    input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+                )
+
                 apply_blur_degradation(
                     input_folder=input_folder,
                     output_folder=output_folder,
                     in_place=in_place,
                     blur_type=blur_type,
                     kernel_size=kernel_size,
-                    probability=probability
+                    probability=probability,
                 )
                 print_success("Blur degradation completed!")
                 break
@@ -1067,53 +1131,69 @@ def blur_degradation_menu():
             except Exception as e:
                 print_error(f"Error applying blur degradation: {e}")
 
+
 def noise_degradation_menu():
     """Menu for noise degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🎲 Noise Degradation Menu")
     print_info("Add noise to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     options = {
         "1": ("Gaussian Noise", "gauss"),
         "2": ("Salt & Pepper Noise", "salt"),
-        "0": ("⬅️ Back", None)
+        "0": ("⬅️  Back", None),
     }
-    
+
     menu_context = {
         "Purpose": "Configure noise degradation settings",
         "Options": "2 noise types available",
         "Navigation": "Use numbers 1-2 to select, 0 to go back",
-        "Key Features": ["Gaussian noise for realistic noise", "Salt & pepper for impulse noise"]
+        "Key Features": [
+            "Gaussian noise for realistic noise",
+            "Salt & pepper for impulse noise",
+        ],
     }
-    
+
     while True:
-        key = show_menu("Noise Type Selection", options, Mocha.lavender, current_menu="Noise Degradation", menu_context=menu_context)
+        key = show_menu(
+            "Noise Type Selection",
+            options,
+            Mocha.lavender,
+            current_menu="Noise Degradation",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         noise_type = options[key][1]
         if noise_type:
             try:
-                alpha = float(input("Enter noise intensity (0.0-1.0, default 0.2): ") or "0.2")
-                probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-                
+                alpha = float(
+                    input("Enter noise intensity (0.0-1.0, default 0.2): ") or "0.2"
+                )
+                probability = float(
+                    input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+                )
+
                 apply_noise_degradation(
                     input_folder=input_folder,
                     output_folder=output_folder,
                     in_place=in_place,
                     noise_type=noise_type,
                     alpha=alpha,
-                    probability=probability
+                    probability=probability,
                 )
                 print_success("Noise degradation completed!")
                 break
@@ -1122,53 +1202,64 @@ def noise_degradation_menu():
             except Exception as e:
                 print_error(f"Error applying noise degradation: {e}")
 
+
 def compress_degradation_menu():
     """Menu for compression degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🗜️ Compression Degradation Menu")
     print_info("Apply compression artifacts to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     options = {
         "1": ("JPEG Compression", "jpeg"),
         "2": ("WebP Compression", "webp"),
-        "0": ("⬅️ Back", None)
+        "0": ("⬅️  Back", None),
     }
-    
+
     menu_context = {
         "Purpose": "Configure compression degradation settings",
         "Options": "2 compression types available",
         "Navigation": "Use numbers 1-2 to select, 0 to go back",
-        "Key Features": ["JPEG compression artifacts", "WebP compression artifacts"]
+        "Key Features": ["JPEG compression artifacts", "WebP compression artifacts"],
     }
-    
+
     while True:
-        key = show_menu("Compression Type Selection", options, Mocha.lavender, current_menu="Compression Degradation", menu_context=menu_context)
+        key = show_menu(
+            "Compression Type Selection",
+            options,
+            Mocha.lavender,
+            current_menu="Compression Degradation",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         algorithm = options[key][1]
         if algorithm:
             try:
                 quality = int(input("Enter quality (1-100, default 50): ") or "50")
-                probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-                
+                probability = float(
+                    input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+                )
+
                 apply_compress_degradation(
                     input_folder=input_folder,
                     output_folder=output_folder,
                     in_place=in_place,
                     algorithm=algorithm,
                     quality=quality,
-                    probability=probability
+                    probability=probability,
                 )
                 print_success("Compression degradation completed!")
                 break
@@ -1177,33 +1268,38 @@ def compress_degradation_menu():
             except Exception as e:
                 print_error(f"Error applying compression degradation: {e}")
 
+
 def pixelate_degradation_menu():
     """Menu for pixelate degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🟫 Pixelate Degradation Menu")
     print_info("Apply pixelation to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         size = int(input("Enter pixel size (2-32, default 8): ") or "8")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         apply_pixelate_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
             in_place=in_place,
             size=size,
-            probability=probability
+            probability=probability,
         )
         print_success("Pixelate degradation completed!")
     except ValueError as e:
@@ -1211,29 +1307,34 @@ def pixelate_degradation_menu():
     except Exception as e:
         print_error(f"Error applying pixelate degradation: {e}")
 
+
 def color_degradation_menu():
     """Menu for color degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🎨 Color Degradation Menu")
     print_info("Apply color modifications to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         high = int(input("Enter high value (0-255, default 255): ") or "255")
         low = int(input("Enter low value (0-255, default 0): ") or "0")
         gamma = float(input("Enter gamma value (0.1-3.0, default 1.0): ") or "1.0")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         apply_color_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
@@ -1241,7 +1342,7 @@ def color_degradation_menu():
             high=high,
             low=low,
             gamma=gamma,
-            probability=probability
+            probability=probability,
         )
         print_success("Color degradation completed!")
     except ValueError as e:
@@ -1249,33 +1350,38 @@ def color_degradation_menu():
     except Exception as e:
         print_error(f"Error applying color degradation: {e}")
 
+
 def saturation_degradation_menu():
     """Menu for saturation degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🌈 Saturation Degradation Menu")
     print_info("Modify image saturation")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         rand = float(input("Enter saturation factor (0.0-2.0, default 0.7): ") or "0.7")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         apply_saturation_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
             in_place=in_place,
             rand=rand,
-            probability=probability
+            probability=probability,
         )
         print_success("Saturation degradation completed!")
     except ValueError as e:
@@ -1283,53 +1389,69 @@ def saturation_degradation_menu():
     except Exception as e:
         print_error(f"Error applying saturation degradation: {e}")
 
+
 def dithering_degradation_menu():
     """Menu for dithering degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🖼️ Dithering Degradation Menu")
     print_info("Apply dithering effects to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     options = {
         "1": ("Quantize", "quantize"),
         "2": ("Floyd-Steinberg", "floyd"),
-        "0": ("⬅️ Back", None)
+        "0": ("⬅️  Back", None),
     }
-    
+
     menu_context = {
         "Purpose": "Configure dithering degradation settings",
         "Options": "2 dithering types available",
         "Navigation": "Use numbers 1-2 to select, 0 to go back",
-        "Key Features": ["Quantize for color reduction", "Floyd-Steinberg for error diffusion"]
+        "Key Features": [
+            "Quantize for color reduction",
+            "Floyd-Steinberg for error diffusion",
+        ],
     }
-    
+
     while True:
-        key = show_menu("Dithering Type Selection", options, Mocha.lavender, current_menu="Dithering Degradation", menu_context=menu_context)
+        key = show_menu(
+            "Dithering Type Selection",
+            options,
+            Mocha.lavender,
+            current_menu="Dithering Degradation",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         dithering_type = options[key][1]
         if dithering_type:
             try:
-                color_ch = int(input("Enter color channels (2-256, default 8): ") or "8")
-                probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-                
+                color_ch = int(
+                    input("Enter color channels (2-256, default 8): ") or "8"
+                )
+                probability = float(
+                    input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+                )
+
                 apply_dithering_degradation(
                     input_folder=input_folder,
                     output_folder=output_folder,
                     in_place=in_place,
                     dithering_type=dithering_type,
                     color_ch=color_ch,
-                    probability=probability
+                    probability=probability,
                 )
                 print_success("Dithering degradation completed!")
                 break
@@ -1338,54 +1460,71 @@ def dithering_degradation_menu():
             except Exception as e:
                 print_error(f"Error applying dithering degradation: {e}")
 
+
 def subsampling_degradation_menu():
     """Menu for subsampling degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🧩 Subsampling Degradation Menu")
     print_info("Apply chroma subsampling to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     options = {
         "1": ("4:2:0 Subsampling", "4:2:0"),
         "2": ("4:2:2 Subsampling", "4:2:2"),
         "3": ("4:1:1 Subsampling", "4:1:1"),
-        "0": ("⬅️ Back", None)
+        "0": ("⬅️  Back", None),
     }
-    
+
     menu_context = {
         "Purpose": "Configure subsampling degradation settings",
         "Options": "3 subsampling types available",
         "Navigation": "Use numbers 1-3 to select, 0 to go back",
-        "Key Features": ["4:2:0 for maximum compression", "4:2:2 for moderate compression", "4:1:1 for aggressive compression"]
+        "Key Features": [
+            "4:2:0 for maximum compression",
+            "4:2:2 for moderate compression",
+            "4:1:1 for aggressive compression",
+        ],
     }
-    
+
     while True:
-        key = show_menu("Subsampling Type Selection", options, Mocha.lavender, current_menu="Subsampling Degradation", menu_context=menu_context)
+        key = show_menu(
+            "Subsampling Type Selection",
+            options,
+            Mocha.lavender,
+            current_menu="Subsampling Degradation",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         sampling = options[key][1]
         if sampling:
             try:
-                blur = float(input("Enter blur amount (0.0-1.0, default 0.0): ") or "0.0")
-                probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-                
+                blur = float(
+                    input("Enter blur amount (0.0-1.0, default 0.0): ") or "0.0"
+                )
+                probability = float(
+                    input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+                )
+
                 apply_subsampling_degradation(
                     input_folder=input_folder,
                     output_folder=output_folder,
                     in_place=in_place,
                     sampling=sampling,
                     blur=blur,
-                    probability=probability
+                    probability=probability,
                 )
                 print_success("Subsampling degradation completed!")
                 break
@@ -1394,27 +1533,32 @@ def subsampling_degradation_menu():
             except Exception as e:
                 print_error(f"Error applying subsampling degradation: {e}")
 
+
 def sharpen_degradation_menu():
     """Menu for sharpen degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("✨ Sharpen Degradation Menu")
     print_info("Apply sharpening effects to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         kernel_size = int(input("Enter kernel size (1-10, default 3): ") or "3")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use the halo degradation with unsharp mask for sharpening
         apply_halo_degradation(
             input_folder=input_folder,
@@ -1424,7 +1568,7 @@ def sharpen_degradation_menu():
             kernel=kernel_size,
             amount=1.0,
             threshold=0.0,
-            probability=probability
+            probability=probability,
         )
         print_success("Sharpen degradation completed!")
     except ValueError as e:
@@ -1432,34 +1576,39 @@ def sharpen_degradation_menu():
     except Exception as e:
         print_error(f"Error applying sharpen degradation: {e}")
 
+
 def downscale_degradation_menu():
     """Menu for downscale degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("⬇️ Downscale Degradation Menu")
     print_info("Downscale images and upscale back")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         scale = float(input("Enter scale factor (0.1-0.9, default 0.5): ") or "0.5")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         apply_resize_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
             in_place=in_place,
             alg_lq="box",
             scale=scale,
-            probability=probability
+            probability=probability,
         )
         print_success("Downscale degradation completed!")
     except ValueError as e:
@@ -1467,27 +1616,32 @@ def downscale_degradation_menu():
     except Exception as e:
         print_error(f"Error applying downscale degradation: {e}")
 
+
 def posterize_degradation_menu():
     """Menu for posterize degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🖍️ Posterize Degradation Menu")
     print_info("Reduce color levels in images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         levels = int(input("Enter color levels (2-256, default 8): ") or "8")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use dithering with quantize for posterize effect
         apply_dithering_degradation(
             input_folder=input_folder,
@@ -1495,7 +1649,7 @@ def posterize_degradation_menu():
             in_place=in_place,
             dithering_type="quantize",
             color_ch=levels,
-            probability=probability
+            probability=probability,
         )
         print_success("Posterize degradation completed!")
     except ValueError as e:
@@ -1503,36 +1657,41 @@ def posterize_degradation_menu():
     except Exception as e:
         print_error(f"Error applying posterize degradation: {e}")
 
+
 def bitdepth_degradation_menu():
     """Menu for bit depth degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🕳️ Bit Depth Degradation Menu")
     print_info("Reduce bit depth of images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         bits = int(input("Enter bit depth (1-8, default 4): ") or "4")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use dithering with quantize for bit depth reduction
-        levels = 2 ** bits
+        levels = 2**bits
         apply_dithering_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
             in_place=in_place,
             dithering_type="quantize",
             color_ch=levels,
-            probability=probability
+            probability=probability,
         )
         print_success("Bit depth degradation completed!")
     except ValueError as e:
@@ -1540,27 +1699,32 @@ def bitdepth_degradation_menu():
     except Exception as e:
         print_error(f"Error applying bit depth degradation: {e}")
 
+
 def banding_degradation_menu():
     """Menu for banding degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🟪 Banding Degradation Menu")
     print_info("Apply color banding effects")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         levels = int(input("Enter color levels (2-64, default 16): ") or "16")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use dithering without error diffusion for banding
         apply_dithering_degradation(
             input_folder=input_folder,
@@ -1568,7 +1732,7 @@ def banding_degradation_menu():
             in_place=in_place,
             dithering_type="quantize",
             color_ch=levels,
-            probability=probability
+            probability=probability,
         )
         print_success("Banding degradation completed!")
     except ValueError as e:
@@ -1576,27 +1740,32 @@ def banding_degradation_menu():
     except Exception as e:
         print_error(f"Error applying banding degradation: {e}")
 
+
 def jpeg2000_degradation_menu():
     """Menu for JPEG2000 degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🏞️ JPEG2000 Degradation Menu")
     print_info("Apply JPEG2000 compression artifacts")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         quality = int(input("Enter quality (1-100, default 30): ") or "30")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use compression with JPEG2000-like settings
         apply_compress_degradation(
             input_folder=input_folder,
@@ -1604,7 +1773,7 @@ def jpeg2000_degradation_menu():
             in_place=in_place,
             algorithm="jpeg",
             quality=quality,
-            probability=probability
+            probability=probability,
         )
         print_success("JPEG2000 degradation completed!")
     except ValueError as e:
@@ -1612,27 +1781,32 @@ def jpeg2000_degradation_menu():
     except Exception as e:
         print_error(f"Error applying JPEG2000 degradation: {e}")
 
+
 def moire_degradation_menu():
     """Menu for moiré pattern degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("📶 Moiré Pattern Degradation Menu")
     print_info("Apply moiré pattern effects")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         frequency = int(input("Enter frequency (10-200, default 50): ") or "50")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use sine wave degradation for moiré effect
         apply_sin_degradation(
             input_folder=input_folder,
@@ -1642,7 +1816,7 @@ def moire_degradation_menu():
             alpha=0.3,
             bias=0.0,
             vertical=0.5,
-            probability=probability
+            probability=probability,
         )
         print_success("Moiré pattern degradation completed!")
     except ValueError as e:
@@ -1650,27 +1824,34 @@ def moire_degradation_menu():
     except Exception as e:
         print_error(f"Error applying moiré pattern degradation: {e}")
 
+
 def vignetting_degradation_menu():
     """Menu for vignetting degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🌑 Vignetting Degradation Menu")
     print_info("Apply vignetting effects to images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
-        intensity = float(input("Enter vignetting intensity (0.0-1.0, default 0.5): ") or "0.5")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        intensity = float(
+            input("Enter vignetting intensity (0.0-1.0, default 0.5): ") or "0.5"
+        )
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use color degradation with gamma for vignetting effect
         apply_color_degradation(
             input_folder=input_folder,
@@ -1679,7 +1860,7 @@ def vignetting_degradation_menu():
             high=255,
             low=0,
             gamma=1.0 + intensity,
-            probability=probability
+            probability=probability,
         )
         print_success("Vignetting degradation completed!")
     except ValueError as e:
@@ -1687,27 +1868,34 @@ def vignetting_degradation_menu():
     except Exception as e:
         print_error(f"Error applying vignetting degradation: {e}")
 
+
 def lens_distortion_degradation_menu():
     """Menu for lens distortion degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🔄 Lens Distortion Degradation Menu")
     print_info("Apply lens distortion effects")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
-        distortion = float(input("Enter distortion amount (-1.0 to 1.0, default 0.1): ") or "0.1")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        distortion = float(
+            input("Enter distortion amount (-1.0 to 1.0, default 0.1): ") or "0.1"
+        )
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use shift degradation for lens distortion simulation
         apply_shift_degradation(
             input_folder=input_folder,
@@ -1716,7 +1904,7 @@ def lens_distortion_degradation_menu():
             shift_type="rgb",
             percent=True,
             amount=int(distortion * 10),
-            probability=probability
+            probability=probability,
         )
         print_success("Lens distortion degradation completed!")
     except ValueError as e:
@@ -1724,27 +1912,32 @@ def lens_distortion_degradation_menu():
     except Exception as e:
         print_error(f"Error applying lens distortion degradation: {e}")
 
+
 def color_shift_degradation_menu():
     """Menu for color shift degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🎭 Color Shift Degradation Menu")
     print_info("Apply color channel shifts")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         shift_amount = int(input("Enter shift amount (1-10, default 2): ") or "2")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         apply_shift_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
@@ -1752,7 +1945,7 @@ def color_shift_degradation_menu():
             shift_type="rgb",
             percent=False,
             amount=shift_amount,
-            probability=probability
+            probability=probability,
         )
         print_success("Color shift degradation completed!")
     except ValueError as e:
@@ -1760,26 +1953,31 @@ def color_shift_degradation_menu():
     except Exception as e:
         print_error(f"Error applying color shift degradation: {e}")
 
+
 def channel_swap_degradation_menu():
     """Menu for channel swap degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🔀 Channel Swap Degradation Menu")
     print_info("Swap color channels in images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use shift degradation with RGB shift for channel swap effect
         apply_shift_degradation(
             input_folder=input_folder,
@@ -1788,7 +1986,7 @@ def channel_swap_degradation_menu():
             shift_type="rgb",
             percent=False,
             amount=5,
-            probability=probability
+            probability=probability,
         )
         print_success("Channel swap degradation completed!")
     except ValueError as e:
@@ -1796,34 +1994,39 @@ def channel_swap_degradation_menu():
     except Exception as e:
         print_error(f"Error applying channel swap degradation: {e}")
 
+
 def block_shuffle_degradation_menu():
     """Menu for block shuffle degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🧊 Block Shuffle Degradation Menu")
     print_info("Shuffle image blocks")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
         block_size = int(input("Enter block size (8-64, default 16): ") or "16")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use pixelate degradation for block shuffle effect
         apply_pixelate_degradation(
             input_folder=input_folder,
             output_folder=output_folder,
             in_place=in_place,
             size=block_size,
-            probability=probability
+            probability=probability,
         )
         print_success("Block shuffle degradation completed!")
     except ValueError as e:
@@ -1831,27 +2034,34 @@ def block_shuffle_degradation_menu():
     except Exception as e:
         print_error(f"Error applying block shuffle degradation: {e}")
 
+
 def random_erasing_degradation_menu():
     """Menu for random erasing degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("❌ Random Erasing Degradation Menu")
     print_info("Randomly erase parts of images")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
-        erasure_ratio = float(input("Enter erasure ratio (0.1-0.5, default 0.2): ") or "0.2")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        erasure_ratio = float(
+            input("Enter erasure ratio (0.1-0.5, default 0.2): ") or "0.2"
+        )
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use noise degradation with salt & pepper for random erasing effect
         apply_noise_degradation(
             input_folder=input_folder,
@@ -1859,7 +2069,7 @@ def random_erasing_degradation_menu():
             in_place=in_place,
             noise_type="salt",
             alpha=erasure_ratio,
-            probability=probability
+            probability=probability,
         )
         print_success("Random erasing degradation completed!")
     except ValueError as e:
@@ -1867,27 +2077,34 @@ def random_erasing_degradation_menu():
     except Exception as e:
         print_error(f"Error applying random erasing degradation: {e}")
 
+
 def color_jitter_degradation_menu():
     """Menu for color jitter degradation settings."""
     from dataset_forge.utils.menu import show_menu
     from dataset_forge.utils.color import Mocha
     from dataset_forge.utils.input_utils import get_folder_path
     from dataset_forge.utils.printing import print_info, print_success, print_error
-    
+
     print_info("🎚️ Color Jitter Degradation Menu")
     print_info("Apply random color variations")
-    
+
     input_folder = get_folder_path("Enter input folder path: ")
     if not input_folder:
         return
-    
-    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+
+    output_folder = get_folder_path(
+        "Enter output folder path (or press Enter for in-place): "
+    )
     in_place = not output_folder
-    
+
     try:
-        jitter_amount = float(input("Enter jitter amount (0.1-0.5, default 0.2): ") or "0.2")
-        probability = float(input("Enter probability (0.0-1.0, default 0.5): ") or "0.5")
-        
+        jitter_amount = float(
+            input("Enter jitter amount (0.1-0.5, default 0.2): ") or "0.2"
+        )
+        probability = float(
+            input("Enter probability (0.0-1.0, default 0.5): ") or "0.5"
+        )
+
         # Use color degradation with random parameters for jitter effect
         apply_color_degradation(
             input_folder=input_folder,
@@ -1896,7 +2113,7 @@ def color_jitter_degradation_menu():
             high=255,
             low=0,
             gamma=1.0 + jitter_amount,
-            probability=probability
+            probability=probability,
         )
         print_success("Color jitter degradation completed!")
     except ValueError as e:

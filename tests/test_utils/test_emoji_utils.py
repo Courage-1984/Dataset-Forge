@@ -316,7 +316,7 @@ class TestEmojiIntegration:
             "1": ("📁 Create Dataset", None),
             "2": ("🔍 Analyze Dataset", None),
             "3": ("🎨 Color Adjustments", None),
-            "0": ("⬅️ Back", None),
+            "0": ("⬅️  Back", None),
         }
 
         # Validate emojis in menu options

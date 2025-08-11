@@ -85,12 +85,12 @@ def consolidated_dedup_menu():
     while True:
         options = {
             "1": ("🔍 Fuzzy Matching De-duplication", fuzzy_matching_dedup),
-            "2": ("👁️ Visual De-duplication", visual_dedup_action),
+            "2": ("👁️  Visual De-duplication", visual_dedup_action),
             "3": ("🔐 File Hash De-duplication", file_hash_dedup_action),
             "4": ("🔍 ImageDedup Pro", imagededup_action),
             "5": ("📊 Analysis & Reports", duplicate_analysis_action),
-            "6": ("⚙️ Settings & Configuration", dedup_settings_action),
-            "0": ("⬅️ Back to Utilities", None),
+            "6": ("⚙️  Settings & Configuration", dedup_settings_action),
+            "0": ("⬅️  Back to Utilities", None),
         }
 
         key = show_menu(
@@ -235,7 +235,7 @@ def fuzzy_matching_dedup():
 
 def visual_dedup_action():
     """Visual de-duplication using CLIP/LPIPS embeddings."""
-    print_header("👁️ Visual De-duplication", color=Mocha.yellow)
+    print_header("👁️  Visual De-duplication", color=Mocha.yellow)
 
     # Get input method
     print_section("Input Selection", color=Mocha.yellow)

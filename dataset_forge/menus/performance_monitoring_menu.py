@@ -47,7 +47,7 @@ def performance_monitoring_menu():
         "6": ("🚀 Preload Common Menus", preload_common_menus_action),
         "7": ("📊 System Performance Overview", system_performance_overview_action),
         "8": ("🔧 Performance Settings", performance_settings_action),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system

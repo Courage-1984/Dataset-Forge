@@ -84,7 +84,7 @@ def user_profile_menu():
         "2": ("⭐ Favorites", favorites_menu),
         "3": ("📁 Favorite Paths", favorite_paths_menu),
         "4": ("⚙️ Settings", settings_menu),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
     # Define menu context for help system
     menu_context = {

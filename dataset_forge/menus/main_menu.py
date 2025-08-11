@@ -91,7 +91,7 @@ def main_menu():
                     ),
                 ),
                 "4": (
-                    "🛠️ Utilities",
+                    "🛠️  Utilities",
                     lazy_menu("dataset_forge.menus.utilities_menu", "utilities_menu"),
                 ),
                 "5": (
@@ -102,14 +102,14 @@ def main_menu():
                     ),
                 ),
                 "6": (
-                    "🗂️ Enhanced Metadata Management",
+                    "🗂️  Enhanced Metadata Management",
                     lazy_menu(
                         "dataset_forge.menus.enhanced_metadata_menu",
                         "enhanced_metadata_menu",
                     ),
                 ),
                 "7": (
-                    "⚙️ System & Settings",
+                    "⚙️  System & Settings",
                     lazy_menu(
                         "dataset_forge.menus.system_settings_menu",
                         "system_settings_menu",

@@ -20,12 +20,12 @@ from dataset_forge.actions.enhanced_metadata_actions import (
 def enhanced_metadata_menu():
     options = {
         "1": ("📤 Batch Extract Metadata (CSV/SQLite)", batch_extract_metadata),
-        "2": ("👁️ View/Edit Metadata (Single Image)", view_edit_metadata),
+        "2": ("👁️  View/Edit Metadata (Single Image)", view_edit_metadata),
         "3": ("🔎 Filter Images by Metadata", filter_by_metadata),
         "4": ("🧹 Batch Anonymize Metadata", batch_anonymize_metadata),
         "0": ("⬅️  Back", None),
     }
-    
+
     # Define menu context for help system
     menu_context = {
         "Purpose": "Advanced metadata handling and management",
@@ -33,7 +33,7 @@ def enhanced_metadata_menu():
         "Navigation": "Use numbers 1-4 to select, 0 to go back",
         "Key Features": "Batch extraction, metadata editing, filtering, anonymization",
     }
-    
+
     while True:
         key = show_menu(
             "🗂️  Enhanced Metadata Management",

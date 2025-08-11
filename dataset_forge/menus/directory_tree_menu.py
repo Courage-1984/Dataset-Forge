@@ -2793,7 +2793,7 @@ def directory_tree_menu():
     )
     options = {
         "1": ("🌳 Quick Tree Generation", quick_tree_generation),
-        "2": ("⚙️ Advanced Tree Generation", advanced_tree_generation),
+        "2": ("⚙️  Advanced Tree Generation", advanced_tree_generation),
         "3": ("📦 Batch Tree Generation", batch_tree_generation),
         "4": ("📊 Statistics Analysis", tree_statistics_analysis),
         "5": ("🔍 Compare Directories", compare_directories),

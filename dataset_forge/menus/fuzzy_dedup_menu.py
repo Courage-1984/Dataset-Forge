@@ -59,12 +59,12 @@ def fuzzy_dedup_menu():
     while True:
         options = {
             "1": ("🔍 Fuzzy Matching De-duplication", fuzzy_matching_dedup),
-            "2": ("👁️ Visual De-duplication", visual_dedup_action),
+            "2": ("👁️  Visual De-duplication", visual_dedup_action),
             "3": ("🔐 File Hash De-duplication", file_hash_dedup_action),
             "4": ("🔍 ImageDedup Advanced", imagededup_action),
             "5": ("📊 Duplicate Analysis", duplicate_analysis_action),
             "6": ("⚙️ Fuzzy Matching Settings", fuzzy_settings_action),
-            "0": ("⬅️ Back to Utilities", None),
+            "0": ("⬅️  Back to Utilities", None),
         }
 
         key = show_menu(

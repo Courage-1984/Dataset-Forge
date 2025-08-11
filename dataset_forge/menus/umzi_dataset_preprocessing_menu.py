@@ -35,7 +35,7 @@ def umzi_dataset_preprocessing_menu():
             ),
         ),
         "5": (
-            "🗑️ Clear Model Cache (Fix Download Issues)",
+            "🗑️  Clear Model Cache (Fix Download Issues)",
             lazy_action(
                 "dataset_forge.actions.umzi_dataset_preprocessing_actions",
                 "manual_cache_clear_action",

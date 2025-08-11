@@ -192,7 +192,7 @@ def performance_optimization_menu():
                         "performance_monitoring_menu",
                     ),
                 ),
-                "0": ("⬅️ Back", None),
+                "0": ("⬅️  Back", None),
             }
 
             key = show_menu(

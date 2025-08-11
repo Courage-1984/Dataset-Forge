@@ -245,7 +245,7 @@ def find_fix_issues_menu():
         input()
 
     def find_alpha_channels_menu():
-        print_header("🖼️ Find Images with Alpha Channel", color=Mocha.sky)
+        print_header("🖼️  Find Images with Alpha Channel", color=Mocha.sky)
         folder = get_path_with_history(
             "📁 Enter folder path:", allow_hq_lq=True, allow_single_folder=True
         )
@@ -259,7 +259,7 @@ def find_fix_issues_menu():
         "1": ("🔧 Verify & Fix Image Corruption", verify_fix_corruption),
         "2": ("🔍 Find Misaligned Image Pairs", find_misaligned_workflow),
         "3": ("🎯 Find Outliers & Anomalies", find_outliers_workflow),
-        "4": ("🖼️ Find Images with Alpha Channel", find_alpha_channels_menu),
+        "4": ("🖼️  Find Images with Alpha Channel", find_alpha_channels_menu),
         "0": ("⬅️  Back", None),
     }
     from dataset_forge.utils.printing import print_error
@@ -391,9 +391,7 @@ def analyze_properties_menu():
             "0": ("⬅️  Back", None),
         }
         while True:
-            key = show_menu(
-                "Select input type", input_type_options, Mocha.lavender
-            )
+            key = show_menu("Select input type", input_type_options, Mocha.lavender)
             if key is None or key == "0":
                 return
             if key == "1":

@@ -13,6 +13,7 @@ from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
 from dataset_forge.utils import monitoring
 
+
 # Helper for lazy importing submenu modules
 def lazy_menu(module_name: str, func_name: str):
     def _menu():
@@ -80,7 +81,7 @@ def utilities_menu():
             ),
         ),
         "5": (
-            "🗜️ Consolidated Compression",
+            "🗜️  Consolidated Compression",
             lazy_menu(
                 "dataset_forge.menus.consolidated_compression_menu",
                 "consolidated_compression_menu",
@@ -100,7 +101,7 @@ def utilities_menu():
             "📁 File Filtering",
             filter_non_images_menu,
         ),
-        "0": ("⬅️ Back to Main Menu", None),
+        "0": ("⬅️  Back to Main Menu", None),
     }
 
     # Define menu context for help system
@@ -153,7 +154,7 @@ def utilities_menu():
     while True:
         try:
             key = show_menu(
-                "🛠️ Utilities",
+                "🛠️  Utilities",
                 options,
                 Mocha.lavender,
                 current_menu="Utilities",
@@ -258,7 +259,7 @@ def filter_non_images_menu():
     options = {
         "1": ("Single folder", run_single_folder_filter),
         "2": ("HQ/LQ paired folders", run_hq_lq_filter),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system

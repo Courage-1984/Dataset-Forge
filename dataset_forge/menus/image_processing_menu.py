@@ -55,7 +55,7 @@ def basic_transformations_menu():
             ),
         ),
         "2": (
-            "✂️ Crop Images",
+            "✂️  Crop Images",
             lazy_action("dataset_forge.actions.transform_actions", "crop_images_menu"),
         ),
         "3": (
@@ -78,7 +78,7 @@ def basic_transformations_menu():
             "💾 Resave Images",
             lazy_action("dataset_forge.menus.resave_images_menu", "resave_images_menu"),
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -182,13 +182,13 @@ def colour_tone_levels_menu():
         )()
 
     options = {
-        "1": ("☀️ Adjust Brightness", brightness_adjustment_menu),
+        "1": ("☀️  Adjust Brightness", brightness_adjustment_menu),
         "2": ("🌓 Adjust Contrast", contrast_adjustment_menu),
         "3": ("🌈 Adjust Hue", hue_adjustment_menu),
         "4": ("🎨 Adjust Saturation", saturation_adjustment_menu),
         "5": ("🌅 Convert HDR to SDR", hdr_to_sdr_menu),
         "6": ("⚫️ Convert to Grayscale", grayscale_conversion_menu),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -246,7 +246,7 @@ def metadata_menu():
             "🎯 Convert ICC Profile to sRGB",
             lazy_action("dataset_forge.actions.metadata_actions", "icc_to_srgb_menu"),
         ),
-        "0": ("⬅️ Back", None),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
@@ -316,8 +316,8 @@ def image_processing_menu():
         "2": ("🎨 Color & Tone Adjustments", colour_tone_levels_menu),
         "3": ("✨ Image Augmentation", augmentation_submenu),
         "4": ("📋 Metadata Management", metadata_menu),
-        "5": ("✏️ Sketch Extraction", extract_sketches_menu),
-        "0": ("⬅️ Back", None),
+        "5": ("✏️  Sketch Extraction", extract_sketches_menu),
+        "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system

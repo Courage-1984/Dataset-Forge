@@ -74,14 +74,14 @@ def consolidated_compression_menu():
 
     while True:
         options = {
-            "1": ("🖼️ Individual Image Compression", individual_image_compression),
+            "1": ("🖼️  Individual Image Compression", individual_image_compression),
             "2": ("📁 Directory Compression", directory_compression),
-            "3": ("⚙️ Compression Settings", compression_settings),
-            "0": ("⬅️ Back to Utilities", None),
+            "3": ("⚙️  Compression Settings", compression_settings),
+            "0": ("⬅️  Back to Utilities", None),
         }
 
         key = show_menu(
-            "🗜️ Consolidated Compression",
+            "🗜️  Consolidated Compression",
             options,
             Mocha.lavender,
             current_menu="Consolidated Compression",
@@ -97,7 +97,7 @@ def consolidated_compression_menu():
 
 def individual_image_compression():
     """Individual image compression with format and quality options."""
-    print_header("🖼️ Individual Image Compression", color=Mocha.lavender)
+    print_header("🖼️  Individual Image Compression", color=Mocha.lavender)
 
     # Get input mode
     print_section("Input Selection", color=Mocha.lavender)
@@ -284,7 +284,7 @@ def directory_compression():
 
 def compression_settings():
     """Compression settings and configuration."""
-    print_header("⚙️ Compression Settings", color=Mocha.lavender)
+    print_header("⚙️  Compression Settings", color=Mocha.lavender)
 
     print_section("Current Settings", color=Mocha.lavender)
     print_info("Default compression settings:")
