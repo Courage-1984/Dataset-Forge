@@ -28,71 +28,97 @@ from dataset_forge.utils.monitoring import time_and_record_menu_load
 from dataset_forge.utils import monitoring
 from dataset_forge.utils.audio_utils import play_startup_sound
 
+
 # Import performance optimization modules
 # Lazy imports for performance optimization modules
 def get_gpu_processor():
     """Lazy import wrapper for gpu_processor."""
     from dataset_forge.utils.gpu_acceleration import GPUImageProcessor
+
     return GPUImageProcessor()
+
 
 def get_distributed_processor():
     """Lazy import wrapper for distributed_processor."""
     from dataset_forge.utils.distributed_processing import distributed_processor
+
     return distributed_processor
+
 
 def get_multi_gpu_processor():
     """Lazy import wrapper for multi_gpu_processor."""
     from dataset_forge.utils.distributed_processing import multi_gpu_processor
+
     return multi_gpu_processor
+
 
 def get_start_distributed_processing():
     """Lazy import wrapper for start_distributed_processing."""
     from dataset_forge.utils.distributed_processing import start_distributed_processing
+
     return start_distributed_processing
+
 
 def get_stop_distributed_processing():
     """Lazy import wrapper for stop_distributed_processing."""
     from dataset_forge.utils.distributed_processing import stop_distributed_processing
+
     return stop_distributed_processing
+
 
 def get_DistributedConfig():
     """Lazy import wrapper for DistributedConfig."""
     from dataset_forge.utils.distributed_processing import DistributedConfig
+
     return DistributedConfig
+
 
 def get_ProcessingMode():
     """Lazy import wrapper for ProcessingMode."""
     from dataset_forge.utils.distributed_processing import ProcessingMode
+
     return ProcessingMode
+
 
 def get_sample_prioritizer():
     """Lazy import wrapper for sample_prioritizer."""
     from dataset_forge.utils.sample_prioritization import sample_prioritizer
+
     return sample_prioritizer
+
 
 def get_prioritize_samples():
     """Lazy import wrapper for prioritize_samples."""
     from dataset_forge.utils.sample_prioritization import prioritize_samples
+
     return prioritize_samples
+
 
 def get_PrioritizationStrategy():
     """Lazy import wrapper for PrioritizationStrategy."""
     from dataset_forge.utils.sample_prioritization import PrioritizationStrategy
+
     return PrioritizationStrategy
+
 
 def get_pipeline_compiler():
     """Lazy import wrapper for pipeline_compiler."""
     from dataset_forge.utils.pipeline_compilation import pipeline_compiler
+
     return pipeline_compiler
+
 
 def get_compile_function():
     """Lazy import wrapper for compile_function."""
     from dataset_forge.utils.pipeline_compilation import compile_function
+
     return compile_function
+
 
 def get_CompilationType():
     """Lazy import wrapper for CompilationType."""
     from dataset_forge.utils.pipeline_compilation import CompilationType
+
     return CompilationType
 
 
@@ -160,8 +186,11 @@ def performance_optimization_menu():
                     ),
                 ),
                 "6": (
-                    "📈 System Profiling",
-                    lambda: print_warning("System Profiling menu not yet implemented"),
+                    "📊 Performance Monitoring",
+                    lazy_menu(
+                        "dataset_forge.menus.performance_monitoring_menu",
+                        "performance_monitoring_menu",
+                    ),
                 ),
                 "0": ("⬅️ Back", None),
             }
@@ -1019,6 +1048,7 @@ def cli_startup_optimization_action():
         # Import main menu (this is where lazy imports help)
         def get_main_menu():
             from dataset_forge.menus.main_menu import main_menu
+
             return main_menu
 
         startup_time = time.time() - start_time

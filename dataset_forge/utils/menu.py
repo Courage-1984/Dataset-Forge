@@ -6,20 +6,28 @@ This module provides the core menu functionality including display, input handli
 global commands, and help system integration.
 """
 
+import os
 import sys
-import threading
-from typing import Any, Dict, Optional
+import time
+from typing import Any, Callable, Dict, Optional, Union
 
+from dataset_forge.utils.color import Mocha
 from dataset_forge.utils.printing import (
     print_info,
     print_success,
     print_warning,
     print_error,
     print_header,
+    print_section,
     print_prompt,
 )
-from dataset_forge.utils.audio_utils import play_shutdown_sound
-from dataset_forge.utils.color import Mocha
+from dataset_forge.utils.help_system import show_help
+from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.menu_cache import (
+    record_menu_load_time,
+    menu_function_cache,
+    menu_context_cache,
+)
 
 
 def show_global_help(
@@ -139,73 +147,86 @@ def show_menu(
     Returns:
         The selected option key or None if cancelled
     """
-    # Lazy import emoji utilities to avoid circular dependencies
-    try:
-        from .emoji_utils import validate_menu_emojis, normalize_unicode, sanitize_emoji
+    # Record menu load time for performance monitoring
+    start_time = time.time()
 
-        # Validate emojis in menu options
-        emoji_issues = validate_menu_emojis(options)
-        if emoji_issues["invalid"]:
-            print_warning(
-                f"⚠️  Found {len(emoji_issues['invalid'])} invalid emojis in menu options"
+    try:
+        # Lazy import emoji utilities to avoid circular dependencies
+        try:
+            from .emoji_utils import (
+                validate_menu_emojis,
+                normalize_unicode,
+                sanitize_emoji,
             )
 
-        # Normalize and sanitize the title
-        safe_title = sanitize_emoji(normalize_unicode(title))
-    except ImportError:
-        # Fallback if emoji utilities are not available
-        safe_title = title
+            # Validate emojis in menu options
+            emoji_issues = validate_menu_emojis(options)
+            if emoji_issues["invalid"]:
+                print_warning(
+                    f"⚠️  Found {len(emoji_issues['invalid'])} invalid emojis in menu options"
+                )
 
-    # Print header
-    print_header(safe_title, char, header_color)
-    print_info("")
-
-    # Display options with emoji safety
-    for key, (description, action) in options.items():
-        try:
-            # Normalize and sanitize the description
-            safe_description = sanitize_emoji(normalize_unicode(description))
-        except (NameError, ImportError):
+            # Normalize and sanitize the title
+            safe_title = sanitize_emoji(normalize_unicode(title))
+        except ImportError:
             # Fallback if emoji utilities are not available
-            safe_description = description
-        print_info(f"{key}. {safe_description}")
+            safe_title = title
 
-    print_info("")
+        # Print header
+        print_header(safe_title, char, header_color)
+        print_info("")
 
-    # Get user input
-    while True:
-        try:
-            print_prompt("Enter your choice: ")
-            choice = input().strip()
+        # Display options with emoji safety
+        for key, (description, action) in options.items():
+            try:
+                # Normalize and sanitize the description
+                safe_description = sanitize_emoji(normalize_unicode(description))
+            except (NameError, ImportError):
+                # Fallback if emoji utilities are not available
+                safe_description = description
+            print_info(f"{key}. {safe_description}")
 
-            # Handle global commands
-            if handle_global_command(choice, current_menu, menu_context):
-                # Redraw the menu after global command
-                print_header(safe_title, char, header_color)
-                print_info("")
-                for key, (description, action) in options.items():
-                    try:
-                        safe_description = sanitize_emoji(
-                            normalize_unicode(description)
-                        )
-                    except (NameError, ImportError):
-                        safe_description = description
-                    print_info(f"{key}. {safe_description}")
-                print_info("")
-                continue
+        print_info("")
 
-            # Check if choice is valid
-            if choice in options:
-                return choice
-            elif choice == "0":
+        # Get user input
+        while True:
+            try:
+                print_prompt("Enter your choice: ")
+                choice = input().strip()
+
+                # Handle global commands
+                if handle_global_command(choice, current_menu, menu_context):
+                    # Redraw the menu after global command
+                    print_header(safe_title, char, header_color)
+                    print_info("")
+                    for key, (description, action) in options.items():
+                        try:
+                            safe_description = sanitize_emoji(
+                                normalize_unicode(description)
+                            )
+                        except (NameError, ImportError):
+                            safe_description = description
+                        print_info(f"{key}. {safe_description}")
+                    print_info("")
+                    continue
+
+                # Check if choice is valid
+                if choice in options:
+                    return choice
+                elif choice == "0":
+                    return None
+                else:
+                    print_error(f"Invalid choice: {choice}")
+                    print_info("Please enter a valid option.")
+
+            except (KeyboardInterrupt, EOFError):
+                print_info("\nExiting...")
                 return None
-            else:
-                print_error(f"Invalid choice: {choice}")
-                print_info("Please enter a valid option.")
 
-        except (KeyboardInterrupt, EOFError):
-            print_info("\nExiting...")
-            return None
+    finally:
+        # Record menu load time
+        load_time = time.time() - start_time
+        record_menu_load_time(current_menu, load_time)
 
 
 def lazy_action(module_name: str, func_name: str):
