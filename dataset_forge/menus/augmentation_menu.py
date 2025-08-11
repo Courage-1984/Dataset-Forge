@@ -38,6 +38,15 @@ def augmentation_menu():
     from dataset_forge.actions import augmentation_actions as aug
 
     options = augmentation_menu.__menu_options__
+
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Apply image augmentation techniques and manage recipes",
+        "Total Options": "5 augmentation operations",
+        "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        "Key Features": "Augmentation pipeline, recipe management, image transformations",
+    }
+
     while True:
         print_header("🚀 Augmentation - Input/Output Selection", color=Mocha.sapphire)
         key = show_menu(
@@ -45,6 +54,8 @@ def augmentation_menu():
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Augmentation Menu",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             return

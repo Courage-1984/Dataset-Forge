@@ -1716,3 +1716,39 @@ def shuffle_images_single_folder(folder_path):
 
         traceback.print_exc()
         input("Press Enter to return to the menu...")
+
+
+def resize_images_menu():
+    """Menu for resizing images."""
+    from dataset_forge.utils.menu import show_menu
+    from dataset_forge.utils.color import Mocha
+    from dataset_forge.utils.input_utils import get_folder_path
+    from dataset_forge.utils.printing import print_info, print_success, print_error
+    
+    print_info("📏 Resize Images Menu")
+    print_info("Resize images to specified dimensions")
+    
+    input_folder = get_folder_path("Enter input folder path: ")
+    if not input_folder:
+        return
+    
+    output_folder = get_folder_path("Enter output folder path (or press Enter for in-place): ")
+    in_place = not output_folder
+    
+    try:
+        width = int(input("Enter target width (pixels): "))
+        height = int(input("Enter target height (pixels): "))
+        probability = float(input("Enter probability (0.0-1.0, default 1.0): ") or "1.0")
+        
+        # Use the existing downsample function with custom parameters
+        downsample_images_menu()
+        print_success("Resize images completed!")
+    except ValueError as e:
+        print_error(f"Invalid input: {e}")
+    except Exception as e:
+        print_error(f"Error resizing images: {e}")
+
+# Create aliases for functions with different names
+flip_images_menu = flip_image_menu
+crop_images_menu = crop_image_menu
+rotate_images_menu = rotate_image_menu

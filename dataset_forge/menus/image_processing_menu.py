@@ -36,7 +36,6 @@ def require_hq_lq(func):
 
 def lazy_action(module_path, func_name):
     def _action(*args, **kwargs):
-        print(f"DEBUG: lazy_action importing {module_path}.{func_name}")
         import importlib
 
         return getattr(importlib.import_module(module_path), func_name)(*args, **kwargs)
@@ -77,9 +76,7 @@ def basic_transformations_menu():
         ),
         "6": (
             "💾 Resave Images",
-            lazy_action(
-                "dataset_forge.menus.resave_images_menu", "resave_images_menu"
-            ),
+            lazy_action("dataset_forge.menus.resave_images_menu", "resave_images_menu"),
         ),
         "0": ("⬅️  Back", None),
     }
@@ -100,11 +97,9 @@ def basic_transformations_menu():
             current_menu="Basic Transformations",
             menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:
@@ -146,19 +141,31 @@ def colour_tone_levels_menu():
     # Lazy imports for color adjustment menus
     def brightness_adjustment_menu():
         from dataset_forge.utils.menu import lazy_menu
-        return lazy_menu("dataset_forge.menus.color_adjustment_menu", "brightness_adjustment_menu")()
-    
+
+        return lazy_menu(
+            "dataset_forge.menus.color_adjustment_menu", "brightness_adjustment_menu"
+        )()
+
     def contrast_adjustment_menu():
         from dataset_forge.utils.menu import lazy_menu
-        return lazy_menu("dataset_forge.menus.color_adjustment_menu", "contrast_adjustment_menu")()
-    
+
+        return lazy_menu(
+            "dataset_forge.menus.color_adjustment_menu", "contrast_adjustment_menu"
+        )()
+
     def hue_adjustment_menu():
         from dataset_forge.utils.menu import lazy_menu
-        return lazy_menu("dataset_forge.menus.color_adjustment_menu", "hue_adjustment_menu")()
-    
+
+        return lazy_menu(
+            "dataset_forge.menus.color_adjustment_menu", "hue_adjustment_menu"
+        )()
+
     def saturation_adjustment_menu():
         from dataset_forge.utils.menu import lazy_menu
-        return lazy_menu("dataset_forge.menus.color_adjustment_menu", "saturation_adjustment_menu")()
+
+        return lazy_menu(
+            "dataset_forge.menus.color_adjustment_menu", "saturation_adjustment_menu"
+        )()
 
     options = {
         "1": ("☀️  Adjust Brightness", brightness_adjustment_menu),
@@ -238,21 +245,27 @@ def metadata_menu():
 
 def augmentation_submenu():
     """Sub-menu for image augmentation."""
+
     # Lazy import for augmentation menu
     def get_augmentation_menu():
         from dataset_forge.utils.menu import lazy_menu
+
         return lazy_menu("dataset_forge.menus.augmentation_menu", "augmentation_menu")
-    
+
     get_augmentation_menu()()
 
 
 def extract_sketches_menu():
     """Sub-menu for sketch extraction."""
+
     # Lazy import for sketch extraction menu
     def get_extract_sketches_menu():
         from dataset_forge.utils.menu import lazy_menu
-        return lazy_menu("dataset_forge.actions.sketch_extraction_actions", "extract_sketches_menu")
-    
+
+        return lazy_menu(
+            "dataset_forge.actions.sketch_extraction_actions", "extract_sketches_menu"
+        )
+
     get_extract_sketches_menu()()
 
 

@@ -156,18 +156,37 @@ def comprehensive_validation_menu():
     }
     from dataset_forge.utils.printing import print_error
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Comprehensive dataset analysis and validation tools",
+        "Options": "4 analysis operations available",
+        "Navigation": "Use numbers 1-4 to select, 0 to go back",
+        "Key Features": [
+            "Generate HQ/LQ Dataset Report - Comprehensive dataset analysis",
+            "Find and Fix Issues - Corruption detection and repair",
+            "Analyze Properties - Detailed property analysis",
+            "Progressive Validation - Step-by-step validation workflow",
+        ],
+        "Tips": [
+            "Start with 'Generate HQ/LQ Dataset Report' for overview",
+            "Use 'Find and Fix Issues' to identify problems",
+            "Analyze Properties for detailed insights",
+            "Progressive Validation for systematic checking",
+        ],
+    }
+
     while True:
         key = show_menu(
             "📊 Dataset Analysis & Reporting",
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="Analysis & Validation",
+            menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:
@@ -498,11 +517,9 @@ def analyze_properties_menu():
             current_menu="Analyze Properties",
             menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             break
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:
@@ -544,11 +561,9 @@ def analysis_validation_menu():
             current_menu="Analysis & Validation",
             menu_context=menu_context,
         )
-        print(f"DEBUG: key={key!r}, type={type(key)}")
         if key is None or key == "0":
             return
         action = options.get(key, (None, None))[1]
-        print(f"DEBUG: action={action!r}, type={type(action)}")
         if callable(action):
             action()
         else:

@@ -514,9 +514,9 @@ def get_clip_model_cached(device: str = "cpu"):
         try:
             import open_clip
 
-    model, _, preprocess = open_clip.create_model_and_transforms(
-        "ViT-B-32", pretrained="laion2b_s34b_b79k"
-    )
+            model, _, preprocess = open_clip.create_model_and_transforms(
+                "ViT-B-32", pretrained="laion2b_s34b_b79k"
+            )
             model = model.to(device)
             model.eval()
             _model_cache[cache_key] = (model, preprocess)
@@ -831,10 +831,12 @@ def find_near_duplicates_clip(
     threshold: float = 0.98,
     device: str = "cuda" if torch.cuda.is_available() else "cpu",
 ) -> List[List[str]]:
-    """Find near-duplicate images using CLIP embeddings with optimized memory management."""
+    """
+    Find near-duplicate images using CLIP embeddings with optimized memory management.
+    """
     try:
         # Compute embeddings with memory management
-    embs = compute_clip_embeddings(images, device)
+        embs = compute_clip_embeddings(images, device)
 
         # Use FAISS for efficient similarity search if available
         try:

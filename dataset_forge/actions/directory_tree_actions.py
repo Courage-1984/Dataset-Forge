@@ -26,26 +26,42 @@ from ..utils.emoji_utils import (
     sanitize_emoji,
     is_valid_emoji,
     extract_emojis,
-    categorize_emoji
+    categorize_emoji,
 )
 from ..utils.memory_utils import auto_cleanup, memory_context
 from ..utils.printing import print_info, print_success, print_warning, print_error
+from ..utils.color import Mocha
 
 # Try to import magic for better file type detection
 try:
     import magic
+
     MAGIC_AVAILABLE = True
 except ImportError:
     MAGIC_AVAILABLE = False
     magic = None
-    print_warning("⚠️  python-magic not available. Using extension-based file type detection.")
+    print_warning(
+        "⚠️  python-magic not available. Using extension-based file type detection."
+    )
 
 
 def is_image_file(filename: str) -> bool:
     """Check if a file is an image based on its extension."""
     image_extensions = {
-        '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif',
-        '.webp', '.svg', '.ico', '.raw', '.cr2', '.nef', '.arw'
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".bmp",
+        ".tiff",
+        ".tif",
+        ".webp",
+        ".svg",
+        ".ico",
+        ".raw",
+        ".cr2",
+        ".nef",
+        ".arw",
     }
     return Path(filename).suffix.lower() in image_extensions
 
@@ -77,52 +93,52 @@ class EnhancedDirectoryTreeGenerator:
             "temp": "🗑️",
             "archive": "📦",
             "font": "🔤",
-            "other": "📄"
+            "other": "📄",
         }
-        
+
         # MIME type to category mapping
         self.file_type_mappings = {
-            'image/jpeg': 'image',
-            'image/png': 'image',
-            'image/gif': 'image',
-            'image/bmp': 'image',
-            'image/tiff': 'image',
-            'image/webp': 'image',
-            'image/svg+xml': 'image',
-            'video/mp4': 'video',
-            'video/avi': 'video',
-            'video/mov': 'video',
-            'video/wmv': 'video',
-            'video/flv': 'video',
-            'video/webm': 'video',
-            'audio/mpeg': 'audio',
-            'audio/wav': 'audio',
-            'audio/flac': 'audio',
-            'audio/ogg': 'audio',
-            'audio/aac': 'audio',
-            'application/pdf': 'document_pdf',
-            'text/plain': 'document',
-            'text/html': 'code_html',
-            'text/css': 'code_html',
-            'application/javascript': 'code_js',
-            'text/javascript': 'code_js',
-            'application/json': 'data_json',
-            'text/csv': 'data_csv',
-            'application/x-python-code': 'code_python',
-            'text/x-python': 'code_python',
-            'application/x-yaml': 'config',
-            'text/yaml': 'config',
-            'text/xml': 'config',
-            'application/xml': 'config',
-            'application/zip': 'archive',
-            'application/x-rar': 'archive',
-            'application/x-tar': 'archive',
-            'application/gzip': 'archive',
-            'application/x-7z-compressed': 'archive',
-            'font/ttf': 'font',
-            'font/otf': 'font',
-            'font/woff': 'font',
-            'font/woff2': 'font',
+            "image/jpeg": "image",
+            "image/png": "image",
+            "image/gif": "image",
+            "image/bmp": "image",
+            "image/tiff": "image",
+            "image/webp": "image",
+            "image/svg+xml": "image",
+            "video/mp4": "video",
+            "video/avi": "video",
+            "video/mov": "video",
+            "video/wmv": "video",
+            "video/flv": "video",
+            "video/webm": "video",
+            "audio/mpeg": "audio",
+            "audio/wav": "audio",
+            "audio/flac": "audio",
+            "audio/ogg": "audio",
+            "audio/aac": "audio",
+            "application/pdf": "document_pdf",
+            "text/plain": "document",
+            "text/html": "code_html",
+            "text/css": "code_html",
+            "application/javascript": "code_js",
+            "text/javascript": "code_js",
+            "application/json": "data_json",
+            "text/csv": "data_csv",
+            "application/x-python-code": "code_python",
+            "text/x-python": "code_python",
+            "application/x-yaml": "config",
+            "text/yaml": "config",
+            "text/xml": "config",
+            "application/xml": "config",
+            "application/zip": "archive",
+            "application/x-rar": "archive",
+            "application/x-tar": "archive",
+            "application/gzip": "archive",
+            "application/x-7z-compressed": "archive",
+            "font/ttf": "font",
+            "font/otf": "font",
+            "font/woff": "font",
+            "font/woff2": "font",
         }
 
     def get_file_emoji(self, file_path: str) -> str:
@@ -697,7 +713,7 @@ def quick_tree_generation():
             include_file_info=False,
         )
 
-        print("\n" + output)
+        print_info("\n" + output)
         print_success("✅ Quick tree generation completed!")
 
     except KeyboardInterrupt:
@@ -712,7 +728,7 @@ def quick_tree_generation():
             tree_output, _ = generator.generate_tree(
                 root_path=root_path, include_stats=False, include_file_info=False
             )
-            print("\n" + tree_output)
+            print_info("\n" + tree_output)
             print_success("✅ Fallback tree generation completed!")
         except Exception as fallback_error:
             print_error(f"❌ Fallback also failed: {fallback_error}")
@@ -757,9 +773,9 @@ def advanced_tree_generation():
 
         # Get output format
         print_info("\n📤 Output Format:")
-        print("1. Console (display only)")
-        print("2. Markdown file")
-        print("3. JSON file")
+        print_info("1. Console (display only)")
+        print_info("2. Markdown file")
+        print_info("3. JSON file")
         format_choice = input("Select format [1-3]: ").strip() or "1"
 
         format_map = {"1": "console", "2": "markdown", "3": "json"}
@@ -786,7 +802,7 @@ def advanced_tree_generation():
 
         # Display results
         if output_format == "console":
-            print("\n" + output)
+            print_info("\n" + output)
 
         print_success("✅ Advanced tree generation completed!")
 
@@ -884,7 +900,7 @@ def tree_statistics_analysis():
         )
 
         # Display statistics
-        print("\n" + generator.generate_statistics_report(stats))
+        print_info("\n" + generator.generate_statistics_report(stats))
         print_success("✅ Statistics analysis completed!")
 
     except KeyboardInterrupt:
@@ -939,21 +955,21 @@ def compare_directories():
             return
 
         # Display comparison
-        print("\n" + "=" * 60)
-        print("📊 Directory Comparison Results")
-        print("=" * 60)
+        print_info("\n" + "=" * 60)
+        print_info("📊 Directory Comparison Results")
+        print_info("=" * 60)
 
         for path, stats in results:
-            print(f"\n📁 {os.path.basename(path)} ({path})")
-            print(f"  📄 Files: {stats['total_files']}")
-            print(f"  📁 Directories: {stats['total_dirs']}")
-            print(f"  💾 Size: {generator.format_file_size(stats['total_size'])}")
+            print_info(f"\n📁 {os.path.basename(path)} ({path})")
+            print_info(f"  📄 Files: {stats['total_files']}")
+            print_info(f"  📁 Directories: {stats['total_dirs']}")
+            print_info(f"  💾 Size: {generator.format_file_size(stats['total_size'])}")
 
             if stats["file_types"]:
                 top_types = sorted(
                     stats["file_types"].items(), key=lambda x: x[1], reverse=True
                 )[:3]
-                print(
+                print_info(
                     f"  📋 Top file types: {', '.join([f'{t[0]}({t[1]})' for t in top_types])}"
                 )
 

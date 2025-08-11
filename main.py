@@ -19,6 +19,10 @@ import sys
 # All functionality is now organized in the new hierarchical menu structure
 # See MENU_RESTRUCTURE_SUMMARY.md for details on the new organization
 
+# Import centralized printing utilities
+from dataset_forge.utils.printing import print_info, print_warning, print_error
+from dataset_forge.utils.color import Mocha
+
 shutdown_sound_played = False
 
 
@@ -35,7 +39,7 @@ def _sigint_handler(signum, frame):
                 play_shutdown_sound(block=True)
                 shutdown_sound_played = True
             except Exception as e:
-                print(f"Shutdown sound failed: {e}")
+                print_error(f"Shutdown sound failed: {e}")
 
         shutdown_thread = threading.Thread(
             target=play_shutdown_with_timeout, daemon=True
@@ -47,16 +51,16 @@ def _sigint_handler(signum, frame):
 
         # If thread is still running, let it continue in background
         if shutdown_thread.is_alive():
-            print("Shutdown sound playing in background...")
+            print_info("Shutdown sound playing in background...")
 
     except Exception as e:
-        print(f"Audio system error: {e}")
+        print_error(f"Audio system error: {e}")
     try:
         from dataset_forge.utils.memory_utils import clear_memory
 
         clear_memory()
     except Exception as e:
-        print(f"[SIGINT] Memory cleanup failed: {e}")
+        print_error(f"[SIGINT] Memory cleanup failed: {e}")
     # Try to gracefully quit pygame audio if running
     try:
         # Use lazy import for pygame
@@ -64,12 +68,12 @@ def _sigint_handler(signum, frame):
 
         if pygame.mixer.get_init():
             pygame.mixer.quit()
-            print("[SIGINT] Pygame mixer quit.")
+            print_info("[SIGINT] Pygame mixer quit.")
     except ImportError:
         pass
     except Exception as e:
-        print(f"[SIGINT] Pygame mixer quit failed: {e}")
-    print("\n🛑 Caught Ctrl+C (SIGINT). Cleaned up memory and audio. Exiting...")
+        print_error(f"[SIGINT] Pygame mixer quit failed: {e}")
+    print_info("\n🛑 Caught Ctrl+C (SIGINT). Cleaned up memory and audio. Exiting...")
     sys.exit(130)
 
 
@@ -91,9 +95,9 @@ if __name__ == "__main__":
         )
 
         memory_manager = get_memory_manager()
-        print("🧠 Memory management system initialized successfully.")
+        print_info("🧠 Memory management system initialized successfully.")
     except Exception as e:
-        print(f"⚠️ Warning: Memory management system initialization failed: {e}")
+        print_warning(f"Memory management system initialization failed: {e}")
 
     # Minimal global logging to console. Functions can add specific file handlers.
     logging.basicConfig(
@@ -111,7 +115,7 @@ if __name__ == "__main__":
 
         # Print startup time
         startup_time = time.time() - startup_start
-        print(f"🚀 CLI startup completed in {startup_time:.3f}s")
+        print_info(f"🚀 CLI startup completed in {startup_time:.3f}s")
 
         main_menu()
     finally:
@@ -127,7 +131,7 @@ if __name__ == "__main__":
                         play_shutdown_sound(block=True)
                         shutdown_sound_played = True
                     except Exception as e:
-                        print(f"Shutdown sound failed: {e}")
+                        print_error(f"Shutdown sound failed: {e}")
 
                 shutdown_thread = threading.Thread(
                     target=play_shutdown_with_timeout, daemon=True
@@ -139,18 +143,18 @@ if __name__ == "__main__":
 
                 # If thread is still running, let it continue in background
                 if shutdown_thread.is_alive():
-                    print("Shutdown sound playing in background...")
+                    print_info("Shutdown sound playing in background...")
 
             except Exception as e:
-                print(f"Audio system error: {e}")
+                print_error(f"Audio system error: {e}")
         # Cleanup memory on exit
         try:
             from dataset_forge.utils.memory_utils import clear_memory
 
             clear_memory()
-            print("🧹 Memory cleanup completed on exit.")
+            print_info("🧹 Memory cleanup completed on exit.")
         except Exception as e:
-            print(f"⚠️ Warning: Memory cleanup failed on exit: {e}")
+            print_warning(f"Memory cleanup failed on exit: {e}")
 
         # Print lazy import statistics if available
         try:

@@ -104,7 +104,7 @@ def sanitize_images_menu():
             if step == "📄 Zsteg results file":
                 continue
             color = Mocha.green if ("Run" in status) else Mocha.peach
-            print(color + f"{step:35} : {status}" + Mocha.reset)
+            print_info(color + f"{step:35} : {status}" + Mocha.reset)
         if "📄 Zsteg results file" in summary:
             print_info(f"📄 Zsteg results file: {summary['📄 Zsteg results file']}")
         print_section("", char="-", color=Mocha.lavender)

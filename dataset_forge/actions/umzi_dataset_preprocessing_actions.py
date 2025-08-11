@@ -3,46 +3,184 @@
 Actions for Umzi's Dataset_Preprocessing integration using pepedp.
 """
 
+import os
+import shutil
+import tempfile
+from pathlib import Path
+from typing import Optional
+
+from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.color import Mocha
+from dataset_forge.utils.history_log import log_operation
+from dataset_forge.utils.input_utils import (
+    ask_choice,
+    ask_float,
+    ask_int,
+    ask_yes_no,
+    get_folder_path,
+    get_input,
+)
+from dataset_forge.utils.lazy_imports import (
+    pepedp_best_tile,
+    pepedp_cosine_dist,
+    pepedp_create_embedd,
+    pepedp_euclid_dist,
+    pepedp_filtered_pairs,
+    pepedp_ic9600_complexity,
+    pepedp_img_to_embedding as ImgToEmbedding,
+    pepedp_laplacian_complexity,
+    pepedp_move_duplicate_files,
+    pepedp_threshold_alg,
+    pepedp_video_to_frame,
+    pepedp_enum,
+)
+from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import (
+    print_error,
+    print_header,
     print_info,
     print_success,
     print_warning,
-    print_error,
-    print_header,
 )
-from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.history_log import log_operation
-from dataset_forge.utils.input_utils import (
-    get_folder_path,
-    get_input,
-    ask_int,
-    ask_float,
-    ask_choice,
-    ask_yes_no,
-)
-from dataset_forge.utils.progress_utils import tqdm
-from dataset_forge.utils.audio_utils import play_done_sound
-from dataset_forge.menus import session_state
+from dataset_forge.utils.progress_utils import smart_map
+from tqdm import tqdm
 
-# Lazy imports for heavy libraries
-from dataset_forge.utils.lazy_imports import (
-    pepedp,
-    pepedpid,
-    pepedp_enum,
-    pepedp_best_tile as BestTile,
-    pepedp_laplacian_complexity as LaplacianComplexity,
-    pepedp_ic9600_complexity as IC9600Complexity,
-    pepedp_img_to_embedding as ImgToEmbedding,
-    pepedp_euclid_dist as euclid_dist,
-    pepedp_cosine_dist as cosine_dist,
-    pepedp_video_to_frame as VideoToFrame,
-    pepedp_create_embedd as create_embedd,
-    pepedp_filtered_pairs as filtered_pairs,
-    pepedp_move_duplicate_files as move_duplicate_files,
-    pepedp_threshold_alg as ThresholdAlg,
-)
 
-# Remove direct import - will import inside functions when needed
+def clear_corrupted_model_cache(
+    model_name: str = "convnextL_384_1kpretrained_official_style.pth",
+) -> None:
+    """Clear corrupted model cache files to fix download issues.
+
+    Args:
+        model_name: Name of the corrupted model file to remove
+    """
+    try:
+        # Common cache locations
+        cache_locations = [
+            os.path.expanduser("~/.cache/torch/hub/checkpoints/"),
+            os.path.expanduser("~/.cache/torch/hub/"),
+            os.path.join(os.getcwd(), ".cache", "torch", "hub", "checkpoints"),
+        ]
+
+        for cache_dir in cache_locations:
+            if os.path.exists(cache_dir):
+                model_path = os.path.join(cache_dir, model_name)
+                if os.path.exists(model_path):
+                    print_warning(f"Removing corrupted model cache: {model_path}")
+                    try:
+                        os.remove(model_path)
+                        print_success(f"✅ Removed corrupted cache file: {model_path}")
+                    except Exception as e:
+                        print_warning(f"Could not remove {model_path}: {e}")
+
+        # Also clear any temporary download files
+        temp_dir = tempfile.gettempdir()
+        temp_patterns = [f"*{model_name}*", "*convnext*", "*torch_hub*"]
+
+        for pattern in temp_patterns:
+            import glob
+
+            temp_files = glob.glob(os.path.join(temp_dir, pattern))
+            for temp_file in temp_files:
+                try:
+                    if os.path.isfile(temp_file):
+                        os.remove(temp_file)
+                        print_info(f"Cleared temporary file: {temp_file}")
+                except Exception:
+                    pass
+
+    except Exception as e:
+        print_warning(f"Error clearing cache: {e}")
+
+
+def safe_model_initialization(
+    model_enum, amp: bool, scale: int, max_retries: int = 3
+) -> any:
+    """Safely initialize embedding model with retry logic and fallback options.
+
+    Args:
+        model_enum: Model enum to initialize
+        amp: Whether to use AMP
+        scale: Scale factor
+        max_retries: Maximum number of retry attempts
+
+    Returns:
+        Initialized embedder model
+
+    Raises:
+        RuntimeError: If all retry attempts fail
+    """
+    last_error = None
+
+    for attempt in range(max_retries):
+        try:
+            print_info(
+                f"Attempting to initialize model (attempt {attempt + 1}/{max_retries})"
+            )
+
+            # Clear memory before each attempt
+            clear_memory()
+            clear_cuda_cache()
+
+            embedder = ImgToEmbedding(
+                model=model_enum,
+                amp=amp,
+                scale=scale,
+            )
+
+            print_success("✅ Model initialized successfully")
+            return embedder
+
+        except RuntimeError as e:
+            error_msg = str(e)
+            last_error = e
+
+            if "PytorchStreamReader failed reading zip archive" in error_msg:
+                print_warning(
+                    f"⚠️  Corrupted model download detected (attempt {attempt + 1})"
+                )
+                print_info("Clearing corrupted cache files...")
+
+                # Clear corrupted cache
+                clear_corrupted_model_cache()
+
+                if attempt < max_retries - 1:
+                    print_info("Retrying model download...")
+                    continue
+                else:
+                    print_error("❌ All retry attempts failed")
+                    break
+
+            elif "out of memory" in error_msg.lower():
+                print_warning(f"⚠️  CUDA memory error (attempt {attempt + 1})")
+                print_info("Clearing CUDA cache and retrying...")
+                clear_cuda_cache()
+                continue
+
+            else:
+                print_error(f"❌ Unexpected error: {error_msg}")
+                break
+
+        except Exception as e:
+            last_error = e
+            print_error(f"❌ Error initializing model: {e}")
+            break
+
+    # If all attempts failed, try fallback to CPU
+    print_warning("⚠️  Attempting fallback to CPU processing...")
+    try:
+        embedder = ImgToEmbedding(
+            model=model_enum,
+            amp=False,  # Disable AMP for CPU
+            scale=scale,
+        )
+        print_success("✅ Model initialized on CPU successfully")
+        return embedder
+    except Exception as e:
+        print_error(f"❌ CPU fallback also failed: {e}")
+        raise RuntimeError(
+            f"Failed to initialize model after {max_retries} attempts and CPU fallback. Last error: {last_error}"
+        )
 
 
 def create_embedd_with_progress(img_folder: str, embedder):
@@ -276,9 +414,9 @@ def best_tile_extraction_action(
             if median_blur is None:
                 print_info("DEBUG: median_blur missing, prompting user...")
                 median_blur = ask_int("Median blur", default=5, min_value=1)
-            func = LaplacianComplexity(median_blur=median_blur)
+            func = pepedp_laplacian_complexity(median_blur=median_blur)
         else:
-            func = IC9600Complexity()
+            func = pepedp_ic9600_complexity()
 
         print_info(f"DEBUG: Instantiating BestTile with func={func}")
 
@@ -289,7 +427,7 @@ def best_tile_extraction_action(
         print_info(f"Tile size: {tile_size}, Scale: {scale}")
         print_info(f"Complexity function: {func_type}")
 
-        bt = BestTile(
+        bt = pepedp_best_tile(
             in_folder=in_folder,
             out_folder=out_folder,
             tile_size=tile_size,
@@ -354,10 +492,17 @@ def video_frame_extraction_action(
     try:
         if embed_model is None:
             print_info("DEBUG: embed_model missing, prompting user...")
-            # Fix: Use correct PepeDP enum attribute names
+            # Use correct PepeDP enum attribute names
             embed_model = ask_choice(
                 "Embedding model",
-                ["ConvNextS", "ConvNextL", "VITS", "VITB", "VITL", "VITG"],
+                [
+                    "ConvNeXt_Small",
+                    "ConvNeXt_Large",
+                    "ViT_Small",
+                    "ViT_Base",
+                    "ViT_Large",
+                    "ViT_Giant",
+                ],
                 default=0,
             )
         if amp is None:
@@ -371,37 +516,54 @@ def video_frame_extraction_action(
             threshold = ask_float("Distance threshold (0.3-0.5 typical)", default=0.4)
         if dist_fn_name is None:
             print_info("DEBUG: dist_fn_name missing, prompting user...")
-            dist_fn_name = ask_choice(
-                "Distance function", ["euclid", "cosine"], default=0
-            )
-        dist_fn = euclid_dist if dist_fn_name == "euclid" else cosine_dist
+        dist_fn_name = ask_choice("Distance function", ["euclid", "cosine"], default=0)
+    except Exception as e:
+        print_error(f"Error in video_frame_extraction_action parameter setup: {e}")
+        raise
 
-        # --- Print heading before input/output prompts ---
-        from dataset_forge.utils.color import Mocha
+    dist_fn = pepedp_euclid_dist if dist_fn_name == "euclid" else pepedp_cosine_dist
 
-        print_header(
-            "🎬 Video Frame Extraction (PepeDP) - Input/Output Selection",
-            color=Mocha.yellow,
-        )
-        if video_path is None:
-            print_info("DEBUG: video_path missing, prompting user...")
-            video_path = get_input("Video path", default="video.mp4")
-        if out_folder is None:
-            print_info("DEBUG: out_folder missing, prompting user...")
-            out_folder = get_folder_path("Output folder")
+    # --- Print heading before input/output prompts ---
+    from dataset_forge.utils.color import Mocha
 
-        # Initialize embedder with progress tracking
+    print_header(
+        "🎬 Video Frame Extraction (PepeDP) - Input/Output Selection",
+        color=Mocha.yellow,
+    )
+    if video_path is None:
+        print_info("DEBUG: video_path missing, prompting user...")
+        video_path = get_input("Video path", default="video.mp4")
+    if out_folder is None:
+        print_info("DEBUG: out_folder missing, prompting user...")
+        out_folder = get_folder_path("Output folder")
+
+    try:
+
+        # Initialize embedder with progress tracking and error handling
         print_header("🔧 Initializing Embedding Model")
-        embedder = ImgToEmbedding(
-            model=get_embedded_model_enum(embed_model),
-            amp=amp,
-            scale=scale,
-        )
+        try:
+            embedder = safe_model_initialization(
+                model_enum=get_embedded_model_enum(embed_model),
+                amp=amp,
+                scale=scale,
+                max_retries=3,
+            )
+        except Exception as e:
+            print_error(f"❌ Failed to initialize embedding model: {e}")
+            print_info("💡 Troubleshooting tips:")
+            print_info("1. Check your internet connection")
+            print_info(
+                "2. Try using a different model (ConvNextS instead of ConvNextL)"
+            )
+            print_info("3. Clear your browser cache and try again")
+            print_info("4. Check available disk space")
+            log_operation("duplicate_detection", f"Model initialization failed: {e}")
+            return
 
         print_info(
             f"DEBUG: Instantiating VideoToFrame with embedder={embedder}, threshold={threshold}, dist_fn={dist_fn}"
         )
-        vtf = VideoToFrame(
+        vtf = pepedp_video_to_frame(
             embedder=embedder,
             threshold=threshold,
             distance_fn=dist_fn,
@@ -479,7 +641,7 @@ def duplicate_image_detection_action(
             dist_fn_name = ask_choice(
                 "Distance function", ["euclid", "cosine"], default=0
             )
-        dist_fn = euclid_dist if dist_fn_name == "euclid" else cosine_dist
+        dist_fn = pepedp_euclid_dist if dist_fn_name == "euclid" else pepedp_cosine_dist
         if in_folder is None:
             print_info("DEBUG: in_folder missing, prompting user...")
             in_folder = get_folder_path("Input folder")
@@ -487,13 +649,26 @@ def duplicate_image_detection_action(
             print_info("DEBUG: out_folder missing, prompting user...")
             out_folder = get_folder_path("Output folder")
 
-        # Initialize embedder with progress tracking
+        # Initialize embedder with progress tracking and error handling
         print_header("🔧 Initializing Embedding Model")
-        embedder = ImgToEmbedding(
-            model=get_embedded_model_enum(embed_model),
-            amp=amp,
-            scale=scale,
-        )
+        try:
+            embedder = safe_model_initialization(
+                model_enum=get_embedded_model_enum(embed_model),
+                amp=amp,
+                scale=scale,
+                max_retries=3,
+            )
+        except Exception as e:
+            print_error(f"❌ Failed to initialize embedding model: {e}")
+            print_info("💡 Troubleshooting tips:")
+            print_info("1. Check your internet connection")
+            print_info(
+                "2. Try using a different model (ConvNextS instead of ConvNextL)"
+            )
+            print_info("3. Clear your browser cache and try again")
+            print_info("4. Check available disk space")
+            log_operation("video_frame_extraction", f"Model initialization failed: {e}")
+            return
 
         # Create embeddings with progress tracking
         print_header("📊 Creating Image Embeddings")
@@ -607,7 +782,7 @@ def iqa_filtering_action(
         print_info(f"IQA model: {iqa_model}")
         print_info(f"Batch size: {batch_size}, Threshold: {threshold}")
 
-        alg_enum = getattr(ThresholdAlg, iqa_model)
+        alg_enum = getattr(pepedp_threshold_alg.ThresholdAlg, iqa_model)
         print_info(f"DEBUG: Instantiating {iqa_model}.value(...) for IQA filtering")
         alg = alg_enum.value(
             img_dir=in_folder,
@@ -642,6 +817,47 @@ def iqa_filtering_action(
     except Exception as e:
         print_error(f"Error in iqa_filtering_action: {e}")
         raise
+
+
+def manual_cache_clear_action():
+    """Manual action to clear corrupted model cache files."""
+    print_header("🧹 Manual Model Cache Clear")
+    print_info(
+        "This will clear corrupted model cache files that may be causing download issues."
+    )
+
+    try:
+        # Clear all common model cache locations
+        cache_locations = [
+            os.path.expanduser("~/.cache/torch/hub/checkpoints/"),
+            os.path.expanduser("~/.cache/torch/hub/"),
+            os.path.join(os.getcwd(), ".cache", "torch", "hub", "checkpoints"),
+        ]
+
+        cleared_files = []
+        for cache_dir in cache_locations:
+            if os.path.exists(cache_dir):
+                print_info(f"Checking cache directory: {cache_dir}")
+                for file in os.listdir(cache_dir):
+                    if file.endswith(".pth") or "convnext" in file.lower():
+                        file_path = os.path.join(cache_dir, file)
+                        try:
+                            os.remove(file_path)
+                            cleared_files.append(file_path)
+                            print_info(f"✅ Removed: {file}")
+                        except Exception as e:
+                            print_warning(f"Could not remove {file}: {e}")
+
+        if cleared_files:
+            print_success(f"✅ Successfully cleared {len(cleared_files)} cache files")
+            print_info("You can now retry the model download.")
+        else:
+            print_info("No cache files found to clear.")
+
+    except Exception as e:
+        print_error(f"Error clearing cache: {e}")
+
+    play_done_sound()
 
 
 # Only export the new wrappers

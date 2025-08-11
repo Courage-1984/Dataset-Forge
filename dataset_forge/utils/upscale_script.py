@@ -8,6 +8,8 @@ import argparse
 import sys
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.memory_utils import to_device_safe, clear_memory
+from dataset_forge.utils.printing import print_info, print_error, print_success, print_warning
+from dataset_forge.utils.color import Mocha
 import chainner_ext
 
 # Lazy imports for heavy libraries
@@ -273,7 +275,7 @@ def batch_upscale(
                 )
                 results.append((input_path, out_path, True))
     except Exception as e:
-                print(f"Error upscaling {input_path}: {e}")
+                print_error(f"Error upscaling {input_path}: {e}")
         traceback.print_exc()
                 results.append((input_path, out_path, False))
             if progress_bar:
@@ -359,20 +361,20 @@ def main():
     use_onnx = args.onnx or args.model.lower().endswith(".onnx")
 
     if not os.path.exists(args.input):
-        print(f"Error: Input path not found: {args.input}")
+        print_error(f"Error: Input path not found: {args.input}")
         return
     if not os.path.exists(args.output):
-        print(f"Creating output directory: {args.output}")
+        print_info(f"Creating output directory: {args.output}")
         os.makedirs(args.output)
     if not os.path.exists(args.model):
-        print(f"Error: Model file not found: {args.model}")
+        print_error(f"Error: Model file not found: {args.model}")
         return
     try:
-        print("Loading model...")
+        print_info("Loading model...")
         model = load_model(args.model, device=device, use_onnx=use_onnx)
-        print("Model loaded successfully.")
+        print_success("Model loaded successfully.")
         if os.path.isfile(args.input):
-            print(f"Processing single file: {args.input}")
+            print_info(f"Processing single file: {args.input}")
             out_path = os.path.join(
                 args.output,
                 os.path.splitext(os.path.basename(args.input))[0] + f".{output_format}",
@@ -391,7 +393,7 @@ def main():
                 output_format=output_format,
             )
         else:
-            print(f"Processing directory: {args.input}")
+            print_info(f"Processing directory: {args.input}")
             batch_upscale(
                 args.input,
                 args.output,
@@ -406,15 +408,15 @@ def main():
                 output_format=output_format,
                 progress_bar=True,
             )
-        print("All processing completed.")
+        print_success("All processing completed.")
     except Exception as e:
-        print(f"Error: {str(e)}")
+        print_error(f"Error: {str(e)}")
         traceback.print_exc()
     finally:
         clear_memory()
-        print("Cleanup completed.")
+        print_info("Cleanup completed.")
 
 
 if __name__ == "__main__":
     main()
-    print("Script execution finished.")
+    print_success("Script execution finished.")

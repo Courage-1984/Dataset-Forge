@@ -256,6 +256,24 @@ def imagededup_menu():
         print_info("\nGitHub: https://github.com/idealo/imagededup")
         print_info("Documentation: https://idealo.github.io/imagededup/")
 
+    # Define menu context for help system
+    menu_context = {
+        "Purpose": "Advanced duplicate detection using ImageDedup library",
+        "Options": "3 deduplication operations available",
+        "Navigation": "Use numbers 1-3 to select, 0 to go back",
+        "Key Features": [
+            "Single Folder Deduplication - Find duplicates in a single folder",
+            "HQ/LQ Paired Dataset Deduplication - Find duplicates in paired datasets",
+            "About ImageDedup - Information about the ImageDedup library",
+        ],
+        "Tips": [
+            "Use Single Folder for basic duplicate detection",
+            "Use HQ/LQ Paired for super-resolution datasets",
+            "ImageDedup uses perceptual hashing for accurate detection",
+            "Supports multiple hash methods (PHash, DHash, AHash, WHash)",
+        ],
+    }
+
     options = {
         "1": ("Single Folder Deduplication", single_folder_dedup),
         "2": ("HQ/LQ Paired Dataset Deduplication", hq_lq_dedup),
@@ -269,6 +287,8 @@ def imagededup_menu():
             options,
             header_color=Mocha.sapphire,
             char="-",
+            current_menu="ImageDedup",
+            menu_context=menu_context,
         )
         if key is None or key == "0":
             return

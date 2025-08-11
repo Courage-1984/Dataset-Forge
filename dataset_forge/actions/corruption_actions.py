@@ -10,8 +10,9 @@ from dataset_forge.utils.image_ops import CorruptionFixer
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import print_success, print_header, print_section, print_info, print_error
 from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.color import Mocha
 
 
 def detect_corruption(file_path):
@@ -41,16 +42,14 @@ def fix_corruption(file_path):
 @monitor_all("fix_corrupted_images", critical_on_error=True)
 def fix_corrupted_images(folder_path, grayscale=False):
     """Re-save images to fix corruption issues using CorruptionFixer class."""
-    print("\n" + "=" * 30)
-    print("  Fixing Corrupted Images")
-    print("=" * 30)
+    print_header("Fixing Corrupted Images", color=Mocha.lavender)
 
     operation = get_file_operation_choice()
     dest_dir = ""
     if operation != "inplace":
         dest_dir = get_destination_path()
         if not dest_dir:
-            print(
+            print_error(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -81,18 +80,14 @@ def fix_corrupted_images(folder_path, grayscale=False):
         else:
             errors.append(f"Error processing {filename}: {msg}")
 
-    print("\n" + "-" * 30)
-    print("  Fix Corrupted Images Summary")
-    print("-" * 30)
-    print(f"Total images processed: {processed_count}")
+    print_section("Fix Corrupted Images Summary", color=Mocha.lavender)
+    print_info(f"Total images processed: {processed_count}")
     if errors:
-        print(f"\nErrors encountered: {len(errors)}")
+        print_info(f"\nErrors encountered: {len(errors)}")
         for error in errors[:5]:
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors")
     clear_memory()
     clear_cuda_cache()
     print_success("Corruption fixing complete.")
@@ -100,7 +95,7 @@ def fix_corrupted_images(folder_path, grayscale=False):
 
 
 def fix_corrupted_images_hq_lq(hq_folder, lq_folder, grayscale=False):
-    print("\n=== Fixing Corrupted Images in HQ Folder ===")
+    print_header("Fixing Corrupted Images in HQ Folder", color=Mocha.lavender)
     fix_corrupted_images(hq_folder, grayscale=grayscale)
-    print("\n=== Fixing Corrupted Images in LQ Folder ===")
+    print_header("Fixing Corrupted Images in LQ Folder", color=Mocha.lavender)
     fix_corrupted_images(lq_folder, grayscale=grayscale)

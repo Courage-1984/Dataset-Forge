@@ -34,14 +34,32 @@ def umzi_dataset_preprocessing_menu():
                 "iqa_filtering_action",
             ),
         ),
+        "5": (
+            "🗑️ Clear Model Cache (Fix Download Issues)",
+            lazy_action(
+                "dataset_forge.actions.umzi_dataset_preprocessing_actions",
+                "manual_cache_clear_action",
+            ),
+        ),
         "0": ("⬅️  Back to Main Menu", None),
     }
     # Define menu context for help system
     menu_context = {
         "Purpose": "Advanced dataset preprocessing tools from PepeDP",
-        "Total Options": "4 preprocessing operations",
-        "Navigation": "Use numbers 1-4 to select, 0 to go back",
-        "Key Features": "Tile extraction, video frame extraction, duplicate detection, IQA filtering",
+        "Total Options": "5 preprocessing operations",
+        "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        "Key Features": [
+            "Tile extraction - Extract best tiles from images",
+            "Video frame extraction - Extract frames with deduplication",
+            "Duplicate detection - Find and remove duplicate images",
+            "IQA filtering - Filter images based on quality metrics",
+            "Cache clearing - Fix corrupted model downloads",
+        ],
+        "Tips": [
+            "Use option 5 if you encounter model download errors",
+            "Try ConvNextS instead of ConvNextL for faster processing",
+            "Ensure stable internet connection for model downloads",
+        ],
     }
 
     while True:

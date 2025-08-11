@@ -46,6 +46,7 @@ from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
 from dataset_forge.utils.printing import print_success
 from dataset_forge.utils.audio_utils import play_done_sound
+from dataset_forge.utils.color import Mocha
 import threading
 
 
@@ -272,14 +273,14 @@ def de_dupe(
     """Detect and handle duplicate or near-duplicate images. If lq_folder is None or blank, only dedupe in hq_folder."""
     hq_hashes = compute_hashes(hq_folder, hash_func=hash_type)
     if not hq_hashes:
-        print("No images found in HQ folder.")
+        print_info("No images found in HQ folder.")
         return
     if mode == "near":
         groups = find_near_duplicates(hq_hashes, max_distance=max_dist) or []
     else:
         groups = find_duplicates(hq_hashes) or []
     if not groups:
-        print("No duplicates or near-duplicates found.")
+        print_info("No duplicates or near-duplicates found.")
         return
     import threading
 
@@ -300,19 +301,19 @@ def de_dupe(
                 if op == "delete":
                     if os.path.exists(hq_path):
                         os.remove(hq_path)
-                        print(f"Deleted {hq_path}")
+                        print_info(f"Deleted {hq_path}")
                 elif op in ("move", "copy"):
                     if dest_dir and "hq" in dest_dir:
                         dest = os.path.join(dest_dir["hq"], fname)
                         os.makedirs(dest_dir["hq"], exist_ok=True)
                         if op == "move":
                             os.rename(hq_path, dest)
-                            print(f"Moved {hq_path} -> {dest}")
+                            print_info(f"Moved {hq_path} -> {dest}")
                         elif op == "copy":
                             import shutil
 
                             shutil.copy2(hq_path, dest)
-                            print(f"Copied {hq_path} -> {dest}")
+                            print_info(f"Copied {hq_path} -> {dest}")
     clear_memory()
     clear_cuda_cache()
     print_success("Deduplication complete.")

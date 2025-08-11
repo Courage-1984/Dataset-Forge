@@ -875,10 +875,7 @@ class EmojiHandler:
             sanitized = self.sanitize_emoji(normalized)
 
             # Print with proper encoding
-            if use_colors:
-                print(sanitized, flush=True)
-            else:
-                print(sanitized, flush=True)
+            print(sanitized, flush=True)
 
         except UnicodeEncodeError as e:
             print_warning, print_error, print_info = _get_printing_functions()
