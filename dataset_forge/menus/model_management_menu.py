@@ -94,7 +94,13 @@ def search_filter_menu(models):
             "Navigation": "Use numbers 1-5 to select, 0 to go back",
         }
 
-        key = show_menu("Search/Filter Models", options, Mocha.lavender, current_menu="Search/Filter Models", menu_context=menu_context)
+        key = show_menu(
+            "Search/Filter Models",
+            options,
+            Mocha.lavender,
+            current_menu="Search/Filter Models",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         options[key][1]()
@@ -189,7 +195,13 @@ def list_models_menu(models):
     }
 
     while True:
-        key = show_menu("Select a Model", options, Mocha.lavender, current_menu="Select a Model", menu_context=menu_context)
+        key = show_menu(
+            "Select a Model",
+            options,
+            Mocha.lavender,
+            current_menu="Select a Model",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         model_key = options[key][1]
@@ -246,7 +258,13 @@ def list_downloaded_models_menu(models):
     }
 
     while True:
-        key = show_menu("Select a Downloaded Model File", options, Mocha.lavender, current_menu="Select a Downloaded Model File", menu_context=menu_context)
+        key = show_menu(
+            "Select a Downloaded Model File",
+            options,
+            Mocha.lavender,
+            current_menu="Select a Downloaded Model File",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         selected_file = options[key][1]
@@ -293,7 +311,13 @@ def downloaded_model_menu(filename, model_info):
     }
 
     while True:
-        key = show_menu(f"Downloaded Model: {filename}", options, Mocha.lavender, current_menu="Downloaded Model", menu_context=menu_context)
+        key = show_menu(
+            f"Downloaded Model: {filename}",
+            options,
+            Mocha.lavender,
+            current_menu="Downloaded Model",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         options[key][1]()
@@ -332,40 +356,47 @@ def model_details_menu(models, model_key):
     from dataset_forge.utils.color import Mocha
 
     details = get_model_details(models, model_key)
-    print("\n" + "#" * 50)
-    print(f"{Mocha.lavender}Model: {Mocha.rosewater}{details['name']}{Mocha.reset}")
-    print("#" * 50)
-    print(f"{Mocha.blue}Author:{Mocha.text} {details.get('author', '-')}{Mocha.reset}")
-    print(
+    print_header("Model Details", char="#", color=Mocha.lavender)
+    print_info(
+        f"{Mocha.lavender}Model: {Mocha.rosewater}{details['name']}{Mocha.reset}"
+    )
+    print_info(
+        f"{Mocha.blue}Author:{Mocha.text} {details.get('author', '-')}{Mocha.reset}"
+    )
+    print_info(
         f"{Mocha.yellow}Tags:{Mocha.text} {', '.join(details.get('tags', []))}{Mocha.reset}"
     )
-    print(
+    print_info(
         f"{Mocha.mauve}Architecture:{Mocha.text} {details.get('architecture', '-')}{Mocha.reset}"
     )
-    print(f"{Mocha.green}Scale:{Mocha.text} {details.get('scale', '-')}{Mocha.reset}")
-    print(
+    print_info(
+        f"{Mocha.green}Scale:{Mocha.text} {details.get('scale', '-')}{Mocha.reset}"
+    )
+    print_info(
         f"{Mocha.peach}License:{Mocha.text} {details.get('license', '-')}{Mocha.reset}"
     )
-    print(f"{Mocha.sapphire}Date:{Mocha.text} {details.get('date', '-')}{Mocha.reset}")
-    print(
+    print_info(
+        f"{Mocha.sapphire}Date:{Mocha.text} {details.get('date', '-')}{Mocha.reset}"
+    )
+    print_info(
         f"{Mocha.text}Description:{Mocha.reset}\n  {details.get('description', '-')}\n"
     )
     # Show resources
-    print(f"{Mocha.flamingo}Resources:{Mocha.reset}")
+    print_info(f"{Mocha.flamingo}Resources:{Mocha.reset}")
     for i, res in enumerate(details.get("resources", []), 1):
-        print(
+        print_info(
             f"  {Mocha.text}[{i}] Platform: {res.get('platform', '-')}, Type: {res.get('type', '-')}, Size: {res.get('size', '-')}, SHA256: {res.get('sha256', '-')}{Mocha.reset}"
         )
         for url in res.get("urls", []):
-            print(f"    {Mocha.blue}URL:{Mocha.text} {url}{Mocha.reset}")
+            print_info(f"    {Mocha.blue}URL:{Mocha.text} {url}{Mocha.reset}")
     # Show images if present
     if details.get("images"):
-        print(f"\n{Mocha.pink}Sample Images:{Mocha.reset}")
+        print_info(f"\n{Mocha.pink}Sample Images:{Mocha.reset}")
         for img in details["images"]:
-            print(
+            print_info(
                 f"  {Mocha.text}LR: {img.get('LR', '-')}, SR: {img.get('SR', '-')}{Mocha.reset}"
             )
-    print("#" * 50)
+    print_header("", char="#", color=Mocha.lavender)
     options = {
         "1": ("⬇️ Download Model", lambda: download_model(details, MODELS_DIR)),
         "2": (
@@ -386,7 +417,13 @@ def model_details_menu(models, model_key):
     }
 
     while True:
-        key = show_menu(f"Model: {details['name']}", options, Mocha.lavender, current_menu="Model Details", menu_context=menu_context)
+        key = show_menu(
+            f"Model: {details['name']}",
+            options,
+            Mocha.lavender,
+            current_menu="Model Details",
+            menu_context=menu_context,
+        )
         if key is None or key == "0":
             return
         options[key][1]()
@@ -435,7 +472,7 @@ def openmodeldb_model_browser_cli_interactive():
 
     CACHE_DIR = os.path.join("OpenModelDB", "cache")
     MODELS_DIR = os.path.join("OpenModelDB", "models")
-    print("\nUpdating OpenModelDB model cache...")
+    print_info("\nUpdating OpenModelDB model cache...")
     update_model_cache(CACHE_DIR)
     models = get_cached_models(CACHE_DIR)
     model_keys = list(models.keys())

@@ -4,7 +4,7 @@ import shutil
 from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import print_success, print_info, print_warning, print_error
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -28,12 +28,12 @@ def compress_directory(
     elif src_hq and src_lq:
         folders.extend([src_hq, src_lq])
     else:
-        print("No valid input folder(s) provided.")
+        print_error("No valid input folder(s) provided.")
         return
 
     for folder in folders:
         if not os.path.isdir(folder):
-            print(f"Not a directory: {folder}")
+            print_warning(f"Not a directory: {folder}")
             continue
         base_name = os.path.abspath(folder)
         out_name = base_name + (
@@ -46,7 +46,7 @@ def compress_directory(
         for root, _, files in os.walk(folder):
             for f in files:
                 file_list.append(os.path.join(root, f))
-        print(f"Archiving {folder} to {out_name} ({len(file_list)} files)...")
+        print_info(f"Archiving {folder} to {out_name} ({len(file_list)} files)...")
         # Use tqdm for progress
         with tqdm(
             total=len(file_list), desc=f"Archiving {os.path.basename(folder)}", ncols=80
@@ -85,6 +85,6 @@ def compress_directory(
                         arcname = os.path.relpath(file, folder)
                         tf.add(file, arcname=arcname, filter=_progress_filter)
             else:
-                print(f"Unsupported archive format: {archive_format}")
+                print_error(f"Unsupported archive format: {archive_format}")
                 return
-        print(f"Archive created: {out_name}")
+        print_success(f"Archive created: {out_name}")

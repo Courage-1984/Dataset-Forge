@@ -51,18 +51,26 @@ def _get_printing_functions():
     """Get printing functions with fallback for circular import issues."""
     try:
         from .printing import print_warning, print_error, print_info
-
         return print_warning, print_error, print_info
     except ImportError:
         # Fallback if printing utilities are not available
         def print_warning(msg):
-            print(f"WARNING: {msg}")
+            # Use sys.stderr.write to avoid circular import issues
+            import sys
+            sys.stderr.write(f"WARNING: {msg}\n")
+            sys.stderr.flush()
 
         def print_error(msg):
-            print(f"ERROR: {msg}")
+            # Use sys.stderr.write to avoid circular import issues
+            import sys
+            sys.stderr.write(f"ERROR: {msg}\n")
+            sys.stderr.flush()
 
         def print_info(msg):
-            print(f"INFO: {msg}")
+            # Use sys.stdout.write to avoid circular import issues
+            import sys
+            sys.stdout.write(f"INFO: {msg}\n")
+            sys.stdout.flush()
 
         return print_warning, print_error, print_info
 
@@ -874,19 +882,26 @@ class EmojiHandler:
             normalized = self.normalize_unicode(text)
             sanitized = self.sanitize_emoji(normalized)
 
-            # Print with proper encoding
-            print(sanitized, flush=True)
+            # Print with proper encoding using sys.stdout.write to avoid circular imports
+            import sys
+            sys.stdout.write(sanitized + "\n")
+            sys.stdout.flush()
 
         except UnicodeEncodeError as e:
             print_warning, print_error, print_info = _get_printing_functions()
             print_error(f"Unicode encoding error: {e}")
             # Fallback: print without emojis
+            import re
             fallback_text = re.sub(r"[^\x00-\x7F]+", "", text)
-            print(fallback_text, flush=True)
+            import sys
+            sys.stdout.write(fallback_text + "\n")
+            sys.stdout.flush()
         except Exception as e:
             print_warning, print_error, print_info = _get_printing_functions()
             print_error(f"Error printing emoji text: {e}")
-            print(text, flush=True)
+            import sys
+            sys.stdout.write(text + "\n")
+            sys.stdout.flush()
 
 
 # Global emoji handler instance

@@ -506,10 +506,10 @@ def configure_gpu_settings():
     print_info(f"  Device: {gpu_processor.device}")
     print_info(f"  Batch Size: {gpu_processor.batch_size}")
 
-    print("\n[1] Change Device")
-    print("[2] Adjust Batch Size")
-    print("[3] Memory Management")
-    print("[0] Back")
+    print_info("\n[1] Change Device")
+    print_info("[2] Adjust Batch Size")
+    print_info("[3] Memory Management")
+    print_info("[0] Back")
 
     choice = input("Choice: ").strip()
 
@@ -600,18 +600,18 @@ def configure_distributed_settings():
     print_info(f"  Workers: {config.num_workers}")
     print_info(f"  GPU Devices: {config.gpu_devices}")
 
-    print("\n[1] Change Mode")
-    print("[2] Adjust Workers")
-    print("[3] GPU Configuration")
-    print("[0] Back")
+    print_info("\n[1] Change Mode")
+    print_info("[2] Adjust Workers")
+    print_info("[3] GPU Configuration")
+    print_info("[0] Back")
 
     choice = input("Choice: ").strip()
 
     if choice == "1":
-        print("Available modes:")
+        print_info("Available modes:")
         ProcessingMode = get_ProcessingMode()
         for mode in ProcessingMode:
-            print(f"  {mode.value}")
+            print_info(f"  {mode.value}")
         mode_name = input("Enter mode: ").strip()
         ProcessingMode = get_ProcessingMode()
         for mode in ProcessingMode:
@@ -688,18 +688,18 @@ def configure_prioritization():
     print_info(f"  Batch Size: {config.batch_size}")
     print_info(f"  Use GPU: {config.use_gpu}")
 
-    print("\n[1] Change Strategy")
-    print("[2] Adjust Weights")
-    print("[3] Batch Settings")
-    print("[0] Back")
+    print_info("\n[1] Change Strategy")
+    print_info("[2] Adjust Weights")
+    print_info("[3] Batch Settings")
+    print_info("[0] Back")
 
     choice = input("Choice: ").strip()
 
     if choice == "1":
-        print("Available strategies:")
+        print_info("Available strategies:")
         PrioritizationStrategy = get_PrioritizationStrategy()
         for strategy in PrioritizationStrategy:
-            print(f"  {strategy.value}")
+            print_info(f"  {strategy.value}")
         strategy_name = input("Enter strategy: ").strip()
         PrioritizationStrategy = get_PrioritizationStrategy()
         for strategy in PrioritizationStrategy:
@@ -757,11 +757,11 @@ def configure_compilation():
     print_info(f"  Parallel: {config.parallel}")
     print_info(f"  Fast Math: {config.fastmath}")
 
-    print("\n[1] Toggle Numba")
-    print("[2] Toggle Cython")
-    print("[3] Toggle Torch JIT")
-    print("[4] Optimization Level")
-    print("[0] Back")
+    print_info("\n[1] Toggle Numba")
+    print_info("[2] Toggle Cython")
+    print_info("[3] Toggle Torch JIT")
+    print_info("[4] Optimization Level")
+    print_info("[0] Back")
 
     choice = input("Choice: ").strip()
 

@@ -155,7 +155,7 @@ def view_edit_metadata():
                 stderr=subprocess.PIPE,
                 encoding="utf-8",
             )
-            print(result.stdout)
+            print_info(result.stdout)
         except Exception as e:
             print_error(f"Error running exiftool: {e}")
     # Edit metadata
@@ -222,7 +222,7 @@ def filter_by_metadata():
             print_info(f"Found {len(filtered)} matching images.")
             print_info("Show results? (y/n)")
             if input().strip().lower().startswith("y"):
-                print(
+                print_info(
                     filtered[
                         [
                             c

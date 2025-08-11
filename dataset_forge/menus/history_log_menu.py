@@ -28,7 +28,7 @@ def select_log_to_view():
     print_section("Available Logs", color=Mocha.sapphire)
     for idx, fname in enumerate(logs, 1):
         print(f"[{idx}] {fname}")
-    print()
+    print_info("")
     try:
         choice = int(input("Enter log number to view (0 to cancel): ").strip())
         if choice == 0:

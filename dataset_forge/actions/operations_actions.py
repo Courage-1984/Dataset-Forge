@@ -221,32 +221,34 @@ def split_dataset_in_half(hq_folder, lq_folder):
 def remove_pairs_by_count_percentage(hq_folder, lq_folder):
     print_header("Remove Pairs by Count/Percentage", "=", Mocha.lavender)
 
-    hq_files_list = sorted(
+    hq_files = sorted(
         [
             f
             for f in os.listdir(hq_folder)
             if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
         ]
     )
-    lq_files_list = sorted(
+    lq_files = sorted(
         [
             f
             for f in os.listdir(lq_folder)
             if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
         ]
     )
-    matching_files = [f for f in hq_files_list if f in lq_files_list]
+
+    # Find matching pairs
+    matching_files = [f for f in hq_files if f in lq_files]
 
     if not matching_files:
         print_warning("No matching HQ/LQ pairs found.")
         return
 
     num_available = len(matching_files)
-    print_info(f"Found {num_available} matching pairs.")
+    print_info(f"Found {num_available} matching HQ/LQ pairs.")
 
     while True:
         amount_str = input(
-            f"Enter amount to remove (e.g., 100 or 10% of {num_available} pairs): "
+            f"Enter number of pairs to remove (0-{num_available}) or percentage (e.g., 10%): "
         ).strip()
         num_to_remove = 0
         if amount_str.endswith("%"):
@@ -256,9 +258,9 @@ def remove_pairs_by_count_percentage(hq_folder, lq_folder):
                     num_to_remove = int(num_available * (percentage / 100))
                     break
                 else:
-                    print("Percentage must be between 0 and 100.")
+                    print_error("Percentage must be between 0 and 100.")
             except ValueError:
-                print("Invalid percentage format.")
+                print_error("Invalid percentage format.")
         else:
             try:
                 num = int(amount_str)
@@ -266,18 +268,18 @@ def remove_pairs_by_count_percentage(hq_folder, lq_folder):
                     num_to_remove = num
                     break
                 else:
-                    print(
+                    print_error(
                         f"Number of pairs to remove must be between 0 and {num_available}."
                     )
             except ValueError:
-                print("Invalid number format.")
+                print_error("Invalid number format.")
 
     if num_to_remove == 0:
-        print("No pairs to remove. Exiting operation.")
-        print("=" * 30)
+        print_warning("No pairs to remove. Exiting operation.")
+        print_info("=" * 30)
         return
 
-    print(f"Will identify {num_to_remove} pairs for removal.")
+    print_info(f"Will identify {num_to_remove} pairs for removal.")
 
     operation = (
         get_file_operation_choice()
@@ -302,7 +304,7 @@ def remove_pairs_by_count_percentage(hq_folder, lq_folder):
             else get_destination_path()
         )  # a bit of a hack for older signature
         if not destination:
-            print(
+            print_error(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -314,11 +316,13 @@ def remove_pairs_by_count_percentage(hq_folder, lq_folder):
         )
         os.makedirs(dest_hq_folder, exist_ok=True)
         os.makedirs(dest_lq_folder, exist_ok=True)
-        print(f"Pairs designated for 'removal' will be {operation}d to {destination}")
+        print_info(
+            f"Pairs designated for 'removal' will be {operation}d to {destination}"
+        )
 
     pairs_to_remove_names = random.sample(matching_files, num_to_remove)
 
-    print(
+    print_info(
         f"\nPerforming '{action_verb}' operation on {len(pairs_to_remove_names)} pairs..."
     )
 
@@ -350,61 +354,66 @@ def remove_pairs_by_count_percentage(hq_folder, lq_folder):
                 )
                 shutil.copy2(hq_path, hq_dest)
                 shutil.copy2(lq_path, lq_dest)
-            elif operation == "inplace":  # This means actual deletion
+            else:  # remove
                 os.remove(hq_path)
                 os.remove(lq_path)
-            processed_count += 1
-        except Exception as e:
-            errors.append(f"Error {action_verb}ing pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Remove by Count/Percentage Summary")
-    print("-" * 30)
-    print(f"Requested to {action_verb}: {num_to_remove} pairs.")
-    print(f"Successfully {action_verb}d: {processed_count} pairs.")
-    if operation == "inplace":
-        print("  (Files were deleted from the source folders).")
-    elif operation in ["copy", "move"]:
-        print(f"  (Files were {operation}d to {destination}).")
+            processed_count += 1
+
+        except Exception as e:
+            error_msg = f"Error processing {filename}: {e}"
+            errors.append(error_msg)
+
+    # Summary
+    print_info("\n" + "-" * 30)
+    print_info("  Remove by Count/Percentage Summary")
+    print_info("-" * 30)
+    print_info(f"Requested to {action_verb}: {num_to_remove} pairs.")
+    print_info(f"Successfully {action_verb}d: {processed_count} pairs.")
+
+    if operation == "remove":
+        print_info("  (Files were deleted from the source folders).")
+    else:
+        print_info(f"  (Files were {operation}d to {destination}).")
 
     if errors:
-        print(f"Errors encountered: {len(errors)}")
-        for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
+        print_warning(f"Errors encountered: {len(errors)}")
+        for i, error in enumerate(errors[:5]):  # Show first 5 errors
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors.")
+    print_info("-" * 30)
+    print_info("=" * 30)
+    print_success("Remove by count/percentage operation complete!")
+    play_done_sound()
 
 
 def remove_pairs_by_size(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Remove Pairs by File Size")
-    print("=" * 30)
+    print_header("Remove Pairs by File Size", "=", Mocha.lavender)
 
-    hq_files_list = sorted(
+    hq_files = sorted(
         [
             f
             for f in os.listdir(hq_folder)
             if os.path.isfile(os.path.join(hq_folder, f)) and is_image_file(f)
         ]
     )
-    lq_files_list = sorted(
+    lq_files = sorted(
         [
             f
             for f in os.listdir(lq_folder)
             if os.path.isfile(os.path.join(lq_folder, f)) and is_image_file(f)
         ]
     )
-    matching_files = [f for f in hq_files_list if f in lq_files_list]
+    matching_files = [f for f in hq_files if f in lq_files]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found.")
+        print_info("=" * 30)
         return
 
     num_available = len(matching_files)
-    print(f"Found {num_available} matching pairs.")
+    print_info(f"Found {num_available} matching pairs.")
 
     while True:
         try:
@@ -427,9 +436,9 @@ def remove_pairs_by_size(hq_folder, lq_folder):
             if size_threshold >= 0:
                 break
             else:
-                print("Size threshold must be non-negative.")
+                print_error("Size threshold must be non-negative.")
         except ValueError:
-            print(
+            print_error(
                 "Invalid input. Please enter a number, optionally followed by KB, MB, or B."
             )
 
@@ -444,7 +453,7 @@ def remove_pairs_by_size(hq_folder, lq_folder):
         if criteria in ["above", "below"]:
             break
         else:
-            print("Invalid criteria. Please enter 'above' or 'below'.")
+            print_error("Invalid criteria. Please enter 'above' or 'below'.")
 
     operation = get_file_operation_choice()
     action_verb = "remove"
@@ -467,66 +476,52 @@ def remove_pairs_by_size(hq_folder, lq_folder):
             else get_destination_path()
         )
         if not destination:
-            print(
+            print_error(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
-        dest_hq_folder = os.path.join(destination, "size_criteria_hq")
-        dest_lq_folder = os.path.join(destination, "size_criteria_lq")
+        dest_hq_folder = os.path.join(
+            destination, "removed_hq" if operation == "move" else "copied_removed_hq"
+        )
+        dest_lq_folder = os.path.join(
+            destination, "removed_lq" if operation == "move" else "copied_removed_lq"
+        )
         os.makedirs(dest_hq_folder, exist_ok=True)
         os.makedirs(dest_lq_folder, exist_ok=True)
-        print(f"Pairs matching criteria will be {operation}d to {destination}")
+        print_info(f"Pairs meeting size criteria will be {operation}d to {destination}")
 
-    pairs_to_process_names = []
-    skipped_due_error = []
-    for filename in tqdm(matching_files, desc="Checking File Sizes"):
+    # Identify pairs meeting the size criteria
+    pairs_to_remove = []
+    for filename in matching_files:
         hq_path = os.path.join(hq_folder, filename)
         lq_path = os.path.join(lq_folder, filename)
 
         try:
             hq_size = os.path.getsize(hq_path)
             lq_size = os.path.getsize(lq_path)
-            process_pair = False
-            if criteria == "above" and (
-                hq_size > size_threshold or lq_size > size_threshold
-            ):
-                process_pair = True
-            elif criteria == "below" and (
-                hq_size < size_threshold or lq_size < size_threshold
-            ):
-                process_pair = True
 
-            if process_pair:
-                pairs_to_process_names.append(filename)
-        except Exception as e:
-            # print(f"Error getting size for pair {filename}: {e}")
-            skipped_due_error.append(f"{filename}: {e}")
+            if criteria == "above":
+                if hq_size > size_threshold or lq_size > size_threshold:
+                    pairs_to_remove.append(filename)
+            else:  # below
+                if hq_size < size_threshold or lq_size < size_threshold:
+                    pairs_to_remove.append(filename)
 
-    if not pairs_to_process_names:
-        print(
-            f"No pairs found matching the criteria: size {criteria} {size_threshold / multiplier:.2f}{('KB' if multiplier==1024 else ('MB' if multiplier==1024*1024 else 'B'))}. Exiting."
-        )
-        if skipped_due_error:
-            print(
-                f"Skipped {len(skipped_due_error)} pairs due to errors during size check."
-            )
-        print("=" * 30)
+        except OSError as e:
+            print_warning(f"Could not get size for {filename}: {e}")
+
+    if not pairs_to_remove:
+        print_info("No pairs meet the size criteria.")
+        print_info("=" * 30)
         return
 
-    print(
-        f"\nWill {action_verb} {len(pairs_to_process_names)} pairs matching: size {criteria} {size_threshold / multiplier:.2f}{('KB' if multiplier==1024 else ('MB' if multiplier==1024*1024 else 'B'))}."
-    )
-    if skipped_due_error:
-        print(
-            f"Note: Skipped {len(skipped_due_error)} pairs due to errors during size check (e.g., file not found)."
-        )
+    print_info(f"Found {len(pairs_to_remove)} pairs meeting size criteria.")
 
+    # Process the pairs
     processed_count = 0
     errors = []
 
-    for filename in tqdm(
-        pairs_to_process_names, desc=f"{action_verb.capitalize()}ing Pairs by Size"
-    ):
+    for filename in tqdm(pairs_to_remove, desc=f"{action_verb.capitalize()}ing Pairs"):
         hq_path = os.path.join(hq_folder, filename)
         lq_path = os.path.join(lq_folder, filename)
 
@@ -549,47 +544,47 @@ def remove_pairs_by_size(hq_folder, lq_folder):
                 )
                 shutil.copy2(hq_path, hq_dest)
                 shutil.copy2(lq_path, lq_dest)
-            elif operation == "inplace":  # Actual deletion
+            else:  # remove
                 os.remove(hq_path)
                 os.remove(lq_path)
-            processed_count += 1
-        except Exception as e:
-            errors.append(f"Error {action_verb}ing pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Remove by File Size Summary")
-    print("-" * 30)
-    print(
-        f"Criteria: Size {criteria} {size_threshold / multiplier:.2f}{('KB' if multiplier==1024 else ('MB' if multiplier==1024*1024 else 'B'))}."
+            processed_count += 1
+
+        except Exception as e:
+            error_msg = f"Error processing {filename}: {e}"
+            errors.append(error_msg)
+
+    # Summary
+    print_info("\n" + "-" * 30)
+    print_info("  Remove by File Size Summary")
+    print_info("-" * 30)
+    print_info(
+        f"Size criteria: {criteria} {size_threshold / multiplier:.2f}{('KB' if multiplier==1024 else ('MB' if multiplier==1024*1024 else 'B'))}"
     )
-    print(f"Successfully {action_verb}d: {processed_count} pairs.")
-    if operation == "inplace":
-        print("  (Files were deleted from the source folders).")
-    elif operation in ["copy", "move"]:
-        print(f"  (Files were {operation}d to {destination}).")
+    print_info(f"Pairs meeting criteria: {len(pairs_to_remove)}")
+    print_info(f"Successfully {action_verb}d: {processed_count} pairs.")
+
+    if operation == "remove":
+        print_info("  (Files were deleted from the source folders).")
+    else:
+        print_info(f"  (Files were {operation}d to {destination}).")
 
     if errors:
-        print(f"Errors encountered during {action_verb} operation: {len(errors)}")
-        for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
+        print_warning(f"Errors encountered: {len(errors)}")
+        for i, error in enumerate(errors[: min(len(errors), 5)]):  # Show first 5 errors
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-    if skipped_due_error:
-        print(
-            f"Pairs skipped due to read errors during initial check: {len(skipped_due_error)}"
-        )
-        for i, error in enumerate(skipped_due_error[: min(len(skipped_due_error), 2)]):
-            print(f"  - {error}")
-        if len(skipped_due_error) > 2:
-            print(f"  ... and {len(skipped_due_error) - 2} more skipped.")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors.")
+    print_info("-" * 30)
+    print_info("=" * 30)
+    print_success("Remove by file size operation complete!")
+    play_done_sound()
 
 
 def remove_pairs_by_dimensions(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Remove Pairs by Dimensions")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Remove Pairs by Dimensions")
+    print_info("=" * 30)
 
     hq_files_list = sorted(
         [
@@ -608,12 +603,12 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
     matching_files = [f for f in hq_files_list if f in lq_files_list]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found.")
+        print_info("=" * 30)
         return
 
     num_available = len(matching_files)
-    print(f"Found {num_available} matching pairs.")
+    print_info(f"Found {num_available} matching pairs.")
 
     while True:
         # Clarify if criteria applies to HQ, LQ, or BOTH images in a pair
@@ -627,7 +622,7 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
         if target_image in ["hq", "lq", "both_must_match_criteria"]:
             break
         else:
-            print(
+            print_warning(
                 "Invalid input. Please enter 'hq', 'lq', or 'both_must_match_criteria'."
             )
 
@@ -642,7 +637,7 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
         if dim_type in ["width", "height", "area", "any_dimension"]:
             break
         else:
-            print(
+            print_warning(
                 "Invalid input. Please enter 'width', 'height', 'area', or 'any_dimension'."
             )
 
@@ -656,11 +651,11 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
             ).strip()
             min_val = float(min_val_str) if min_val_str else -1.0
             if min_val != -1.0 and min_val < 0:
-                print("Minimum value cannot be negative.")
+                print_warning("Minimum value cannot be negative.")
                 continue
             break
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print_warning("Invalid input. Please enter a number.")
     while True:
         try:
             max_val_str = input(
@@ -668,14 +663,14 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
             ).strip()
             max_val = float(max_val_str) if max_val_str else float("inf")
             if max_val != float("inf") and max_val < 0:  # max_val can be 0
-                print("Maximum value cannot be negative.")
+                print_warning("Maximum value cannot be negative.")
                 continue
             break
         except ValueError:
-            print("Invalid input. Please enter an integer.")
+            print_warning("Invalid input. Please enter an integer.")
 
     if min_val != -1.0 and max_val != float("inf") and min_val > max_val:
-        print("Minimum value cannot be greater than maximum value. Aborting.")
+        print_warning("Minimum value cannot be greater than maximum value. Aborting.")
         return
 
     # Ask if the user wants to remove pairs *within* this range or *outside* this range.
@@ -690,7 +685,7 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
         if removal_logic in ["within", "outside"]:
             break
         else:
-            print("Invalid choice. Please enter 'within' or 'outside'.")
+            print_warning("Invalid choice. Please enter 'within' or 'outside'.")
 
     operation = get_file_operation_choice()
     action_verb = "remove"
@@ -713,7 +708,7 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
             else get_destination_path()
         )
         if not destination:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -721,7 +716,7 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
         dest_lq_folder = os.path.join(destination, "dimension_criteria_lq")
         os.makedirs(dest_hq_folder, exist_ok=True)
         os.makedirs(dest_lq_folder, exist_ok=True)
-        print(f"Pairs matching criteria will be {operation}d to {destination}")
+        print_info(f"Pairs matching criteria will be {operation}d to {destination}")
 
     pairs_to_process_names = []
     skipped_due_error = []
@@ -784,19 +779,21 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
             skipped_due_error.append(f"{filename}: {e}")
 
     if not pairs_to_process_names:
-        print(f"No pairs found matching the dimension criteria. Exiting operation.")
+        print_warning(
+            f"No pairs found matching the dimension criteria. Exiting operation."
+        )
         if skipped_due_error:
-            print(
+            print_warning(
                 f"Skipped {len(skipped_due_error)} pairs due to errors reading images."
             )
-        print("=" * 30)
+        print_info("=" * 30)
         return
 
-    print(
+    print_info(
         f"\nWill {action_verb} {len(pairs_to_process_names)} pairs. Criteria: Target '{target_image}', Dim '{dim_type}', Range [{min_val if min_val != -1.0 else 'any'}-{max_val if max_val != float('inf') else 'any'}], Logic '{removal_logic}'."
     )
     if skipped_due_error:
-        print(
+        print_warning(
             f"Note: Skipped {len(skipped_due_error)} pairs due to errors reading image dimensions."
         )
 
@@ -835,36 +832,34 @@ def remove_pairs_by_dimensions(hq_folder, lq_folder):
         except Exception as e:
             errors.append(f"Error {action_verb}ing pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Remove by Dimensions Summary")
-    print("-" * 30)
-    print(
+    print_info("\n" + "-" * 30)
+    print_info("  Remove by Dimensions Summary")
+    print_info("-" * 30)
+    print_info(
         f"Criteria: Target '{target_image}', Dim '{dim_type}', Range [{min_val if min_val != -1.0 else 'any'} - {max_val if max_val != float('inf') else 'any'}], Logic '{removal_logic}'."
     )
-    print(f"Successfully {action_verb}d: {processed_count} pairs.")
+    print_info(f"Successfully {action_verb}d: {processed_count} pairs.")
     if operation == "inplace":
-        print("  (Files were deleted from the source folders).")
+        print_info("  (Files were deleted from the source folders).")
     elif operation in ["copy", "move"]:
-        print(f"  (Files were {operation}d to {destination}).")
+        print_info(f"  (Files were {operation}d to {destination}).")
 
     if errors:
-        print(f"Errors encountered during {action_verb} operation: {len(errors)}")
-        for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
-        if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-    if skipped_due_error:
-        print(
-            f"Pairs skipped due to read errors during initial check: {len(skipped_due_error)}"
-        )
-    print("-" * 30)
-    print("=" * 30)
+        print_error(f"Errors encountered during {action_verb} operation: {len(errors)}")
+        for i, error_msg in enumerate(
+            errors[: min(len(errors), 10)]
+        ):  # Show more errors if many
+            print_error(f"  - {error_msg}")
+        if len(errors) > 10:
+            print_error(
+                f"  ... and {len(errors) - 10} more issues (check log if detailed logging was added)."
+            )
+    print_info("-" * 30)
+    print_info("=" * 30)
 
 
 def remove_pairs_by_file_type(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print(" Remove Pairs by File Type")
-    print("=" * 30)
+    print_header("Remove Pairs by File Type", "=", Mocha.lavender)
 
     hq_files_list = sorted(
         [
@@ -883,16 +878,16 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
     matching_files = [f for f in hq_files_list if f in lq_files_list]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found.")
+        print_info("=" * 30)
         return
 
     num_available = len(matching_files)
-    print(f"Found {num_available} matching pairs.")
+    print_info(f"Found {num_available} matching pairs.")
 
-    print("\nSupported image types:")
+    print_info("\nSupported image types:")
     for i, img_type in enumerate(IMAGE_TYPES):
-        print(f"  {i+1}. {img_type.lstrip('.')}")
+        print_info(f"  {i+1}. {img_type.lstrip('.')}")
 
     while True:
         file_type_input = (
@@ -908,7 +903,7 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
         if file_type_to_remove_normalized in IMAGE_TYPES:
             break
         else:
-            print(
+            print_warning(
                 f"Invalid file type '{file_type_input}'. Please enter a supported image type (e.g., png, jpg, webp)."
             )
 
@@ -924,7 +919,9 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
         if target_choice in ["hq", "lq", "both", "either"]:
             break
         else:
-            print("Invalid choice. Please enter 'hq', 'lq', 'both', or 'either'.")
+            print_warning(
+                "Invalid choice. Please enter 'hq', 'lq', 'both', or 'either'."
+            )
 
     operation = get_file_operation_choice()
     action_verb = "remove"
@@ -938,14 +935,14 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
     dest_lq_folder = None
 
     if operation == "move" or operation == "copy":
-        destination_prompt = f"Enter destination directory for pairs where {target_choice} is type '{file_type_to_remove_normalized}':"
+        destination_prompt = "Enter destination directory for pairs where {target_choice} is type '{file_type_to_remove_normalized}':"
         destination = (
             get_destination_path(prompt=destination_prompt)
             if callable(get_destination_path)
             else get_destination_path()
         )
         if not destination:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -953,7 +950,7 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
         dest_lq_folder = os.path.join(destination, "filetype_criteria_lq")
         os.makedirs(dest_hq_folder, exist_ok=True)
         os.makedirs(dest_lq_folder, exist_ok=True)
-        print(f"Pairs matching criteria will be {operation}d to {destination}")
+        print_info(f"Pairs matching criteria will be {operation}d to {destination}")
 
     pairs_to_process_names = []
     for filename in matching_files:
@@ -978,13 +975,13 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
             pairs_to_process_names.append(filename)
 
     if not pairs_to_process_names:
-        print(
+        print_warning(
             f"No pairs found matching criteria: {target_choice} is type '{file_type_to_remove_normalized}'. Exiting."
         )
-        print("=" * 30)
+        print_info("=" * 30)
         return
 
-    print(
+    print_info(
         f"\nWill {action_verb} {len(pairs_to_process_names)} pairs where {target_choice} is of type '{file_type_to_remove_normalized}'."
     )
 
@@ -1023,26 +1020,26 @@ def remove_pairs_by_file_type(hq_folder, lq_folder):
         except Exception as e:
             errors.append(f"Error {action_verb}ing pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print(" Remove by File Type Summary")
-    print("-" * 30)
-    print(
+    print_info("\n" + "-" * 30)
+    print_info(" Remove by File Type Summary")
+    print_info("-" * 30)
+    print_info(
         f"Criteria: {target_choice.capitalize()} image file type is '{file_type_to_remove_normalized}'."
     )
-    print(f"Successfully {action_verb}d: {processed_count} pairs.")
+    print_info(f"Successfully {action_verb}d: {processed_count} pairs.")
     if operation == "inplace":
-        print("  (Files were deleted from the source folders).")
+        print_info("  (Files were deleted from the source folders).")
     elif operation in ["copy", "move"]:
-        print(f"  (Files were {operation}d to {destination}).")
+        print_info(f"  (Files were {operation}d to {destination}).")
 
     if errors:
-        print(f"Errors encountered: {len(errors)}")
+        print_error(f"Errors encountered: {len(errors)}")
         for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-    print("-" * 30)
-    print("=" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors.")
+    print_info("-" * 30)
+    print_info("=" * 30)
 
 
 # --- Function from remove_small_pairs.py ---
@@ -1261,16 +1258,16 @@ def adjust_image_color(
 
 def grayscale_conversion(hq_folder, lq_folder):
     """Convert HQ/LQ images to grayscale using ColorAdjuster class."""
-    print("\n" + "=" * 30)
-    print("  Grayscale Conversion")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Grayscale Conversion")
+    print_info("=" * 30)
 
     operation = get_file_operation_choice()
     dest_dir = ""
     if operation != "inplace":
         dest_dir = get_destination_path()
         if not dest_dir:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -1295,14 +1292,12 @@ def grayscale_conversion(hq_folder, lq_folder):
                 src_path, output_path=dest_path, operation=operation
             )
             if not success:
-                print(f"Error converting {label} {filename}: {msg}")
-    print("Grayscale conversion complete.")
+                print_error(f"Error converting {label} {filename}: {msg}")
+    print_success("Grayscale conversion complete.")
 
 
 def remove_small_image_pairs(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Removing Small Image Pairs")
-    print("=" * 30)
+    print_header("Removing Small Image Pairs", "=", Mocha.lavender)
 
     while True:
         try:
@@ -1310,23 +1305,27 @@ def remove_small_image_pairs(hq_folder, lq_folder):
             if min_size >= 0:
                 break
             else:
-                print("Please enter a non-negative integer.")
+                print_warning("Please enter a non-negative integer.")
         except ValueError:
-            print("Invalid input. Please enter an integer.")
+            print_warning("Invalid input. Please enter an integer.")
 
     operation = get_file_operation_choice()
     destination = ""
     if operation == "move":
         destination = get_destination_path()
         if not destination:
-            print("Operation aborted as no destination path was provided for move.")
+            print_warning(
+                "Operation aborted as no destination path was provided for move."
+            )
             return
         os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
         os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
     elif operation == "copy":
         destination = get_destination_path()
         if not destination:
-            print("Operation aborted as no destination path was provided for copy.")
+            print_warning(
+                "Operation aborted as no destination path was provided for copy."
+            )
             return
         os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
         os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
@@ -1346,7 +1345,7 @@ def remove_small_image_pairs(hq_folder, lq_folder):
     hq_files_set = set(os.listdir(hq_folder))
     matching_files = [f for f in lq_files if f in hq_files_set and is_image_file(f)]
 
-    print(f"Checking {len(matching_files)} HQ/LQ pairs...")
+    print_info(f"Checking {len(matching_files)} HQ/LQ pairs...")
 
     for filename in tqdm(matching_files, desc="Processing Small Pairs"):
         lq_path = os.path.join(lq_folder, filename)
@@ -1394,28 +1393,28 @@ def remove_small_image_pairs(hq_folder, lq_folder):
                 errors.append(f"Error {operation}ing {filename}: {e}")
                 logging.error(f"Error {operation}ing small pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Remove Small Pairs Summary")
-    print("-" * 30)
-    print(f"Checked {checked_count} pairs.")
-    print(
+    print_info("\n" + "-" * 30)
+    print_info("  Remove Small Pairs Summary")
+    print_info("-" * 30)
+    print_info(f"Checked {checked_count} pairs.")
+    print_info(
         f"Processed ({operation}ed) {removed_count} image pairs where either dimension was smaller than {min_size}."
     )
     if errors:
-        print(f"Errors encountered: {len(errors)}")
+        print_error(f"Errors encountered: {len(errors)}")
         for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-    print("-" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors.")
+    print_info("-" * 30)
     print("=" * 30)
 
 
 # --- Function from extract_val_random.py ---
 def extract_random_pairs(input_hq_folder, input_lq_folder):
-    print("\n" + "=" * 30)
-    print("  Extracting Random Image Pairs")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Extracting Random Image Pairs")
+    print_info("=" * 30)
 
     operation = get_file_operation_choice()
 
@@ -1423,7 +1422,7 @@ def extract_random_pairs(input_hq_folder, input_lq_folder):
     if operation != "inplace":
         output_base_dir = get_destination_path()
         if not output_base_dir:
-            print(
+            print_warning(
                 "Operation aborted as no destination path was provided for copy/move."
             )
             return
@@ -1437,9 +1436,9 @@ def extract_random_pairs(input_hq_folder, input_lq_folder):
             if num_pairs > 0:
                 break
             else:
-                print("Please enter a positive number.")
+                print_warning("Please enter a positive number.")
         except ValueError:
-            print("Invalid input. Please enter an integer.")
+            print_warning("Invalid input. Please enter an integer.")
 
     hq_files = [
         f
@@ -1455,13 +1454,13 @@ def extract_random_pairs(input_hq_folder, input_lq_folder):
     available_pairs = [f for f in hq_files if f in lq_files]
 
     if len(available_pairs) < num_pairs:
-        print(
+        print_warning(
             f"Warning: Only {len(available_pairs)} matching HQ/LQ pairs found, which is less than the requested {num_pairs} pairs. Extracting {len(available_pairs)} pairs instead."
         )
         num_pairs = len(available_pairs)
 
     if num_pairs == 0:
-        print("No pairs to process. Exiting.")
+        print_warning("No pairs to process. Exiting.")
         return
 
     selected_files = random.sample(available_pairs, num_pairs)
@@ -1471,11 +1470,11 @@ def extract_random_pairs(input_hq_folder, input_lq_folder):
         output_lq_dir = os.path.join(output_base_dir, "lq")
         os.makedirs(output_hq_dir, exist_ok=True)
         os.makedirs(output_lq_dir, exist_ok=True)
-        print(
+        print_info(
             f"Processing {num_pairs} random pairs to {output_base_dir} using {operation}..."
         )
     else:
-        print(
+        print_info(
             f"Selected {num_pairs} random pairs. 'Inplace' operation means no files will be moved or copied."
         )
 
@@ -1515,36 +1514,36 @@ def extract_random_pairs(input_hq_folder, input_lq_folder):
         except Exception as e:
             errors.append(f"Error {operation}ing pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Extract Random Pairs Summary")
-    print("-" * 30)
-    print(f"Requested pairs for extraction: {num_pairs}")
+    print_info("\n" + "-" * 30)
+    print_info("  Extract Random Pairs Summary")
+    print_info("-" * 30)
+    print_info(f"Requested pairs for extraction: {num_pairs}")
     if operation != "inplace":
-        print(f"Successfully {operation}d: {processed_count} pairs.")
+        print_info(f"Successfully {operation}d: {processed_count} pairs.")
     else:
-        print(
+        print_info(
             f"Successfully selected: {processed_count} pairs (no files moved/copied due to 'inplace')."
         )
 
     if errors:
-        print(f"Errors encountered during file operations: {len(errors)}")
+        print_error(f"Errors encountered during file operations: {len(errors)}")
         for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more issues.")
+            print_error(f"  ... and {len(errors) - 5} more issues.")
     if operation == "inplace":
-        print(
+        print_info(
             "Note: 'Inplace' operation for extraction means no files were moved or copied, only selected."
         )
-    print("-" * 30)
-    print("=" * 30)
+    print_info("-" * 30)
+    print_info("=" * 30)
 
 
 # --- Functions from shuffle_images.py ---
 def shuffle_image_pairs(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Shuffling Image Pairs (with Renaming)")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Shuffling Image Pairs (with Renaming)")
+    print_info("=" * 30)
 
     hq_files_list = sorted(
         [
@@ -1564,11 +1563,11 @@ def shuffle_image_pairs(hq_folder, lq_folder):
     matching_files = [f for f in hq_files_list if f in lq_files_list]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found to shuffle.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found to shuffle.")
+        print_info("=" * 30)
         return
 
-    print(f"Found {len(matching_files)} matching pairs to shuffle and rename.")
+    print_info(f"Found {len(matching_files)} matching pairs to shuffle and rename.")
 
     operation = get_file_operation_choice()  # copy, move, inplace
 
@@ -1589,7 +1588,7 @@ def shuffle_image_pairs(hq_folder, lq_folder):
         )
 
         if not output_base_dir:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -1601,11 +1600,11 @@ def shuffle_image_pairs(hq_folder, lq_folder):
         output_lq_dir = os.path.join(output_base_dir, "lq")
         os.makedirs(output_hq_dir, exist_ok=True)
         os.makedirs(output_lq_dir, exist_ok=True)
-        print(
+        print_info(
             f"Shuffled pairs will be {operation}d and renamed in: {output_hq_dir} and {output_lq_dir}"
         )
     else:
-        print("Shuffling and renaming files in-place within original folders.")
+        print_info("Shuffling and renaming files in-place within original folders.")
 
     # Create pairs: (original_filename, extension)
     # This ensures that if we shuffle, the extension is tied to the original file.
@@ -1633,7 +1632,7 @@ def shuffle_image_pairs(hq_folder, lq_folder):
     # This list will hold info about files in their (potentially new) locations before final renaming.
     files_in_final_location_for_renaming = []
 
-    print(f"\nStage 1: Preparing files for shuffling ({operation})...")
+    print_info(f"\nStage 1: Preparing files for shuffling ({operation})...")
     if operation == "inplace":
         # Rename to temporary names in source folders
         for idx, pair_info in enumerate(
@@ -1761,7 +1760,7 @@ def shuffle_image_pairs(hq_folder, lq_folder):
                 )
 
     # --- Stage 2: Rename files (which are now in their final folders) to new sequential shuffled names ---
-    print(f"\nStage 2: Renaming files to final shuffled order...")
+    print_info(f"\nStage 2: Renaming files to final shuffled order...")
     # `files_in_final_location_for_renaming` now contains paths to files that are
     # either temp-named (inplace) or copied/moved to destination with original-ish names.
     # The order of this list corresponds to the shuffled order.
@@ -1815,36 +1814,36 @@ def shuffle_image_pairs(hq_folder, lq_folder):
     # Cleanup: Remove original files if operation was 'move' and it was done in stages (not directly relevant here as move is to new name)
     # The current logic for 'move' already puts it in the final place with a temp/original name.
 
-    print("\n" + "-" * 30)
-    print("  Shuffle Image Pairs Summary")
-    print("-" * 30)
-    print(f"Total matching pairs considered: {len(matching_files)}")
-    print(f"Successfully processed (shuffled & renamed): {processed_count} pairs.")
+    print_info("\n" + "-" * 30)
+    print_info("  Shuffle Image Pairs Summary")
+    print_info("-" * 30)
+    print_info(f"Total matching pairs considered: {len(matching_files)}")
+    print_info(f"Successfully processed (shuffled & renamed): {processed_count} pairs.")
     if operation == "inplace":
-        print(f"  Files were renamed in-place in {hq_folder} and {lq_folder}.")
+        print_info(f"  Files were renamed in-place in {hq_folder} and {lq_folder}.")
     else:
-        print(
+        print_info(
             f"  Files were {operation}d and renamed in {output_hq_dir} and {output_lq_dir}."
         )
 
     if errors:
-        print(f"Errors encountered: {len(errors)}")
+        print_error(f"Errors encountered: {len(errors)}")
         for i, error_msg in enumerate(
             errors[: min(len(errors), 10)]
         ):  # Show more errors if many
-            print(f"  - {error_msg}")
+            print_error(f"  - {error_msg}")
         if len(errors) > 10:
-            print(
+            print_error(
                 f"  ... and {len(errors) - 10} more issues (check log if detailed logging was added)."
             )
-    print("-" * 30)
-    print("=" * 30)
+    print_info("-" * 30)
+    print_info("=" * 30)
 
 
 def transform_dataset(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Transforming Dataset")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Transforming Dataset")
+    print_info("=" * 30)
 
     BATCH_SIZE = 1000  # Process this many pairs at a time
 
@@ -1865,14 +1864,14 @@ def transform_dataset(hq_folder, lq_folder):
     matching_files = [f for f in hq_files_list if f in lq_files_list]
 
     if not matching_files:
-        print("No matching HQ/LQ pairs found for transformation.")
-        print("=" * 30)
+        print_warning("No matching HQ/LQ pairs found for transformation.")
+        print_info("=" * 30)
         return
 
     # Get subset of pairs to process
     files_to_process = get_pairs_to_process(matching_files, operation_name="transform")
     if not files_to_process:
-        print("=" * 30)
+        print_info("=" * 30)
         return
 
     num_selected_for_transform = len(files_to_process)
@@ -1888,9 +1887,9 @@ def transform_dataset(hq_folder, lq_folder):
         "8": "grayscale",
     }
 
-    print("\nSelect a transformation:")
+    print_info("\nSelect a transformation:")
     for key, value in transform_options.items():
-        print(f"  {key}. {value.replace('_', ' ').capitalize()}")
+        print_info(f"  {key}. {value.replace('_', ' ').capitalize()}")
 
     while True:
         transform_choice = input("Enter the number of your choice: ").strip()
@@ -1898,7 +1897,7 @@ def transform_dataset(hq_folder, lq_folder):
             selected_transform = transform_options[transform_choice]
             break
         else:
-            print("Invalid choice. Please enter a valid number.")
+            print_warning("Invalid choice. Please enter a valid number.")
 
     value = (
         None  # For transforms like flip/grayscale, value is not directly used from user
@@ -1913,9 +1912,9 @@ def transform_dataset(hq_folder, lq_folder):
                 if value >= 0:  # Allow 0 for some factors, e.g., brightness to black
                     break
                 else:
-                    print("Factor must be non-negative.")
+                    print_warning("Factor must be non-negative.")
             except ValueError:
-                print("Invalid input. Please enter a number.")
+                print_warning("Invalid input. Please enter a number.")
     elif selected_transform == "rotate":
         while True:
             try:
@@ -1925,7 +1924,7 @@ def transform_dataset(hq_folder, lq_folder):
                 value = float(val_str)  # Allow float angles
                 break
             except ValueError:
-                print("Invalid input. Please enter a number for angle.")
+                print_warning("Invalid input. Please enter a number for angle.")
 
     operation = get_file_operation_choice()
 
@@ -1941,7 +1940,7 @@ def transform_dataset(hq_folder, lq_folder):
             else get_destination_path()
         )
         if not output_base_dir:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -1955,7 +1954,7 @@ def transform_dataset(hq_folder, lq_folder):
         )
         os.makedirs(destination_hq_folder, exist_ok=True)
         os.makedirs(destination_lq_folder, exist_ok=True)
-        print(
+        print_info(
             f"Transformed pairs will be {operation}d to respective subfolders in {output_base_dir}"
         )
     else:
@@ -1973,7 +1972,9 @@ def transform_dataset(hq_folder, lq_folder):
     # Batching loop
     for batch_start in range(0, len(files_to_process), BATCH_SIZE):
         batch = files_to_process[batch_start : batch_start + BATCH_SIZE]
-        print(f"Processing batch {batch_start//BATCH_SIZE+1} ({len(batch)} pairs)...")
+        print_info(
+            f"Processing batch {batch_start//BATCH_SIZE+1} ({len(batch)} pairs)..."
+        )
         for filename in tqdm(
             batch,
             desc=f"Transforming Pairs ({selected_transform}) [Batch {batch_start//BATCH_SIZE+1}]",
@@ -2035,33 +2036,35 @@ def transform_dataset(hq_folder, lq_folder):
                     f"Failed to fully transform pair {filename}. HQ status: {hq_success}, LQ status: {lq_success}"
                 )
 
-    print("\n" + "-" * 30)
-    print("  Transform Dataset Summary")
-    print("-" * 30)
-    print(
+    print_info("\n" + "-" * 30)
+    print_info("  Transform Dataset Summary")
+    print_info("-" * 30)
+    print_info(
         f"Transformation: {selected_transform} (Value: {value if value is not None else 'N/A'})"
     )
-    print(f"Operation: {operation.capitalize()}")
-    print(f"Total matching pairs in source: {len(matching_files)}")
-    print(f"Number of pairs selected for transformation: {num_selected_for_transform}")
-    print(f"Successfully transformed: {processed_count} pairs.")
+    print_info(f"Operation: {operation.capitalize()}")
+    print_info(f"Total matching pairs in source: {len(matching_files)}")
+    print_info(
+        f"Number of pairs selected for transformation: {num_selected_for_transform}"
+    )
+    print_info(f"Successfully transformed: {processed_count} pairs.")
     if errors:
-        print(f"Errors or partial failures encountered for {len(errors)} pairs:")
+        print_error(f"Errors or partial failures encountered for {len(errors)} pairs:")
         for i, error_msg in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error_msg}")
+            print_error(f"  - {error_msg}")
         if len(errors) > 5:
-            print(
+            print_error(
                 f"  ... and {len(errors) - 5} more issues (check console/log for details)."
             )
-    print("-" * 30)
-    print("=" * 30)
+    print_info("-" * 30)
+    print_info("=" * 30)
 
 
 def dataset_colour_adjustment(hq_folder, lq_folder):
     """Adjust color properties of HQ/LQ images using ColorAdjuster class."""
-    print("\n" + "=" * 30)
-    print("  Dataset Color Adjustment")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Dataset Color Adjustment")
+    print_info("=" * 30)
 
     adjustment_type = (
         input("Enter adjustment type (brightness/contrast/color/sharpness): ")
@@ -2071,14 +2074,14 @@ def dataset_colour_adjustment(hq_folder, lq_folder):
     try:
         factor = float(input("Enter adjustment factor (e.g., 1.2 for +20%): ").strip())
     except Exception:
-        print("Invalid factor. Aborting.")
+        print_warning("Invalid factor. Aborting.")
         return
     operation = get_file_operation_choice()
     dest_dir = ""
     if operation != "inplace":
         dest_dir = get_destination_path()
         if not dest_dir:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -2102,22 +2105,22 @@ def dataset_colour_adjustment(hq_folder, lq_folder):
                 src_path, output_path=dest_path, operation=operation
             )
             if not success:
-                print(f"Error adjusting {label} {filename}: {msg}")
-    print("Adjustment complete.")
+                print_error(f"Error adjusting {label} {filename}: {msg}")
+    print_success("Adjustment complete.")
 
 
 def grayscale_conversion(hq_folder, lq_folder):
     """Convert HQ/LQ images to grayscale using ColorAdjuster class."""
-    print("\n" + "=" * 30)
-    print("  Grayscale Conversion")
-    print("=" * 30)
+    print_info("\n" + "=" * 30)
+    print_info("  Grayscale Conversion")
+    print_info("=" * 30)
 
     operation = get_file_operation_choice()
     dest_dir = ""
     if operation != "inplace":
         dest_dir = get_destination_path()
         if not dest_dir:
-            print(
+            print_warning(
                 f"Operation aborted as no destination path was provided for {operation}."
             )
             return
@@ -2142,14 +2145,12 @@ def grayscale_conversion(hq_folder, lq_folder):
                 src_path, output_path=dest_path, operation=operation
             )
             if not success:
-                print(f"Error converting {label} {filename}: {msg}")
-    print("Grayscale conversion complete.")
+                print_error(f"Error converting {label} {filename}: {msg}")
+    print_success("Grayscale conversion complete.")
 
 
 def remove_small_image_pairs(hq_folder, lq_folder):
-    print("\n" + "=" * 30)
-    print("  Removing Small Image Pairs")
-    print("=" * 30)
+    print_header("Removing Small Image Pairs", "=", Mocha.lavender)
 
     while True:
         try:
@@ -2157,23 +2158,27 @@ def remove_small_image_pairs(hq_folder, lq_folder):
             if min_size >= 0:
                 break
             else:
-                print("Please enter a non-negative integer.")
+                print_warning("Please enter a non-negative integer.")
         except ValueError:
-            print("Invalid input. Please enter an integer.")
+            print_warning("Invalid input. Please enter an integer.")
 
     operation = get_file_operation_choice()
     destination = ""
     if operation == "move":
         destination = get_destination_path()
         if not destination:
-            print("Operation aborted as no destination path was provided for move.")
+            print_warning(
+                "Operation aborted as no destination path was provided for move."
+            )
             return
         os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
         os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
     elif operation == "copy":
         destination = get_destination_path()
         if not destination:
-            print("Operation aborted as no destination path was provided for copy.")
+            print_warning(
+                "Operation aborted as no destination path was provided for copy."
+            )
             return
         os.makedirs(os.path.join(destination, "hq"), exist_ok=True)
         os.makedirs(os.path.join(destination, "lq"), exist_ok=True)
@@ -2193,7 +2198,7 @@ def remove_small_image_pairs(hq_folder, lq_folder):
     hq_files_set = set(os.listdir(hq_folder))
     matching_files = [f for f in lq_files if f in hq_files_set and is_image_file(f)]
 
-    print(f"Checking {len(matching_files)} HQ/LQ pairs...")
+    print_info(f"Checking {len(matching_files)} HQ/LQ pairs...")
 
     for filename in tqdm(matching_files, desc="Processing Small Pairs"):
         lq_path = os.path.join(lq_folder, filename)
@@ -2241,43 +2246,45 @@ def remove_small_image_pairs(hq_folder, lq_folder):
                 errors.append(f"Error {operation}ing {filename}: {e}")
                 logging.error(f"Error {operation}ing small pair {filename}: {e}")
 
-    print("\n" + "-" * 30)
-    print("  Remove Small Pairs Summary")
-    print("-" * 30)
-    print(f"Checked {checked_count} pairs.")
-    print(
+    print_info("\n" + "-" * 30)
+    print_info("  Remove Small Pairs Summary")
+    print_info("-" * 30)
+    print_info(f"Checked {checked_count} pairs.")
+    print_info(
         f"Processed ({operation}ed) {removed_count} image pairs where either dimension was smaller than {min_size}."
     )
     if errors:
-        print(f"Errors encountered: {len(errors)}")
+        print_error(f"Errors encountered: {len(errors)}")
         for i, error in enumerate(errors[: min(len(errors), 5)]):
-            print(f"  - {error}")
+            print_error(f"  - {error}")
         if len(errors) > 5:
-            print(f"  ... and {len(errors) - 5} more errors.")
-    print("-" * 30)
+            print_error(f"  ... and {len(errors) - 5} more errors.")
+    print_info("-" * 30)
     print("=" * 30)
 
 
 def split_adjust_dataset(hq_folder, lq_folder):
-    print("\nSplit/Adjust Dataset Options:")
-    print(
+    print_info("\nSplit/Adjust Dataset Options:")
+    print_info(
         "  1. Split dataset in half (moves/copies to subfolders 'split_1', 'split_2')"
     )
-    print(
+    print_info(
         "  2. Remove pairs by count or percentage (deletes or moves/copies to 'removed')"
     )
-    print("  3. Remove pairs by file size (deletes or moves/copies to 'size_criteria')")
-    print(
+    print_info(
+        "  3. Remove pairs by file size (deletes or moves/copies to 'size_criteria')"
+    )
+    print_info(
         "  4. Remove pairs by dimensions (deletes or moves/copies to 'dimension_criteria')"
     )
-    print(
+    print_info(
         "  5. Remove pairs by file type (deletes or moves/copies to 'filetype_criteria')"
     )
-    print("  6. Back to main menu")
-    print(
+    print_info("  6. Back to main menu")
+    print_info(
         "  7. Split single folder by custom percentages (comma-separated, e.g. 60,20,20)"
     )
-    print("  8. Umzi's DPID Downscaler (pepedpid)")
+    print_info("  8. Umzi's DPID Downscaler (pepedpid)")
     method = input("Enter method number (default 1): ").strip() or "1"
     if method != "7" and method != "8":
         # ... existing code for other methods ...
@@ -2285,14 +2292,14 @@ def split_adjust_dataset(hq_folder, lq_folder):
     if method == "7":
         from dataset_forge import dpid_phhofm
 
-        print("Phhofm's DPID Downscaler selected.")
+        print_info("Phhofm's DPID Downscaler selected.")
         # ... existing code for Phhofm ...
         return
     if method == "8":
-        print("Umzi's DPID Downscaler selected.")
-        print("Choose mode:")
-        print("  1. Single folder")
-        print("  2. HQ/LQ paired folders (preserve alignment)")
+        print_info("Umzi's DPID Downscaler selected.")
+        print_info("Choose mode:")
+        print_info("  1. Single folder")
+        print_info("  2. HQ/LQ paired folders (preserve alignment)")
         mode = input("Select mode (1=single, 2=pair): ").strip()
         if mode == "2":
             hq_folder = input("Enter HQ folder path: ").strip()

@@ -8,7 +8,7 @@ from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import print_success, print_info, print_warning, print_error
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -20,18 +20,18 @@ class DatasetOperation(ABC):
 
 class DatasetCombiner(DatasetOperation):
     def run(self):
-        print("\n" + "=" * 30)
-        print("  Combine Multiple Datasets (Pairwise HQ/LQ)")
-        print("=" * 30)
+        print_info("\n" + "=" * 30)
+        print_info("  Combine Multiple Datasets (Pairwise HQ/LQ)")
+        print_info("=" * 30)
 
         sources = []
-        print(
+        print_info(
             "Enter paths to SOURCE dataset ROOTS. Each root must contain 'hq' and 'lq' subfolders."
         )
-        print(
+        print_info(
             "These 'hq' and 'lq' subfolders will be combined into a NEW destination's 'hq' and 'lq'."
         )
-        print("Enter a blank path when you are finished adding sources.")
+        print_info("Enter a blank path when you are finished adding sources.")
 
         while True:
             src_root_path = input(
@@ -39,12 +39,12 @@ class DatasetCombiner(DatasetOperation):
             ).strip()
             if not src_root_path:
                 if not sources:  # No sources added yet
-                    print("No sources added. Aborting combine operation.")
+                    print_warning("No sources added. Aborting combine operation.")
                     return
                 break  # Finished adding sources
 
             if not os.path.isdir(src_root_path):
-                print(
+                print_error(
                     f"  Error: '{src_root_path}' is not a valid directory. Please try again."
                 )
                 continue
@@ -53,19 +53,19 @@ class DatasetCombiner(DatasetOperation):
             src_lq_path = os.path.join(src_root_path, "lq")
 
             if not (os.path.isdir(src_hq_path) and os.path.isdir(src_lq_path)):
-                print(
+                print_error(
                     f"  Error: '{src_root_path}' must contain both 'hq' and 'lq' subfolders."
                 )
-                print(f"    Checked for: '{src_hq_path}' and '{src_lq_path}'")
+                print_info(f"    Checked for: '{src_hq_path}' and '{src_lq_path}'")
                 continue
 
             sources.append(
                 {"root": src_root_path, "hq": src_hq_path, "lq": src_lq_path}
             )
-            print(f"  Added source: {src_root_path}")
+            print_info(f"  Added source: {src_root_path}")
 
         if not sources:  # Should be caught earlier, but as a safeguard
-            print("No valid sources provided. Aborting combine operation.")
+            print_warning("No valid sources provided. Aborting combine operation.")
             return
 
         # Get operation: copy or move
@@ -75,15 +75,15 @@ class DatasetCombiner(DatasetOperation):
             )
             if operation in ["copy", "move"]:
                 break
-            print("Invalid operation. Please enter 'copy' or 'move'.")
+            print_error("Invalid operation. Please enter 'copy' or 'move'.")
 
         # Get destination root for the NEW combined dataset
         dest_root_prompt = "Enter path for the NEW combined dataset root directory: "
-        print(dest_root_prompt, end="")
+        print_info(dest_root_prompt, end="")
         dest_root = get_destination_path()
 
         if not dest_root:  # User left it blank or path creation failed
-            print("No valid destination root provided. Aborting combine operation.")
+            print_warning("No valid destination root provided. Aborting combine operation.")
             return
 
         # Create 'hq' and 'lq' subfolders in the destination root
@@ -93,22 +93,22 @@ class DatasetCombiner(DatasetOperation):
             os.makedirs(dest_combined_hq, exist_ok=True)
             os.makedirs(dest_combined_lq, exist_ok=True)
         except OSError as e:
-            print(f"Error creating destination subfolders in '{dest_root}': {e}")
+            print_error(f"Error creating destination subfolders in '{dest_root}': {e}")
             return
 
-        print(f"Combined HQ files will go to: {dest_combined_hq}")
-        print(f"Combined LQ files will go to: {dest_combined_lq}")
+        print_info(f"Combined HQ files will go to: {dest_combined_hq}")
+        print_info(f"Combined LQ files will go to: {dest_combined_lq}")
 
         total_pairs_processed = 0
         total_errors = 0
 
-        print(
+        print_info(
             f"\nStarting to {operation} files from {len(sources)} sources to {dest_root}..."
         )
 
         for src_info in sources:
             src_name = os.path.basename(src_info["root"])  # For progress bar
-            print(f"\nProcessing source: {src_info['root']} ({src_name})")
+            print_info(f"\nProcessing source: {src_info['root']} ({src_name})")
 
             try:
                 src_hq_files = set(
@@ -124,7 +124,7 @@ class DatasetCombiner(DatasetOperation):
                     and is_image_file(f)
                 )
             except FileNotFoundError:
-                print(
+                print_error(
                     f"  Error: Could not list files in hq/lq for source {src_info['root']}. Skipping this source."
                 )
                 total_errors += 1  # Count as a major error for the source
@@ -133,12 +133,12 @@ class DatasetCombiner(DatasetOperation):
             common_files_in_src = sorted(list(src_hq_files & src_lq_files))
 
             if not common_files_in_src:
-                print(
+                print_warning(
                     f"  No common HQ/LQ image pairs found in {src_info['root']}. Skipping."
                 )
                 continue
 
-            print(
+            print_info(
                 f"  Found {len(common_files_in_src)} HQ/LQ pairs to {operation} from this source."
             )
 
@@ -171,28 +171,28 @@ class DatasetCombiner(DatasetOperation):
                         shutil.move(src_lq_filepath, dest_lq_filepath)
                     total_pairs_processed += 1
                 except Exception as e_file_op:
-                    print(
+                    print_error(
                         f"Error {operation}ing pair '{fname}' from '{src_info['root']}': {e_file_op}"
                     )
                     current_source_errors += 1
                     total_errors += 1
 
             if current_source_errors > 0:
-                print(
+                print_warning(
                     f"  Encountered {current_source_errors} errors while processing files from {src_info['root']}."
                 )
 
-        print("\n" + "-" * 30)
-        print(f"  Combine Datasets Summary")
-        print("-" * 30)
-        print(f"Total source locations processed: {len(sources)}")
-        print(f"Total HQ/LQ pairs successfully {operation}d: {total_pairs_processed}")
-        print(f"Total errors during file operations: {total_errors}")
+        print_info("\n" + "-" * 30)
+        print_info(f"  Combine Datasets Summary")
+        print_info("-" * 30)
+        print_info(f"Total source locations processed: {len(sources)}")
+        print_info(f"Total HQ/LQ pairs successfully {operation}d: {total_pairs_processed}")
+        print_info(f"Total errors during file operations: {total_errors}")
         if total_errors > 0:
-            print("  Please check the console output or log for details on errors.")
-        print(f"Combined dataset is located in: {dest_root}")
-        print("-" * 30)
-        print("=" * 30)
+            print_warning("  Please check the console output or log for details on errors.")
+        print_info(f"Combined dataset is located in: {dest_root}")
+        print_info("-" * 30)
+        print_info("=" * 30)
         print_success("Dataset combination complete!")
         play_done_sound()
 

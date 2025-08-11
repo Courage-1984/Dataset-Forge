@@ -6,7 +6,7 @@ from dataset_forge.utils.progress_utils import tqdm
 from dataset_forge.utils.history_log import log_operation
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import print_success, print_error, print_info
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -36,7 +36,7 @@ def compute_hashes(folder, hash_func="phash"):
             with Image.open(fpath) as img:
                 hashes[fname] = func(img)
         except Exception as e:
-            print(f"Error hashing {fname}: {e}")
+            print_error(f"Error hashing {fname}: {e}")
     return hashes
 
 
@@ -94,7 +94,7 @@ def align_and_operate_on_pairs(
                 for p in [hq_path, lq_path]:
                     if os.path.exists(p):
                         os.remove(p)
-                        print(f"Deleted {p}")
+                        print_info(f"Deleted {p}")
             elif op in ("move", "copy"):
                 for src, dkey in zip([hq_path, lq_path], ["hq", "lq"]):
                     if os.path.exists(src):
@@ -102,10 +102,10 @@ def align_and_operate_on_pairs(
                         if op == "move":
                             os.makedirs(dest_dir[dkey], exist_ok=True)
                             os.rename(src, dest)
-                            print(f"Moved {src} -> {dest}")
+                            print_info(f"Moved {src} -> {dest}")
                         elif op == "copy":
                             os.makedirs(dest_dir[dkey], exist_ok=True)
                             import shutil
 
                             shutil.copy2(src, dest)
-                            print(f"Copied {src} -> {dest}")
+                            print_info(f"Copied {src} -> {dest}")

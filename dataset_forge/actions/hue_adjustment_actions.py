@@ -7,7 +7,7 @@ from dataset_forge.utils.file_utils import get_unique_filename
 from dataset_forge.utils.file_utils import is_image_file
 from dataset_forge.utils.monitoring import monitor_all, task_registry
 from dataset_forge.utils.memory_utils import clear_memory, clear_cuda_cache
-from dataset_forge.utils.printing import print_success
+from dataset_forge.utils.printing import print_success, print_error
 from dataset_forge.utils.audio_utils import play_done_sound
 
 
@@ -70,13 +70,13 @@ def process_folder(
         img_path = os.path.join(input_folder, filename)
         img = cv2.imread(img_path)
         if img is None:
-            print(f"Failed to read {img_path}")
+            print_error(f"Failed to read {img_path}")
             continue
         if paired_lq_folder and paired_output_lq_folder:
             lq_path = os.path.join(paired_lq_folder, filename)
             lq_img = cv2.imread(lq_path)
             if lq_img is None:
-                print(f"Failed to read {lq_path}")
+                print_error(f"Failed to read {lq_path}")
                 continue
         for i in range(duplicates):
             # Randomize adjustments if duplicates > 1

@@ -69,7 +69,13 @@ def cache_management_menu():
 
     while True:
         try:
-            key = show_menu("Cache Management", options, Mocha.lavender, current_menu="Cache Management", menu_context=menu_context)
+            key = show_menu(
+                "Cache Management",
+                options,
+                Mocha.lavender,
+                current_menu="Cache Management",
+                menu_context=menu_context,
+            )
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -150,7 +156,13 @@ def clear_caches_menu():
 
     while True:
         try:
-            key = show_menu("Clear Caches", options, Mocha.lavender, current_menu="Clear Caches", menu_context=menu_context)
+            key = show_menu(
+                "Clear Caches",
+                options,
+                Mocha.lavender,
+                current_menu="Clear Caches",
+                menu_context=menu_context,
+            )
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -379,7 +391,13 @@ def cache_maintenance_menu():
 
     while True:
         try:
-            key = show_menu("Cache Maintenance", options, Mocha.lavender, current_menu="Cache Maintenance", menu_context=menu_context)
+            key = show_menu(
+                "Cache Maintenance",
+                options,
+                Mocha.lavender,
+                current_menu="Cache Maintenance",
+                menu_context=menu_context,
+            )
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -550,7 +568,13 @@ def cache_warmup_menu():
 
     while True:
         try:
-            key = show_menu("Cache Warmup", options, Mocha.lavender, current_menu="Cache Warmup", menu_context=menu_context)
+            key = show_menu(
+                "Cache Warmup",
+                options,
+                Mocha.lavender,
+                current_menu="Cache Warmup",
+                menu_context=menu_context,
+            )
             if key is None or key == "0":
                 break
             action = options[key][1]
@@ -649,40 +673,40 @@ def show_cache_documentation():
     print_section("📋 Cache Documentation")
 
     print_info("Dataset Forge Advanced Caching System")
-    print("=" * 60)
+    print_header("", char="=", color=Mocha.lavender)
 
     print_info("Cache Types:")
-    print("-" * 30)
-    print("🧠 In-Memory Cache: Fast, session-only results")
-    print("💾 Disk Cache: Persistent, cross-session results")
-    print("🤖 Model Cache: Specialized for model loading")
-    print("🧠 Smart Cache: Auto-detects best strategy")
+    print_header("", char="-", color=Mocha.lavender)
+    print_info("🧠 In-Memory Cache: Fast, session-only results")
+    print_info("💾 Disk Cache: Persistent, cross-session results")
+    print_info("🤖 Model Cache: Specialized for model loading")
+    print_info("🧠 Smart Cache: Auto-detects best strategy")
 
-    print()
+    print_info("")
     print_info("Usage Examples:")
-    print("-" * 30)
-    print("@in_memory_cache(maxsize=128, ttl_seconds=3600)")
-    print("@disk_cache(compression=True, ttl_seconds=86400)")
-    print("@model_cache(maxsize=10)")
-    print("@smart_cache(cache_type='auto')")
+    print_header("", char="-", color=Mocha.lavender)
+    print_info("@in_memory_cache(maxsize=128, ttl_seconds=3600)")
+    print_info("@disk_cache(compression=True, ttl_seconds=86400)")
+    print_info("@model_cache(maxsize=10)")
+    print_info("@smart_cache(cache_type='auto')")
 
-    print()
+    print_info("")
     print_info("Cache Management:")
-    print("-" * 30)
-    print("• View statistics and performance metrics")
-    print("• Clear specific cache types")
-    print("• Export cache data for analysis")
-    print("• Validate and repair cache integrity")
-    print("• Warm up cache for better performance")
+    print_header("", char="-", color=Mocha.lavender)
+    print_info("• View statistics and performance metrics")
+    print_info("• Clear specific cache types")
+    print_info("• Export cache data for analysis")
+    print_info("• Validate and repair cache integrity")
+    print_info("• Warm up cache for better performance")
 
-    print()
+    print_info("")
     print_info("Best Practices:")
-    print("-" * 30)
-    print("• Use in-memory cache for frequently accessed data")
-    print("• Use disk cache for expensive computations")
-    print("• Use model cache for model loading operations")
-    print("• Monitor cache performance regularly")
-    print("• Clear caches when disk space is low")
+    print_header("", char="-", color=Mocha.lavender)
+    print_info("• Use in-memory cache for frequently accessed data")
+    print_info("• Use disk cache for expensive computations")
+    print_info("• Use model cache for model loading operations")
+    print_info("• Monitor cache performance regularly")
+    print_info("• Clear caches when disk space is low")
 
     print_prompt("Press Enter to return to the menu...")
     input()

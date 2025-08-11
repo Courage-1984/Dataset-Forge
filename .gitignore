@@ -53,7 +53,7 @@ reports/*.md
 store/
 results/
 logs/
-test_datasets/
+# test_datasets/
 OpenModelDB/
 
 # =============================

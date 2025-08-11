@@ -240,11 +240,14 @@ class MochaThemingChecker:
                         ):
                             has_mocha_import = True
                 elif isinstance(node, ast.ImportFrom):
-                    if "dataset_forge.utils.color" in getattr(node.module, "value", ""):
+                    module_name = getattr(node.module, "value", "")
+                    if "dataset_forge.utils.color" in module_name:
                         has_mocha_import = True
-                    elif "dataset_forge.utils.printing" in getattr(
-                        node.module, "value", ""
-                    ):
+                        # Also check if Mocha is specifically imported
+                        for alias in node.names:
+                            if alias.name == "Mocha":
+                                has_mocha_import = True
+                    elif "dataset_forge.utils.printing" in module_name:
                         has_printing_imports = True
         except SyntaxError:
             issues.append(
@@ -290,7 +293,14 @@ class MochaThemingChecker:
 
             # Check for Mocha color usage
             if "Mocha." in line:
-                if not has_mocha_import:
+                # Skip test files and utility files that appropriately don't need Mocha imports
+                file_str = str(file_path)
+                if (
+                    not has_mocha_import
+                    and not file_str.endswith("test_emoji_utils.py")  # Test file
+                    and not file_str.endswith("printing.py")  # Centralized utility
+                    and not file_str.endswith("color.py")  # Color utility
+                ):
                     issues.append(
                         ThemingIssue(
                             file_path=str(file_path),

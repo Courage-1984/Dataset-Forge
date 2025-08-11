@@ -19,6 +19,7 @@ from dataset_forge.utils.printing import (
     print_prompt,
 )
 from dataset_forge.utils.audio_utils import play_shutdown_sound
+from dataset_forge.utils.color import Mocha
 
 
 def show_global_help(
@@ -27,7 +28,7 @@ def show_global_help(
     pause: bool = True,
 ) -> None:
     """Show context-aware help for the current menu."""
-    print_header("Help", char="=", color="")
+    print_header("Help", char="=", color=Mocha.mauve)
     
     if menu_context:
         print_info(f"Menu: {current_menu}")
@@ -55,7 +56,7 @@ def show_global_help(
     print_info("  Ctrl+C - Emergency exit")
     
     if pause:
-        input("\nPress Enter to continue...")
+        input(f"\n{Mocha.lavender}Press Enter to continue...{Mocha.reset}")
 
 
 def handle_global_command(
