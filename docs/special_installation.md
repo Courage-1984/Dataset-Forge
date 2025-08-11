@@ -506,7 +506,7 @@ python-magic's dll's & .mgc magicfile
 
 _run.bat contains CUDA & Pytorch optimization settings_
 
-### Step 2: Be Sure `venv312` has cuda torch installed
+### Step 2: Be Sure your `venv312` has cuda torch installed
 
 1. See [Getting Started](getting_started.md#-installation) for:
 
@@ -514,44 +514,54 @@ _run.bat contains CUDA & Pytorch optimization settings_
 
 ### Step 3: Windows Pagefile
 
-1. lorem ipsum
-2. lorem ipsum
-3. lorem ipsum
+1. Press the Windows key + R to open the Run dialog box.
 
-Press the Windows key + R to open the Run dialog box.
+Type `SystemPropertiesAdvanced.exe` and press Enter.
 
-Type SystemPropertiesAdvanced.exe and press Enter.
+2. Where to go:
 
-Performance section
+**Performance** section
 click
-Settings...
-Advanced tab
-Virtual Memory section
+`Settings...`
+**Advanced** tab
+**Virtual Memory** section
 click
-Change
-check
-Custom Size
+`Change`
+check **"Custom Size"**:
 radio button
-Initial size
-1.5 x your totall RAM
-Maximum size
-3 x your totall RAM
-click OK
-Restart Windows
+**Initial size**
+
+> 1.5 x your totall RAM for
+> **Maximum size**
+> 3 x your totall RAM
+> click `OK`
+> Restart Windows
 
 ### Step 4: NVIDIA Control Panel
 
-1. Right Click Desktop
+1. Right Click Desktop:
+
 click
-NVIDIA Control Panel
-Manage 3D settings
+**NVIDIA Control Panel**
+**Manage 3D settings** > **Program Settings**
+Add:
+Full path to your
+`venv312`'s `python.exe`
+like
+`C:/Users/username/github/Dataset-Forge/venv312/Scripts/python.exe`
+then change these settings:
+**CUDA - GPUs**:
 
-2. lorem ipsum
-3. lorem ipsum
-
-### Step 5: `venv312`'s `python.exe`
-
-1. lorem ipsum
+> All
+> **CUDA - Sysmem Fallback Policy**:
+> Prefer No Sysmem Fallback
+> **Power management mode**:
+> Prefer maximum performance
+> **Texture filtering - Quality**:
+> High performance
+> **Threaded optimization**:
+> On
+> click **Apply**
 
 ---
 

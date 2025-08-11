@@ -77,20 +77,32 @@ def dataset_creation_menu():
 
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Create new datasets from various sources and formats",
-        "Options": "4 creation methods available",
+        "Purpose": "Create datasets from various sources - build your image dataset from existing files, videos, or images",
+        "Total Options": "4 creation methods",
         "Navigation": "Use numbers 1-4 to select, 0 to go back",
         "Key Features": [
-            "📁 Create from Source Folder - Build dataset from existing image folder",
-            "🎬 Create from Video - Extract frames from video files",
-            "🖼️ Create from Images - Build dataset from individual images",
-            "⚡ Advanced Preprocessing - Umzi's specialized preprocessing tools",
+            "📁 Create from Source Folder - Extract images from an existing folder structure",
+            "🎬 Create from Video - Extract frames from video files to create image datasets",
+            "🖼️ Create from Images - Build dataset from individual image files",
+            "⚡ Advanced Creation - Specialized creation methods for specific use cases",
         ],
         "Tips": [
-            "Source Folder is best for existing image collections",
-            "Video extraction is great for creating training datasets",
-            "Individual images work well for custom datasets",
-            "Advanced Preprocessing offers specialized tools for complex workflows",
+            "📁 Source Folder: Best for existing image collections with organized structure",
+            "🎬 Video Extraction: Great for creating datasets from video content (movies, recordings)",
+            "🖼️ Individual Images: Use when you have scattered image files to organize",
+            "⚡ Advanced: Provides specialized tools for specific ML and research tasks",
+        ],
+        "Usage Examples": [
+            "📁 From folder: Select source folder → Choose output location → Set options → Process",
+            "🎬 From video: Select video file → Set frame rate → Choose output folder → Extract frames",
+            "🖼️ From images: Select image files → Choose organization method → Create dataset",
+            "⚡ Advanced: Choose specialized method → Configure parameters → Execute creation",
+        ],
+        "Performance Notes": [
+            "💾 Large folders: Use chunked processing to avoid memory issues",
+            "🎬 Video processing: Frame extraction can be time-consuming for long videos",
+            "🖼️ Image organization: Ensure consistent naming for better dataset structure",
+            "⚡ Advanced methods: May require specific dependencies or configurations",
         ],
     }
 
@@ -456,24 +468,40 @@ def dataset_management_menu():
 
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Comprehensive dataset creation, organization, and management tools",
+        "Purpose": "Comprehensive dataset creation, organization, and management tools - build and maintain your image datasets",
         "Total Options": "7 main categories",
         "Navigation": "Use numbers 1-7 to select, 0 to go back",
         "Key Features": [
             "📁 Dataset Creation - Build datasets from various sources (folders, videos, images)",
-            "🔄 Dataset Operations - Combine, split, and manage existing datasets",
-            "🔗 HQ/LQ Management - Handle high/low quality image pairs",
-            "🧹 Dataset Cleanup - Remove duplicates, organize files, batch operations",
-            "🎯 Image Alignment - Batch projective alignment for image pairs",
-            "📊 Dataset Analysis - Assess dataset quality and health metrics",
-            "⚡ Advanced Preprocessing - Umzi's specialized preprocessing tools",
+            "🔄 Dataset Operations - Combine multiple datasets or split existing ones into subsets",
+            "🔗 HQ/LQ Management - Handle high-quality and low-quality image pairs for super-resolution",
+            "🧹 Dataset Cleanup - Remove duplicates, organize files, and maintain dataset hygiene",
+            "🎯 Image Alignment - Batch projective alignment for image pairs and sequences",
+            "📊 Dataset Analysis - Assess dataset quality, health, and characteristics",
+            "⚡ Advanced Preprocessing - Umzi's specialized preprocessing tools for ML workflows",
         ],
         "Tips": [
-            "Start with Dataset Creation for building new datasets from scratch",
-            "Use Dataset Cleanup to remove duplicates and organize files",
-            "HQ/LQ Management is essential for super-resolution training",
-            "Dataset Analysis helps identify quality issues before processing",
-            "Image Alignment ensures proper registration between image pairs",
+            "🎯 Start with Dataset Creation to build your first dataset from existing images",
+            "🔄 Use Dataset Operations to merge multiple datasets or create training/validation splits",
+            "🔗 HQ/LQ Management is essential for super-resolution and image restoration tasks",
+            "🧹 Always run Dataset Cleanup to remove duplicates and organize your data",
+            "🎯 Image Alignment helps ensure consistent positioning across image pairs",
+            "📊 Use Dataset Analysis to identify quality issues before training models",
+            "⚡ Advanced Preprocessing provides specialized tools for specific ML tasks",
+        ],
+        "Usage Examples": [
+            "📁 New dataset: 1 → Create from folder → Select source → Choose output location",
+            "🔄 Merge datasets: 2 → Combine datasets → Select folders → Choose merge strategy",
+            "🔗 HQ/LQ pairs: 3 → Create pairs → Set HQ folder → Set LQ folder → Validate pairs",
+            "🧹 Clean dataset: 4 → Remove duplicates → Choose method → Review results",
+            "🎯 Align images: 5 → Select pairs → Choose alignment method → Process batch",
+            "📊 Analyze quality: 6 → Run health check → Review metrics → Fix issues",
+        ],
+        "Performance Notes": [
+            "💾 Large datasets: Use chunked processing and monitor disk space",
+            "🔄 Batch operations: Process in smaller batches for better error recovery",
+            "📊 Analysis: Use sampling for quick previews on datasets >10k images",
+            "🔗 HQ/LQ pairs: Ensure consistent naming conventions for automatic pairing",
         ],
     }
 

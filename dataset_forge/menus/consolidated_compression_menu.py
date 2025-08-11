@@ -38,21 +38,37 @@ def consolidated_compression_menu():
 
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Comprehensive image and directory compression with multiple format support",
+        "Purpose": "Comprehensive image and directory compression with multiple format support - reduce file sizes while maintaining quality",
         "Total Options": "3 compression methods",
         "Navigation": "Use numbers 1-3 to select, 0 to go back",
         "Key Features": [
-            "🖼️ Individual Image Compression - Compress individual images with format options",
-            "📁 Directory Compression - Compress entire directories and folders",
-            "⚙️ Compression Settings - Configure quality, format, and advanced options",
+            "🖼️ Individual Image Compression - Compress individual images with format options and quality control",
+            "📁 Directory Compression - Compress entire directories and folders with batch processing",
+            "⚙️ Compression Settings - Configure quality, format, and advanced options for optimal results",
         ],
         "Tips": [
-            "Individual compression is best for selective image optimization",
-            "Directory compression processes entire folders efficiently",
-            "PNG offers lossless compression with Oxipng support",
-            "JPEG and WebP provide lossy compression with quality control",
-            "Always backup original files before compression",
-            "Use appropriate quality settings for your use case",
+            "🖼️ Individual compression is best for selective image optimization and quality control",
+            "📁 Directory compression processes entire folders efficiently with consistent settings",
+            "⚙️ PNG offers lossless compression with Oxipng support for maximum quality",
+            "⚙️ JPEG and WebP provide lossy compression with quality control for smaller files",
+            "💾 Always backup original files before compression operations",
+            "⚙️ Use appropriate quality settings based on your specific use case and requirements",
+        ],
+        "Usage Examples": [
+            "🖼️ Individual compression: 1 → Select images → Choose format → Set quality → Process",
+            "📁 Directory compression: 2 → Select input/output → Choose format → Set options → Process",
+            "⚙️ Settings configuration: 3 → View current settings → Modify parameters → Save changes",
+        ],
+        "Performance Notes": [
+            "💾 Large datasets: Use chunked processing to avoid memory issues",
+            "⚙️ Quality settings: Test on sample images before batch processing",
+            "📁 Directory processing: Monitor disk space during compression operations",
+            "🖼️ Format selection: PNG for quality, JPEG for size, WebP for modern compatibility",
+        ],
+        "Format Comparison": [
+            "🖼️ PNG: Lossless compression, best quality, larger file sizes",
+            "🖼️ JPEG: Lossy compression, good quality, smaller file sizes",
+            "🖼️ WebP: Modern format, excellent compression, good browser support",
         ],
     }
 

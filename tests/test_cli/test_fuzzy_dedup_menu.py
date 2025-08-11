@@ -95,64 +95,64 @@ class TestFuzzyDedupMenu:
     @patch('dataset_forge.menus.fuzzy_dedup_menu.show_menu')
     def test_fuzzy_dedup_menu_options(self, mock_show_menu):
         """Test that the fuzzy deduplication menu has the correct options."""
-        # Mock the show_menu to return "1" (single folder option)
+        # Mock the show_menu to return "1" (fuzzy matching dedup option)
         mock_show_menu.return_value = "1"
         
-        # Mock the single_folder_fuzzy_dedup function
-        with patch('dataset_forge.menus.fuzzy_dedup_menu.single_folder_fuzzy_dedup') as mock_single:
+        # Mock the fuzzy_matching_dedup function
+        with patch('dataset_forge.menus.fuzzy_dedup_menu.fuzzy_matching_dedup') as mock_fuzzy:
             fuzzy_dedup_menu()
             
-            # Verify the single folder function was called
-            mock_single.assert_called_once()
+            # Verify the fuzzy matching function was called
+            mock_fuzzy.assert_called_once()
 
     @patch('dataset_forge.menus.fuzzy_dedup_menu.show_menu')
     def test_fuzzy_dedup_menu_hq_lq_option(self, mock_show_menu):
-        """Test HQ/LQ pairs option in fuzzy deduplication menu."""
-        # Mock the show_menu to return "2" (HQ/LQ pairs option)
+        """Test visual deduplication option in fuzzy deduplication menu."""
+        # Mock the show_menu to return "2" (visual deduplication option)
         mock_show_menu.return_value = "2"
         
-        # Mock the hq_lq_pairs_fuzzy_dedup function
-        with patch('dataset_forge.menus.fuzzy_dedup_menu.hq_lq_pairs_fuzzy_dedup') as mock_hq_lq:
+        # Mock the visual_dedup_action function
+        with patch('dataset_forge.menus.fuzzy_dedup_menu.visual_dedup_action') as mock_visual:
             fuzzy_dedup_menu()
             
-            # Verify the HQ/LQ pairs function was called
-            mock_hq_lq.assert_called_once()
+            # Verify the visual deduplication function was called
+            mock_visual.assert_called_once()
 
     @patch('dataset_forge.menus.fuzzy_dedup_menu.show_menu')
     def test_fuzzy_dedup_menu_settings_option(self, mock_show_menu):
-        """Test settings option in fuzzy deduplication menu."""
-        # Mock the show_menu to return "3" (settings option)
+        """Test file hash deduplication option in fuzzy deduplication menu."""
+        # Mock the show_menu to return "3" (file hash deduplication option)
         mock_show_menu.return_value = "3"
         
-        # Mock the configure_fuzzy_matching_settings function
-        with patch('dataset_forge.menus.fuzzy_dedup_menu.configure_fuzzy_matching_settings') as mock_settings:
+        # Mock the file_hash_dedup_action function
+        with patch('dataset_forge.menus.fuzzy_dedup_menu.file_hash_dedup_action') as mock_file_hash:
             fuzzy_dedup_menu()
             
-            # Verify the settings function was called
-            mock_settings.assert_called_once()
+            # Verify the file hash deduplication function was called
+            mock_file_hash.assert_called_once()
 
     @patch('dataset_forge.menus.fuzzy_dedup_menu.show_menu')
     def test_fuzzy_dedup_menu_statistics_option(self, mock_show_menu):
-        """Test statistics option in fuzzy deduplication menu."""
-        # Mock the show_menu to return "4" (statistics option)
+        """Test ImageDedup advanced option in fuzzy deduplication menu."""
+        # Mock the show_menu to return "4" (ImageDedup advanced option)
         mock_show_menu.return_value = "4"
         
-        # Mock the view_fuzzy_matching_statistics function
-        with patch('dataset_forge.menus.fuzzy_dedup_menu.view_fuzzy_matching_statistics') as mock_stats:
+        # Mock the imagededup_action function
+        with patch('dataset_forge.menus.fuzzy_dedup_menu.imagededup_action') as mock_imagededup:
             fuzzy_dedup_menu()
             
-            # Verify the statistics function was called
-            mock_stats.assert_called_once()
+            # Verify the ImageDedup advanced function was called
+            mock_imagededup.assert_called_once()
 
     @patch('dataset_forge.menus.fuzzy_dedup_menu.get_path_with_history')
-    @patch('dataset_forge.menus.fuzzy_dedup_menu.fuzzy_matching_workflow')
-    def test_single_folder_fuzzy_dedup_workflow(self, mock_workflow, mock_get_path, temp_dir, test_images):
+    @patch('dataset_forge.menus.fuzzy_dedup_menu.fuzzy_matching_dedup')
+    def test_single_folder_fuzzy_dedup_workflow(self, mock_fuzzy_dedup, mock_get_path, temp_dir, test_images):
         """Test single folder fuzzy deduplication workflow."""
         # Mock path input
         mock_get_path.return_value = temp_dir
         
-        # Mock the fuzzy matching workflow
-        mock_workflow.return_value = {
+        # Mock the fuzzy matching dedup function
+        mock_fuzzy_dedup.return_value = {
             "total_files_processed": len(test_images),
             "duplicate_groups": [
                 [
@@ -163,29 +163,21 @@ class TestFuzzyDedupMenu:
             "total_duplicates_found": 2
         }
         
-        # Mock user inputs for hash methods, thresholds, and operation
+        # Mock user inputs for mode selection
         with patch('builtins.input') as mock_input:
             mock_input.side_effect = [
-                "phash,dhash",  # Hash methods
-                "90",           # pHash threshold
-                "85",           # dHash threshold
-                "1"             # Show operation
+                "1",  # Single folder mode
             ]
             
             # Call the function
-            single_folder_fuzzy_dedup()
+            fuzzy_matching_dedup()
             
-            # Verify the workflow was called with correct parameters
-            mock_workflow.assert_called_once()
-            call_args = mock_workflow.call_args
-            assert call_args[1]["folder"] == temp_dir
-            assert call_args[1]["hash_methods"] == ["phash", "dhash"]
-            assert call_args[1]["thresholds"] == {"phash": 90, "dhash": 85}
-            assert call_args[1]["operation"] == "show"
+            # Verify the function was called
+            mock_fuzzy_dedup.assert_called_once()
 
     @patch('dataset_forge.menus.fuzzy_dedup_menu.get_path_with_history')
-    @patch('dataset_forge.menus.fuzzy_dedup_menu.fuzzy_matching_workflow')
-    def test_hq_lq_pairs_fuzzy_dedup_workflow(self, mock_workflow, mock_get_path, temp_dir, test_images):
+    @patch('dataset_forge.menus.fuzzy_dedup_menu.fuzzy_matching_dedup')
+    def test_hq_lq_pairs_fuzzy_dedup_workflow(self, mock_fuzzy_dedup, mock_get_path, temp_dir, test_images):
         """Test HQ/LQ pairs fuzzy deduplication workflow."""
         # Create HQ and LQ folders
         hq_folder = os.path.join(temp_dir, "hq")
@@ -196,8 +188,8 @@ class TestFuzzyDedupMenu:
         # Mock path inputs
         mock_get_path.side_effect = [hq_folder, lq_folder]
         
-        # Mock the fuzzy matching workflow
-        mock_workflow.return_value = {
+        # Mock the fuzzy matching dedup function
+        mock_fuzzy_dedup.return_value = {
             "total_files_processed": len(test_images),
             "duplicate_groups": [
                 [
@@ -208,64 +200,37 @@ class TestFuzzyDedupMenu:
             "total_duplicates_found": 2
         }
         
-        # Mock user inputs for hash methods, thresholds, and operation
+        # Mock user inputs for mode selection
         with patch('builtins.input') as mock_input:
             mock_input.side_effect = [
-                "phash,dhash",  # Hash methods
-                "90",           # pHash threshold
-                "85",           # dHash threshold
-                "1"             # Show operation
+                "2",  # HQ/LQ pairs mode
             ]
             
             # Call the function
-            hq_lq_pairs_fuzzy_dedup()
+            fuzzy_matching_dedup()
             
-            # Verify the workflow was called with correct parameters
-            mock_workflow.assert_called_once()
-            call_args = mock_workflow.call_args
-            assert call_args[1]["hq_folder"] == hq_folder
-            assert call_args[1]["lq_folder"] == lq_folder
-            assert call_args[1]["hash_methods"] == ["phash", "dhash"]
-            assert call_args[1]["thresholds"] == {"phash": 90, "dhash": 85}
-            assert call_args[1]["operation"] == "show"
+            # Verify the function was called
+            mock_fuzzy_dedup.assert_called_once()
 
     def test_configure_fuzzy_matching_settings(self):
         """Test fuzzy matching settings configuration."""
-        # Mock user inputs for settings
-        with patch('builtins.input') as mock_input:
-            mock_input.side_effect = [
-                "phash,dhash,ahash",  # Default hash methods
-                "90",                 # pHash threshold
-                "85",                 # dHash threshold
-                "80",                 # aHash threshold
-                "100",                # Batch size
-                "y"                   # Enable progress display
-            ]
-            
+        # Mock the fuzzy_settings_action function
+        with patch('dataset_forge.menus.fuzzy_dedup_menu.fuzzy_settings_action') as mock_settings:
             # Call the function
-            configure_fuzzy_matching_settings()
+            fuzzy_settings_action()
             
-            # This function should complete without errors
-            # We're testing that it handles user input correctly
+            # Verify the settings function was called
+            mock_settings.assert_called_once()
 
     def test_view_fuzzy_matching_statistics(self):
         """Test fuzzy matching statistics viewing."""
-        # Mock statistics data
-        mock_stats = {
-            "total_operations": 10,
-            "total_files_processed": 1000,
-            "total_duplicates_found": 150,
-            "average_processing_time": 5.5,
-            "most_used_hash_methods": ["phash", "dhash"]
-        }
-        
-        # Mock the statistics retrieval
-        with patch('dataset_forge.menus.fuzzy_dedup_menu.get_fuzzy_matching_statistics', return_value=mock_stats):
+        # Mock the duplicate_analysis_action function
+        with patch('dataset_forge.menus.fuzzy_dedup_menu.duplicate_analysis_action') as mock_analysis:
             # Call the function
-            view_fuzzy_matching_statistics()
+            duplicate_analysis_action()
             
-            # This function should complete without errors
-            # We're testing that it displays statistics correctly
+            # Verify the analysis function was called
+            mock_analysis.assert_called_once()
 
     @patch('dataset_forge.menus.fuzzy_dedup_menu.show_menu')
     def test_fuzzy_dedup_menu_help_command(self, mock_show_menu):

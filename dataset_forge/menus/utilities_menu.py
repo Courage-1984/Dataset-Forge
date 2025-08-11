@@ -13,6 +13,17 @@ from dataset_forge.utils.color import Mocha
 from dataset_forge.menus import session_state
 from dataset_forge.utils import monitoring
 
+# Helper for lazy importing submenu modules
+def lazy_menu(module_name: str, func_name: str):
+    def _menu():
+        # Use the decorator pattern
+        decorated_func = monitoring.time_and_record_menu_load(func_name)(
+            lambda: getattr(importlib.import_module(module_name), func_name)()
+        )
+        return decorated_func()  # Call the decorated function
+
+    return _menu
+
 
 def require_hq_lq(func):
     def wrapper(*args, **kwargs):
@@ -94,26 +105,48 @@ def utilities_menu():
 
     # Define menu context for help system
     menu_context = {
-        "Purpose": "Helper tools and utilities for dataset management and analysis",
+        "Purpose": "Helper tools and utilities for dataset management and analysis - essential tools for maintaining and optimizing your datasets",
         "Total Options": "8 utility categories",
         "Navigation": "Use numbers 1-8 to select, 0 to go back",
         "Key Features": [
-            "🔍 Comparison Tools - Compare folders and analyze differences",
-            "🖼️ Visual Comparisons - Create side-by-side comparison images",
-            "🎬 GIF Comparisons - Generate animated comparison GIFs",
-            "🔍 Consolidated De-duplication - Comprehensive duplicate detection and removal",
-            "🗜️ Consolidated Compression - Compress individual images and directories",
-            "🧹 Sanitization Tools - Clean and sanitize image files",
-            "🌳 Directory Tools - Enhanced directory tree visualization",
-            "📁 File Filtering - Filter and manage non-image files",
+            "🔍 Comparison Tools - Compare folders and analyze differences between datasets",
+            "🖼️ Visual Comparisons - Create side-by-side comparison images for quality assessment",
+            "🎬 GIF Comparisons - Generate animated comparison GIFs for dynamic analysis",
+            "🔍 Consolidated De-duplication - Comprehensive duplicate detection and removal using multiple algorithms",
+            "🗜️ Consolidated Compression - Compress individual images and entire directories with format options",
+            "🧹 Sanitization Tools - Clean and sanitize image files for consistency and compatibility",
+            "🌳 Directory Tools - Enhanced directory tree visualization and analysis",
+            "📁 File Filtering - Filter and manage non-image files to maintain dataset purity",
         ],
         "Tips": [
-            "Comparison tools help identify differences between datasets",
-            "Visual comparisons are great for quality assessment",
-            "Consolidated De-duplication combines all duplicate detection methods",
-            "Consolidated Compression handles both individual and batch compression",
-            "Sanitization tools ensure image file integrity",
-            "Directory tools provide detailed folder structure analysis",
+            "🔍 Use Comparison Tools to identify differences between dataset versions",
+            "🖼️ Visual Comparisons help assess quality differences between image pairs",
+            "🎬 GIF Comparisons are great for showing temporal or processing changes",
+            "🔍 Start with Consolidated De-duplication to clean your datasets",
+            "🗜️ Use Consolidated Compression to reduce storage space and improve loading speed",
+            "🧹 Run Sanitization Tools to ensure consistent file formats and metadata",
+            "🌳 Directory Tools help understand your dataset structure and organization",
+            "📁 File filtering removes unwanted files that could interfere with processing",
+        ],
+        "Usage Examples": [
+            "🔍 Compare datasets: 1 → Select folders → Choose comparison method → Review differences",
+            "🖼️ Visual comparison: 2 → Select image pairs → Choose layout → Generate comparison",
+            "🎬 GIF comparison: 3 → Select image sequence → Set animation → Create GIF",
+            "🔍 Remove duplicates: 4 → Choose method → Set thresholds → Process dataset",
+            "🗜️ Compress images: 5 → Select format → Set quality → Choose operation → Process",
+            "🧹 Sanitize files: 6 → Choose operation → Select files → Apply sanitization",
+            "🌳 Analyze structure: 7 → Select directory → Generate tree → Review organization",
+            "📁 Filter files: 8 → Choose filter type → Select operation → Process files",
+        ],
+        "Performance Notes": [
+            "🔍 Comparison tools: Use sampling for large datasets to speed up analysis",
+            "🖼️ Visual comparisons: Generate previews first before creating full comparisons",
+            "🎬 GIF creation: Limit frame count for large sequences to avoid memory issues",
+            "🔍 Deduplication: Start with conservative thresholds and adjust based on results",
+            "🗜️ Compression: Test quality settings on sample images before batch processing",
+            "🧹 Sanitization: Always backup original files before applying changes",
+            "🌳 Directory analysis: Use depth limits for very large directory structures",
+            "📁 File filtering: Use dry-run mode first to preview changes",
         ],
     }
 

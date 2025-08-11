@@ -29,6 +29,10 @@
   - [🚀 Performance & Optimization](#performance-optimization)
   - [🛠️ Utilities](#utilities)
   - [🧪 Testing & Developer Tools](#testing-developer-tools)
+  - [🎨 Menu System Excellence](#menu-system-excellence)
+    - [**📊 Menu System Statistics**](#menu-system-statistics)
+    - [**✅ Menu System Achievements**](#menu-system-achievements)
+    - [**🎯 Menu Organization**](#menu-organization)
 - [Features (tl;dr)](#features-tldr)
 - [Features (main menus)](#features-main-menus)
   - [⚙️ Core & Configuration](#core-configuration)
@@ -174,6 +178,7 @@
   - [Quick Reference](#quick-reference)
   - [Global Commands & Menu Navigation](#global-commands-menu-navigation)
     - [**Available Global Commands**](#available-global-commands)
+    - [**Menu System Excellence**](#menu-system-excellence)
     - [**User Experience Features**](#user-experience-features)
     - [**Example Usage**](#example-usage)
 - [...context-aware help screen appears with menu-specific information...](#context-aware-help-screen-appears-with-menu-specific-information)
@@ -496,6 +501,7 @@
   - [🔄 Maintenance & Updates](#maintenance-updates)
     - [Regular Tasks](#regular-tasks)
     - [Quality Assurance](#quality-assurance)
+  - [❓ Unsorted](#unsorted)
 
 ## Special Installation
 
@@ -536,15 +542,15 @@
     - [Step 3: Test the implementations](#step-3-test-the-implementations)
   - [10. CUDA & GPU Performance Steps](#10-cuda-gpu-performance-steps)
     - [Step 1: Always use ./run.bat/](#step-1-always-use-runbat)
-    - [Step 2: Be Sure `venv312` has cuda torch installed](#step-2-be-sure-venv312-has-cuda-torch-installed)
+    - [Step 2: Be Sure your `venv312` has cuda torch installed](#step-2-be-sure-your-venv312-has-cuda-torch-installed)
     - [Step 3: Windows Pagefile](#step-3-windows-pagefile)
     - [Step 4: NVIDIA Control Panel](#step-4-nvidia-control-panel)
-    - [Step 5: `venv312`'s `python.exe`](#step-5-venv312s-pythonexe)
 
 ## Changelog
 
 - [Changelog](#changelog)
   - [[Unreleased]](#unreleased)
+    - [🎨 Comprehensive Menu System Improvement (August 2025)](#comprehensive-menu-system-improvement-august-2025)
     - [🔍 Fuzzy Matching De-duplication Feature (December 2024)](#fuzzy-matching-de-duplication-feature-december-2024)
     - [⭐ BHI Filtering Advanced CUDA Optimizations (August 2025)](#bhi-filtering-advanced-cuda-optimizations-august-2025)
     - [🔗 MCP Integration Implementation (August 2025)](#mcp-integration-implementation-august-2025)

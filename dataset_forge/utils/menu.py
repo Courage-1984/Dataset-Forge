@@ -28,35 +28,10 @@ def show_global_help(
     pause: bool = True,
 ) -> None:
     """Show context-aware help for the current menu."""
-    print_header("Help", char="=", color=Mocha.mauve)
-    
-    if menu_context:
-        print_info(f"Menu: {current_menu}")
-        print_info(f"Purpose: {menu_context.get('Purpose', 'Not specified')}")
-        print_info(f"Options: {menu_context.get('Options', 'Not specified')}")
-        print_info(f"Navigation: {menu_context.get('Navigation', 'Not specified')}")
-        
-        if 'Key Features' in menu_context:
-            print_info("Key Features:")
-            for feature in menu_context['Key Features']:
-                print_info(f"  • {feature}")
-        
-        if 'Tips' in menu_context:
-            print_info("Tips:")
-            for tip in menu_context['Tips']:
-                print_info(f"  • {tip}")
-    else:
-        print_info(f"Help for: {current_menu}")
-        print_info("No specific context available for this menu.")
-    
-    print_info("\nGlobal Commands:")
-    print_info("  help, h, ? - Show this help")
-    print_info("  quit, exit, q - Exit Dataset Forge")
-    print_info("  0 - Go back to previous menu")
-    print_info("  Ctrl+C - Emergency exit")
-    
-    if pause:
-        input(f"\n{Mocha.lavender}Press Enter to continue...{Mocha.reset}")
+    from dataset_forge.utils.help_system import HelpSystem
+
+    # Use the enhanced help system
+    HelpSystem.show_menu_help(current_menu, menu_context, pause)
 
 
 def handle_global_command(
@@ -66,24 +41,42 @@ def handle_global_command(
     pause: bool = True,
 ) -> bool:
     """Handle global commands that work in any menu.
-    
+
     Returns:
         True if a global command was handled, False otherwise
     """
     if not command:
         return False
-    
+
     command_lower = command.lower().strip()
-    
-    # Help commands
+
+    # Help commands with enhanced features
     if command_lower in ["help", "h", "?"]:
         show_global_help(current_menu, menu_context, pause)
         return True
-    
+
+    # Enhanced help commands
+    elif command_lower.startswith("help "):
+        help_args = command_lower.split(" ", 1)
+        if len(help_args) > 1:
+            help_type = help_args[1].strip()
+            from dataset_forge.utils.help_system import show_help
+
+            if help_type in ["troubleshooting", "trouble", "debug"]:
+                show_help("troubleshooting", pause=pause)
+            elif help_type in ["feature", "features"]:
+                show_help("feature", pause=pause, feature_name="general")
+            elif help_type in ["quick", "reference", "ref"]:
+                show_help("general", pause=pause)
+            else:
+                # Try to show feature-specific help
+                show_help("feature", pause=pause, feature_name=help_type)
+        return True
+
     # Quit commands
     elif command_lower in ["quit", "exit", "q"]:
         print_info("🔄 Shutting down Dataset Forge...")
-        
+
         # Play shutdown sound in background
         try:
             # Play shutdown sound in a separate thread with better timeout handling
@@ -94,21 +87,33 @@ def handle_global_command(
                 except Exception as e:
                     print_error(f"Shutdown sound failed: {e}")
 
-            shutdown_thread = threading.Thread(target=play_shutdown_with_timeout, daemon=True)
+            shutdown_thread = threading.Thread(
+                target=play_shutdown_with_timeout, daemon=True
+            )
             shutdown_thread.start()
-            
+
             # Wait for a reasonable time for the sound to play (most audio files are 1-3 seconds)
             shutdown_thread.join(timeout=3.0)
-            
-            # If thread is still running, let it continue in background
-            if shutdown_thread.is_alive():
-                print_info("Shutdown sound playing in background...")
-            
-        except Exception as e:
-            print_error(f"Audio system error: {e}")
 
-        print_success("👋 Thank you for using Dataset Forge!")
+        except Exception as e:
+            print_warning(f"Could not play shutdown sound: {e}")
+
+        print_success("✅ Dataset Forge shutdown complete. Goodbye!")
         sys.exit(0)
+
+    # Quick reference commands
+    elif command_lower in ["quick", "reference", "ref"]:
+        from dataset_forge.utils.help_system import HelpSystem
+
+        HelpSystem.show_quick_reference(pause)
+        return True
+
+    # Troubleshooting commands
+    elif command_lower in ["troubleshooting", "trouble", "debug", "fix"]:
+        from dataset_forge.utils.help_system import HelpSystem
+
+        HelpSystem.show_troubleshooting_help("general", pause)
+        return True
 
     return False
 
@@ -137,18 +142,20 @@ def show_menu(
     # Lazy import emoji utilities to avoid circular dependencies
     try:
         from .emoji_utils import validate_menu_emojis, normalize_unicode, sanitize_emoji
-        
+
         # Validate emojis in menu options
         emoji_issues = validate_menu_emojis(options)
         if emoji_issues["invalid"]:
-            print_warning(f"⚠️  Found {len(emoji_issues['invalid'])} invalid emojis in menu options")
-        
+            print_warning(
+                f"⚠️  Found {len(emoji_issues['invalid'])} invalid emojis in menu options"
+            )
+
         # Normalize and sanitize the title
         safe_title = sanitize_emoji(normalize_unicode(title))
     except ImportError:
         # Fallback if emoji utilities are not available
         safe_title = title
-    
+
     # Print header
     print_header(safe_title, char, header_color)
     print_info("")
@@ -178,7 +185,9 @@ def show_menu(
                 print_info("")
                 for key, (description, action) in options.items():
                     try:
-                        safe_description = sanitize_emoji(normalize_unicode(description))
+                        safe_description = sanitize_emoji(
+                            normalize_unicode(description)
+                        )
                     except (NameError, ImportError):
                         safe_description = description
                     print_info(f"{key}. {safe_description}")
@@ -193,7 +202,7 @@ def show_menu(
             else:
                 print_error(f"Invalid choice: {choice}")
                 print_info("Please enter a valid option.")
-                
+
         except (KeyboardInterrupt, EOFError):
             print_info("\nExiting...")
             return None
@@ -201,17 +210,21 @@ def show_menu(
 
 def lazy_action(module_name: str, func_name: str):
     """Create a lazy action that imports the module when called."""
+
     def _action(*args, **kwargs):
         module = __import__(module_name, fromlist=[func_name])
         func = getattr(module, func_name)
         return func(*args, **kwargs)
+
     return _action
 
 
 def lazy_menu(module_name: str, func_name: str):
     """Create a lazy menu that imports the module when called."""
+
     def _menu(*args, **kwargs):
         module = __import__(module_name, fromlist=[func_name])
         func = getattr(module, func_name)
         return func(*args, **kwargs)
+
     return _menu

@@ -16,6 +16,7 @@ Welcome to the **Dataset Forge** documentation hub! Here you'll find detailed gu
 - [Troubleshooting](troubleshooting.md)
 - [Contributing](contributing.md)
 - [Style Guide](style_guide.md)
+- [Menu System Improvement Progress](menu_improvement_progress.md)
 - [FAQ](faq.md)
 - [Changelog](changelog.md)
 - [License](license.md)
