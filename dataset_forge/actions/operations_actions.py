@@ -2341,14 +2341,14 @@ def split_adjust_dataset(hq_folder, lq_folder):
                     [f for f in os.listdir(out_hq_folder) if is_image_file(f)]
                 )
             except Exception as e:
-                print(f"Error: {e}")
+                print_error(f"Error: {e}")
                 failed = 1
-            print(f"\nOperation complete:")
-            print(f"  Processed: {processed} pairs")
-            print(f"  Skipped:   {skipped} pairs")
-            print(f"  Failed:    {failed} pairs")
-            print(f"  Output HQ: {out_hq_folder}")
-            print(f"  Output LQ: {out_lq_folder}")
+            print_info(f"\nOperation complete:")
+            print_info(f"  Processed: {processed} pairs")
+            print_info(f"  Skipped:   {skipped} pairs")
+            print_info(f"  Failed:    {failed} pairs")
+            print_info(f"  Output HQ: {out_hq_folder}")
+            print_info(f"  Output LQ: {out_lq_folder}")
         else:
             input_folder = input("Enter input folder path: ").strip()
             output_folder = input("Enter output folder path: ").strip()
@@ -2385,13 +2385,13 @@ def split_adjust_dataset(hq_folder, lq_folder):
                     [f for f in os.listdir(output_folder) if is_image_file(f)]
                 )
             except Exception as e:
-                print(f"Error: {e}")
+                print_error(f"Error: {e}")
                 failed = 1
-            print(f"\nOperation complete:")
-            print(f"  Processed: {processed} images")
-            print(f"  Skipped:   {skipped} images")
-            print(f"  Failed:    {failed} images")
-            print(f"  Output:    {output_folder}")
+            print_info(f"\nOperation complete:")
+            print_info(f"  Processed: {processed} images")
+            print_info(f"  Skipped:   {skipped} images")
+            print_info(f"  Failed:    {failed} images")
+            print_info(f"  Output:    {output_folder}")
         return
 
 
