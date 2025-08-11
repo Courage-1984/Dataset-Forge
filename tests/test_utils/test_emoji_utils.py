@@ -203,17 +203,17 @@ class TestEmojiHandler:
         assert isinstance(issues["valid"], list)
         assert isinstance(issues["invalid"], list)
 
-    @patch("builtins.print")
-    def test_safe_print_emoji(self, mock_print):
+    @patch("sys.stdout.write")
+    def test_safe_print_emoji(self, mock_write):
         """Test safe emoji printing."""
         handler = EmojiHandler()
         text = "Hello 😀 world"
 
         handler.safe_print_emoji(text)
-        mock_print.assert_called()
+        mock_write.assert_called()
 
-    @patch("builtins.print")
-    def test_safe_print_emoji_unicode_error(self, mock_print):
+    @patch("sys.stdout.write")
+    def test_safe_print_emoji_unicode_error(self, mock_write):
         """Test safe emoji printing with Unicode error."""
         handler = EmojiHandler()
         text = "Hello 😀 world"
@@ -224,7 +224,7 @@ class TestEmojiHandler:
             side_effect=UnicodeEncodeError("utf-8", text, 0, 1, "invalid"),
         ):
             handler.safe_print_emoji(text)
-            mock_print.assert_called()
+            mock_write.assert_called()
 
 
 class TestConvenienceFunctions:
@@ -299,12 +299,12 @@ class TestConvenienceFunctions:
         assert "valid" in issues
         assert "invalid" in issues
 
-    @patch("builtins.print")
-    def test_safe_print_emoji_function(self, mock_print):
+    @patch("sys.stdout.write")
+    def test_safe_print_emoji_function(self, mock_write):
         """Test safe_print_emoji convenience function."""
         text = "Hello 😀 world"
         safe_print_emoji(text)
-        mock_print.assert_called()
+        mock_write.assert_called()
 
 
 class TestEmojiIntegration:

@@ -63,7 +63,8 @@ def test_best_tile_extraction_action(cleanup_test_dirs):
     assert len(os.listdir(out_folder)) > 0
 
 
-def test_video_frame_extraction_action(cleanup_test_dirs):
+@patch("builtins.input", return_value="0")
+def test_video_frame_extraction_action(mock_input, cleanup_test_dirs):
     video_path = "test_video.avi"
     out_folder = "test_frames"
     h, w = 256, 256

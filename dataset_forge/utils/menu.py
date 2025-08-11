@@ -30,8 +30,8 @@ def show_global_help(
     """Show context-aware help for the current menu."""
     from dataset_forge.utils.help_system import HelpSystem
 
-    # Use the enhanced help system
-    HelpSystem.show_menu_help(current_menu, menu_context, pause)
+    # Use the enhanced help system with keyword arguments
+    HelpSystem.show_menu_help(current_menu, menu_context, pause=pause)
 
 
 def handle_global_command(
