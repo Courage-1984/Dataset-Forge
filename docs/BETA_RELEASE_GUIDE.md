@@ -135,7 +135,7 @@ Test the beta package locally:
 
 ```bash
 # Install from local distribution
-pip install dist/dataset-forge-1.0.0b1.tar.gz
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
 
 # Test basic functionality
 dataset-forge --help
