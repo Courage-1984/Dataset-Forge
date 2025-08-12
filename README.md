@@ -86,6 +86,23 @@ cd Dataset-Forge
 
 ---
 
+## 🧰 External Tools integrated:
+
+- [PepeDP](https://github.com/umzi2/PepeDP)
+- [WTP Dataset Destroyer](https://github.com/umzi2/wtp_dataset_destroyer)
+- [traiNNer-redux](https://github.com/the-database/traiNNer-redux)
+- [Getnative](https://github.com/Infiziert90/getnative)
+- [resdet](https://github.com/0x09/resdet)
+- [ExifTool](https://exiftool.org/)
+- [Oxipng](https://github.com/oxipng/oxipng)
+- [Steghide](https://steghide.sourceforge.net/download.php)
+- [zsteg](https://github.com/zed-0xff/zsteg)
+- [IQA-PyTorch / py-iqa](https://github.com/chaofengc/IQA-PyTorch)
+- [imagededup](https://github.com/idealo/imagededup)
+- [ffmpeg](https://ffmpeg.org/) | [ffmpeg builds](https://www.gyan.dev/ffmpeg/builds/)
+
+---
+
 ## 🪪 License
 
 This project is licensed under the Creative Commons CC-BY-SA-4.0. See [LICENSE](LICENSE) for details.
