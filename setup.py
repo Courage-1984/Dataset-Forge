@@ -5,9 +5,67 @@ import subprocess
 import sys
 
 # Read requirements from requirements.txt
-with open("requirements.txt", "r", encoding="utf-8") as f:
+try:
+    with open("requirements.txt", "r", encoding="utf-8") as f:
+        all_requirements = [
+            line.strip() for line in f if line.strip() and not line.startswith("#")
+        ]
+except FileNotFoundError:
+    # If requirements.txt is not found (e.g., when installing from tar.gz),
+    # use a comprehensive fallback set of requirements
+    print(
+        "Warning: requirements.txt not found, using comprehensive fallback requirements"
+    )
     all_requirements = [
-        line.strip() for line in f if line.strip() and not line.startswith("#")
+        "numpy",
+        "opencv-python",
+        "Pillow",
+        "imageio",
+        "imagehash",
+        "matplotlib",
+        "seaborn",
+        "questionary",
+        "pygame",
+        "playsound==1.2.2",
+        "pydub",
+        "psutil",
+        "joblib",
+        "GPUtil",
+        "dask[complete]",
+        "ray[default]",
+        "numba",
+        "cython",
+        "setuptools",
+        "kornia",
+        "albumentations",
+        "python-magic==0.4.27",
+        "python-magic-bin==0.4.14",
+        "libmagic==1.0",
+        "ffmpeg-python",
+        "jinja2",
+        "pyyaml",
+        "importlib",
+        "gdown",
+        "emoji>=2.8.0",
+        "demoji>=1.1.0",
+        "pepeline",
+        "pepedpid",
+        "pepedp",
+        "imagededup",
+        "pytest",
+        "pytest-timeout",
+        "pytest-cov",
+        "vulture",
+        "coverage",
+        "pyan3",
+        "pyflakes",
+        "pandas",
+        "argparse",
+        "logging",
+        "dataset-support",
+        "tqdm",
+        "python-hcl2",
+        "colour-science",
     ]
 
 # Filter out PyTorch packages from requirements for setup
@@ -50,13 +108,36 @@ class InstallPyTorchCommand(Command):
                     "https://download.pytorch.org/whl/cu121",
                 ]
             )
-            print("✅ PyTorch with CUDA support installed successfully!")
+            print("PyTorch with CUDA support installed successfully!")
         except subprocess.CalledProcessError as e:
-            print(f"❌ Failed to install PyTorch with CUDA: {e}")
-            print(
-                "Please install manually: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121"
-            )
-            sys.exit(1)
+            print(f"Failed to install PyTorch with CUDA: {e}")
+            print("Falling back to CPU-only PyTorch...")
+            try:
+                # Fallback to CPU-only PyTorch
+                subprocess.check_call(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "torch",
+                        "torchvision",
+                        "torchaudio",
+                        "--index-url",
+                        "https://download.pytorch.org/whl/cpu",
+                    ]
+                )
+                print("PyTorch CPU-only version installed successfully!")
+            except subprocess.CalledProcessError as e2:
+                print(f"Failed to install PyTorch CPU version: {e2}")
+                print("Please install PyTorch manually:")
+                print(
+                    "  For CUDA: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121"
+                )
+                print(
+                    "  For CPU:  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu"
+                )
+                sys.exit(1)
 
 
 class CustomInstallCommand(install):
@@ -81,9 +162,9 @@ class CustomInstallCommand(install):
                     "wheel",
                 ]
             )
-            print("✅ pip, setuptools, and wheel upgraded successfully!")
+            print("pip, setuptools, and wheel upgraded successfully!")
         except subprocess.CalledProcessError as e:
-            print(f"⚠️  Warning: Failed to upgrade pip/setuptools/wheel: {e}")
+            print(f"Warning: Failed to upgrade pip/setuptools/wheel: {e}")
 
         # Install PyTorch with CUDA support
         pytorch_cmd = InstallPyTorchCommand(self.distribution)
@@ -100,7 +181,7 @@ setup(
     long_description=(
         open("README.md", encoding="utf-8").read()
         if os.path.exists("README.md")
-        else ""
+        else "Dataset Forge - Modular CLI utility for image dataset management, analysis, and transformation"
     ),
     long_description_content_type="text/markdown",
     author="Courage-1984 and contributors",
@@ -110,7 +191,7 @@ setup(
     include_package_data=True,
     install_requires=filtered_requirements,  # Use filtered requirements (no PyTorch)
     python_requires=">=3.12",
-    entry_points={"console_scripts": ["dataset-forge=main:main"]},
+    entry_points={"console_scripts": ["dataset-forge=dataset_forge.cli:main"]},
     cmdclass={
         "install": CustomInstallCommand,
         "install_pytorch": InstallPyTorchCommand,

@@ -374,11 +374,31 @@ Please report any issues or suggestions:
         """Print next steps for the release process."""
         print_success("\n🎉 Beta release preparation completed!")
         print_info("\n📋 Next steps:")
-        print_info("1. Review the generated release notes")
-        print_info("2. Push the git tag: git push origin v{self.version}")
-        print_info("3. Create a GitHub release with the built packages")
-        print_info("4. Upload the packages to the GitHub release")
-        print_info("5. Announce the beta release")
+        print_info("1. 📦 Review the generated files in the 'dist' directory:")
+        print_info("   - Source distribution (.tar.gz)")
+        print_info("   - Wheel distribution (.whl) - if created")
+        print_info("   - Custom source code archives (.zip, .tar.gz)")
+        print_info("   - Windows executable (.exe) - if created")
+        print_info("")
+        print_info("2. 🏷️  Push the git tag: git push origin v{self.version}")
+        print_info("")
+        print_info("3. 🚀 Create a GitHub release:")
+        print_info("   - Go to GitHub repository")
+        print_info("   - Click 'Releases' → 'Create a new release'")
+        print_info(f"   - Tag: v{self.version}")
+        print_info("   - Title: Dataset-Forge Beta {self.version}")
+        print_info("   - Upload ALL assets from 'dist' directory:")
+        print_info("     • Custom source code archives (recommended)")
+        print_info("     • Distribution packages")
+        print_info("     • Executables")
+        print_info("")
+        print_info("4. 📋 Note: GitHub will automatically create:")
+        print_info("   - Source code (zip) - from repository")
+        print_info("   - Source code (tar.gz) - from repository")
+        print_info("   These contain the full repository at the tagged commit")
+        print_info("")
+        print_info("5. 📢 Announce the beta release")
+        print_info("6. 🧪 Monitor feedback and issues")
 
         if self.dry_run:
             print_warning("\n⚠️ This was a dry run. No files were actually modified.")
@@ -411,6 +431,10 @@ Please report any issues or suggestions:
         if not self.verify_package():
             return False
 
+        # Create source code archives
+        if not self.create_source_archives():
+            return False
+
         # Create git tag
         if not self.create_git_tag():
             return False
@@ -423,6 +447,126 @@ Please report any issues or suggestions:
         self.print_next_steps()
 
         return True
+
+    def create_source_archives(self) -> bool:
+        """Create custom source code archives for release assets."""
+        print_info("📦 Creating source code archives...")
+        
+        # Define what to include/exclude
+        include_patterns = [
+            "dataset_forge/**/*",
+            "docs/**/*", 
+            "tests/**/*",
+            "configs/**/*",
+            "tools/**/*",
+            "requirements.txt",
+            "setup.py",
+            "README.md",
+            "LICENSE",
+            "MANIFEST.in",
+            "pytest.ini",
+            "main.py",
+            "run.bat"
+        ]
+        
+        exclude_patterns = [
+            "**/__pycache__/**",
+            "**/*.pyc",
+            "**/.git/**",
+            "**/venv*/**",
+            "**/logs/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/*.egg-info/**",
+            "**/.pytest_cache/**",
+            "**/.coverage",
+            "**/htmlcov/**",
+            "**/.tox/**",
+            "**/.mypy_cache/**",
+            "**/.vscode/**",
+            "**/.idea/**",
+            "**/node_modules/**",
+            "**/test_datasets/**",
+            "**/store/**",
+            "**/reports/**"
+        ]
+        
+        try:
+            import zipfile
+            import tarfile
+            from pathlib import Path
+            
+            # Create temporary directory for clean source
+            temp_dir = self.project_root / "temp_source"
+            if temp_dir.exists():
+                shutil.rmtree(temp_dir)
+            temp_dir.mkdir()
+            
+            # Copy files based on patterns
+            for pattern in include_patterns:
+                pattern_path = self.project_root / pattern
+                if pattern_path.exists():
+                    if pattern_path.is_file():
+                        # Copy single file
+                        dest_path = temp_dir / pattern_path.name
+                        dest_path.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(pattern_path, dest_path)
+                    else:
+                        # Copy directory
+                        dest_path = temp_dir / pattern_path.name
+                        shutil.copytree(pattern_path, dest_path, dirs_exist_ok=True)
+            
+            # Remove excluded files/directories
+            for pattern in exclude_patterns:
+                for path in temp_dir.rglob(pattern.replace("**/*", "*")):
+                    if path.exists():
+                        if path.is_file():
+                            path.unlink()
+                        elif path.is_dir():
+                            shutil.rmtree(path)
+            
+            # Create zip archive
+            zip_path = self.dist_dir / f"Dataset-Forge-{self.version}-source.zip"
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for file_path in temp_dir.rglob('*'):
+                    if file_path.is_file():
+                        arcname = file_path.relative_to(temp_dir)
+                        zipf.write(file_path, arcname)
+            
+            # Create tar.gz archive
+            tar_path = self.dist_dir / f"Dataset-Forge-{self.version}-source.tar.gz"
+            with tarfile.open(tar_path, 'w:gz') as tarf:
+                tarf.add(temp_dir, arcname=f"Dataset-Forge-{self.version}")
+            
+            # Clean up
+            shutil.rmtree(temp_dir)
+            
+            print_success(f"Created source archives:")
+            print_info(f"  📦 {zip_path.name}")
+            print_info(f"  📦 {tar_path.name}")
+            
+            return True
+            
+        except Exception as e:
+            print_error(f"Failed to create source archives: {e}")
+            return False
+
+    def create_release_assets(self) -> List[Path]:
+        """Create all release assets including source code archives."""
+        assets = []
+        
+        # Create source archives
+        if self.create_source_archives():
+            assets.extend([
+                self.dist_dir / f"Dataset-Forge-{self.version}-source.zip",
+                self.dist_dir / f"Dataset-Forge-{self.version}-source.tar.gz"
+            ])
+        
+        # Add existing distribution files
+        for pattern in ["*.tar.gz", "*.whl", "*.exe"]:
+            assets.extend(self.dist_dir.glob(pattern))
+        
+        return assets
 
 
 def print_header(text: str):

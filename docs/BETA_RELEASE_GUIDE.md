@@ -134,25 +134,29 @@ pyinstaller --onefile --name dataset-forge-beta main.py
 Test the beta package locally:
 
 ```bash
+./venv312/Scripts/activate
+python -m pip install --upgrade pip setuptools wheel
+
 # Install from local distribution
 pip install ./dist/dataset_forge-1.0.0b1.tar.gz
 
 # Test basic functionality
-dataset-forge --help
 python -c "import dataset_forge; print(dataset_forge.__version__)"
+dataset-forge --help
 ```
 
-### 2. Virtual Environment Test
+<!-- ### 2. Virtual Environment Test
 
 Test in a clean virtual environment:
 
 ```bash
 # Create new virtual environment
-python -m venv test_beta_env
-source test_beta_env/bin/activate  # On Windows: test_beta_env\Scripts\activate
+py -3.12 -m venv test_beta_env
+./test_beta_env\Scripts\Activate.ps1
+python -m pip install --upgrade pip setuptools wheel
 
 # Install beta version
-pip install dist/dataset-forge-1.0.0b1.tar.gz
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
 
 # Run basic tests
 python -m pytest tests/ -v
@@ -171,7 +175,7 @@ python -m pytest tests/test_cli/ -v
 
 # Test specific features
 python -m pytest tests/test_utils/ -v
-```
+``` -->
 
 ---
 
@@ -503,3 +507,310 @@ jobs:
 ---
 
 **Remember:** Beta releases are for testing and feedback. Focus on stability and user experience rather than adding new features. Use the feedback to improve the final release.
+
+## 📦 Source Code Assets in GitHub Releases
+
+### Understanding Source Code Assets
+
+GitHub releases automatically include source code archives, and you can also create custom source code packages for better control over what's included.
+
+#### **Automatic GitHub Source Code Assets**
+
+When you create a GitHub release, GitHub automatically generates two source code archives:
+
+- **Source code (zip)** - `Dataset-Forge-v1.0.0b1.zip`
+- **Source code (tar.gz)** - `Dataset-Forge-v1.0.0b1.tar.gz`
+
+**What's included:**
+
+- ✅ Complete repository at the tagged commit
+- ✅ All source code, documentation, and assets
+- ✅ Full directory structure
+- ❌ No `.git` directory (Git history excluded)
+- ❌ No build artifacts or temporary files
+
+**Direct URLs:**
+
+```
+https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.zip
+https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.tar.gz
+```
+
+#### **Custom Source Code Archives**
+
+The beta release script creates custom source code archives with better control:
+
+- **Dataset-Forge-1.0.0b1-source.zip**
+- **Dataset-Forge-1.0.0b1-source.tar.gz**
+
+**What's included:**
+
+- ✅ All source code (`dataset_forge/`, `tests/`, `tools/`)
+- ✅ Documentation (`docs/`, `README.md`, `LICENSE`)
+- ✅ Configuration files (`setup.py`, `requirements.txt`)
+- ✅ Essential scripts (`main.py`, `run.bat`)
+- ❌ Development files (`.git`, `venv`, `__pycache__`)
+- ❌ Build artifacts (`dist/`, `build/`, `*.egg-info`)
+- ❌ Test data (`test_datasets/`, `store/`, `reports/`)
+
+### How to Access Source Code Assets
+
+#### **From GitHub Web Interface:**
+
+1. **Navigate to Releases:**
+
+   - Go to your GitHub repository
+   - Click "Releases" in the right sidebar
+   - Click on a specific release
+
+2. **Download Assets:**
+   - Scroll down to "Assets" section
+   - Click on any source code archive to download
+   - Available assets include:
+     - Automatic GitHub archives
+     - Custom source code archives (if uploaded)
+     - Distribution packages
+     - Executables
+
+#### **From Command Line:**
+
+```bash
+# Download automatic GitHub source code
+wget https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.zip
+wget https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.tar.gz
+
+# Extract archives
+unzip Dataset-Forge-v1.0.0b1.zip
+tar -xzf Dataset-Forge-v1.0.0b1.tar.gz
+```
+
+#### **Using GitHub CLI:**
+
+```bash
+# List release assets
+gh release view v1.0.0b1 --json assets
+
+# Download specific asset
+gh release download v1.0.0b1 --pattern "*.zip"
+gh release download v1.0.0b1 --pattern "*.tar.gz"
+```
+
+### Creating Custom Source Code Archives
+
+The beta release script automatically creates custom source code archives:
+
+```bash
+# Run the beta release script
+python tools/create_beta_release.py --version 1.0.0b1
+
+# This will create:
+# - Dataset-Forge-1.0.0b1-source.zip
+# - Dataset-Forge-1.0.0b1-source.tar.gz
+```
+
+#### **Manual Creation:**
+
+If you want to create custom source code archives manually:
+
+```bash
+# Create a clean source directory
+mkdir temp_source
+cp -r dataset_forge/ temp_source/
+cp -r docs/ temp_source/
+cp -r tests/ temp_source/
+cp -r tools/ temp_source/
+cp requirements.txt setup.py README.md LICENSE temp_source/
+
+# Remove development files
+find temp_source -name "__pycache__" -type d -exec rm -rf {} +
+find temp_source -name "*.pyc" -delete
+find temp_source -name ".git" -type d -exec rm -rf {} +
+
+# Create archives
+cd temp_source
+zip -r ../Dataset-Forge-1.0.0b1-source.zip .
+tar -czf ../Dataset-Forge-1.0.0b1-source.tar.gz .
+
+# Clean up
+cd ..
+rm -rf temp_source
+```
+
+### Best Practices for Source Code Assets
+
+#### **When to Use Automatic vs Custom:**
+
+**Use Automatic GitHub Archives When:**
+
+- You want the complete repository state
+- Users need all files including development tools
+- You're confident in your `.gitignore` configuration
+- You want to preserve the exact repository structure
+
+**Use Custom Source Code Archives When:**
+
+- You want to exclude development files
+- You want to include only essential files
+- You want to optimize download size
+- You want to provide a "clean" distribution
+
+#### **File Inclusion Strategy:**
+
+**Essential Files (Always Include):**
+
+- Source code (`dataset_forge/`)
+- Documentation (`docs/`, `README.md`)
+- Configuration (`setup.py`, `requirements.txt`)
+- License and legal files (`LICENSE`)
+
+**Optional Files (Consider Including):**
+
+- Tests (`tests/`) - for developers
+- Tools (`tools/`) - for advanced users
+- Examples and templates
+- Configuration examples
+
+**Files to Exclude:**
+
+- Development files (`.git`, `venv`, `__pycache__`)
+- Build artifacts (`dist/`, `build/`, `*.egg-info`)
+- Test data and large assets
+- IDE configuration files
+- Log files and temporary files
+
+#### **Naming Conventions:**
+
+```bash
+# Automatic GitHub archives
+Dataset-Forge-v1.0.0b1.zip
+Dataset-Forge-v1.0.0b1.tar.gz
+
+# Custom source archives
+Dataset-Forge-1.0.0b1-source.zip
+Dataset-Forge-1.0.0b1-source.tar.gz
+
+# Distribution packages
+dataset_forge-1.0.0b1.tar.gz
+dataset_forge-1.0.0b1-py3-none-any.whl
+
+# Executables
+dataset-forge-beta.exe
+```
+
+### Uploading Source Code Assets to GitHub Releases
+
+#### **Manual Upload:**
+
+1. **Create Release:**
+
+   - Go to GitHub repository
+   - Click "Releases" → "Create a new release"
+   - Set tag and title
+
+2. **Upload Assets:**
+   - Drag and drop files to the "Attach binaries" area
+   - Or click "Attach binaries" to select files
+   - Upload both automatic and custom archives
+
+#### **Automated Upload with GitHub Actions:**
+
+```yaml
+# .github/workflows/release.yml
+- name: Upload Release Assets
+  uses: softprops/action-gh-release@v1
+  with:
+    files: |
+      dist/*.zip
+      dist/*.tar.gz
+      dist/*.whl
+      dist/*.exe
+    draft: false
+    prerelease: true
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Using Source Code Assets
+
+#### **For End Users:**
+
+```bash
+# Download and extract
+wget https://github.com/Courage-1984/Dataset-Forge/releases/download/v1.0.0b1/Dataset-Forge-1.0.0b1-source.zip
+unzip Dataset-Forge-1.0.0b1-source.zip
+
+# Install from source
+cd Dataset-Forge-1.0.0b1
+pip install -e .
+```
+
+#### **For Developers:**
+
+```bash
+# Clone and checkout specific version
+git clone https://github.com/Courage-1984/Dataset-Forge.git
+cd Dataset-Forge
+git checkout v1.0.0b1
+
+# Or download source archive
+wget https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.zip
+unzip Dataset-Forge-v1.0.0b1.zip
+cd Dataset-Forge-1.0.0b1
+```
+
+#### **For Package Managers:**
+
+```bash
+# Install from PyPI (if published)
+pip install dataset-forge==1.0.0b1
+
+# Install from source distribution
+pip install dataset_forge-1.0.0b1.tar.gz
+
+# Install from wheel
+pip install dataset_forge-1.0.0b1-py3-none-any.whl
+```
+
+### Troubleshooting Source Code Assets
+
+#### **Common Issues:**
+
+**Large File Sizes:**
+
+- Use custom source archives to exclude unnecessary files
+- Compress large assets before uploading
+- Consider splitting into multiple archives
+
+**Missing Files:**
+
+- Check `.gitignore` configuration
+- Verify file inclusion patterns in custom archives
+- Ensure all essential files are included
+
+**Download Issues:**
+
+- Verify direct URLs are correct
+- Check file permissions on GitHub
+- Use alternative download methods (GitHub CLI, wget, curl)
+
+**Extraction Problems:**
+
+- Verify archive integrity (checksums)
+- Use appropriate extraction tools
+- Check for file path length limitations on Windows
+
+#### **Quality Assurance:**
+
+```bash
+# Verify archive contents
+unzip -l Dataset-Forge-1.0.0b1-source.zip
+tar -tzf Dataset-Forge-1.0.0b1-source.tar.gz
+
+# Check file sizes
+ls -lh *.zip *.tar.gz
+
+# Verify essential files are present
+find . -name "setup.py" -o -name "README.md" -o -name "__init__.py"
+```
+
+---

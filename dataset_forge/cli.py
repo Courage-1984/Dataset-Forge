@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+CLI entry point for dataset-forge.
+"""
+
 import warnings
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="pkg_resources")
@@ -15,9 +20,6 @@ main_menu = None
 
 import signal
 import sys
-
-# All functionality is now organized in the new hierarchical menu structure
-# See MENU_RESTRUCTURE_SUMMARY.md for details on the new organization
 
 # Import centralized printing utilities
 from dataset_forge.utils.printing import print_info, print_warning, print_error
@@ -108,6 +110,7 @@ def main():
 
     try:
         # Lazy import of main_menu for faster CLI startup
+        global main_menu
         if main_menu is None:
             from dataset_forge.menus.main_menu import main_menu
 
@@ -163,6 +166,7 @@ def main():
             pass
 
 
+# Set up signal handler
 signal.signal(signal.SIGINT, _sigint_handler)
 
 if __name__ == "__main__":

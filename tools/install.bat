@@ -5,22 +5,24 @@ echo ========================================
 echo.
 
 REM Check if Python 3.12+ is available
-python --version >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
+set PYTHON_PATH=C:\Users\anon\AppData\Local\Programs\Python\Python312\python.exe
+
+REM Check if the specific Python path exists
+if not exist "%PYTHON_PATH%" (
+    echo ERROR: Python is not found at expected location: %PYTHON_PATH%
     echo Please install Python 3.12+ from https://python.org
     pause
     exit /b 1
 )
 
 REM Check Python version
-for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
+for /f "tokens=2" %%i in ('"%PYTHON_PATH%" --version 2^>^&1') do set PYTHON_VERSION=%%i
 echo Found Python version: %PYTHON_VERSION%
 
 REM Create virtual environment if it doesn't exist
 if not exist "venv312" (
     echo Creating virtual environment...
-    python -m venv venv312
+    "%PYTHON_PATH%" -m venv venv312
     if errorlevel 1 (
         echo ERROR: Failed to create virtual environment
         pause
@@ -39,7 +41,7 @@ if errorlevel 1 (
 
 REM Run the Python installation script
 echo Running installation script...
-python tools\install.py
+"%PYTHON_PATH%" tools\install.py
 if errorlevel 1 (
     echo ERROR: Installation failed
     pause
