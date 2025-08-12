@@ -47,6 +47,8 @@
 
 - **pepedpid ImportError:** Ensure pepedpid is installed in the correct environment.
 - **DPID workflow errors:** Check input folders for valid images and use the correct menu option.
+- **Alpha Channel Processing:** All DPID methods now support RGBA images with automatic alpha channel detection and preservation.
+- **DPID Alpha Panics Fixed:** Previous alpha channel processing panics have been resolved using hybrid approach (DPID for RGB, OpenCV for alpha).
 
 ## Steganography Tools (zsteg, steghide)
 

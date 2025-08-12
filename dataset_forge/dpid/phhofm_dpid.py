@@ -9,6 +9,8 @@ import cv2
 
 # Use local read/save from tiling.py
 from dataset_forge.actions.tiling_actions import read, save
+# Import alpha handling functions from umzi_dpid
+from dataset_forge.dpid.umzi_dpid import read_with_alpha, save_with_alpha, process_image_with_alpha
 
 try:
     from pepedpid import dpid_resize
@@ -19,6 +21,10 @@ except ImportError:
 def run_phhofm_dpid_single_folder(
     input_folder, output_base, scales, overwrite=False, lambd=1.0
 ):
+    """
+    Downscale all images in a folder using Phhofm's DPID implementation.
+    Now supports alpha channels properly.
+    """
     if dpid_resize is None:
         raise ImportError(
             "pepedpid is required for Phhofm DPID. Please install it: pip install pepedpid"
@@ -41,7 +47,9 @@ def run_phhofm_dpid_single_folder(
             out_path = os.path.join(output_folder, fname)
             if not overwrite and os.path.exists(out_path):
                 continue
-            img = read(in_path)
+            
+            # Read image with alpha support
+            img, has_alpha = read_with_alpha(in_path)
             h, w = img.shape[:2]
             # Phhofm DPID expects scale as an integer factor (e.g., 4 for 0.25)
             scale_factor = 1.0 / scale
@@ -49,13 +57,21 @@ def run_phhofm_dpid_single_folder(
             target_w = max(1, int(round(w * scale)))
             # DPID factor: (scale_factor - 1) / scale_factor, but allow user override
             factor = lambd if lambd is not None else (scale_factor - 1) / scale_factor
-            img_ds = dpid_resize(img, target_h, target_w, factor)
-            save(img_ds, out_path)
+            
+            # Process image with alpha handling
+            img_ds = process_image_with_alpha(img, target_h, target_w, factor, has_alpha)
+            
+            # Save with alpha support
+            save_with_alpha(img_ds, out_path, has_alpha)
 
 
 def run_phhofm_dpid_hq_lq(
     hq_folder, lq_folder, out_hq_base, out_lq_base, scales, overwrite=False, lambd=1.0
 ):
+    """
+    Downscale HQ/LQ paired images using Phhofm's DPID implementation.
+    Now supports alpha channels properly.
+    """
     if dpid_resize is None:
         raise ImportError(
             "pepedpid is required for Phhofm DPID. Please install it: pip install pepedpid"
@@ -90,14 +106,24 @@ def run_phhofm_dpid_hq_lq(
             out_lq = os.path.join(out_lq_folder, fname)
             if not overwrite and os.path.exists(out_hq) and os.path.exists(out_lq):
                 continue
-            img_hq = read(in_hq)
-            img_lq = read(in_lq)
+            
+            # Read images with alpha support
+            img_hq, has_alpha_hq = read_with_alpha(in_hq)
+            img_lq, has_alpha_lq = read_with_alpha(in_lq)
+            
+            # Use the alpha status from HQ image (they should match)
+            has_alpha = has_alpha_hq
+            
             h, w = img_hq.shape[:2]
             scale_factor = 1.0 / scale
             target_h = max(1, int(round(h * scale)))
             target_w = max(1, int(round(w * scale)))
             factor = lambd if lambd is not None else (scale_factor - 1) / scale_factor
-            img_hq_ds = dpid_resize(img_hq, target_h, target_w, factor)
-            img_lq_ds = dpid_resize(img_lq, target_h, target_w, factor)
-            save(img_hq_ds, out_hq)
-            save(img_lq_ds, out_lq)
+            
+            # Process images with alpha handling
+            img_hq_ds = process_image_with_alpha(img_hq, target_h, target_w, factor, has_alpha)
+            img_lq_ds = process_image_with_alpha(img_lq, target_h, target_w, factor, has_alpha)
+            
+            # Save with alpha support
+            save_with_alpha(img_hq_ds, out_hq, has_alpha)
+            save_with_alpha(img_lq_ds, out_lq, has_alpha)

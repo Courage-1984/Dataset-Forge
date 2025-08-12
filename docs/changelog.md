@@ -6,6 +6,42 @@
 
 ## [Unreleased]
 
+### 🧠 CBIR Semantic Detection Integration (August 2025)
+
+- **New Feature**: CBIR (Content-Based Image Retrieval) Semantic Detection integrated into Consolidated De-duplication menu
+- **Key Features**:
+  - **Deep Learning Models**: CLIP (fast), ResNet (balanced), VGG (detailed) for semantic similarity detection
+  - **Semantic Understanding**: Finds conceptually similar images beyond pixel-level comparisons
+  - **Advanced Configuration**: Configurable thresholds, model selection, and batch processing
+  - **Multiple Operations**: Show, Copy, Move, Delete duplicate groups with comprehensive reporting
+  - **Memory Management**: Efficient batch processing with GPU acceleration support
+- **Model Characteristics**:
+  - **CLIP**: Fastest processing (~10-20 images/second), best for semantic similarity
+  - **ResNet**: Medium speed (~5-10 images/second), good for visual feature analysis
+  - **VGG**: Slowest but most detailed (~2-5 images/second), comprehensive feature extraction
+- **Performance Optimization**:
+  - **GPU Acceleration**: Automatic GPU usage when available with memory management
+  - **Batch Processing**: Configurable max image limits for memory optimization
+  - **Efficient Caching**: Model caching and embedding reuse for improved performance
+- **Threshold Guidelines**:
+  - **Conservative (0.95-0.98)**: High precision, fewer false positives
+  - **Balanced (0.90-0.95)**: Good balance between precision and recall
+  - **Aggressive (0.80-0.90)**: Higher recall, more potential duplicates
+- **Files Updated**:
+  - `dataset_forge/menus/consolidated_dedup_menu.py` - Added CBIR as option 7 with comprehensive workflow
+  - `dataset_forge/actions/cbir_actions.py` - Enhanced with improved error handling and memory management
+  - `docs/features.md` - Added comprehensive CBIR feature documentation
+  - `docs/usage.md` - Added CBIR usage guide with examples and best practices
+  - `docs/changelog.md` - Documented CBIR integration
+- **Menu Integration**:
+  - **Added**: Option 7 "🧠 CBIR Semantic Detection" to Consolidated De-duplication menu
+  - **Enhanced**: Menu context with CBIR information and usage examples
+  - **Updated**: Help system with CBIR documentation and troubleshooting
+- **Testing**: Comprehensive validation of CBIR integration with menu navigation and workflow testing
+- **Documentation**: Complete usage guide, model selection guidelines, and performance optimization tips
+- **Result**: Advanced semantic duplicate detection with deep learning models and flexible configuration
+- **User Experience**: Intuitive model selection, comprehensive parameter configuration, and safe operation modes
+
 ### 🎨 Comprehensive Menu System Improvement (August 2025)
 
 - **Major Achievement**: Complete transformation of Dataset Forge's menu system with perfect theming compliance and enhanced user experience
@@ -460,6 +496,17 @@
   - Documented in all relevant docs and .cursorrules.
 - Added '🧭 Align Images (Batch Projective Alignment)' feature to Dataset Management menu. Allows batch alignment of images from two folders (flat or recursive) using SIFT+FLANN projective transformation. Robust error handling, modular implementation, and public API.
 - Added robust, non-interactive test for Align Images using feature-rich dummy images to ensure SIFT keypoint detection and alignment.
+
+### 🆕 DPID: Comprehensive Detail-Preserving Downscaling Menu with Alpha Channel Support (August 2025)
+
+- **New Consolidated DPID Menu:** Created comprehensive DPID (Detail-Preserving Image Downscaling) menu with 4 methods: Umzi's DPID (pepedpid), Phhofm DPID, BasicSR DPID, and OpenMMLab DPID.
+- **🔄 Alpha Channel Support:** Implemented comprehensive alpha channel support across all DPID methods with hybrid processing approach (DPID for RGB, optimized OpenCV for alpha).
+- **Robust Error Handling:** Fixed alpha channel processing panics by using OpenCV resize for alpha channels instead of problematic DPID methods.
+- **Menu Integration:** Added as option 4 in Image Processing & Augmentation menu with full theming compliance and global command support.
+- **Advanced Features:** Method comparison tool, parameter configuration, session state integration, and comprehensive help system.
+- **Processing Modes:** Support for both single folder and HQ/LQ paired processing with configurable parameters (RGB and RGBA images).
+- **Testing:** Comprehensive test suite covering menu integration, parameter validation, and processing workflows.
+- **Documentation:** Updated all relevant docs and .cursorrules to reflect the new consolidated DPID menu system with alpha channel support.
 
 ### 🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)
 

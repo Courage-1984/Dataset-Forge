@@ -315,20 +315,22 @@ def image_processing_menu():
         "1": ("🔄 Geometric Transformations", basic_transformations_menu),
         "2": ("🎨 Color & Tone Adjustments", colour_tone_levels_menu),
         "3": ("✨ Image Augmentation", augmentation_submenu),
-        "4": ("📋 Metadata Management", metadata_menu),
-        "5": ("✏️  Sketch Extraction", extract_sketches_menu),
+        "4": ("🔽 DPID Detail-Preserving Downscaling", dpid_submenu),
+        "5": ("📋 Metadata Management", metadata_menu),
+        "6": ("✏️  Sketch Extraction", extract_sketches_menu),
         "0": ("⬅️  Back", None),
     }
 
     # Define menu context for help system
     menu_context = {
         "Purpose": "Transform, enhance, and augment images for machine learning training",
-        "Total Options": "5 processing categories",
-        "Navigation": "Use numbers 1-5 to select, 0 to go back",
+        "Total Options": "6 processing categories",
+        "Navigation": "Use numbers 1-6 to select, 0 to go back",
         "Key Features": [
             "🔄 Geometric Transformations - Resize, crop, rotate, flip, and shuffle images",
             "🎨 Color & Tone Adjustments - Brightness, contrast, hue, saturation, and grayscale",
             "✨ Image Augmentation - Advanced augmentation techniques for training",
+            "🔽 DPID Detail-Preserving Downscaling - Advanced downscaling with detail preservation",
             "📋 Metadata Management - EXIF data scrubbing and color profile conversion",
             "✏️ Sketch Extraction - Extract sketch-like features from images",
         ],
@@ -336,6 +338,7 @@ def image_processing_menu():
             "Start with Geometric Transformations for basic image modifications",
             "Color adjustments help normalize image appearance",
             "Augmentation increases training dataset diversity",
+            "DPID downscaling preserves image details better than standard methods",
             "Metadata management ensures clean, standardized images",
             "Sketch extraction creates specialized training data",
             "Always backup original images before processing",
@@ -356,3 +359,9 @@ def image_processing_menu():
         action = options.get(key, (None, None))[1]
         if callable(action):
             action()
+
+
+def dpid_submenu():
+    """Sub-menu for DPID downscaling."""
+    from dataset_forge.actions.dpid_actions import dpid_menu
+    dpid_menu()

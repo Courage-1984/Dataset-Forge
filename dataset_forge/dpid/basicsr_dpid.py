@@ -8,6 +8,9 @@ from PIL import Image
 import cv2
 import math
 
+# Import alpha handling functions from umzi_dpid
+from dataset_forge.dpid.umzi_dpid import read_with_alpha, save_with_alpha
+
 
 def dpid_kernel_basicsr(
     kernel_size, sigma, lambd, isotropic=True, sig_x=None, sig_y=None, theta=None
@@ -61,6 +64,47 @@ def dpid_downscale_img(img, scale, kernel, border_type=cv2.BORDER_REFLECT):
     return img_ds
 
 
+def process_image_with_alpha_basicsr(img, scale, kernel, has_alpha=False):
+    """
+    Process image with BasicSR DPID, handling alpha channels properly.
+    
+    Args:
+        img: Input image (float32, range [0,1])
+        scale: Scale factor
+        kernel: DPID kernel
+        has_alpha: Whether the image has alpha channel
+        
+    Returns:
+        Processed image with same format as input
+    """
+    if has_alpha:
+        # Separate RGB and alpha channels
+        rgb = img[:, :, :3]
+        alpha = img[:, :, 3]  # Convert to 2D array (H, W)
+        
+        # Process RGB channels with BasicSR DPID
+        rgb_processed = dpid_downscale_img(rgb, scale, kernel)
+        
+        # Process alpha channel with OpenCV resize (more reliable for single channel)
+        # Convert to uint8 for OpenCV, resize, then convert back to float32
+        alpha_uint8 = (alpha * 255).astype(np.uint8)
+        h, w = alpha_uint8.shape[:2]
+        new_h = int(h * scale)
+        new_w = int(w * scale)
+        alpha_resized = cv2.resize(alpha_uint8, (new_w, new_h), interpolation=cv2.INTER_CUBIC)
+        alpha_processed = alpha_resized.astype(np.float32) / 255.0
+        
+        # Add channel dimension back for concatenation
+        alpha_processed_3d = alpha_processed[:, :, np.newaxis]
+        
+        # Combine RGB and alpha
+        result = np.concatenate([rgb_processed, alpha_processed_3d], axis=2)
+        return result
+    else:
+        # Process RGB image directly
+        return dpid_downscale_img(img, scale, kernel)
+
+
 def run_basicsr_dpid_single_folder(
     input_folder,
     output_base,
@@ -74,6 +118,10 @@ def run_basicsr_dpid_single_folder(
     sig_y=None,
     theta=None,
 ):
+    """
+    Downscale all images in a folder using BasicSR's DPID implementation.
+    Now supports alpha channels properly.
+    """
     if isinstance(scales, float):
         scales = [scales]
     files = [
@@ -95,10 +143,15 @@ def run_basicsr_dpid_single_folder(
             out_path = os.path.join(output_folder, fname)
             if not overwrite and os.path.exists(out_path):
                 continue
-            img = np.array(Image.open(in_path).convert("RGB"), dtype=np.float32) / 255.0
-            img_ds = dpid_downscale_img(img, scale, kernel)
-            img_ds = (img_ds * 255.0).clip(0, 255).astype(np.uint8)
-            Image.fromarray(img_ds).save(out_path)
+            
+            # Read image with alpha support
+            img, has_alpha = read_with_alpha(in_path)
+            
+            # Process image with alpha handling
+            img_ds = process_image_with_alpha_basicsr(img, scale, kernel, has_alpha)
+            
+            # Save with alpha support
+            save_with_alpha(img_ds, out_path, has_alpha)
 
 
 def run_basicsr_dpid_hq_lq(
@@ -116,6 +169,10 @@ def run_basicsr_dpid_hq_lq(
     sig_y=None,
     theta=None,
 ):
+    """
+    Downscale HQ/LQ paired images using BasicSR's DPID implementation.
+    Now supports alpha channels properly.
+    """
     if isinstance(scales, float):
         scales = [scales]
     hq_files = {
@@ -151,15 +208,18 @@ def run_basicsr_dpid_hq_lq(
             out_lq = os.path.join(out_lq_folder, fname)
             if not overwrite and os.path.exists(out_hq) and os.path.exists(out_lq):
                 continue
-            img_hq = (
-                np.array(Image.open(in_hq).convert("RGB"), dtype=np.float32) / 255.0
-            )
-            img_lq = (
-                np.array(Image.open(in_lq).convert("RGB"), dtype=np.float32) / 255.0
-            )
-            img_hq_ds = dpid_downscale_img(img_hq, scale, kernel)
-            img_lq_ds = dpid_downscale_img(img_lq, scale, kernel)
-            img_hq_ds = (img_hq_ds * 255.0).clip(0, 255).astype(np.uint8)
-            img_lq_ds = (img_lq_ds * 255.0).clip(0, 255).astype(np.uint8)
-            Image.fromarray(img_hq_ds).save(out_hq)
-            Image.fromarray(img_lq_ds).save(out_lq)
+            
+            # Read images with alpha support
+            img_hq, has_alpha_hq = read_with_alpha(in_hq)
+            img_lq, has_alpha_lq = read_with_alpha(in_lq)
+            
+            # Use the alpha status from HQ image (they should match)
+            has_alpha = has_alpha_hq
+            
+            # Process images with alpha handling
+            img_hq_ds = process_image_with_alpha_basicsr(img_hq, scale, kernel, has_alpha)
+            img_lq_ds = process_image_with_alpha_basicsr(img_lq, scale, kernel, has_alpha)
+            
+            # Save with alpha support
+            save_with_alpha(img_hq_ds, out_hq, has_alpha)
+            save_with_alpha(img_lq_ds, out_lq, has_alpha)

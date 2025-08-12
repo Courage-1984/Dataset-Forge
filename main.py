@@ -78,6 +78,8 @@ def _sigint_handler(signum, frame):
 
 
 def main():
+    global main_menu
+    
     # Suppress pygame warnings and other unnecessary output
     warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
     os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"

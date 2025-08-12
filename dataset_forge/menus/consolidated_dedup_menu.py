@@ -40,8 +40,8 @@ def consolidated_dedup_menu():
     # Define menu context for help system
     menu_context = {
         "Purpose": "Comprehensive de-duplication using multiple advanced methods and algorithms - find and remove duplicate images from your datasets",
-        "Total Options": "6 de-duplication methods",
-        "Navigation": "Use numbers 1-6 to select, 0 to go back",
+        "Total Options": "7 de-duplication methods",
+        "Navigation": "Use numbers 1-7 to select, 0 to go back",
         "Key Features": [
             "🔍 Fuzzy Matching - Multi-algorithm fuzzy matching with configurable thresholds for perceptual duplicates",
             "👁️ Visual Detection - CLIP/LPIPS based semantic duplicate detection for content similarity",
@@ -49,6 +49,7 @@ def consolidated_dedup_menu():
             "🔍 ImageDedup Pro - Professional duplicate detection with advanced features and reporting",
             "📊 Analysis & Reports - Comprehensive duplicate analysis and detailed reporting",
             "⚙️ Settings & Configuration - Configure thresholds and algorithms for optimal results",
+            "🧠 CBIR Semantic Detection - Content-Based Image Retrieval using deep learning embeddings for conceptual similarity",
         ],
         "Tips": [
             "🔍 Start with Fuzzy Matching for comprehensive duplicate detection using multiple algorithms",
@@ -57,6 +58,7 @@ def consolidated_dedup_menu():
             "🔍 ImageDedup Pro offers professional-grade features with advanced reporting",
             "📊 Always test with dry run before destructive operations",
             "⚙️ Configure thresholds based on your dataset characteristics and requirements",
+            "🧠 Use CBIR for finding conceptually similar images using deep learning embeddings",
         ],
         "Usage Examples": [
             "🔍 Fuzzy matching: 1 → Select folder → Choose algorithms → Set thresholds → Process",
@@ -65,6 +67,7 @@ def consolidated_dedup_menu():
             "🔍 ImageDedup Pro: 4 → Select operation → Configure settings → Generate report",
             "📊 Analysis: 5 → Choose analysis type → Select output format → Generate report",
             "⚙️ Settings: 6 → View current settings → Modify thresholds → Save configuration",
+            "🧠 CBIR detection: 7 → Select workflow → Choose model → Set parameters → Process",
         ],
         "Performance Notes": [
             "🔍 Fuzzy matching: Use multiple algorithms for better accuracy but slower processing",
@@ -73,12 +76,14 @@ def consolidated_dedup_menu():
             "🔍 ImageDedup Pro: Professional features but may require more memory",
             "📊 Analysis: Use sampling for large datasets to speed up reporting",
             "⚙️ Settings: Conservative thresholds recommended for first-time use",
+            "🧠 CBIR: CLIP is fastest, ResNet/VGG are slower but may be more accurate for specific tasks",
         ],
         "Algorithm Comparison": [
             "🔍 Fuzzy Matching: Best for finding similar images with slight variations",
             "👁️ Visual Detection: Best for finding semantically similar content",
             "🔐 File Hash: Best for finding exact or very similar images quickly",
             "🔍 ImageDedup Pro: Best for professional workflows with detailed reporting",
+            "🧠 CBIR: Best for finding conceptually similar images using deep learning embeddings",
         ],
     }
 
@@ -90,6 +95,7 @@ def consolidated_dedup_menu():
             "4": ("🔍 ImageDedup Pro", imagededup_action),
             "5": ("📊 Analysis & Reports", duplicate_analysis_action),
             "6": ("⚙️  Settings & Configuration", dedup_settings_action),
+            "7": ("🧠 CBIR Semantic Detection", cbir_dedup_action),
             "0": ("⬅️  Back to Utilities", None),
         }
 
@@ -615,6 +621,122 @@ def dedup_settings_action():
         print_section("Import Settings", color=Mocha.yellow)
         # Import settings
         print_info("Settings import not implemented yet")
+
+
+def cbir_dedup_action():
+    """CBIR Semantic Detection - Content-Based Image Retrieval."""
+    print_header("🧠 CBIR Semantic Detection", color=Mocha.yellow)
+
+    # Get input method
+    print_section("Input Selection", color=Mocha.yellow)
+    print_info("1. Single folder")
+    print_info("2. HQ/LQ paired folders")
+    mode_choice = input("Select mode [1]: ").strip() or "1"
+
+    if mode_choice == "1":
+        folder = get_path_with_history(
+            "Enter folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        if not folder or not os.path.isdir(folder):
+            print_error("Invalid folder path.")
+            return
+        hq_folder = lq_folder = None
+    else:
+        hq_folder = get_path_with_history(
+            "Enter HQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        lq_folder = get_path_with_history(
+            "Enter LQ folder path:", allow_hq_lq=True, allow_single_folder=True
+        )
+        if (
+            not hq_folder
+            or not lq_folder
+            or not os.path.isdir(hq_folder)
+            or not os.path.isdir(lq_folder)
+        ):
+            print_error("Invalid HQ/LQ folder paths.")
+            return
+        folder = None
+
+    # Get model
+    print_section("Model Selection", color=Mocha.yellow)
+    print_info("1. CLIP (fast, semantic similarity)")
+    print_info("2. ResNet (slower, more accurate)")
+    print_info("3. VGG (slower, more accurate)")
+    model_choice = input("Select model [1]: ").strip() or "1"
+    model_name = (
+        "clip" if model_choice == "1" else "resnet" if model_choice == "2" else "vgg"
+    )
+
+    # Get parameters
+    try:
+        max_images = int(input("Max images to check [100]: ").strip() or "100")
+        threshold = float(input("Similarity threshold [0.98]: ").strip() or "0.98")
+    except ValueError:
+        max_images = 100
+        threshold = 0.98
+
+    # Get operation
+    print_section("Operation Mode", color=Mocha.yellow)
+    print_info("1. Show duplicates only (preview)")
+    print_info("2. Copy duplicates to folder")
+    print_info("3. Move duplicates to folder")
+    print_info("4. Delete duplicates (permanent)")
+
+    operation_choice = input("Select operation [1]: ").strip() or "1"
+    operations = {"1": "find", "2": "copy", "3": "move", "4": "remove"}
+    operation = operations.get(operation_choice, "find")
+
+    # Get destination if needed
+    dest_dir = None
+    if operation in ["copy", "move"]:
+        dest_dir = get_destination_path("Enter destination folder for duplicates:")
+        if not dest_dir:
+            print_error("Destination folder is required for copy/move operations.")
+            return
+
+    # Confirm destructive operations
+    if operation == "remove":
+        confirm = input(
+            "⚠️  This will PERMANENTLY DELETE files. Type 'DELETE' to confirm: "
+        ).strip()
+        if confirm != "DELETE":
+            print_info("Operation cancelled.")
+            return
+
+    # Execute CBIR
+    print_section("Processing", color=Mocha.yellow)
+    try:
+        from dataset_forge.actions.cbir_actions import cbir_workflow
+
+        results = cbir_workflow(
+            folder=folder,
+            hq_folder=hq_folder,
+            lq_folder=lq_folder,
+            model_name=model_name,
+            threshold=threshold,
+            max_images=max_images,
+            operation=operation,
+            dest_dir=dest_dir,
+            dry_run=(operation == "find"),
+        )
+
+        if results:
+            if operation == "find":
+                total_groups = sum(len(groups) for groups in results.values())
+                print_success(f"Found {total_groups} duplicate groups")
+            else:
+                total_processed = sum(len(processed) for processed in results.values())
+                print_success(f"Processed {total_processed} files")
+            play_done_sound()
+        else:
+            print_info("No duplicates found.")
+
+    except Exception as e:
+        print_error(f"Error during CBIR processing: {e}")
+    finally:
+        clear_memory()
+        clear_cuda_cache()
 
 
 def get_default_threshold(method: str) -> float:

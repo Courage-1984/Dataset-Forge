@@ -99,6 +99,203 @@ Dataset Forge is configured with comprehensive MCP (Model Context Protocol) serv
    - `mcp_firecrawl_firecrawl_extract` - Structured data extraction
    - `mcp_firecrawl_firecrawl_deep_research` - Complex research questions
 
+---
+
+## Beta Release Workflow
+
+### Overview
+
+Dataset Forge follows a comprehensive beta release process to ensure quality and stability. Beta releases are used for testing new features, collecting feedback, and preparing for stable releases.
+
+### Beta Release Process
+
+#### **Pre-Release Checklist**
+
+Before creating a beta release, ensure:
+
+- [ ] All tests pass (`python -m pytest`)
+- [ ] Code linting passes (if using flake8/black)
+- [ ] Documentation is up-to-date
+- [ ] No critical bugs in TODO.md
+- [ ] Performance benchmarks pass (if applicable)
+- [ ] Version numbers updated in all relevant files
+
+#### **Version Management**
+
+Dataset Forge follows [PEP 440](https://www.python.org/dev/peps/pep-0440/) for versioning:
+
+```
+MAJOR.MINOR.PATCHbNUMBER
+```
+
+**Examples:**
+- `1.0.0b1` - First beta release
+- `1.0.0b2` - Second beta release
+- `2.1.0b1` - First beta of version 2.1
+
+**Files to Update:**
+1. `setup.py` - `version="1.0.0b1"`
+2. `dataset_forge/__init__.py` - `__version__ = "1.0.0b1"`
+
+#### **Automated Beta Release**
+
+Use the automated script for consistent releases:
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Create beta release
+python tools/create_beta_release.py --version 1.0.0b1
+```
+
+**What the script does:**
+- Updates version numbers in all files
+- Creates git tag
+- Builds source distribution and wheel packages
+- Creates custom source code archives
+- Prepares GitHub release assets
+
+#### **Manual Beta Release Process**
+
+If you need to create a beta release manually:
+
+```bash
+# 1. Update version numbers
+# Edit setup.py and dataset_forge/__init__.py
+
+# 2. Create git tag
+git tag -a v1.0.0b1 -m "Beta release 1.0.0b1"
+git push origin v1.0.0b1
+
+# 3. Build packages
+python setup.py sdist bdist_wheel
+
+# 4. Create GitHub release
+# Go to GitHub → Releases → Create new release
+# Select the tag and upload assets
+```
+
+#### **Package Types**
+
+**Source Distribution:**
+- File: `dataset-forge-1.0.0b1.tar.gz`
+- Install: `pip install dataset-forge-1.0.0b1.tar.gz`
+- Use case: Standard Python package installation
+
+**Wheel Distribution:**
+- File: `dataset_forge-1.0.0b1-py3-none-any.whl`
+- Install: `pip install dataset_forge-1.0.0b1-py3-none-any.whl`
+- Use case: Faster installation, better compatibility
+
+**Windows Executable:**
+- File: `dataset-forge-beta.exe`
+- Install: Download and run directly
+- Use case: Users who don't want to install Python
+
+#### **Testing Beta Releases**
+
+**Local Installation Test:**
+```bash
+# Test the beta package locally
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -c "import dataset_forge; print(dataset_forge.__version__)"
+dataset-forge --help
+```
+
+**Clean Environment Test:**
+```bash
+# Create new virtual environment
+py -3.12 -m venv test_beta_env
+./test_beta_env\Scripts\Activate.ps1
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -m pytest tests/ -v
+```
+
+#### **GitHub Release Process**
+
+1. **Go to GitHub repository** → Releases
+2. **Click "Create a new release"**
+3. **Tag version:** `v1.0.0b1`
+4. **Release title:** `Dataset-Forge Beta 1.0.0b1`
+5. **Description:** Include changelog and installation instructions
+6. **Mark as pre-release**
+7. **Upload assets:**
+   - `dataset-forge-1.0.0b1.tar.gz`
+   - `dataset_forge-1.0.0b1-py3-none-any.whl`
+   - `dataset-forge-beta.exe`
+   - Custom source code archives
+
+#### **Source Code Assets**
+
+**Automatic GitHub Assets:**
+- `Dataset-Forge-v1.0.0b1.zip`
+- `Dataset-Forge-v1.0.0b1.tar.gz`
+
+**Custom Source Archives:**
+- `Dataset-Forge-1.0.0b1-source.zip`
+- `Dataset-Forge-1.0.0b1-source.tar.gz`
+
+**What's included in custom archives:**
+- ✅ All source code (`dataset_forge/`, `tests/`, `tools/`)
+- ✅ Documentation (`docs/`, `README.md`, `LICENSE`)
+- ✅ Configuration files (`setup.py`, `requirements.txt`)
+- ✅ Essential scripts (`main.py`, `run.bat`)
+- ❌ Development files (`.git`, `venv`, `__pycache__`)
+- ❌ Build artifacts (`dist/`, `build/`, `*.egg-info`)
+- ❌ Test data (`test_datasets/`, `store/`, `reports/`)
+
+#### **Post-Release Process**
+
+**Week 1-2: Collect Feedback**
+- Monitor GitHub issues and discussions
+- Collect user feedback and bug reports
+- Track installation and usage metrics
+
+**Week 3: Analyze and Prioritize**
+- Review all feedback and bug reports
+- Prioritize fixes and improvements
+- Plan release candidate features
+
+**Week 4-5: Implement Fixes**
+- Fix critical bugs
+- Implement high-priority improvements
+- Update documentation
+
+**Week 6: Release Candidate**
+- Create release candidate
+- Final testing and validation
+- Prepare for stable release
+
+#### **Emergency Procedures**
+
+**Critical Bug Discovery:**
+1. **Acknowledge immediately** on GitHub
+2. **Create hotfix** if needed
+3. **Release new beta** with incremented number
+4. **Communicate clearly** to users
+
+**Rollback Plan:**
+1. **Keep previous beta** available
+2. **Provide rollback instructions**
+3. **Monitor for additional issues**
+
+#### **Best Practices**
+
+**Do's:**
+- ✅ Test thoroughly before release
+- ✅ Use semantic versioning
+- ✅ Provide clear installation instructions
+- ✅ Document known issues
+- ✅ Respond to feedback promptly
+
+**Don'ts:**
+- ❌ Rush releases without testing
+- ❌ Skip version updates
+- ❌ Ignore user feedback
+- ❌ Release with critical bugs
+- ❌ Forget to mark as pre-release
+
 3. **Filesystem Tools** (Project Analysis)
 
    - `mcp_filesystem_read_text_file` - Read and analyze project files

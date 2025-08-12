@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import os
 from dataset_forge.dpid import basicsr_dpid, openmmlab_dpid, phhofm_dpid, umzi_dpid
+from dataset_forge.actions.dpid_actions import dpid_menu
 
 
 def make_dummy_image(path, size=(8, 8)):
@@ -108,3 +109,27 @@ def test_run_umzi_dpid_hq_lq(tmp_path, monkeypatch):
     out_subdir_lq = out_lq / "50pct"
     assert (out_subdir_hq / "a.png").exists()
     assert (out_subdir_lq / "a.png").exists()
+
+
+def test_dpid_menu_integration():
+    """Test that DPID menu can be imported and called."""
+    assert dpid_menu is not None
+    assert callable(dpid_menu)
+
+
+def test_dpid_menu_imports():
+    """Test that all DPID menu components can be imported."""
+    from dataset_forge.actions.dpid_actions import (
+        umzi_dpid_menu,
+        phhofm_dpid_menu,
+        basicsr_dpid_menu,
+        openmmlab_dpid_menu,
+        compare_dpid_methods,
+    )
+    
+    # Test that all menus are callable
+    assert callable(umzi_dpid_menu)
+    assert callable(phhofm_dpid_menu)
+    assert callable(basicsr_dpid_menu)
+    assert callable(openmmlab_dpid_menu)
+    assert callable(compare_dpid_methods)

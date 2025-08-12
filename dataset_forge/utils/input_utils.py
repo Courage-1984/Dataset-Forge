@@ -125,10 +125,12 @@ def get_file_operation_choice():
         print_error("Invalid choice. Please enter 'copy', 'move', or 'inplace'.")
 
 
-def get_destination_path(is_optional=False):
+def get_destination_path(
+    prompt="Enter the destination directory path", is_optional=False
+):
     while True:
         path = get_path_with_history(
-            "Enter the destination directory path",
+            prompt,
             is_destination=True,
             is_optional=is_optional,
         )
@@ -192,7 +194,9 @@ def get_pairs_to_process(matching_files, operation_name="process"):
                     num_to_process = num
                     break
                 else:
-                    print_error(f"Number of pairs must be between 0 and {num_available}.")
+                    print_error(
+                        f"Number of pairs must be between 0 and {num_available}."
+                    )
             except ValueError:
                 print_error(
                     "Invalid input. Please enter 'all', a number, a percentage (e.g., '10%'), or 'random'."

@@ -34,6 +34,315 @@
 - **📊 Performance Monitoring**: Real-time metrics, cache statistics, and automated optimization tools.
 - **🎯 User Experience**: Comprehensive visual feedback, error handling, and user interaction systems.
 
+---
+
+## Beta Release & Packaging
+
+### Overview
+
+Dataset Forge uses a comprehensive beta release system for testing new features and collecting user feedback before stable releases. This section covers the complete beta release workflow, packaging strategies, and distribution methods.
+
+### Beta Release Workflow
+
+#### **Quick Start**
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Run tests to ensure everything works
+python -m pytest tests/ -v
+
+# Check for any critical issues
+python tools/check_mocha_theming.py
+
+# Create beta release
+python tools/create_beta_release.py --version 1.0.0b1
+```
+
+#### **Pre-Release Testing Checklist**
+
+Before releasing, test:
+
+- [ ] All tests pass (`python -m pytest`)
+- [ ] CLI works (`python main.py --help`)
+- [ ] Package installs correctly
+- [ ] Core features work (dataset creation, deduplication, etc.)
+- [ ] No critical bugs in TODO.md
+- [ ] Documentation is up-to-date
+
+#### **Version Management**
+
+Dataset Forge follows [PEP 440](https://www.python.org/dev/peps/pep-0440/) for versioning:
+
+```
+MAJOR.MINOR.PATCHbNUMBER
+```
+
+**Examples:**
+- `1.0.0b1` - First beta
+- `1.0.0b2` - Second beta
+- `2.1.0b1` - First beta of version 2.1
+
+**Files to Update:**
+1. `setup.py` - `version="1.0.0b1"`
+2. `dataset_forge/__init__.py` - `__version__ = "1.0.0b1"`
+
+### Packaging Strategies
+
+#### **Source Distribution (sdist)**
+
+Create a source distribution package:
+
+```bash
+# Clean previous builds
+rm -rf build/ dist/ *.egg-info/
+
+# Create source distribution
+python setup.py sdist
+
+# Verify the package
+tar -tzf ./dist/dataset_forge-1.0.0b1.tar.gz
+```
+
+**File:** `dataset-forge-1.0.0b1.tar.gz`
+**Install:** `pip install dataset-forge-1.0.0b1.tar.gz`
+**Use case:** Standard Python package installation
+
+#### **Wheel Distribution**
+
+For better installation performance:
+
+```bash
+# Install wheel if not already installed
+pip install wheel
+
+# Create wheel distribution
+python setup.py bdist_wheel
+
+# Verify the wheel
+python -m zipfile -l dist/dataset_forge-1.0.0b1-py3-none-any.whl
+```
+
+**File:** `dataset_forge-1.0.0b1-py3-none-any.whl`
+**Install:** `pip install dataset_forge-1.0.0b1-py3-none-any.whl`
+**Use case:** Faster installation, better compatibility
+
+#### **Standalone Executable (Windows)**
+
+Using PyInstaller for Windows users:
+
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Create executable
+pyinstaller --onefile --name dataset-forge-beta main.py
+
+# The executable will be in dist/dataset-forge-beta.exe
+```
+
+**File:** `dataset-forge-beta.exe`
+**Install:** Download and run directly
+**Use case:** Users who don't want to install Python
+
+### Distribution Methods
+
+#### **GitHub Releases (Recommended)**
+
+Create a GitHub release for the beta:
+
+1. **Go to GitHub repository** → Releases
+2. **Click "Create a new release"**
+3. **Tag version:** `v1.0.0b1`
+4. **Release title:** `Dataset-Forge Beta 1.0.0b1`
+5. **Description:** Include changelog and installation instructions
+6. **Mark as pre-release**
+7. **Upload assets:**
+   - `dataset-forge-1.0.0b1.tar.gz`
+   - `dataset_forge-1.0.0b1-py3-none-any.whl`
+   - `dataset-forge-beta.exe`
+
+#### **PyPI Test Server (Optional)**
+
+For testing PyPI distribution:
+
+```bash
+# Install twine
+pip install twine
+
+# Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# Test installation from TestPyPI
+pip install --index-url https://test.pypi.org/simple/ dataset-forge==1.0.0b1
+```
+
+### Source Code Assets
+
+#### **Automatic GitHub Assets**
+
+When you create a GitHub release, GitHub automatically generates:
+
+- **Source code (zip)** - `Dataset-Forge-v1.0.0b1.zip`
+- **Source code (tar.gz)** - `Dataset-Forge-v1.0.0b1.tar.gz`
+
+**Direct URLs:**
+```
+https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.zip
+https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.tar.gz
+```
+
+#### **Custom Source Code Archives**
+
+The beta release script creates custom source code archives:
+
+- **Dataset-Forge-1.0.0b1-source.zip**
+- **Dataset-Forge-1.0.0b1-source.tar.gz**
+
+**What's included:**
+- ✅ All source code (`dataset_forge/`, `tests/`, `tools/`)
+- ✅ Documentation (`docs/`, `README.md`, `LICENSE`)
+- ✅ Configuration files (`setup.py`, `requirements.txt`)
+- ✅ Essential scripts (`main.py`, `run.bat`)
+- ❌ Development files (`.git`, `venv`, `__pycache__`)
+- ❌ Build artifacts (`dist/`, `build/`, `*.egg-info`)
+- ❌ Test data (`test_datasets/`, `store/`, `reports/`)
+
+### Testing Beta Releases
+
+#### **Local Installation Test**
+
+```bash
+# Test the beta package locally
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -c "import dataset_forge; print(dataset_forge.__version__)"
+dataset-forge --help
+```
+
+#### **Clean Environment Test**
+
+```bash
+# Create new virtual environment
+py -3.12 -m venv test_beta_env
+./test_beta_env\Scripts\Activate.ps1
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -m pytest tests/ -v
+```
+
+### Release Announcement Template
+
+```markdown
+# Dataset-Forge Beta 1.0.0b1
+
+🎉 Beta release is ready for testing!
+
+## What's New
+
+- [List major features]
+- [List improvements]
+- [List bug fixes]
+
+## Installation
+
+- **Source:** `pip install dataset-forge==1.0.0b1`
+- **Windows:** Download `dataset-forge-beta.exe`
+- **From source:** `pip install -e .`
+
+## Testing
+
+Please test and report issues on GitHub!
+
+## Known Issues
+
+- [List any known issues]
+```
+
+### Automated Workflow
+
+#### **GitHub Actions**
+
+The repository includes automated beta release workflow:
+
+1. **Push a tag:** `git push origin v1.0.0b1`
+2. **GitHub Actions automatically:**
+   - Runs tests
+   - Builds packages
+   - Creates GitHub release
+   - Uploads assets
+
+#### **Manual Override**
+
+If you need to trigger manually:
+
+1. Go to Actions → Beta Release
+2. Click "Run workflow"
+3. Enter version (e.g., `1.0.0b1`)
+4. Click "Run workflow"
+
+### Post-Release Monitoring
+
+#### **Track These Metrics**
+
+1. **Installation Success Rate**
+   - Number of successful installations
+   - Common installation errors
+
+2. **Feature Usage**
+   - Most used features
+   - Least used features
+   - Performance bottlenecks
+
+3. **Bug Reports**
+   - Number of issues reported
+   - Severity distribution
+   - Common problems
+
+4. **User Feedback**
+   - Positive feedback
+   - Feature requests
+   - Usability issues
+
+#### **Timeline**
+
+- **Week 1-2:** Collect feedback
+- **Week 3:** Analyze and prioritize
+- **Week 4-5:** Implement fixes
+- **Week 6:** Release candidate
+
+### Emergency Procedures
+
+#### **Critical Bug Found**
+
+1. **Acknowledge immediately** on GitHub
+2. **Create hotfix** if needed
+3. **Release new beta** with incremented number
+4. **Communicate clearly** to users
+
+#### **Rollback**
+
+1. **Keep previous beta** available
+2. **Provide rollback instructions**
+3. **Monitor for additional issues**
+
+### Best Practices
+
+#### **Do's**
+
+- ✅ Test thoroughly before release
+- ✅ Use semantic versioning
+- ✅ Provide clear installation instructions
+- ✅ Document known issues
+- ✅ Respond to feedback promptly
+
+#### **Don'ts**
+
+- ❌ Rush releases without testing
+- ❌ Skip version updates
+- ❌ Ignore user feedback
+- ❌ Release with critical bugs
+- ❌ Forget to mark as pre-release
+
 <details>
 <summary><strong>Technical Implementation: Caching System</strong></summary>
 

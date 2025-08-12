@@ -12,7 +12,7 @@
 - **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
 - **dataset_forge/utils/**: Shared utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dataset_forge/dpid/**: Degradation Process Implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
+- **dataset_forge/dpid/**: Degradation Process Implementations (BasicSR, OpenMMLab, Phhofm, Umzi) with comprehensive alpha channel support
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
 - **assets/**: Static assets
@@ -99,7 +99,7 @@ flowchart TD
 - **Menus:** All CLI and user interaction logic. Each menu is modular and uses a robust loop pattern.
 - **Actions:** All business logic and core dataset/image operations. Each action is testable and exposed via public APIs.
 - **Utils:** Shared utilities for file operations, memory management, parallelism, color schemes, and monitoring.
-- **DPID:** Multiple degradation process implementations for HQ/LQ pair generation.
+- **DPID:** Multiple degradation process implementations for HQ/LQ pair generation with comprehensive alpha channel support and hybrid processing approach.
 
 ## Menu System Architecture
 

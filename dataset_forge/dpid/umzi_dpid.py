@@ -2,6 +2,8 @@
 # Wraps pepedpid.dpid_resize as described in store/umzi_dpid.md
 
 import os
+import cv2
+import numpy as np
 from tqdm import tqdm
 from dataset_forge.actions.tiling_actions import read, save
 
@@ -9,6 +11,100 @@ try:
     from pepedpid import dpid_resize
 except ImportError:
     dpid_resize = None
+
+
+def read_with_alpha(path):
+    """
+    Read image with alpha channel support.
+    
+    Args:
+        path: Path to the image file
+        
+    Returns:
+        tuple: (image_array, has_alpha) where image_array is RGB or RGBA
+    """
+    # Read with alpha channel if present
+    img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    if img is None:
+        raise ValueError(f"Could not read image: {path}")
+    
+    # Check if image has alpha channel
+    has_alpha = img.shape[-1] == 4 if len(img.shape) == 3 else False
+    
+    if has_alpha:
+        # Convert BGR to RGB and preserve alpha
+        img = cv2.cvtColor(img, cv2.COLOR_BGRA2RGBA)
+    else:
+        # Convert BGR to RGB
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    
+    # Convert to float32 and normalize
+    if img.dtype == np.uint8:
+        img = img.astype(np.float32) / 255.0
+    
+    return img, has_alpha
+
+
+def save_with_alpha(img, path, has_alpha=False):
+    """
+    Save image with alpha channel support.
+    
+    Args:
+        img: Image array (float32, range [0,1])
+        path: Output path
+        has_alpha: Whether the image has alpha channel
+    """
+    # Convert to uint8
+    if img.dtype == np.float32:
+        img = (img * 255).astype(np.uint8)
+    
+    if has_alpha:
+        # Convert RGBA to BGRA for OpenCV
+        img = cv2.cvtColor(img, cv2.COLOR_RGBA2BGRA)
+    else:
+        # Convert RGB to BGR for OpenCV
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    
+    cv2.imwrite(path, img)
+
+
+def process_image_with_alpha(img, target_h, target_w, lambd, has_alpha=False):
+    """
+    Process image with DPID, handling alpha channels properly.
+    
+    Args:
+        img: Input image (float32, range [0,1])
+        target_h: Target height
+        target_w: Target width
+        lambd: DPID lambda parameter
+        has_alpha: Whether the image has alpha channel
+        
+    Returns:
+        Processed image with same format as input
+    """
+    if has_alpha:
+        # Separate RGB and alpha channels
+        rgb = img[:, :, :3]
+        alpha = img[:, :, 3]  # Convert to 2D array (H, W)
+        
+        # Process RGB channels with DPID
+        rgb_processed = dpid_resize(rgb, target_h, target_w, lambd)
+        
+        # Process alpha channel with OpenCV resize (more reliable than dpid_resize for single channel)
+        # Convert to uint8 for OpenCV, resize, then convert back to float32
+        alpha_uint8 = (alpha * 255).astype(np.uint8)
+        alpha_resized = cv2.resize(alpha_uint8, (target_w, target_h), interpolation=cv2.INTER_CUBIC)
+        alpha_processed = alpha_resized.astype(np.float32) / 255.0
+        
+        # Add channel dimension back for concatenation
+        alpha_processed_3d = alpha_processed[:, :, np.newaxis]
+        
+        # Combine RGB and alpha
+        result = np.concatenate([rgb_processed, alpha_processed_3d], axis=2)
+        return result
+    else:
+        # Process RGB image directly
+        return dpid_resize(img, target_h, target_w, lambd)
 
 
 def run_umzi_dpid_single_folder(
@@ -20,6 +116,7 @@ def run_umzi_dpid_single_folder(
 ):
     """
     Downscale all images in a folder using Umzi's DPID (pepedpid) implementation.
+    Now supports alpha channels properly.
 
     Args:
         input_folder: Path to input images folder.
@@ -56,12 +153,18 @@ def run_umzi_dpid_single_folder(
             out_path = os.path.join(output_folder, fname)
             if not overwrite and os.path.exists(out_path):
                 continue
-            img = read(in_path)
+            
+            # Read image with alpha support
+            img, has_alpha = read_with_alpha(in_path)
             h, w = img.shape[:2]
             target_h = max(1, int(round(h * scale)))
             target_w = max(1, int(round(w * scale)))
-            img_ds = dpid_resize(img, target_h, target_w, lambd)
-            save(img_ds, out_path)
+            
+            # Process image with alpha handling
+            img_ds = process_image_with_alpha(img, target_h, target_w, lambd, has_alpha)
+            
+            # Save with alpha support
+            save_with_alpha(img_ds, out_path, has_alpha)
 
 
 def run_umzi_dpid_hq_lq(
@@ -75,6 +178,7 @@ def run_umzi_dpid_hq_lq(
 ):
     """
     Downscale HQ/LQ paired images using Umzi's DPID (pepedpid) implementation.
+    Now supports alpha channels properly.
 
     Args:
         hq_folder: Path to HQ images folder.
@@ -127,12 +231,22 @@ def run_umzi_dpid_hq_lq(
             out_lq = os.path.join(out_lq_folder, fname)
             if not overwrite and os.path.exists(out_hq) and os.path.exists(out_lq):
                 continue
-            img_hq = read(in_hq)
-            img_lq = read(in_lq)
+            
+            # Read images with alpha support
+            img_hq, has_alpha_hq = read_with_alpha(in_hq)
+            img_lq, has_alpha_lq = read_with_alpha(in_lq)
+            
+            # Use the alpha status from HQ image (they should match)
+            has_alpha = has_alpha_hq
+            
             h, w = img_hq.shape[:2]
             target_h = max(1, int(round(h * scale)))
             target_w = max(1, int(round(w * scale)))
-            img_hq_ds = dpid_resize(img_hq, target_h, target_w, lambd)
-            img_lq_ds = dpid_resize(img_lq, target_h, target_w, lambd)
-            save(img_hq_ds, out_hq)
-            save(img_lq_ds, out_lq)
+            
+            # Process images with alpha handling
+            img_hq_ds = process_image_with_alpha(img_hq, target_h, target_w, lambd, has_alpha)
+            img_lq_ds = process_image_with_alpha(img_lq, target_h, target_w, lambd, has_alpha)
+            
+            # Save with alpha support
+            save_with_alpha(img_hq_ds, out_hq, has_alpha)
+            save_with_alpha(img_lq_ds, out_lq, has_alpha)

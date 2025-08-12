@@ -85,6 +85,48 @@ The global command system is built on:
 - **Apply augmentations, tiling, and batch processing** from the Augmentation and Image Processing menus.
 - **Resave images, convert formats, and apply basic transformations** (crop, flip, rotate, grayscale, etc.).
 - **Use advanced pipelines and recipes** for complex augmentation workflows.
+- **🔽 DPID Detail-Preserving Downscaling**: Advanced downscaling with detail preservation using 4 different methods (Umzi's DPID, Phhofm DPID, BasicSR DPID, OpenMMLab DPID).
+
+#### 🔽 DPID Detail-Preserving Downscaling
+
+The DPID (Detail-Preserving Image Downscaling) menu provides advanced downscaling capabilities with detail preservation and **comprehensive alpha channel support**:
+
+**Menu Location**: Main Menu → ✨ Image Processing & Augmentation → 🔽 DPID Detail-Preserving Downscaling
+
+**Available Methods**:
+- **🐸 Umzi's DPID (pepedpid)**: Fast and efficient general-purpose downscaling with alpha channel support
+- **🔧 Phhofm DPID**: Advanced control over detail preservation with alpha channel support
+- **⚡ BasicSR DPID**: Optimized for super-resolution training data generation with alpha channel support
+- **🚀 OpenMMLab DPID**: Research-grade, high-quality downscaling with alpha channel support
+
+**Features**:
+- **🔄 Alpha Channel Support**: Full RGBA image processing with preserved alpha channels
+- **Single Folder Processing**: Process all images in one folder (RGB and RGBA)
+- **HQ/LQ Paired Processing**: Handle matching high/low quality image pairs with alpha support
+- **Parameter Configuration**: Set lambda, kernel size, sigma, and scale factors
+- **Method Comparison**: Compare different DPID approaches and characteristics
+- **Session State**: Parameters persist across menu sessions
+- **Hybrid Processing**: DPID algorithms for RGB channels, optimized OpenCV resize for alpha channels
+
+**Usage Workflow**:
+1. Navigate to Image Processing → DPID Detail-Preserving Downscaling
+2. Choose a DPID method (Umzi's DPID recommended for most users)
+3. Configure parameters (lambda controls detail preservation: 0.5 recommended)
+4. Select processing mode (single folder or HQ/LQ pairs)
+5. Provide input/output paths and confirm processing
+
+**Parameter Guidelines**:
+- **Lambda (λ)**: Controls detail preservation (0.0=smooth, 0.5=balanced, 1.0=detail)
+- **Scale Factors**: Multiple ratios supported (e.g., 0.5, 0.25, 0.125)
+- **Kernel Size**: Odd numbers recommended (21 default)
+- **Sigma**: Gaussian kernel parameter (2.0 default)
+
+**Alpha Channel Processing**:
+- **Automatic Detection**: DPID automatically detects and preserves alpha channels in RGBA images
+- **Hybrid Approach**: RGB channels processed with DPID algorithms, alpha channels with optimized OpenCV resize
+- **Quality Preservation**: High-quality INTER_CUBIC interpolation for alpha channel resizing
+- **Format Support**: Supports PNG, WebP, and other formats with alpha channels
+- **No Panics**: Robust error handling prevents crashes when processing alpha channels
 
 ### 🩺 Monitoring & Utilities
 
@@ -602,6 +644,268 @@ results = fuzzy_matching_workflow(
 
 The Fuzzy Matching De-duplication feature requires:
 - **imagehash**: For perceptual hash computation
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
+
+---
+
+## 🧠 CBIR Semantic Detection
+
+The CBIR (Content-Based Image Retrieval) Semantic Detection feature provides advanced duplicate detection using deep learning embeddings. This feature is accessible through the Consolidated De-duplication menu and offers semantic understanding of image content for finding conceptually similar images.
+
+### **Quick Start**
+
+1. **Navigate to the menu**: Main Menu → 🛠️ Utilities → 🔍 Consolidated De-duplication → 7. 🧠 CBIR Semantic Detection
+2. **Choose input method**: Single folder or HQ/LQ paired folders
+3. **Select model**: CLIP (fast), ResNet (balanced), or VGG (detailed)
+4. **Configure parameters**: Set max images and similarity threshold
+5. **Choose operation mode**: Show, Copy, Move, or Delete duplicates
+
+### **Deep Learning Models**
+
+- **CLIP (Contrastive Language-Image Pre-training)**: Fast, semantic similarity detection using OpenAI's CLIP model
+- **ResNet**: Classic CNN-based feature extraction for detailed visual analysis
+- **VGG**: Traditional CNN architecture for comprehensive feature representation
+
+### **Model Selection Guidelines**
+
+#### **CLIP (Recommended)**
+- **Best for**: Most use cases, semantic similarity detection
+- **Speed**: Fastest processing (~10-20 images/second)
+- **Accuracy**: Excellent for conceptual understanding
+- **Memory**: Moderate usage with efficient caching
+
+#### **ResNet**
+- **Best for**: Detailed visual analysis, feature extraction
+- **Speed**: Medium speed (~5-10 images/second)
+- **Accuracy**: Good for visual feature analysis
+- **Memory**: Higher usage due to model size
+
+#### **VGG**
+- **Best for**: Comprehensive feature extraction, detailed analysis
+- **Speed**: Slowest but most detailed (~2-5 images/second)
+- **Accuracy**: Most comprehensive feature extraction
+- **Memory**: Highest usage but most detailed analysis
+
+### **Threshold Guidelines**
+
+#### **Conservative (High Precision)**
+- **Range**: 0.95-0.98
+- **Use case**: High precision, fewer false positives
+- **Best for**: Critical datasets where accuracy is paramount
+
+#### **Balanced (Recommended)**
+- **Range**: 0.90-0.95
+- **Use case**: Good balance between precision and recall
+- **Best for**: Most general use cases
+
+#### **Aggressive (High Recall)**
+- **Range**: 0.80-0.90
+- **Use case**: Higher recall, more potential duplicates
+- **Best for**: Comprehensive duplicate detection
+
+### **Example Workflow**
+
+```
+# Navigate to CBIR Semantic Detection
+Main Menu → 🛠️ Utilities → 🔍 Consolidated De-duplication → 7. 🧠 CBIR Semantic Detection
+
+# Select input method
+1. Single folder
+
+# Enter folder path
+C:/path/to/your/images
+
+# Choose model
+1. CLIP (fast, semantic similarity)
+
+# Configure parameters
+Max images to check: 100
+Similarity threshold: 0.95
+
+# Choose operation mode
+1. Show duplicates only (preview)
+```
+
+#### **Expected Output**
+```
+🧠 CBIR Semantic Detection
+========================
+
+📁 Input Selection
+-----------------
+Processing single folder: C:/path/to/your/images
+
+🔬 Model Selection
+-----------------
+Using CLIP model for semantic similarity detection
+
+⚙️ Parameter Configuration
+-------------------------
+Max images: 100
+Similarity threshold: 0.95
+
+🔄 Processing
+------------
+Loading CLIP model...
+Computing embeddings: 100%|████████████████| 100/100 [00:15<00:00, 6.67it/s]
+Finding semantic duplicates...
+✅ CBIR workflow completed successfully!
+
+📊 Results:
+  - Total files processed: 100
+  - Duplicate groups found: 8
+  - Total duplicates: 24
+  - Average similarity: 0.96
+
+🔍 Duplicate groups:
+  Group 1 (similarity: 0.97):
+    - landscape1.jpg
+    - landscape2.jpg
+    - landscape3.jpg
+  Group 2 (similarity: 0.96):
+    - portrait1.jpg
+    - portrait2.jpg
+```
+
+### **Use Cases**
+
+#### **Semantic Duplicate Detection**
+- Find images with similar content but different visual appearances
+- Detect variations of the same scene or object
+- Identify conceptually related images across different styles
+
+#### **Content Organization**
+- Group images by semantic similarity for better organization
+- Find related images for dataset curation
+- Identify duplicate content across different formats or resolutions
+
+#### **Quality Control**
+- Detect semantic duplicates in training datasets
+- Ensure dataset diversity by removing overly similar content
+- Maintain dataset quality for machine learning applications
+
+### **Best Practices**
+
+1. **Start with CLIP**: Best overall performance for most use cases
+2. **Test with Small Datasets**: Always test with small datasets first
+3. **Use Conservative Thresholds**: Begin with higher thresholds (0.95+) to avoid false positives
+4. **Monitor Memory Usage**: Use appropriate max image limits for your system
+5. **Validate Results**: Always review results before destructive operations
+6. **Backup Important Data**: Always backup before using delete operations
+
+### **Advanced Configuration**
+
+#### **Custom Model Configuration**
+```python
+from dataset_forge.actions.cbir_actions import cbir_workflow
+
+# Custom CBIR configuration
+results = cbir_workflow(
+    folder="C:/path/to/images",
+    model_name="clip",
+    threshold=0.95,
+    max_images=200,
+    operation="find",
+    dry_run=True
+)
+```
+
+#### **Batch Processing**
+```python
+# Process multiple folders
+folders = ["folder1", "folder2", "folder3"]
+for folder in folders:
+    results = cbir_workflow(
+        folder=folder,
+        model_name="clip",
+        threshold=0.90,
+        max_images=100,
+        operation="find"
+    )
+```
+
+### **Performance Optimization**
+
+#### **Memory Management**
+- **Small Datasets** (< 500 images): Use max_images=500
+- **Medium Datasets** (500-2000 images): Use max_images=200
+- **Large Datasets** (> 2000 images): Use max_images=100
+
+#### **Speed Optimization**
+- **CLIP**: Fastest for most use cases
+- **ResNet**: Good balance for detailed analysis
+- **VGG**: Use only when detailed analysis is required
+
+#### **GPU Acceleration**
+- CBIR automatically uses GPU when available
+- Memory usage increases with GPU acceleration
+- Monitor GPU memory usage for large datasets
+
+### **Troubleshooting**
+
+#### **Common Issues**
+
+**"Model loading failed"**
+- **Cause**: Missing dependencies or network issues
+- **Solution**: Check internet connection and install required packages
+- **Alternative**: Try a different model (ResNet instead of CLIP)
+
+**"Memory error"**
+- **Cause**: Too many images or large model
+- **Solution**: Reduce max_images parameter
+- **Alternative**: Use smaller model or process in batches
+
+**"No duplicates found"**
+- **Cause**: Threshold too high
+- **Solution**: Lower the similarity threshold
+- **Alternative**: Try different model or increase max_images
+
+**"Slow processing"**
+- **Cause**: Large model or many images
+- **Solution**: Use CLIP model or reduce max_images
+- **Alternative**: Process in smaller batches
+
+#### **Error Messages**
+
+**"Invalid model name"**
+- **Cause**: Unsupported model specified
+- **Solution**: Use "clip", "resnet", or "vgg"
+- **Alternative**: Check available models in the menu
+
+**"Invalid threshold value"**
+- **Cause**: Threshold not between 0.0 and 1.0
+- **Solution**: Use values between 0.0 and 1.0
+- **Alternative**: Use default threshold (0.98)
+
+**"Operation cancelled"**
+- **Cause**: User cancelled the operation
+- **Solution**: Re-run the operation
+- **Alternative**: Check input parameters
+
+### **Integration with Other Features**
+
+#### **Fuzzy Matching**
+- Use CBIR for semantic similarity detection
+- Use fuzzy matching for pixel-level similarity
+
+#### **Visual Deduplication**
+- CBIR for conceptual similarity
+- Visual deduplication for perceptual similarity
+
+#### **File Hash Deduplication**
+- CBIR for content-based duplicates
+- File hash for exact duplicates
+
+### **Dependencies**
+
+The CBIR Semantic Detection feature requires:
+- **torch**: PyTorch for deep learning models
+- **transformers**: Hugging Face transformers for CLIP
+- **timm**: PyTorch Image Models for ResNet/VGG
 - **PIL/Pillow**: For image processing
 - **numpy**: For numerical operations
 - **tqdm**: For progress tracking

@@ -188,6 +188,44 @@
       - [**Planned Features**](#planned-features)
       - [**Performance Improvements**](#performance-improvements)
     - [**Dependencies**](#dependencies)
+  - [🧠 CBIR Semantic Detection (NEW - August 2025)](#cbir-semantic-detection-new-august-2025)
+    - [**Overview**](#overview)
+    - [**Key Features**](#key-features)
+      - [**🔬 Deep Learning Models**](#deep-learning-models)
+      - [**🎯 Semantic Understanding**](#semantic-understanding)
+      - [**⚙️ Advanced Configuration**](#advanced-configuration)
+    - [**Use Cases**](#use-cases)
+      - [**Semantic Duplicate Detection**](#semantic-duplicate-detection)
+      - [**Content Organization**](#content-organization)
+      - [**Quality Control**](#quality-control)
+    - [**Workflow**](#workflow)
+      - [**1. Input Selection**](#1-input-selection)
+      - [**2. Model Configuration**](#2-model-configuration)
+      - [**3. Parameter Tuning**](#3-parameter-tuning)
+      - [**4. Operation Selection**](#4-operation-selection)
+    - [**Performance Characteristics**](#performance-characteristics)
+      - [**Speed Comparison**](#speed-comparison)
+      - [**Accuracy Comparison**](#accuracy-comparison)
+      - [**Memory Usage**](#memory-usage)
+    - [**Best Practices**](#best-practices)
+      - [**Model Selection Guidelines**](#model-selection-guidelines)
+      - [**Threshold Guidelines**](#threshold-guidelines)
+      - [**Processing Guidelines**](#processing-guidelines)
+    - [**Integration with Other Features**](#integration-with-other-features)
+      - [**Fuzzy Matching**](#fuzzy-matching)
+      - [**Visual Deduplication**](#visual-deduplication)
+      - [**File Hash Deduplication**](#file-hash-deduplication)
+    - [**Technical Implementation**](#technical-implementation)
+      - [**Embedding Extraction**](#embedding-extraction)
+      - [**Similarity Computation**](#similarity-computation)
+      - [**Memory Management**](#memory-management)
+    - [**Error Handling**](#error-handling)
+      - [**Robust Processing**](#robust-processing)
+      - [**Validation**](#validation)
+    - [**Dependencies**](#dependencies)
+    - [**Future Enhancements**](#future-enhancements)
+      - [**Planned Features**](#planned-features)
+      - [**Performance Improvements**](#performance-improvements)
 
 ## Usage
 
@@ -206,6 +244,7 @@
     - [📂 Dataset Management](#dataset-management)
     - [🔍 Analysis & Validation](#analysis-validation)
     - [✨ Augmentation & Processing](#augmentation-processing)
+      - [🔽 DPID Detail-Preserving Downscaling](#dpid-detail-preserving-downscaling)
     - [🩺 Monitoring & Utilities](#monitoring-utilities)
     - [🧪 Testing & Developer Tools](#testing-developer-tools)
     - [🔍 Static Analysis Tool](#static-analysis-tool)
@@ -291,6 +330,47 @@
       - [**Memory Management**](#memory-management)
       - [**Error Handling**](#error-handling)
     - [**Dependencies**](#dependencies)
+  - [🧠 CBIR Semantic Detection](#cbir-semantic-detection)
+    - [**Quick Start**](#quick-start)
+    - [**Deep Learning Models**](#deep-learning-models)
+    - [**Model Selection Guidelines**](#model-selection-guidelines)
+      - [**CLIP (Recommended)**](#clip-recommended)
+      - [**ResNet**](#resnet)
+      - [**VGG**](#vgg)
+    - [**Threshold Guidelines**](#threshold-guidelines)
+      - [**Conservative (High Precision)**](#conservative-high-precision)
+      - [**Balanced (Recommended)**](#balanced-recommended)
+      - [**Aggressive (High Recall)**](#aggressive-high-recall)
+    - [**Example Workflow**](#example-workflow)
+- [Navigate to CBIR Semantic Detection](#navigate-to-cbir-semantic-detection)
+- [Select input method](#select-input-method)
+- [Enter folder path](#enter-folder-path)
+- [Choose model](#choose-model)
+- [Configure parameters](#configure-parameters)
+- [Choose operation mode](#choose-operation-mode)
+      - [**Expected Output**](#expected-output)
+    - [**Use Cases**](#use-cases)
+      - [**Semantic Duplicate Detection**](#semantic-duplicate-detection)
+      - [**Content Organization**](#content-organization)
+      - [**Quality Control**](#quality-control)
+    - [**Best Practices**](#best-practices)
+    - [**Advanced Configuration**](#advanced-configuration)
+      - [**Custom Model Configuration**](#custom-model-configuration)
+- [Custom CBIR configuration](#custom-cbir-configuration)
+      - [**Batch Processing**](#batch-processing)
+- [Process multiple folders](#process-multiple-folders)
+    - [**Performance Optimization**](#performance-optimization)
+      - [**Memory Management**](#memory-management)
+      - [**Speed Optimization**](#speed-optimization)
+      - [**GPU Acceleration**](#gpu-acceleration)
+    - [**Troubleshooting**](#troubleshooting)
+      - [**Common Issues**](#common-issues)
+      - [**Error Messages**](#error-messages)
+    - [**Integration with Other Features**](#integration-with-other-features)
+      - [**Fuzzy Matching**](#fuzzy-matching)
+      - [**Visual Deduplication**](#visual-deduplication)
+      - [**File Hash Deduplication**](#file-hash-deduplication)
+    - [**Dependencies**](#dependencies)
   - [Example: Running a Workflow](#example-running-a-workflow)
 - [or](#or)
   - [Tips & Best Practices](#tips-best-practices)
@@ -301,6 +381,61 @@
 - [Advanced Features & Configuration](#advanced-features-configuration)
   - [Advanced Configuration](#advanced-configuration)
   - [Performance & Optimization](#performance-optimization)
+  - [Beta Release & Packaging](#beta-release-packaging)
+    - [Overview](#overview)
+    - [Beta Release Workflow](#beta-release-workflow)
+      - [**Quick Start**](#quick-start)
+- [Activate virtual environment](#activate-virtual-environment)
+- [Run tests to ensure everything works](#run-tests-to-ensure-everything-works)
+- [Check for any critical issues](#check-for-any-critical-issues)
+- [Create beta release](#create-beta-release)
+      - [**Pre-Release Testing Checklist**](#pre-release-testing-checklist)
+      - [**Version Management**](#version-management)
+    - [Packaging Strategies](#packaging-strategies)
+      - [**Source Distribution (sdist)**](#source-distribution-sdist)
+- [Clean previous builds](#clean-previous-builds)
+- [Create source distribution](#create-source-distribution)
+- [Verify the package](#verify-the-package)
+      - [**Wheel Distribution**](#wheel-distribution)
+- [Install wheel if not already installed](#install-wheel-if-not-already-installed)
+- [Create wheel distribution](#create-wheel-distribution)
+- [Verify the wheel](#verify-the-wheel)
+      - [**Standalone Executable (Windows)**](#standalone-executable-windows)
+- [Install PyInstaller](#install-pyinstaller)
+- [Create executable](#create-executable)
+- [The executable will be in dist/dataset-forge-beta.exe](#the-executable-will-be-in-distdataset-forge-betaexe)
+    - [Distribution Methods](#distribution-methods)
+      - [**GitHub Releases (Recommended)**](#github-releases-recommended)
+      - [**PyPI Test Server (Optional)**](#pypi-test-server-optional)
+- [Install twine](#install-twine)
+- [Upload to TestPyPI](#upload-to-testpypi)
+- [Test installation from TestPyPI](#test-installation-from-testpypi)
+    - [Source Code Assets](#source-code-assets)
+      - [**Automatic GitHub Assets**](#automatic-github-assets)
+      - [**Custom Source Code Archives**](#custom-source-code-archives)
+    - [Testing Beta Releases](#testing-beta-releases)
+      - [**Local Installation Test**](#local-installation-test)
+- [Test the beta package locally](#test-the-beta-package-locally)
+      - [**Clean Environment Test**](#clean-environment-test)
+- [Create new virtual environment](#create-new-virtual-environment)
+    - [Release Announcement Template](#release-announcement-template)
+- [Dataset-Forge Beta 1.0.0b1](#dataset-forge-beta-100b1)
+  - [What's New](#whats-new)
+  - [Installation](#installation)
+  - [Testing](#testing)
+  - [Known Issues](#known-issues)
+    - [Automated Workflow](#automated-workflow)
+      - [**GitHub Actions**](#github-actions)
+      - [**Manual Override**](#manual-override)
+    - [Post-Release Monitoring](#post-release-monitoring)
+      - [**Track These Metrics**](#track-these-metrics)
+      - [**Timeline**](#timeline)
+    - [Emergency Procedures](#emergency-procedures)
+      - [**Critical Bug Found**](#critical-bug-found)
+      - [**Rollback**](#rollback)
+    - [Best Practices](#best-practices)
+      - [**Do's**](#dos)
+      - [**Don'ts**](#donts)
 - [Instead of: import torch, cv2, numpy as np](#instead-of-import-torch-cv2-numpy-as-np)
 - [Function-level lazy imports](#function-level-lazy-imports)
 - [Performance monitoring](#performance-monitoring)
@@ -406,6 +541,31 @@
     - [Global Command System Development](#global-command-system-development)
     - [MCP Integration Development (MANDATORY)](#mcp-integration-development-mandatory)
       - [**Available MCP Servers**](#available-mcp-servers)
+  - [Beta Release Workflow](#beta-release-workflow)
+    - [Overview](#overview)
+    - [Beta Release Process](#beta-release-process)
+      - [**Pre-Release Checklist**](#pre-release-checklist)
+      - [**Version Management**](#version-management)
+      - [**Automated Beta Release**](#automated-beta-release)
+- [Activate virtual environment](#activate-virtual-environment)
+- [Create beta release](#create-beta-release)
+      - [**Manual Beta Release Process**](#manual-beta-release-process)
+- [1. Update version numbers](#1-update-version-numbers)
+- [Edit setup.py and dataset_forge/__init__.py](#edit-setuppy-and-dataset_forge__init__py)
+- [2. Create git tag](#2-create-git-tag)
+- [3. Build packages](#3-build-packages)
+- [4. Create GitHub release](#4-create-github-release)
+- [Go to GitHub → Releases → Create new release](#go-to-github-releases-create-new-release)
+- [Select the tag and upload assets](#select-the-tag-and-upload-assets)
+      - [**Package Types**](#package-types)
+      - [**Testing Beta Releases**](#testing-beta-releases)
+- [Test the beta package locally](#test-the-beta-package-locally)
+- [Create new virtual environment](#create-new-virtual-environment)
+      - [**GitHub Release Process**](#github-release-process)
+      - [**Source Code Assets**](#source-code-assets)
+      - [**Post-Release Process**](#post-release-process)
+      - [**Emergency Procedures**](#emergency-procedures)
+      - [**Best Practices**](#best-practices)
       - [**MCP Tool Usage Patterns (MANDATORY)**](#mcp-tool-usage-patterns-mandatory)
         - [Before Implementing Any Solution:](#before-implementing-any-solution)
         - [When Debugging Issues:](#when-debugging-issues)
@@ -580,6 +740,7 @@
 
 - [Changelog](#changelog)
   - [[Unreleased]](#unreleased)
+    - [🧠 CBIR Semantic Detection Integration (August 2025)](#cbir-semantic-detection-integration-august-2025)
     - [🎨 Comprehensive Menu System Improvement (August 2025)](#comprehensive-menu-system-improvement-august-2025)
     - [🔍 Fuzzy Matching De-duplication Feature (December 2024)](#fuzzy-matching-de-duplication-feature-december-2024)
     - [⭐ BHI Filtering Advanced CUDA Optimizations (August 2025)](#bhi-filtering-advanced-cuda-optimizations-august-2025)
@@ -602,6 +763,7 @@
       - [**Dependencies**](#dependencies)
     - [🔧 Technical Improvements](#technical-improvements)
     - [📚 Documentation](#documentation)
+    - [🆕 DPID: Comprehensive Detail-Preserving Downscaling Menu with Alpha Channel Support (August 2025)](#dpid-comprehensive-detail-preserving-downscaling-menu-with-alpha-channel-support-august-2025)
     - [🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)](#dpid-umzis-dpid-pepedpid-integration-july-2025)
   - [[July 2025]](#july-2025)
 
@@ -848,7 +1010,7 @@ dataset-forge
 
 ## 🛠️ Utilities
 
-- **🔍 Consolidated De-duplication**: Unified menu combining fuzzy matching, visual deduplication, and hash-based methods
+- **🔍 Consolidated De-duplication**: Unified menu combining fuzzy matching, visual deduplication, hash-based methods, and CBIR semantic detection
 - **🗜️ Consolidated Compression**: Single menu for individual and directory compression with format optimization
 - **📊 Enhanced Comparison Tools**: Image/gif comparison creation with advanced analysis features
 - **🌳 Directory Tree Visualization**: Enhanced tree display with metadata and filtering options
@@ -1003,7 +1165,7 @@ Dataset Forge features a comprehensive, well-organized menu system that has been
 - **🔄 Orientation Organization**: Sort by landscape/portrait/square
 - **📏 Size Filtering**: Remove small/invalid image pairs
 - **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
-- **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows.
+- **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling with **comprehensive alpha channel support**, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows. Hybrid processing approach ensures optimal quality for both RGB and alpha channels.
 
 ### 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
 
@@ -1030,6 +1192,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 - **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel, **resave images (with lossless options and quality control)**
 - **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
 - **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
+- **🔽 DPID Detail-Preserving Downscaling**: Comprehensive DPID (Detail-Preserving Image Downscaling) menu with 4 methods: Umzi's DPID (pepedpid), Phhofm DPID, BasicSR DPID, and OpenMMLab DPID. **Full alpha channel support** with hybrid processing (DPID for RGB, optimized OpenCV for alpha). Supports both single folder and HQ/LQ paired processing with configurable parameters and method comparison.
 - **🚀 Augmentation**: List, create, edit or delete _recipes_ or run advanced augmentation pipelines (using recipes)
 - **📋 Metadata**: Scrub EXIF Metadata, Convert ICC Profile to sRGB
 - **✏️ Find & extract sketches/drawings/line art**: Find & extract sketches/drawings/line art using pre-trained model
@@ -1045,6 +1208,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 ## 🛠️ Utilities
 
 - **🔍 Fuzzy Matching De-duplication**: Multi-algorithm perceptual hashing with configurable thresholds (pHash, dHash, aHash, wHash, Color Hash). Support for single folder and HQ/LQ paired folders with multiple operation modes (show/copy/move/delete).
+- **🧠 CBIR Semantic Detection**: Content-Based Image Retrieval using deep learning embeddings (CLIP, ResNet, VGG) for conceptual similarity detection. Advanced semantic duplicate detection with configurable thresholds and multiple operation modes.
 - **🖼️ Create Comparisons**: Create striking image / gif comparisons
 - **📦 Compression**: Compress images or directories
 - **🧹 Sanitize Images**: Comprehensive, interactive image file sanitization. Each major step (corruption fix, copy, batch rename, ICC to sRGB, PNG conversion, remove alpha, metadata removal, steganography) is prompted interactively with emoji and Mocha color. Steganography checks prompt for steghide and zsteg individually, and the summary reports both. A visually distinct summary box is always shown at the end, including zsteg results file path if produced. All output uses the Catppuccin Mocha color scheme and emoji-rich prompts. Menu header is reprinted after returning to the workflow menu.
@@ -2041,6 +2205,178 @@ This feature provides a comprehensive solution for fuzzy duplicate detection, co
 
 ---
 
+## 🧠 CBIR Semantic Detection (NEW - August 2025)
+
+**Location**: Main Menu → 🛠️ Utilities → 🔍 Consolidated De-duplication → 7. 🧠 CBIR Semantic Detection
+
+**Purpose**: Advanced semantic duplicate detection using deep learning embeddings for finding conceptually similar images.
+
+### **Overview**
+
+The CBIR (Content-Based Image Retrieval) Semantic Detection feature provides advanced duplicate detection using deep learning embeddings. Unlike traditional hash-based methods that focus on pixel-level similarity, CBIR uses semantic understanding to find images that are conceptually similar, even if they have different visual appearances.
+
+### **Key Features**
+
+#### **🔬 Deep Learning Models**
+- **CLIP (Contrastive Language-Image Pre-training)**: Fast, semantic similarity detection using OpenAI's CLIP model
+- **ResNet**: Classic CNN-based feature extraction for detailed visual analysis
+- **VGG**: Traditional CNN architecture for comprehensive feature representation
+
+#### **🎯 Semantic Understanding**
+- **Conceptual Similarity**: Finds images with similar semantic content rather than just visual similarity
+- **Content-Aware Detection**: Understands image content beyond pixel-level comparisons
+- **Flexible Thresholds**: Configurable similarity thresholds for different use cases
+
+#### **⚙️ Advanced Configuration**
+- **Model Selection**: Choose between CLIP (fast), ResNet (balanced), or VGG (detailed)
+- **Threshold Control**: Adjustable similarity thresholds (0.0-1.0) for precision vs recall trade-offs
+- **Batch Processing**: Configurable maximum image limits for memory management
+- **Multiple Operations**: Show, copy, move, or delete duplicate groups
+
+### **Use Cases**
+
+#### **Semantic Duplicate Detection**
+- Find images with similar content but different visual appearances
+- Detect variations of the same scene or object
+- Identify conceptually related images across different styles
+
+#### **Content Organization**
+- Group images by semantic similarity for better organization
+- Find related images for dataset curation
+- Identify duplicate content across different formats or resolutions
+
+#### **Quality Control**
+- Detect semantic duplicates in training datasets
+- Ensure dataset diversity by removing overly similar content
+- Maintain dataset quality for machine learning applications
+
+### **Workflow**
+
+#### **1. Input Selection**
+- **Single Folder**: Process all images in a single directory
+- **HQ/LQ Paired Folders**: Process paired high-quality and low-quality image folders
+
+#### **2. Model Configuration**
+- **CLIP**: Recommended for most use cases (fast and accurate)
+- **ResNet**: Good balance between speed and accuracy
+- **VGG**: Most detailed analysis but slower processing
+
+#### **3. Parameter Tuning**
+- **Max Images**: Limit processing to manage memory usage (default: 100)
+- **Similarity Threshold**: Control detection sensitivity (default: 0.98)
+
+#### **4. Operation Selection**
+- **Show Only**: Preview duplicates without taking action
+- **Copy**: Copy duplicates to separate folder for review
+- **Move**: Move duplicates to separate folder
+- **Delete**: Permanently remove duplicates (with confirmation)
+
+### **Performance Characteristics**
+
+#### **Speed Comparison**
+- **CLIP**: Fastest processing (~10-20 images/second)
+- **ResNet**: Medium speed (~5-10 images/second)
+- **VGG**: Slowest but most detailed (~2-5 images/second)
+
+#### **Accuracy Comparison**
+- **CLIP**: Best for semantic similarity and conceptual understanding
+- **ResNet**: Good for visual feature analysis
+- **VGG**: Most comprehensive feature extraction
+
+#### **Memory Usage**
+- **CLIP**: Moderate memory usage with efficient caching
+- **ResNet**: Higher memory usage due to model size
+- **VGG**: Highest memory usage but most detailed analysis
+
+### **Best Practices**
+
+#### **Model Selection Guidelines**
+- **Start with CLIP**: Best overall performance for most use cases
+- **Use ResNet**: When you need more detailed visual analysis
+- **Use VGG**: For comprehensive feature extraction and analysis
+
+#### **Threshold Guidelines**
+- **Conservative (0.95-0.98)**: High precision, fewer false positives
+- **Balanced (0.90-0.95)**: Good balance between precision and recall
+- **Aggressive (0.80-0.90)**: Higher recall, more potential duplicates
+
+#### **Processing Guidelines**
+- **Start Small**: Test with small datasets first
+- **Monitor Memory**: Use appropriate max image limits
+- **Validate Results**: Always review results before destructive operations
+
+### **Integration with Other Features**
+
+#### **Fuzzy Matching**
+- Use CBIR for semantic similarity detection
+- Use fuzzy matching for pixel-level similarity
+
+#### **Visual Deduplication**
+- CBIR for conceptual similarity
+- Visual deduplication for perceptual similarity
+
+#### **File Hash Deduplication**
+- CBIR for content-based duplicates
+- File hash for exact duplicates
+
+### **Technical Implementation**
+
+#### **Embedding Extraction**
+- Uses pre-trained deep learning models
+- Extracts high-dimensional feature vectors
+- Implements efficient similarity computation
+
+#### **Similarity Computation**
+- Cosine similarity for CLIP embeddings
+- Euclidean distance for CNN features
+- Configurable similarity metrics
+
+#### **Memory Management**
+- Efficient batch processing
+- Automatic memory cleanup
+- GPU acceleration when available
+
+### **Error Handling**
+
+#### **Robust Processing**
+- Graceful handling of corrupted images
+- Automatic fallback for model loading failures
+- Comprehensive error reporting
+
+#### **Validation**
+- Input validation for all parameters
+- Path existence verification
+- Operation confirmation for destructive actions
+
+### **Dependencies**
+
+The CBIR Semantic Detection feature requires:
+- **torch**: PyTorch for deep learning models
+- **transformers**: Hugging Face transformers for CLIP
+- **timm**: PyTorch Image Models for ResNet/VGG
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
+
+### **Future Enhancements**
+
+#### **Planned Features**
+- **Custom Model Support**: Load and use custom trained models
+- **Batch Processing**: Process multiple folders simultaneously
+- **Cloud Integration**: Support for cloud storage providers
+- **Advanced Filtering**: Filter by image metadata or content
+
+#### **Performance Improvements**
+- **GPU Acceleration**: Enhanced GPU support for all models
+- **Model Optimization**: Quantized models for faster inference
+- **Caching**: Persistent embedding cache for repeated analysis
+
+This feature provides advanced semantic duplicate detection capabilities, enabling users to find conceptually similar images using state-of-the-art deep learning models with flexible configuration options and safe operation modes.
+
+---
+
 # Usage
 
 [← Main README](../README.md) | [Features](features.md) | [Usage](usage.md) | [Advanced](advanced.md) | [Architecture](architecture.md) | [Troubleshooting](troubleshooting.md) | [Style Guide](style_guide.md) | [Changelog](changelog.md) | [ToC](toc.md)
@@ -2130,6 +2466,48 @@ The global command system is built on:
 - **Apply augmentations, tiling, and batch processing** from the Augmentation and Image Processing menus.
 - **Resave images, convert formats, and apply basic transformations** (crop, flip, rotate, grayscale, etc.).
 - **Use advanced pipelines and recipes** for complex augmentation workflows.
+- **🔽 DPID Detail-Preserving Downscaling**: Advanced downscaling with detail preservation using 4 different methods (Umzi's DPID, Phhofm DPID, BasicSR DPID, OpenMMLab DPID).
+
+#### 🔽 DPID Detail-Preserving Downscaling
+
+The DPID (Detail-Preserving Image Downscaling) menu provides advanced downscaling capabilities with detail preservation and **comprehensive alpha channel support**:
+
+**Menu Location**: Main Menu → ✨ Image Processing & Augmentation → 🔽 DPID Detail-Preserving Downscaling
+
+**Available Methods**:
+- **🐸 Umzi's DPID (pepedpid)**: Fast and efficient general-purpose downscaling with alpha channel support
+- **🔧 Phhofm DPID**: Advanced control over detail preservation with alpha channel support
+- **⚡ BasicSR DPID**: Optimized for super-resolution training data generation with alpha channel support
+- **🚀 OpenMMLab DPID**: Research-grade, high-quality downscaling with alpha channel support
+
+**Features**:
+- **🔄 Alpha Channel Support**: Full RGBA image processing with preserved alpha channels
+- **Single Folder Processing**: Process all images in one folder (RGB and RGBA)
+- **HQ/LQ Paired Processing**: Handle matching high/low quality image pairs with alpha support
+- **Parameter Configuration**: Set lambda, kernel size, sigma, and scale factors
+- **Method Comparison**: Compare different DPID approaches and characteristics
+- **Session State**: Parameters persist across menu sessions
+- **Hybrid Processing**: DPID algorithms for RGB channels, optimized OpenCV resize for alpha channels
+
+**Usage Workflow**:
+1. Navigate to Image Processing → DPID Detail-Preserving Downscaling
+2. Choose a DPID method (Umzi's DPID recommended for most users)
+3. Configure parameters (lambda controls detail preservation: 0.5 recommended)
+4. Select processing mode (single folder or HQ/LQ pairs)
+5. Provide input/output paths and confirm processing
+
+**Parameter Guidelines**:
+- **Lambda (λ)**: Controls detail preservation (0.0=smooth, 0.5=balanced, 1.0=detail)
+- **Scale Factors**: Multiple ratios supported (e.g., 0.5, 0.25, 0.125)
+- **Kernel Size**: Odd numbers recommended (21 default)
+- **Sigma**: Gaussian kernel parameter (2.0 default)
+
+**Alpha Channel Processing**:
+- **Automatic Detection**: DPID automatically detects and preserves alpha channels in RGBA images
+- **Hybrid Approach**: RGB channels processed with DPID algorithms, alpha channels with optimized OpenCV resize
+- **Quality Preservation**: High-quality INTER_CUBIC interpolation for alpha channel resizing
+- **Format Support**: Supports PNG, WebP, and other formats with alpha channels
+- **No Panics**: Robust error handling prevents crashes when processing alpha channels
 
 ### 🩺 Monitoring & Utilities
 
@@ -2655,6 +3033,268 @@ All dependencies are included in the project's `requirements.txt` file.
 
 ---
 
+## 🧠 CBIR Semantic Detection
+
+The CBIR (Content-Based Image Retrieval) Semantic Detection feature provides advanced duplicate detection using deep learning embeddings. This feature is accessible through the Consolidated De-duplication menu and offers semantic understanding of image content for finding conceptually similar images.
+
+### **Quick Start**
+
+1. **Navigate to the menu**: Main Menu → 🛠️ Utilities → 🔍 Consolidated De-duplication → 7. 🧠 CBIR Semantic Detection
+2. **Choose input method**: Single folder or HQ/LQ paired folders
+3. **Select model**: CLIP (fast), ResNet (balanced), or VGG (detailed)
+4. **Configure parameters**: Set max images and similarity threshold
+5. **Choose operation mode**: Show, Copy, Move, or Delete duplicates
+
+### **Deep Learning Models**
+
+- **CLIP (Contrastive Language-Image Pre-training)**: Fast, semantic similarity detection using OpenAI's CLIP model
+- **ResNet**: Classic CNN-based feature extraction for detailed visual analysis
+- **VGG**: Traditional CNN architecture for comprehensive feature representation
+
+### **Model Selection Guidelines**
+
+#### **CLIP (Recommended)**
+- **Best for**: Most use cases, semantic similarity detection
+- **Speed**: Fastest processing (~10-20 images/second)
+- **Accuracy**: Excellent for conceptual understanding
+- **Memory**: Moderate usage with efficient caching
+
+#### **ResNet**
+- **Best for**: Detailed visual analysis, feature extraction
+- **Speed**: Medium speed (~5-10 images/second)
+- **Accuracy**: Good for visual feature analysis
+- **Memory**: Higher usage due to model size
+
+#### **VGG**
+- **Best for**: Comprehensive feature extraction, detailed analysis
+- **Speed**: Slowest but most detailed (~2-5 images/second)
+- **Accuracy**: Most comprehensive feature extraction
+- **Memory**: Highest usage but most detailed analysis
+
+### **Threshold Guidelines**
+
+#### **Conservative (High Precision)**
+- **Range**: 0.95-0.98
+- **Use case**: High precision, fewer false positives
+- **Best for**: Critical datasets where accuracy is paramount
+
+#### **Balanced (Recommended)**
+- **Range**: 0.90-0.95
+- **Use case**: Good balance between precision and recall
+- **Best for**: Most general use cases
+
+#### **Aggressive (High Recall)**
+- **Range**: 0.80-0.90
+- **Use case**: Higher recall, more potential duplicates
+- **Best for**: Comprehensive duplicate detection
+
+### **Example Workflow**
+
+```
+# Navigate to CBIR Semantic Detection
+Main Menu → 🛠️ Utilities → 🔍 Consolidated De-duplication → 7. 🧠 CBIR Semantic Detection
+
+# Select input method
+1. Single folder
+
+# Enter folder path
+C:/path/to/your/images
+
+# Choose model
+1. CLIP (fast, semantic similarity)
+
+# Configure parameters
+Max images to check: 100
+Similarity threshold: 0.95
+
+# Choose operation mode
+1. Show duplicates only (preview)
+```
+
+#### **Expected Output**
+```
+🧠 CBIR Semantic Detection
+========================
+
+📁 Input Selection
+-----------------
+Processing single folder: C:/path/to/your/images
+
+🔬 Model Selection
+-----------------
+Using CLIP model for semantic similarity detection
+
+⚙️ Parameter Configuration
+-------------------------
+Max images: 100
+Similarity threshold: 0.95
+
+🔄 Processing
+------------
+Loading CLIP model...
+Computing embeddings: 100%|████████████████| 100/100 [00:15<00:00, 6.67it/s]
+Finding semantic duplicates...
+✅ CBIR workflow completed successfully!
+
+📊 Results:
+  - Total files processed: 100
+  - Duplicate groups found: 8
+  - Total duplicates: 24
+  - Average similarity: 0.96
+
+🔍 Duplicate groups:
+  Group 1 (similarity: 0.97):
+    - landscape1.jpg
+    - landscape2.jpg
+    - landscape3.jpg
+  Group 2 (similarity: 0.96):
+    - portrait1.jpg
+    - portrait2.jpg
+```
+
+### **Use Cases**
+
+#### **Semantic Duplicate Detection**
+- Find images with similar content but different visual appearances
+- Detect variations of the same scene or object
+- Identify conceptually related images across different styles
+
+#### **Content Organization**
+- Group images by semantic similarity for better organization
+- Find related images for dataset curation
+- Identify duplicate content across different formats or resolutions
+
+#### **Quality Control**
+- Detect semantic duplicates in training datasets
+- Ensure dataset diversity by removing overly similar content
+- Maintain dataset quality for machine learning applications
+
+### **Best Practices**
+
+1. **Start with CLIP**: Best overall performance for most use cases
+2. **Test with Small Datasets**: Always test with small datasets first
+3. **Use Conservative Thresholds**: Begin with higher thresholds (0.95+) to avoid false positives
+4. **Monitor Memory Usage**: Use appropriate max image limits for your system
+5. **Validate Results**: Always review results before destructive operations
+6. **Backup Important Data**: Always backup before using delete operations
+
+### **Advanced Configuration**
+
+#### **Custom Model Configuration**
+```python
+from dataset_forge.actions.cbir_actions import cbir_workflow
+
+# Custom CBIR configuration
+results = cbir_workflow(
+    folder="C:/path/to/images",
+    model_name="clip",
+    threshold=0.95,
+    max_images=200,
+    operation="find",
+    dry_run=True
+)
+```
+
+#### **Batch Processing**
+```python
+# Process multiple folders
+folders = ["folder1", "folder2", "folder3"]
+for folder in folders:
+    results = cbir_workflow(
+        folder=folder,
+        model_name="clip",
+        threshold=0.90,
+        max_images=100,
+        operation="find"
+    )
+```
+
+### **Performance Optimization**
+
+#### **Memory Management**
+- **Small Datasets** (< 500 images): Use max_images=500
+- **Medium Datasets** (500-2000 images): Use max_images=200
+- **Large Datasets** (> 2000 images): Use max_images=100
+
+#### **Speed Optimization**
+- **CLIP**: Fastest for most use cases
+- **ResNet**: Good balance for detailed analysis
+- **VGG**: Use only when detailed analysis is required
+
+#### **GPU Acceleration**
+- CBIR automatically uses GPU when available
+- Memory usage increases with GPU acceleration
+- Monitor GPU memory usage for large datasets
+
+### **Troubleshooting**
+
+#### **Common Issues**
+
+**"Model loading failed"**
+- **Cause**: Missing dependencies or network issues
+- **Solution**: Check internet connection and install required packages
+- **Alternative**: Try a different model (ResNet instead of CLIP)
+
+**"Memory error"**
+- **Cause**: Too many images or large model
+- **Solution**: Reduce max_images parameter
+- **Alternative**: Use smaller model or process in batches
+
+**"No duplicates found"**
+- **Cause**: Threshold too high
+- **Solution**: Lower the similarity threshold
+- **Alternative**: Try different model or increase max_images
+
+**"Slow processing"**
+- **Cause**: Large model or many images
+- **Solution**: Use CLIP model or reduce max_images
+- **Alternative**: Process in smaller batches
+
+#### **Error Messages**
+
+**"Invalid model name"**
+- **Cause**: Unsupported model specified
+- **Solution**: Use "clip", "resnet", or "vgg"
+- **Alternative**: Check available models in the menu
+
+**"Invalid threshold value"**
+- **Cause**: Threshold not between 0.0 and 1.0
+- **Solution**: Use values between 0.0 and 1.0
+- **Alternative**: Use default threshold (0.98)
+
+**"Operation cancelled"**
+- **Cause**: User cancelled the operation
+- **Solution**: Re-run the operation
+- **Alternative**: Check input parameters
+
+### **Integration with Other Features**
+
+#### **Fuzzy Matching**
+- Use CBIR for semantic similarity detection
+- Use fuzzy matching for pixel-level similarity
+
+#### **Visual Deduplication**
+- CBIR for conceptual similarity
+- Visual deduplication for perceptual similarity
+
+#### **File Hash Deduplication**
+- CBIR for content-based duplicates
+- File hash for exact duplicates
+
+### **Dependencies**
+
+The CBIR Semantic Detection feature requires:
+- **torch**: PyTorch for deep learning models
+- **transformers**: Hugging Face transformers for CLIP
+- **timm**: PyTorch Image Models for ResNet/VGG
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
+
+---
+
 ## Example: Running a Workflow
 
 ```bash
@@ -2727,6 +3367,315 @@ py main.py
 - **🚀 Menu System Optimization**: Intelligent caching, lazy loading, and performance monitoring for optimal menu responsiveness.
 - **📊 Performance Monitoring**: Real-time metrics, cache statistics, and automated optimization tools.
 - **🎯 User Experience**: Comprehensive visual feedback, error handling, and user interaction systems.
+
+---
+
+## Beta Release & Packaging
+
+### Overview
+
+Dataset Forge uses a comprehensive beta release system for testing new features and collecting user feedback before stable releases. This section covers the complete beta release workflow, packaging strategies, and distribution methods.
+
+### Beta Release Workflow
+
+#### **Quick Start**
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Run tests to ensure everything works
+python -m pytest tests/ -v
+
+# Check for any critical issues
+python tools/check_mocha_theming.py
+
+# Create beta release
+python tools/create_beta_release.py --version 1.0.0b1
+```
+
+#### **Pre-Release Testing Checklist**
+
+Before releasing, test:
+
+- [ ] All tests pass (`python -m pytest`)
+- [ ] CLI works (`python main.py --help`)
+- [ ] Package installs correctly
+- [ ] Core features work (dataset creation, deduplication, etc.)
+- [ ] No critical bugs in TODO.md
+- [ ] Documentation is up-to-date
+
+#### **Version Management**
+
+Dataset Forge follows [PEP 440](https://www.python.org/dev/peps/pep-0440/) for versioning:
+
+```
+MAJOR.MINOR.PATCHbNUMBER
+```
+
+**Examples:**
+- `1.0.0b1` - First beta
+- `1.0.0b2` - Second beta
+- `2.1.0b1` - First beta of version 2.1
+
+**Files to Update:**
+1. `setup.py` - `version="1.0.0b1"`
+2. `dataset_forge/__init__.py` - `__version__ = "1.0.0b1"`
+
+### Packaging Strategies
+
+#### **Source Distribution (sdist)**
+
+Create a source distribution package:
+
+```bash
+# Clean previous builds
+rm -rf build/ dist/ *.egg-info/
+
+# Create source distribution
+python setup.py sdist
+
+# Verify the package
+tar -tzf ./dist/dataset_forge-1.0.0b1.tar.gz
+```
+
+**File:** `dataset-forge-1.0.0b1.tar.gz`
+**Install:** `pip install dataset-forge-1.0.0b1.tar.gz`
+**Use case:** Standard Python package installation
+
+#### **Wheel Distribution**
+
+For better installation performance:
+
+```bash
+# Install wheel if not already installed
+pip install wheel
+
+# Create wheel distribution
+python setup.py bdist_wheel
+
+# Verify the wheel
+python -m zipfile -l dist/dataset_forge-1.0.0b1-py3-none-any.whl
+```
+
+**File:** `dataset_forge-1.0.0b1-py3-none-any.whl`
+**Install:** `pip install dataset_forge-1.0.0b1-py3-none-any.whl`
+**Use case:** Faster installation, better compatibility
+
+#### **Standalone Executable (Windows)**
+
+Using PyInstaller for Windows users:
+
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Create executable
+pyinstaller --onefile --name dataset-forge-beta main.py
+
+# The executable will be in dist/dataset-forge-beta.exe
+```
+
+**File:** `dataset-forge-beta.exe`
+**Install:** Download and run directly
+**Use case:** Users who don't want to install Python
+
+### Distribution Methods
+
+#### **GitHub Releases (Recommended)**
+
+Create a GitHub release for the beta:
+
+1. **Go to GitHub repository** → Releases
+2. **Click "Create a new release"**
+3. **Tag version:** `v1.0.0b1`
+4. **Release title:** `Dataset-Forge Beta 1.0.0b1`
+5. **Description:** Include changelog and installation instructions
+6. **Mark as pre-release**
+7. **Upload assets:**
+   - `dataset-forge-1.0.0b1.tar.gz`
+   - `dataset_forge-1.0.0b1-py3-none-any.whl`
+   - `dataset-forge-beta.exe`
+
+#### **PyPI Test Server (Optional)**
+
+For testing PyPI distribution:
+
+```bash
+# Install twine
+pip install twine
+
+# Upload to TestPyPI
+twine upload --repository testpypi dist/*
+
+# Test installation from TestPyPI
+pip install --index-url https://test.pypi.org/simple/ dataset-forge==1.0.0b1
+```
+
+### Source Code Assets
+
+#### **Automatic GitHub Assets**
+
+When you create a GitHub release, GitHub automatically generates:
+
+- **Source code (zip)** - `Dataset-Forge-v1.0.0b1.zip`
+- **Source code (tar.gz)** - `Dataset-Forge-v1.0.0b1.tar.gz`
+
+**Direct URLs:**
+```
+https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.zip
+https://github.com/Courage-1984/Dataset-Forge/archive/v1.0.0b1.tar.gz
+```
+
+#### **Custom Source Code Archives**
+
+The beta release script creates custom source code archives:
+
+- **Dataset-Forge-1.0.0b1-source.zip**
+- **Dataset-Forge-1.0.0b1-source.tar.gz**
+
+**What's included:**
+- ✅ All source code (`dataset_forge/`, `tests/`, `tools/`)
+- ✅ Documentation (`docs/`, `README.md`, `LICENSE`)
+- ✅ Configuration files (`setup.py`, `requirements.txt`)
+- ✅ Essential scripts (`main.py`, `run.bat`)
+- ❌ Development files (`.git`, `venv`, `__pycache__`)
+- ❌ Build artifacts (`dist/`, `build/`, `*.egg-info`)
+- ❌ Test data (`test_datasets/`, `store/`, `reports/`)
+
+### Testing Beta Releases
+
+#### **Local Installation Test**
+
+```bash
+# Test the beta package locally
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -c "import dataset_forge; print(dataset_forge.__version__)"
+dataset-forge --help
+```
+
+#### **Clean Environment Test**
+
+```bash
+# Create new virtual environment
+py -3.12 -m venv test_beta_env
+./test_beta_env\Scripts\Activate.ps1
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -m pytest tests/ -v
+```
+
+### Release Announcement Template
+
+```markdown
+# Dataset-Forge Beta 1.0.0b1
+
+🎉 Beta release is ready for testing!
+
+## What's New
+
+- [List major features]
+- [List improvements]
+- [List bug fixes]
+
+## Installation
+
+- **Source:** `pip install dataset-forge==1.0.0b1`
+- **Windows:** Download `dataset-forge-beta.exe`
+- **From source:** `pip install -e .`
+
+## Testing
+
+Please test and report issues on GitHub!
+
+## Known Issues
+
+- [List any known issues]
+```
+
+### Automated Workflow
+
+#### **GitHub Actions**
+
+The repository includes automated beta release workflow:
+
+1. **Push a tag:** `git push origin v1.0.0b1`
+2. **GitHub Actions automatically:**
+   - Runs tests
+   - Builds packages
+   - Creates GitHub release
+   - Uploads assets
+
+#### **Manual Override**
+
+If you need to trigger manually:
+
+1. Go to Actions → Beta Release
+2. Click "Run workflow"
+3. Enter version (e.g., `1.0.0b1`)
+4. Click "Run workflow"
+
+### Post-Release Monitoring
+
+#### **Track These Metrics**
+
+1. **Installation Success Rate**
+   - Number of successful installations
+   - Common installation errors
+
+2. **Feature Usage**
+   - Most used features
+   - Least used features
+   - Performance bottlenecks
+
+3. **Bug Reports**
+   - Number of issues reported
+   - Severity distribution
+   - Common problems
+
+4. **User Feedback**
+   - Positive feedback
+   - Feature requests
+   - Usability issues
+
+#### **Timeline**
+
+- **Week 1-2:** Collect feedback
+- **Week 3:** Analyze and prioritize
+- **Week 4-5:** Implement fixes
+- **Week 6:** Release candidate
+
+### Emergency Procedures
+
+#### **Critical Bug Found**
+
+1. **Acknowledge immediately** on GitHub
+2. **Create hotfix** if needed
+3. **Release new beta** with incremented number
+4. **Communicate clearly** to users
+
+#### **Rollback**
+
+1. **Keep previous beta** available
+2. **Provide rollback instructions**
+3. **Monitor for additional issues**
+
+### Best Practices
+
+#### **Do's**
+
+- ✅ Test thoroughly before release
+- ✅ Use semantic versioning
+- ✅ Provide clear installation instructions
+- ✅ Document known issues
+- ✅ Respond to feedback promptly
+
+#### **Don'ts**
+
+- ❌ Rush releases without testing
+- ❌ Skip version updates
+- ❌ Ignore user feedback
+- ❌ Release with critical bugs
+- ❌ Forget to mark as pre-release
 
 <details>
 <summary><strong>Technical Implementation: Caching System</strong></summary>
@@ -3920,7 +4869,7 @@ def automated_research_pipeline():
 - **dataset_forge/menus/**: UI layer (CLI menus, user interaction)
 - **dataset_forge/actions/**: Business logic (core dataset/image operations)
 - **dataset_forge/utils/**: Shared utilities (file ops, memory, parallelism, color, monitoring, etc.)
-- **dataset_forge/dpid/**: Degradation Process Implementations (BasicSR, OpenMMLab, Phhofm, Umzi)
+- **dataset_forge/dpid/**: Degradation Process Implementations (BasicSR, OpenMMLab, Phhofm, Umzi) with comprehensive alpha channel support
 - **configs/**: Example and user configuration files
 - **reports/**: Report templates for HTML/Markdown output
 - **assets/**: Static assets
@@ -4007,7 +4956,7 @@ flowchart TD
 - **Menus:** All CLI and user interaction logic. Each menu is modular and uses a robust loop pattern.
 - **Actions:** All business logic and core dataset/image operations. Each action is testable and exposed via public APIs.
 - **Utils:** Shared utilities for file operations, memory management, parallelism, color schemes, and monitoring.
-- **DPID:** Multiple degradation process implementations for HQ/LQ pair generation.
+- **DPID:** Multiple degradation process implementations for HQ/LQ pair generation with comprehensive alpha channel support and hybrid processing approach.
 
 ## Menu System Architecture
 
@@ -4190,6 +5139,203 @@ Dataset Forge is configured with comprehensive MCP (Model Context Protocol) serv
    - `mcp_firecrawl_firecrawl_map` - Discovering website structure
    - `mcp_firecrawl_firecrawl_extract` - Structured data extraction
    - `mcp_firecrawl_firecrawl_deep_research` - Complex research questions
+
+---
+
+## Beta Release Workflow
+
+### Overview
+
+Dataset Forge follows a comprehensive beta release process to ensure quality and stability. Beta releases are used for testing new features, collecting feedback, and preparing for stable releases.
+
+### Beta Release Process
+
+#### **Pre-Release Checklist**
+
+Before creating a beta release, ensure:
+
+- [ ] All tests pass (`python -m pytest`)
+- [ ] Code linting passes (if using flake8/black)
+- [ ] Documentation is up-to-date
+- [ ] No critical bugs in TODO.md
+- [ ] Performance benchmarks pass (if applicable)
+- [ ] Version numbers updated in all relevant files
+
+#### **Version Management**
+
+Dataset Forge follows [PEP 440](https://www.python.org/dev/peps/pep-0440/) for versioning:
+
+```
+MAJOR.MINOR.PATCHbNUMBER
+```
+
+**Examples:**
+- `1.0.0b1` - First beta release
+- `1.0.0b2` - Second beta release
+- `2.1.0b1` - First beta of version 2.1
+
+**Files to Update:**
+1. `setup.py` - `version="1.0.0b1"`
+2. `dataset_forge/__init__.py` - `__version__ = "1.0.0b1"`
+
+#### **Automated Beta Release**
+
+Use the automated script for consistent releases:
+
+```bash
+# Activate virtual environment
+venv312\Scripts\activate
+
+# Create beta release
+python tools/create_beta_release.py --version 1.0.0b1
+```
+
+**What the script does:**
+- Updates version numbers in all files
+- Creates git tag
+- Builds source distribution and wheel packages
+- Creates custom source code archives
+- Prepares GitHub release assets
+
+#### **Manual Beta Release Process**
+
+If you need to create a beta release manually:
+
+```bash
+# 1. Update version numbers
+# Edit setup.py and dataset_forge/__init__.py
+
+# 2. Create git tag
+git tag -a v1.0.0b1 -m "Beta release 1.0.0b1"
+git push origin v1.0.0b1
+
+# 3. Build packages
+python setup.py sdist bdist_wheel
+
+# 4. Create GitHub release
+# Go to GitHub → Releases → Create new release
+# Select the tag and upload assets
+```
+
+#### **Package Types**
+
+**Source Distribution:**
+- File: `dataset-forge-1.0.0b1.tar.gz`
+- Install: `pip install dataset-forge-1.0.0b1.tar.gz`
+- Use case: Standard Python package installation
+
+**Wheel Distribution:**
+- File: `dataset_forge-1.0.0b1-py3-none-any.whl`
+- Install: `pip install dataset_forge-1.0.0b1-py3-none-any.whl`
+- Use case: Faster installation, better compatibility
+
+**Windows Executable:**
+- File: `dataset-forge-beta.exe`
+- Install: Download and run directly
+- Use case: Users who don't want to install Python
+
+#### **Testing Beta Releases**
+
+**Local Installation Test:**
+```bash
+# Test the beta package locally
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -c "import dataset_forge; print(dataset_forge.__version__)"
+dataset-forge --help
+```
+
+**Clean Environment Test:**
+```bash
+# Create new virtual environment
+py -3.12 -m venv test_beta_env
+./test_beta_env\Scripts\Activate.ps1
+pip install ./dist/dataset_forge-1.0.0b1.tar.gz
+python -m pytest tests/ -v
+```
+
+#### **GitHub Release Process**
+
+1. **Go to GitHub repository** → Releases
+2. **Click "Create a new release"**
+3. **Tag version:** `v1.0.0b1`
+4. **Release title:** `Dataset-Forge Beta 1.0.0b1`
+5. **Description:** Include changelog and installation instructions
+6. **Mark as pre-release**
+7. **Upload assets:**
+   - `dataset-forge-1.0.0b1.tar.gz`
+   - `dataset_forge-1.0.0b1-py3-none-any.whl`
+   - `dataset-forge-beta.exe`
+   - Custom source code archives
+
+#### **Source Code Assets**
+
+**Automatic GitHub Assets:**
+- `Dataset-Forge-v1.0.0b1.zip`
+- `Dataset-Forge-v1.0.0b1.tar.gz`
+
+**Custom Source Archives:**
+- `Dataset-Forge-1.0.0b1-source.zip`
+- `Dataset-Forge-1.0.0b1-source.tar.gz`
+
+**What's included in custom archives:**
+- ✅ All source code (`dataset_forge/`, `tests/`, `tools/`)
+- ✅ Documentation (`docs/`, `README.md`, `LICENSE`)
+- ✅ Configuration files (`setup.py`, `requirements.txt`)
+- ✅ Essential scripts (`main.py`, `run.bat`)
+- ❌ Development files (`.git`, `venv`, `__pycache__`)
+- ❌ Build artifacts (`dist/`, `build/`, `*.egg-info`)
+- ❌ Test data (`test_datasets/`, `store/`, `reports/`)
+
+#### **Post-Release Process**
+
+**Week 1-2: Collect Feedback**
+- Monitor GitHub issues and discussions
+- Collect user feedback and bug reports
+- Track installation and usage metrics
+
+**Week 3: Analyze and Prioritize**
+- Review all feedback and bug reports
+- Prioritize fixes and improvements
+- Plan release candidate features
+
+**Week 4-5: Implement Fixes**
+- Fix critical bugs
+- Implement high-priority improvements
+- Update documentation
+
+**Week 6: Release Candidate**
+- Create release candidate
+- Final testing and validation
+- Prepare for stable release
+
+#### **Emergency Procedures**
+
+**Critical Bug Discovery:**
+1. **Acknowledge immediately** on GitHub
+2. **Create hotfix** if needed
+3. **Release new beta** with incremented number
+4. **Communicate clearly** to users
+
+**Rollback Plan:**
+1. **Keep previous beta** available
+2. **Provide rollback instructions**
+3. **Monitor for additional issues**
+
+#### **Best Practices**
+
+**Do's:**
+- ✅ Test thoroughly before release
+- ✅ Use semantic versioning
+- ✅ Provide clear installation instructions
+- ✅ Document known issues
+- ✅ Respond to feedback promptly
+
+**Don'ts:**
+- ❌ Rush releases without testing
+- ❌ Skip version updates
+- ❌ Ignore user feedback
+- ❌ Release with critical bugs
+- ❌ Forget to mark as pre-release
 
 3. **Filesystem Tools** (Project Analysis)
 
@@ -4681,6 +5827,8 @@ mcp_gitmcp-docs_search_generic_code("owner", "repo", "image processing utils")
 
 - **pepedpid ImportError:** Ensure pepedpid is installed in the correct environment.
 - **DPID workflow errors:** Check input folders for valid images and use the correct menu option.
+- **Alpha Channel Processing:** All DPID methods now support RGBA images with automatic alpha channel detection and preservation.
+- **DPID Alpha Panics Fixed:** Previous alpha channel processing panics have been resolved using hybrid approach (DPID for RGB, OpenCV for alpha).
 
 ## Steganography Tools (zsteg, steghide)
 
@@ -5960,6 +7108,42 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
 
 ## [Unreleased]
 
+### 🧠 CBIR Semantic Detection Integration (August 2025)
+
+- **New Feature**: CBIR (Content-Based Image Retrieval) Semantic Detection integrated into Consolidated De-duplication menu
+- **Key Features**:
+  - **Deep Learning Models**: CLIP (fast), ResNet (balanced), VGG (detailed) for semantic similarity detection
+  - **Semantic Understanding**: Finds conceptually similar images beyond pixel-level comparisons
+  - **Advanced Configuration**: Configurable thresholds, model selection, and batch processing
+  - **Multiple Operations**: Show, Copy, Move, Delete duplicate groups with comprehensive reporting
+  - **Memory Management**: Efficient batch processing with GPU acceleration support
+- **Model Characteristics**:
+  - **CLIP**: Fastest processing (~10-20 images/second), best for semantic similarity
+  - **ResNet**: Medium speed (~5-10 images/second), good for visual feature analysis
+  - **VGG**: Slowest but most detailed (~2-5 images/second), comprehensive feature extraction
+- **Performance Optimization**:
+  - **GPU Acceleration**: Automatic GPU usage when available with memory management
+  - **Batch Processing**: Configurable max image limits for memory optimization
+  - **Efficient Caching**: Model caching and embedding reuse for improved performance
+- **Threshold Guidelines**:
+  - **Conservative (0.95-0.98)**: High precision, fewer false positives
+  - **Balanced (0.90-0.95)**: Good balance between precision and recall
+  - **Aggressive (0.80-0.90)**: Higher recall, more potential duplicates
+- **Files Updated**:
+  - `dataset_forge/menus/consolidated_dedup_menu.py` - Added CBIR as option 7 with comprehensive workflow
+  - `dataset_forge/actions/cbir_actions.py` - Enhanced with improved error handling and memory management
+  - `docs/features.md` - Added comprehensive CBIR feature documentation
+  - `docs/usage.md` - Added CBIR usage guide with examples and best practices
+  - `docs/changelog.md` - Documented CBIR integration
+- **Menu Integration**:
+  - **Added**: Option 7 "🧠 CBIR Semantic Detection" to Consolidated De-duplication menu
+  - **Enhanced**: Menu context with CBIR information and usage examples
+  - **Updated**: Help system with CBIR documentation and troubleshooting
+- **Testing**: Comprehensive validation of CBIR integration with menu navigation and workflow testing
+- **Documentation**: Complete usage guide, model selection guidelines, and performance optimization tips
+- **Result**: Advanced semantic duplicate detection with deep learning models and flexible configuration
+- **User Experience**: Intuitive model selection, comprehensive parameter configuration, and safe operation modes
+
 ### 🎨 Comprehensive Menu System Improvement (August 2025)
 
 - **Major Achievement**: Complete transformation of Dataset Forge's menu system with perfect theming compliance and enhanced user experience
@@ -6414,6 +7598,17 @@ For more details, see the [main README Quick Start](../README.md#-quick-start) a
   - Documented in all relevant docs and .cursorrules.
 - Added '🧭 Align Images (Batch Projective Alignment)' feature to Dataset Management menu. Allows batch alignment of images from two folders (flat or recursive) using SIFT+FLANN projective transformation. Robust error handling, modular implementation, and public API.
 - Added robust, non-interactive test for Align Images using feature-rich dummy images to ensure SIFT keypoint detection and alignment.
+
+### 🆕 DPID: Comprehensive Detail-Preserving Downscaling Menu with Alpha Channel Support (August 2025)
+
+- **New Consolidated DPID Menu:** Created comprehensive DPID (Detail-Preserving Image Downscaling) menu with 4 methods: Umzi's DPID (pepedpid), Phhofm DPID, BasicSR DPID, and OpenMMLab DPID.
+- **🔄 Alpha Channel Support:** Implemented comprehensive alpha channel support across all DPID methods with hybrid processing approach (DPID for RGB, optimized OpenCV for alpha).
+- **Robust Error Handling:** Fixed alpha channel processing panics by using OpenCV resize for alpha channels instead of problematic DPID methods.
+- **Menu Integration:** Added as option 4 in Image Processing & Augmentation menu with full theming compliance and global command support.
+- **Advanced Features:** Method comparison tool, parameter configuration, session state integration, and comprehensive help system.
+- **Processing Modes:** Support for both single folder and HQ/LQ paired processing with configurable parameters (RGB and RGBA images).
+- **Testing:** Comprehensive test suite covering menu integration, parameter validation, and processing workflows.
+- **Documentation:** Updated all relevant docs and .cursorrules to reflect the new consolidated DPID menu system with alpha channel support.
 
 ### 🆕 DPID: Umzi's DPID (pepedpid) Integration (July 2025)
 

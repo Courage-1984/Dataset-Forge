@@ -64,7 +64,7 @@
 
 ## 🛠️ Utilities
 
-- **🔍 Consolidated De-duplication**: Unified menu combining fuzzy matching, visual deduplication, and hash-based methods
+- **🔍 Consolidated De-duplication**: Unified menu combining fuzzy matching, visual deduplication, hash-based methods, and CBIR semantic detection
 - **🗜️ Consolidated Compression**: Single menu for individual and directory compression with format optimization
 - **📊 Enhanced Comparison Tools**: Image/gif comparison creation with advanced analysis features
 - **🌳 Directory Tree Visualization**: Enhanced tree display with metadata and filtering options
@@ -219,7 +219,7 @@ Dataset Forge features a comprehensive, well-organized menu system that has been
 - **🔄 Orientation Organization**: Sort by landscape/portrait/square
 - **📏 Size Filtering**: Remove small/invalid image pairs
 - **🧭 Align Images (Batch Projective Alignment)**: Aligns images from two folders (flat or recursive, matching by filename) using SIFT+FLANN projective transformation. Supports batch processing, robust error handling, and both flat and subfolder workflows. See Usage Guide for details.
-- **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows.
+- **DPID implementations (BasicSR, OpenMMLab, Phhofm, Umzi)**: Multiple DPID (degradation) methods for downscaling with **comprehensive alpha channel support**, including Umzi's DPID (pepedpid) for HQ/LQ and single-folder workflows. Hybrid processing approach ensures optimal quality for both RGB and alpha channels.
 
 ### 🧩 Umzi's Dataset_Preprocessing (PepeDP-powered, July 2025)
 
@@ -246,6 +246,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 - **🔄 Basic Transformations**: Downsample Images, crop, flip, rotate, shuffle, remove alpha channel, **resave images (with lossless options and quality control)**
 - **🎨 Colour, Tone & Levels Adjustments**: Brightness, contrast, hue, saturation, HDR>SDR, grayscale
 - **🧪 Degradations**: Blur, noise, pixelate, dithering, sharpen, banding & many more
+- **🔽 DPID Detail-Preserving Downscaling**: Comprehensive DPID (Detail-Preserving Image Downscaling) menu with 4 methods: Umzi's DPID (pepedpid), Phhofm DPID, BasicSR DPID, and OpenMMLab DPID. **Full alpha channel support** with hybrid processing (DPID for RGB, optimized OpenCV for alpha). Supports both single folder and HQ/LQ paired processing with configurable parameters and method comparison.
 - **🚀 Augmentation**: List, create, edit or delete _recipes_ or run advanced augmentation pipelines (using recipes)
 - **📋 Metadata**: Scrub EXIF Metadata, Convert ICC Profile to sRGB
 - **✏️ Find & extract sketches/drawings/line art**: Find & extract sketches/drawings/line art using pre-trained model
@@ -261,6 +262,7 @@ All workflows are modular, testable, and use the latest PepeDP API. See [Usage G
 ## 🛠️ Utilities
 
 - **🔍 Fuzzy Matching De-duplication**: Multi-algorithm perceptual hashing with configurable thresholds (pHash, dHash, aHash, wHash, Color Hash). Support for single folder and HQ/LQ paired folders with multiple operation modes (show/copy/move/delete).
+- **🧠 CBIR Semantic Detection**: Content-Based Image Retrieval using deep learning embeddings (CLIP, ResNet, VGG) for conceptual similarity detection. Advanced semantic duplicate detection with configurable thresholds and multiple operation modes.
 - **🖼️ Create Comparisons**: Create striking image / gif comparisons
 - **📦 Compression**: Compress images or directories
 - **🧹 Sanitize Images**: Comprehensive, interactive image file sanitization. Each major step (corruption fix, copy, batch rename, ICC to sRGB, PNG conversion, remove alpha, metadata removal, steganography) is prompted interactively with emoji and Mocha color. Steganography checks prompt for steghide and zsteg individually, and the summary reports both. A visually distinct summary box is always shown at the end, including zsteg results file path if produced. All output uses the Catppuccin Mocha color scheme and emoji-rich prompts. Menu header is reprinted after returning to the workflow menu.
@@ -1254,3 +1256,175 @@ The Fuzzy Matching De-duplication feature requires:
 All dependencies are included in the project's `requirements.txt` file.
 
 This feature provides a comprehensive solution for fuzzy duplicate detection, combining multiple perceptual hashing algorithms with flexible configuration options and safe operation modes.
+
+---
+
+## 🧠 CBIR Semantic Detection (NEW - August 2025)
+
+**Location**: Main Menu → 🛠️ Utilities → 🔍 Consolidated De-duplication → 7. 🧠 CBIR Semantic Detection
+
+**Purpose**: Advanced semantic duplicate detection using deep learning embeddings for finding conceptually similar images.
+
+### **Overview**
+
+The CBIR (Content-Based Image Retrieval) Semantic Detection feature provides advanced duplicate detection using deep learning embeddings. Unlike traditional hash-based methods that focus on pixel-level similarity, CBIR uses semantic understanding to find images that are conceptually similar, even if they have different visual appearances.
+
+### **Key Features**
+
+#### **🔬 Deep Learning Models**
+- **CLIP (Contrastive Language-Image Pre-training)**: Fast, semantic similarity detection using OpenAI's CLIP model
+- **ResNet**: Classic CNN-based feature extraction for detailed visual analysis
+- **VGG**: Traditional CNN architecture for comprehensive feature representation
+
+#### **🎯 Semantic Understanding**
+- **Conceptual Similarity**: Finds images with similar semantic content rather than just visual similarity
+- **Content-Aware Detection**: Understands image content beyond pixel-level comparisons
+- **Flexible Thresholds**: Configurable similarity thresholds for different use cases
+
+#### **⚙️ Advanced Configuration**
+- **Model Selection**: Choose between CLIP (fast), ResNet (balanced), or VGG (detailed)
+- **Threshold Control**: Adjustable similarity thresholds (0.0-1.0) for precision vs recall trade-offs
+- **Batch Processing**: Configurable maximum image limits for memory management
+- **Multiple Operations**: Show, copy, move, or delete duplicate groups
+
+### **Use Cases**
+
+#### **Semantic Duplicate Detection**
+- Find images with similar content but different visual appearances
+- Detect variations of the same scene or object
+- Identify conceptually related images across different styles
+
+#### **Content Organization**
+- Group images by semantic similarity for better organization
+- Find related images for dataset curation
+- Identify duplicate content across different formats or resolutions
+
+#### **Quality Control**
+- Detect semantic duplicates in training datasets
+- Ensure dataset diversity by removing overly similar content
+- Maintain dataset quality for machine learning applications
+
+### **Workflow**
+
+#### **1. Input Selection**
+- **Single Folder**: Process all images in a single directory
+- **HQ/LQ Paired Folders**: Process paired high-quality and low-quality image folders
+
+#### **2. Model Configuration**
+- **CLIP**: Recommended for most use cases (fast and accurate)
+- **ResNet**: Good balance between speed and accuracy
+- **VGG**: Most detailed analysis but slower processing
+
+#### **3. Parameter Tuning**
+- **Max Images**: Limit processing to manage memory usage (default: 100)
+- **Similarity Threshold**: Control detection sensitivity (default: 0.98)
+
+#### **4. Operation Selection**
+- **Show Only**: Preview duplicates without taking action
+- **Copy**: Copy duplicates to separate folder for review
+- **Move**: Move duplicates to separate folder
+- **Delete**: Permanently remove duplicates (with confirmation)
+
+### **Performance Characteristics**
+
+#### **Speed Comparison**
+- **CLIP**: Fastest processing (~10-20 images/second)
+- **ResNet**: Medium speed (~5-10 images/second)
+- **VGG**: Slowest but most detailed (~2-5 images/second)
+
+#### **Accuracy Comparison**
+- **CLIP**: Best for semantic similarity and conceptual understanding
+- **ResNet**: Good for visual feature analysis
+- **VGG**: Most comprehensive feature extraction
+
+#### **Memory Usage**
+- **CLIP**: Moderate memory usage with efficient caching
+- **ResNet**: Higher memory usage due to model size
+- **VGG**: Highest memory usage but most detailed analysis
+
+### **Best Practices**
+
+#### **Model Selection Guidelines**
+- **Start with CLIP**: Best overall performance for most use cases
+- **Use ResNet**: When you need more detailed visual analysis
+- **Use VGG**: For comprehensive feature extraction and analysis
+
+#### **Threshold Guidelines**
+- **Conservative (0.95-0.98)**: High precision, fewer false positives
+- **Balanced (0.90-0.95)**: Good balance between precision and recall
+- **Aggressive (0.80-0.90)**: Higher recall, more potential duplicates
+
+#### **Processing Guidelines**
+- **Start Small**: Test with small datasets first
+- **Monitor Memory**: Use appropriate max image limits
+- **Validate Results**: Always review results before destructive operations
+
+### **Integration with Other Features**
+
+#### **Fuzzy Matching**
+- Use CBIR for semantic similarity detection
+- Use fuzzy matching for pixel-level similarity
+
+#### **Visual Deduplication**
+- CBIR for conceptual similarity
+- Visual deduplication for perceptual similarity
+
+#### **File Hash Deduplication**
+- CBIR for content-based duplicates
+- File hash for exact duplicates
+
+### **Technical Implementation**
+
+#### **Embedding Extraction**
+- Uses pre-trained deep learning models
+- Extracts high-dimensional feature vectors
+- Implements efficient similarity computation
+
+#### **Similarity Computation**
+- Cosine similarity for CLIP embeddings
+- Euclidean distance for CNN features
+- Configurable similarity metrics
+
+#### **Memory Management**
+- Efficient batch processing
+- Automatic memory cleanup
+- GPU acceleration when available
+
+### **Error Handling**
+
+#### **Robust Processing**
+- Graceful handling of corrupted images
+- Automatic fallback for model loading failures
+- Comprehensive error reporting
+
+#### **Validation**
+- Input validation for all parameters
+- Path existence verification
+- Operation confirmation for destructive actions
+
+### **Dependencies**
+
+The CBIR Semantic Detection feature requires:
+- **torch**: PyTorch for deep learning models
+- **transformers**: Hugging Face transformers for CLIP
+- **timm**: PyTorch Image Models for ResNet/VGG
+- **PIL/Pillow**: For image processing
+- **numpy**: For numerical operations
+- **tqdm**: For progress tracking
+
+All dependencies are included in the project's `requirements.txt` file.
+
+### **Future Enhancements**
+
+#### **Planned Features**
+- **Custom Model Support**: Load and use custom trained models
+- **Batch Processing**: Process multiple folders simultaneously
+- **Cloud Integration**: Support for cloud storage providers
+- **Advanced Filtering**: Filter by image metadata or content
+
+#### **Performance Improvements**
+- **GPU Acceleration**: Enhanced GPU support for all models
+- **Model Optimization**: Quantized models for faster inference
+- **Caching**: Persistent embedding cache for repeated analysis
+
+This feature provides advanced semantic duplicate detection capabilities, enabling users to find conceptually similar images using state-of-the-art deep learning models with flexible configuration options and safe operation modes.

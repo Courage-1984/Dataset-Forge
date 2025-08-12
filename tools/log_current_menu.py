@@ -57,7 +57,7 @@ class MenuAuditor:
             r"Select.*folder",
             r"Choose.*directory",
         ]
-        self.output_file = "menu_system/current_menu.md"
+        self.output_file = "logs/current_menu.md"
         self.max_depth = 20
         self.current_depth = 0
         self.menu_stack: List[str] = []
@@ -874,7 +874,7 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
             report += self.generate_statistics(main_hierarchy)
 
             # Write the report to file
-            # Ensure the menu_system directory exists
+            # Ensure the logs directory exists
             output_dir = Path(self.output_file).parent
             output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1039,7 +1039,7 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
             try:
                 # Convert file path to module path
                 normalized_path = menu_file.replace("\\", "/")
-                
+
                 if normalized_path.startswith("dataset_forge/menus/"):
                     module_name = normalized_path[19:-3]
                 elif normalized_path.startswith("/dataset_forge/menus/"):
@@ -1048,24 +1048,33 @@ This report provides a comprehensive audit of the Dataset Forge menu hierarchy, 
                     module_name = normalized_path[21:-3]
                 else:
                     module_name = normalized_path.replace("/", ".").replace(".py", "")
-                
+
                 if module_name.startswith("/"):
                     module_name = module_name[1:]
-                
+
                 module_path = f"dataset_forge.menus.{module_name}"
-                
+
                 # Find all menu functions in the module
                 menu_functions = self.find_menu_functions(module_path)
-                
+
                 for func_name, func in menu_functions:
-                    if func_name not in all_menus and func_name not in self.visited_menus:
+                    if (
+                        func_name not in all_menus
+                        and func_name not in self.visited_menus
+                    ):
                         try:
-                            print_info(f"🔍 Third pass: analyzing {module_path}.{func_name}...")
-                            menu_info = self.explore_menu_recursively(func, func_name, 0)
+                            print_info(
+                                f"🔍 Third pass: analyzing {module_path}.{func_name}..."
+                            )
+                            menu_info = self.explore_menu_recursively(
+                                func, func_name, 0
+                            )
                             all_menus[func_name] = menu_info
                         except Exception as e:
-                            print_warning(f"Failed to analyze {module_path}.{func_name} in third pass: {e}")
-                            
+                            print_warning(
+                                f"Failed to analyze {module_path}.{func_name} in third pass: {e}"
+                            )
+
             except Exception as e:
                 print_warning(f"Failed to process {menu_file} in third pass: {e}")
                 continue
