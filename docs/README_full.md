@@ -701,6 +701,23 @@ This guide will help you install and launch Dataset Forge for the first time.
    ```
 
 2. **Set up the environment:**
+
+   **Option A: Automated Installation (Recommended)**
+
+   ```bash
+   # Windows (easiest)
+   install.bat
+   # or
+   tools\install.bat
+
+   # Or manually
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   python tools\install.py
+   ```
+
+   **Option B: Manual Installation**
+
    ```bash
    py -3.12 -m venv venv312
    venv312\Scripts\activate
@@ -708,7 +725,17 @@ This guide will help you install and launch Dataset Forge for the first time.
    # Install the correct CUDA-enabled torch/torchvision/torchaudio first!
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
    pip install -r requirements.txt
+   pip install -e .
    ```
+
+   **Option C: Using setup.py directly**
+
+   ```bash
+   py -3.12 -m venv venv312
+   venv312\Scripts\activate
+   python setup.py install
+   ```
+
    > **Note:** For other CUDA versions, see [PyTorch Get Started](https://pytorch.org/get-started/locally/).
 
 ---
@@ -5132,9 +5159,10 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 
 - [ ] **Debug Mode**: Add a comprehensive _Debug Mode_ to the project, which when activated, shows verbose output and debug information throughout the CLI
 - [ ] **Packaging & Distribution**:
-  - [ ] Compile Dataset-Forge into standalone executable
+  - [x] Compile Dataset-Forge into standalone executable (PyInstaller support)
   - [ ] Create Docker container/containerization
-  - [ ] Automated build pipeline for releases
+  - [x] Automated build pipeline for releases (GitHub Actions workflow)
+  - [x] Beta release process and tools (create_beta_release.py script)
 - [ ] **Automated Documentation**: Implement automated documentation generation and maintenance
 - [ ] **Batch Scripts**: Save and replay complex multi-step operations/workflows
 - [ ] **Global Search Functionality**: Implement comprehensive search across all menus and features
@@ -5345,7 +5373,6 @@ If your question is not answered here, check the [usage guide](usage.md), [troub
 - [ ] **lorem**: lorem
 - [ ] **lorem**: lorem
 - [ ] **lorem**: lorem
-
 
 ---
 
