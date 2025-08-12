@@ -451,11 +451,11 @@ Please report any issues or suggestions:
     def create_source_archives(self) -> bool:
         """Create custom source code archives for release assets."""
         print_info("📦 Creating source code archives...")
-        
+
         # Define what to include/exclude
         include_patterns = [
             "dataset_forge/**/*",
-            "docs/**/*", 
+            "docs/**/*",
             "tests/**/*",
             "configs/**/*",
             "tools/**/*",
@@ -466,9 +466,9 @@ Please report any issues or suggestions:
             "MANIFEST.in",
             "pytest.ini",
             "main.py",
-            "run.bat"
+            "run.bat",
         ]
-        
+
         exclude_patterns = [
             "**/__pycache__/**",
             "**/*.pyc",
@@ -488,20 +488,20 @@ Please report any issues or suggestions:
             "**/node_modules/**",
             "**/test_datasets/**",
             "**/store/**",
-            "**/reports/**"
+            "**/reports/**",
         ]
-        
+
         try:
             import zipfile
             import tarfile
             from pathlib import Path
-            
+
             # Create temporary directory for clean source
             temp_dir = self.project_root / "temp_source"
             if temp_dir.exists():
                 shutil.rmtree(temp_dir)
             temp_dir.mkdir()
-            
+
             # Copy files based on patterns
             for pattern in include_patterns:
                 pattern_path = self.project_root / pattern
@@ -515,7 +515,7 @@ Please report any issues or suggestions:
                         # Copy directory
                         dest_path = temp_dir / pattern_path.name
                         shutil.copytree(pattern_path, dest_path, dirs_exist_ok=True)
-            
+
             # Remove excluded files/directories
             for pattern in exclude_patterns:
                 for path in temp_dir.rglob(pattern.replace("**/*", "*")):
@@ -524,29 +524,29 @@ Please report any issues or suggestions:
                             path.unlink()
                         elif path.is_dir():
                             shutil.rmtree(path)
-            
+
             # Create zip archive
             zip_path = self.dist_dir / f"Dataset-Forge-{self.version}-source.zip"
-            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for file_path in temp_dir.rglob('*'):
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for file_path in temp_dir.rglob("*"):
                     if file_path.is_file():
                         arcname = file_path.relative_to(temp_dir)
                         zipf.write(file_path, arcname)
-            
+
             # Create tar.gz archive
             tar_path = self.dist_dir / f"Dataset-Forge-{self.version}-source.tar.gz"
-            with tarfile.open(tar_path, 'w:gz') as tarf:
+            with tarfile.open(tar_path, "w:gz") as tarf:
                 tarf.add(temp_dir, arcname=f"Dataset-Forge-{self.version}")
-            
+
             # Clean up
             shutil.rmtree(temp_dir)
-            
+
             print_success(f"Created source archives:")
             print_info(f"  📦 {zip_path.name}")
             print_info(f"  📦 {tar_path.name}")
-            
+
             return True
-            
+
         except Exception as e:
             print_error(f"Failed to create source archives: {e}")
             return False
@@ -554,18 +554,20 @@ Please report any issues or suggestions:
     def create_release_assets(self) -> List[Path]:
         """Create all release assets including source code archives."""
         assets = []
-        
+
         # Create source archives
         if self.create_source_archives():
-            assets.extend([
-                self.dist_dir / f"Dataset-Forge-{self.version}-source.zip",
-                self.dist_dir / f"Dataset-Forge-{self.version}-source.tar.gz"
-            ])
-        
+            assets.extend(
+                [
+                    self.dist_dir / f"Dataset-Forge-{self.version}-source.zip",
+                    self.dist_dir / f"Dataset-Forge-{self.version}-source.tar.gz",
+                ]
+            )
+
         # Add existing distribution files
         for pattern in ["*.tar.gz", "*.whl", "*.exe"]:
             assets.extend(self.dist_dir.glob(pattern))
-        
+
         return assets
 
 

@@ -706,15 +706,16 @@
     - [Method 1: Windows (WSL - Recommended for CLI Integration)](#method-1-windows-wsl-recommended-for-cli-integration)
     - [Method 2: Windows (MSYS2 MINGW64 Shell)](#method-2-windows-msys2-mingw64-shell)
     - [Method 3: Windows (Windows pre-build binary)](#method-3-windows-windows-pre-build-binary)
-    - [Usage in Dataset Forge](#usage-in-dataset-forge)
-  - [5. Advanced Metadata Operations with ExifTool](#5-advanced-metadata-operations-with-exiftool)
+  - [5. GetFnative & getfscaler](#5-getfnative-getfscaler)
+    - [Method 1: Windows (Quick)](#method-1-windows-quick)
+  - [6. Advanced Metadata Operations with ExifTool](#6-advanced-metadata-operations-with-exiftool)
     - [Method 1.1: Windows (Quick)](#method-11-windows-quick)
     - [Method 1.2: Windows (Better)](#method-12-windows-better)
     - [Method 2: Windows (Chocolatey)](#method-2-windows-chocolatey)
-  - [6. Metadata Strip + Lossless png compression with Oxipng](#6-metadata-strip-lossless-png-compression-with-oxipng)
+  - [7. Metadata Strip + Lossless png compression with Oxipng](#7-metadata-strip-lossless-png-compression-with-oxipng)
     - [Method 1.1: Windows (Quick)](#method-11-windows-quick)
     - [Method 1.2: Windows (Better)](#method-12-windows-better)
-  - [7. Steganography Integration for zsteg and Steghide](#7-steganography-integration-for-zsteg-and-steghide)
+  - [8. Steganography Integration for zsteg and Steghide](#8-steganography-integration-for-zsteg-and-steghide)
     - [zsteg installation (Windows)](#zsteg-installation-windows)
       - [Method 1: Gem Installation (Recommended)](#method-1-gem-installation-recommended)
       - [Method 2.1: Standalone Executable (Quick)](#method-21-standalone-executable-quick)
@@ -722,15 +723,15 @@
     - [steghide installation](#steghide-installation)
       - [Method 1.1: Windows (Quick)](#method-11-windows-quick)
       - [Method 1.2: Windows (Better)](#method-12-windows-better)
-  - [8. ffmpeg integration](#8-ffmpeg-integration)
+  - [9. ffmpeg integration](#9-ffmpeg-integration)
     - [Method 1.1: Windows (Quick)](#method-11-windows-quick)
     - [Method 1.2: Windows (Better)](#method-12-windows-better)
     - [Method 1.3: Windows (`Method 1.1` but download first)](#method-13-windows-method-11-but-download-first)
-  - [9. Special mass implementation of above^^](#9-special-mass-implementation-of-above)
+  - [10. Special mass implementation of above^^](#10-special-mass-implementation-of-above)
     - [Step 1: Windows binary dump](#step-1-windows-binary-dump)
     - [Step 2: Windows dll dump](#step-2-windows-dll-dump)
     - [Step 3: Test the implementations](#step-3-test-the-implementations)
-  - [10. CUDA & GPU Performance Steps](#10-cuda-gpu-performance-steps)
+  - [11. CUDA & GPU Performance Steps](#11-cuda-gpu-performance-steps)
     - [Step 1: Always use ./run.bat/](#step-1-always-use-runbat)
     - [Step 2: Be Sure your `venv312` has cuda torch installed](#step-2-be-sure-your-venv312-has-cuda-torch-installed)
     - [Step 3: Windows Pagefile](#step-3-windows-pagefile)
@@ -6581,6 +6582,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 python vsrepo.py install descale
 python vsrepo.py install ffms2
 python vsrepo.py install lsmas
+python vsrepo.py install imwri
+python vsrepo.py install akarin
+python vsrepo.py install resize2
 ```
 
 3. Activate your virtual environment:
@@ -6678,8 +6682,8 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    sudo apt install pkg-config
    sudo apt install libfftw3-dev libpng-dev mjpegtools libmagickwand-dev
    cd path/to/resdet
-   make clean
    ./configure
+   make clean
    make
    ```
 3. Install resdet to your WSL PATH:
@@ -6697,25 +6701,42 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```sh
    git clone https://github.com/0x09/resdet.git
    ```
-2. Open **MSYS2 MINGW64 Shell**.
+2. Open **[MSYS2 MINGW64 Shell](https://www.msys2.org/)**.
 3. Install dependencies:
    ```sh
-   pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-fftw mingw-w64-x86_64-pkg-config autoconf automake libtool
+   pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-imagemagick mingw-w64-x86_64-fftw mingw-w64-x86_64-pkg-config autoconf automake libtool git
+   ```
+   ```sh
+      pacman -S mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo
    ```
 4. Set PKG_CONFIG_PATH:
    ```sh
    export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
    ```
-5. Build resdet:
+5. Clone resdet:
    ```sh
-   cd path/to/resdet
+   git clone https://github.com/0x09/resdet.git
+   cd resdet
+   ```
+6. Adjust makefile:
+   Look for a line like
+
+   > TOOLS=resdet stat profile imgread
+   > change to
+   > TOOLS=resdet stat imgread
+
+7. Build resdet:
+   ```
+   ./configure --prefix=/mingw64 --disable-libpng --disable-libjpeg
    make clean
-   ./configure --prefix=/mingw64
    make
    ```
-6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
+8. Add your `MSYS2 MINGW64 Shell`'s' `bin` folder (eg `C:\msys64\mingw64\bin`) in your PATH, or add its folder to your PATH.
+9. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
 
 ### Method 3: Windows (Windows pre-build binary)
+
+./r
 
 1. Extract the following files from `assets/resdet_windows.zip`:
 
@@ -6725,15 +6746,27 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 2. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
 
-### Usage in Dataset Forge
+---
 
-- The CLI will detect your platform and use the appropriate resdet binary.
-- On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
-- If resdet is not found, you will receive a clear error message with installation instructions.
+## 5. GetFnative & getfscaler
+
+> (for [GetFnative](https://github.com/YomikoR/GetFnative) & [getfscaler](https://github.com/Jaded-Encoding-Thaumaturgy/getfscaler) functionality/native resolution detection)
+
+### Method 1: Windows (Quick)
+
+1. Extract the following files from `_win_binary_dump`:
+
+```
+   getfnative.exe
+   getfnativeq.exe
+   getfscaler.exe
+```
+
+2. Add all 3 `.exe`'s to a folder in your PATH.
 
 ---
 
-## 5. Advanced Metadata Operations with ExifTool
+## 6. Advanced Metadata Operations with ExifTool
 
 > (for [exiftool](https://exiftool.org/) integration)
 
@@ -6777,7 +6810,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 6. Metadata Strip + Lossless png compression with Oxipng
+## 7. Metadata Strip + Lossless png compression with Oxipng
 
 > (for [Oxipng](https://github.com/oxipng/oxipng) integration)
 > essential for 'Sanitise Image Workflow'
@@ -6804,7 +6837,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 7. Steganography Integration for zsteg and Steghide
+## 8. Steganography Integration for zsteg and Steghide
 
 > (for [zsteg](https://github.com/zed-0xff/zsteg) & [Steghide](https://steghide.sourceforge.net/) integration)
 > optional for 'Sanitise Image Workflow'
@@ -6919,7 +6952,7 @@ gem install ocran
 
 ---
 
-## 8. ffmpeg integration
+## 9. ffmpeg integration
 
 > (for [ffmpeg](https://ffmpeg.org/) integration)
 
@@ -6967,7 +7000,7 @@ gem install ocran
 
 ---
 
-## 9. Special mass implementation of above^^
+## 10. Special mass implementation of above^^
 
 > shortcut that implements multiple special installations from above
 
@@ -6995,6 +7028,9 @@ steghide.exe
 zsteg.exe
 pyiqa.exe
 imagededup.exe
+getfnative.exe
+getfnativeq.exe
+getfscaler.exe
 ```
 
 ### Step 2: Windows dll dump
@@ -7020,7 +7056,7 @@ python-magic's dll's & .mgc magicfile
 
 ---
 
-## 10. CUDA & GPU Performance Steps
+## 11. CUDA & GPU Performance Steps
 
 > a guide on optimizing performance
 
@@ -7094,7 +7130,6 @@ then change these settings:
 ---
 
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
-
 
 ---
 

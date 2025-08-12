@@ -53,6 +53,9 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 python vsrepo.py install descale
 python vsrepo.py install ffms2
 python vsrepo.py install lsmas
+python vsrepo.py install imwri
+python vsrepo.py install akarin
+python vsrepo.py install resize2
 ```
 
 3. Activate your virtual environment:
@@ -150,8 +153,8 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    sudo apt install pkg-config
    sudo apt install libfftw3-dev libpng-dev mjpegtools libmagickwand-dev
    cd path/to/resdet
-   make clean
    ./configure
+   make clean
    make
    ```
 3. Install resdet to your WSL PATH:
@@ -169,25 +172,42 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
    ```sh
    git clone https://github.com/0x09/resdet.git
    ```
-2. Open **MSYS2 MINGW64 Shell**.
+2. Open **[MSYS2 MINGW64 Shell](https://www.msys2.org/)**.
 3. Install dependencies:
    ```sh
-   pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-fftw mingw-w64-x86_64-pkg-config autoconf automake libtool
+   pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-imagemagick mingw-w64-x86_64-fftw mingw-w64-x86_64-pkg-config autoconf automake libtool git
+   ```
+   ```sh
+      pacman -S mingw-w64-x86_64-libjpeg-turbo mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg-turbo
    ```
 4. Set PKG_CONFIG_PATH:
    ```sh
    export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
    ```
-5. Build resdet:
+5. Clone resdet:
    ```sh
-   cd path/to/resdet
+   git clone https://github.com/0x09/resdet.git
+   cd resdet
+   ```
+6. Adjust makefile:
+   Look for a line like
+
+   > TOOLS=resdet stat profile imgread
+   > change to
+   > TOOLS=resdet stat imgread
+
+7. Build resdet:
+   ```
+   ./configure --prefix=/mingw64 --disable-libpng --disable-libjpeg
    make clean
-   ./configure --prefix=/mingw64
    make
    ```
-6. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
+8. Add your `MSYS2 MINGW64 Shell`'s' `bin` folder (eg `C:\msys64\mingw64\bin`) in your PATH, or add its folder to your PATH.
+9. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
 
 ### Method 3: Windows (Windows pre-build binary)
+
+./r
 
 1. Extract the following files from `assets/resdet_windows.zip`:
 
@@ -197,15 +217,27 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 2. Add `resdet.exe` to a folder in your PATH, or add its folder to your PATH.
 
-### Usage in Dataset Forge
+---
 
-- The CLI will detect your platform and use the appropriate resdet binary.
-- On Windows, if WSL is available and resdet is installed in WSL, it will be used automatically.
-- If resdet is not found, you will receive a clear error message with installation instructions.
+## 5. GetFnative & getfscaler
+
+> (for [GetFnative](https://github.com/YomikoR/GetFnative) & [getfscaler](https://github.com/Jaded-Encoding-Thaumaturgy/getfscaler) functionality/native resolution detection)
+
+### Method 1: Windows (Quick)
+
+1. Extract the following files from `_win_binary_dump`:
+
+```
+   getfnative.exe
+   getfnativeq.exe
+   getfscaler.exe
+```
+
+2. Add all 3 `.exe`'s to a folder in your PATH.
 
 ---
 
-## 5. Advanced Metadata Operations with ExifTool
+## 6. Advanced Metadata Operations with ExifTool
 
 > (for [exiftool](https://exiftool.org/) integration)
 
@@ -249,7 +281,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 6. Metadata Strip + Lossless png compression with Oxipng
+## 7. Metadata Strip + Lossless png compression with Oxipng
 
 > (for [Oxipng](https://github.com/oxipng/oxipng) integration)
 > essential for 'Sanitise Image Workflow'
@@ -276,7 +308,7 @@ file_magic = magic.Magic(magic_file="C:/Windows/System32/magic.mgc")
 
 ---
 
-## 7. Steganography Integration for zsteg and Steghide
+## 8. Steganography Integration for zsteg and Steghide
 
 > (for [zsteg](https://github.com/zed-0xff/zsteg) & [Steghide](https://steghide.sourceforge.net/) integration)
 > optional for 'Sanitise Image Workflow'
@@ -391,7 +423,7 @@ gem install ocran
 
 ---
 
-## 8. ffmpeg integration
+## 9. ffmpeg integration
 
 > (for [ffmpeg](https://ffmpeg.org/) integration)
 
@@ -439,7 +471,7 @@ gem install ocran
 
 ---
 
-## 9. Special mass implementation of above^^
+## 10. Special mass implementation of above^^
 
 > shortcut that implements multiple special installations from above
 
@@ -467,6 +499,9 @@ steghide.exe
 zsteg.exe
 pyiqa.exe
 imagededup.exe
+getfnative.exe
+getfnativeq.exe
+getfscaler.exe
 ```
 
 ### Step 2: Windows dll dump
@@ -492,7 +527,7 @@ python-magic's dll's & .mgc magicfile
 
 ---
 
-## 10. CUDA & GPU Performance Steps
+## 11. CUDA & GPU Performance Steps
 
 > a guide on optimizing performance
 
@@ -566,4 +601,3 @@ then change these settings:
 ---
 
 For more details, see the [main README Quick Start](../README.md#-quick-start) and [troubleshooting guide](troubleshooting.md).
-

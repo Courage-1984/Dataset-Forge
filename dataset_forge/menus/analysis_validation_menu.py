@@ -381,7 +381,7 @@ def analyze_properties_menu():
             get_path_with_history,
             get_folder_path,
         )
-        from dataset_forge.utils.printing import print_info, print_warning
+        from dataset_forge.utils.printing import print_info, print_warning, print_prompt
         from dataset_forge.utils.menu import show_menu
 
         # Prompt for input type
@@ -390,6 +390,10 @@ def analyze_properties_menu():
             "2": ("🖼️ Single Image", "image"),
             "0": ("⬅️  Back", None),
         }
+
+        hq = None
+        lq = None
+
         while True:
             key = show_menu("Select input type", input_type_options, Mocha.lavender)
             if key is None or key == "0":
@@ -406,7 +410,7 @@ def analyze_properties_menu():
                     allow_single_folder=True,
                 )
                 break
-            elif input_type == "2":
+            elif key == "2":
                 while True:
                     image_path = get_path_with_history("🖼️ Enter image file path:")
                     from dataset_forge.utils.file_utils import is_image_file
@@ -428,17 +432,21 @@ def analyze_properties_menu():
         method_options = {
             "1": ("🧪 getnative (VapourSynth, Python)", "getnative"),
             "2": ("⚡ resdet (C binary, fast)", "resdet"),
+            "3": ("🔢 GetFnative (Fractional resolution)", "getfnative"),
+            "4": ("🔧 getfscaler (Kernel detection)", "getfscaler"),
             "0": ("⬅️  Back", None),
         }
+
         while True:
-            key = show_menu(
+            method_key = show_menu(
                 "Choose native resolution detection method",
                 method_options,
                 Mocha.lavender,
             )
-            if key is None or key == "0":
+            if method_key is None or method_key == "0":
                 return
-            if key == "1":
+            if method_key == "1":
+                # getnative method
                 from dataset_forge.actions.getnative_actions import (
                     find_native_resolution,
                 )
@@ -448,22 +456,50 @@ def analyze_properties_menu():
                 else:
                     find_native_resolution(hq)
                 break
-            elif method == "2":
+            elif method_key == "2":
+                # resdet method
                 from dataset_forge.actions.getnative_actions import (
                     find_native_resolution_resdet,
                 )
 
                 if lq is not None:
-                    print_info(
-                        "resdet only supports single image input. Please select a single image."
+                    print_warning(
+                        "⚠️  resdet only supports single image input. Please select a single image."
                     )
+                    print_info("🔄 Returning to input type selection...")
+                    continue  # Go back to input type selection
                 else:
                     find_native_resolution_resdet(hq)
+                break
+            elif method_key == "3":
+                # GetFnative method
+                from dataset_forge.actions.getnative_actions import (
+                    find_native_resolution_getfnative,
+                )
+
+                if lq is not None:
+                    find_native_resolution_getfnative(hq, lq)
+                else:
+                    find_native_resolution_getfnative(hq)
+                break
+            elif method_key == "4":
+                # getfscaler method
+                from dataset_forge.actions.getnative_actions import (
+                    find_native_resolution_getfscaler,
+                )
+
+                if lq is not None:
+                    find_native_resolution_getfscaler(hq, lq)
+                else:
+                    find_native_resolution_getfscaler(hq)
                 break
             else:
                 print_warning("Invalid selection. Please try again.")
 
         # At the end of the workflow, after all processing:
+        from dataset_forge.utils.audio_utils import play_done_sound
+
+        play_done_sound()
         print_prompt("\n⏸️ Press Enter to return to the menu...")
         input()
 

@@ -100,6 +100,8 @@ cd Dataset-Forge
 - [IQA-PyTorch / py-iqa](https://github.com/chaofengc/IQA-PyTorch)
 - [imagededup](https://github.com/idealo/imagededup)
 - [ffmpeg](https://ffmpeg.org/) | [ffmpeg builds](https://www.gyan.dev/ffmpeg/builds/)
+- [GetFnative](https://github.com/YomikoR/GetFnative)
+- [getfscaler](https://github.com/Jaded-Encoding-Thaumaturgy/getfscaler)
 
 ---
 
